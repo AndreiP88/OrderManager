@@ -106,13 +106,13 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT DISTINCT machine FROM Info"
+                    CommandText = @"SELECT DISTINCT id FROM machines"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
-                    String machine = sqlReader["machine"].ToString();
+                    String machine = sqlReader["id"].ToString();
 
                     GetValueFromOrdersBase order = new GetValueFromOrdersBase(dataBase, machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
 
@@ -223,7 +223,7 @@ namespace OrderManager
 
                         using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                         {
-                            string commandText = "UPDATE Info SET nameOfExecutor = @currentUser " +
+                            string commandText = "UPDATE machinesInfo SET nameOfExecutor = @currentUser " +
                                 "WHERE (machine = @machine)";
 
                             SQLiteCommand Command = new SQLiteCommand(commandText, Connect);

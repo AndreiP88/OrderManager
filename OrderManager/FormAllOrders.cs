@@ -148,13 +148,13 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT DISTINCT machine FROM Info"
+                    CommandText = @"SELECT DISTINCT id FROM machines"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    comboBox1.Items.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                    comboBox1.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();

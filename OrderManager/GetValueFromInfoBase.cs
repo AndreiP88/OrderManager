@@ -24,22 +24,22 @@ namespace OrderManager
 
         public String GetMachineName(String machine)
         {
-            return GetValue("machine", machine, "machineName");
+            return GetValueMachines("id", machine, "name");
         }
 
         public String GetMachineFromName(String machineName)
         {
-            return GetValue("machineName", machineName, "machine");
+            return GetValueMachines("name", machineName, "id");
+        }
+
+        public String GetCategoryMachine(String machine)
+        {
+            return GetValueMachines("id", machine, "category");
         }
 
         public String GetActiveOrder(String machine)
         {
             return GetValue("machine", machine, "activeOrder");
-        }
-
-        public String GetCategoryMachine(String machine)
-        {
-            return GetValue("machine", machine, "category");
         }
 
         public String GetCurrentOrderNumber(String machine)
@@ -72,6 +72,31 @@ namespace OrderManager
             return GetValueTwoParam("currentOrder", orderNumber, "currentModification", orderModification, "machine");
         }
 
+        private String GetValueMachines(String findColomnName, String findParameter, String valueColomn)
+        {
+            String result = "";
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machines WHERE " + findColomnName + " = '" + findParameter + "'"
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader[valueColomn].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
         private String GetValue(String findColomnName, String findParameter, String valueColomn)
         {
             String result = "";
@@ -82,7 +107,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM Info WHERE " + findColomnName + " = '" + findParameter + "'"
+                    CommandText = @"SELECT * FROM machinesInfo WHERE " + findColomnName + " = '" + findParameter + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
@@ -107,7 +132,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM Info WHERE " + findColomnName + " = '" + findParameter + "' AND " + findColomnName2 + " = '" + findParameter2 + "'"
+                    CommandText = @"SELECT * FROM machinesInfo WHERE " + findColomnName + " = '" + findParameter + "' AND " + findColomnName2 + " = '" + findParameter2 + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 

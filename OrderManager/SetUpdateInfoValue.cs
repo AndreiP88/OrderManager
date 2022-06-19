@@ -33,7 +33,7 @@ namespace OrderManager
         {
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                string commandText = "UPDATE Info SET currentCounterRepeat = @currentCounterRepeat, currentOrder = @currentOrder, " +
+                string commandText = "UPDATE machinesInfo SET currentCounterRepeat = @currentCounterRepeat, currentOrder = @currentOrder, " +
                     "currentModification = @currentModification, lastOrder = @lastOrder, lastModification = @lastModification, activeOrder = @activeOrder " +
                     "WHERE (machine = @machine)";
 

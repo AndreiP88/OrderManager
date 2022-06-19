@@ -387,14 +387,14 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT DISTINCT machine FROM Info"
+                    CommandText = @"SELECT DISTINCT id FROM machines"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
-                    if (CheckUserToSelectedMachine(sqlReader["machine"].ToString(), Form1.Info.nameOfExecutor) == true)
-                        comboBox3.Items.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                    if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), Form1.Info.nameOfExecutor) == true)
+                        comboBox3.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                     //else
                         //comboBox3.Items.Add(sqlReader["machine"].ToString());
                 }

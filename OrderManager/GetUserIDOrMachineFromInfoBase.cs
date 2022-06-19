@@ -30,7 +30,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM Info WHERE machine = '" + machine + "'"
+                    CommandText = @"SELECT * FROM machinesInfo WHERE machine = '" + machine + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
@@ -56,7 +56,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM Info WHERE nameOfExecutor = '" + userID + "'"
+                    CommandText = @"SELECT * FROM machinesInfo WHERE nameOfExecutor = '" + userID + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 

@@ -203,13 +203,13 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT DISTINCT machine FROM Info"
+                    CommandText = @"SELECT DISTINCT id FROM machines"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    machine.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                    machine.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();
@@ -1544,22 +1544,22 @@ namespace OrderManager
                         SQLiteCommand Command = new SQLiteCommand
                         {
                             Connection = Connect,
-                            CommandText = @"SELECT * FROM Info"
+                            CommandText = @"SELECT * FROM machines"
                         };
                         SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            if (getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) == category || selectedCategory == 0)
+                            if (getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
                             {
                                 Invoke(new Action(() =>
                                 {
                                     ListViewItem item = new ListViewItem();
 
-                                    item.Name = sqlReader["machine"].ToString();
+                                    item.Name = sqlReader["id"].ToString();
                                     item.Text = (listView.Items.Count + 1).ToString();
-                                    item.SubItems.Add(categoryValue.GetCategoryName(getInfo.GetCategoryMachine(sqlReader["machine"].ToString())));
-                                    item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                                    item.SubItems.Add(categoryValue.GetCategoryName(getInfo.GetCategoryMachine(sqlReader["id"].ToString())));
+                                    item.SubItems.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                                     item.SubItems.Add("");
                                     item.SubItems.Add("");
 
@@ -1583,16 +1583,16 @@ namespace OrderManager
                         SQLiteCommand Command = new SQLiteCommand
                         {
                             Connection = Connect,
-                            CommandText = @"SELECT * FROM Info"
+                            CommandText = @"SELECT * FROM machines"
                         };
                         SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            if (getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) == category || selectedCategory == 0)
+                            if (getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
                             {
-                                List<int> orderCountAmountMonth = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheMonth(date, sqlReader["machine"].ToString()));
-                                List<int> orderCountAmountYear = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheYear(date, sqlReader["machine"].ToString()));
+                                List<int> orderCountAmountMonth = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheMonth(date, sqlReader["id"].ToString()));
+                                List<int> orderCountAmountYear = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheYear(date, sqlReader["id"].ToString()));
 
                                 countMonth = orderCountAmountMonth[0];
                                 amountMonth = orderCountAmountMonth[1];
@@ -1608,7 +1608,7 @@ namespace OrderManager
 
                                 Invoke(new Action(() =>
                                 {
-                                    int index = listView.Items.IndexOfKey(sqlReader["machine"].ToString());
+                                    int index = listView.Items.IndexOfKey(sqlReader["id"].ToString());
 
                                     ListViewItem item = listView.Items[index];
                                     if (item != null)
