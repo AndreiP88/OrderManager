@@ -250,8 +250,11 @@ namespace OrderManager
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
                 string commandText;
+                
+                commandText = "INSERT INTO settings (userID) SELECT * FROM (SELECT @userID) " +
+                    "AS tmp WHERE NOT EXISTS(SELECT userID FROM settings WHERE (userID = @userID) LIMIT 1";
 
-                commandText = "INSERT INTO settings (userID) VALUES (@userID)";
+                /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
 
                 SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@userID", userID);
@@ -275,6 +278,11 @@ namespace OrderManager
         private void button2_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
