@@ -41,7 +41,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM settings WHERE " + findColomnName + " = '" + findParameter + "'"
+                    CommandText = @"SELECT * FROM usersSettings WHERE " + findColomnName + " = '" + findParameter + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 

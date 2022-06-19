@@ -46,7 +46,7 @@ namespace OrderManager
 
         public String GetLastMachineForUser(String id)
         {
-            return GetValue("id", id, "lastMachine");
+            return GetValueInfo("user", id, "lastMachine");
         }
 
         public String GetActiveUser(String id)
@@ -61,7 +61,7 @@ namespace OrderManager
 
         public String GetCurrentShiftStart(String id)
         {
-            return GetValue("id", id, "currentShiftStart");
+            return GetValueInfo("user", id, "currentShiftStart");
         }
         public List<String> GetUserList(bool activeUserOnly)
         {
@@ -101,7 +101,7 @@ namespace OrderManager
         {
             bool result = false;
 
-            if (GetValue("id", id, "currentShiftStart") != "")
+            if (GetValueInfo("user", id, "currentShiftStart") != "")
                 result = true;
 
             return result;
@@ -198,6 +198,31 @@ namespace OrderManager
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM users WHERE " + findColomnName + " = '" + findParameter + "'"
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader[valueColomn].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        private String GetValueInfo(String findColomnName, String findParameter, String valueColomn)
+        {
+            String result = "";
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM usersInfo WHERE " + findColomnName + " = '" + findParameter + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 

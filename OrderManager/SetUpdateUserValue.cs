@@ -23,7 +23,7 @@ namespace OrderManager
 
         public void UpdateLastMachine(String idUser, String newValue)
         {
-            UpdateValue("lastMachine", idUser, newValue);
+            UpdateValueInfo("lastMachine", idUser, newValue);
         }
 
         public void UpdateName(String idUser, String newValue)
@@ -38,7 +38,7 @@ namespace OrderManager
 
         public void UpdateCurrentShiftStart(String idUser, String newValue)
         {
-            UpdateValue("currentShiftStart", idUser, newValue);
+            UpdateValueInfo("currentShiftStart", idUser, newValue);
         }
 
         private void UpdateValue(String colomn, String id, String value)
@@ -47,6 +47,23 @@ namespace OrderManager
             {
                 string commandText = "UPDATE users SET " + colomn + " = @value " +
                     "WHERE (id = @id)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Command.Parameters.AddWithValue("@value", value);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        private void UpdateValueInfo(String colomn, String id, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE usersInfo SET " + colomn + " = @value " +
+                    "WHERE (user = @id)";
 
                 SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);

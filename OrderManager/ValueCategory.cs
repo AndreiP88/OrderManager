@@ -41,7 +41,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM categoryes"
+                    CommandText = @"SELECT * FROM machinesCategoryes"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
@@ -66,7 +66,7 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM categoryes WHERE " + findColomnName + " = '" + findParameter + "'"
+                    CommandText = @"SELECT * FROM machinesCategoryes WHERE " + findColomnName + " = '" + findParameter + "'"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 

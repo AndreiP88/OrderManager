@@ -274,6 +274,24 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText;
+
+                commandText = "INSERT INTO usersInfo (user) " +
+                    "SELECT * FROM (SELECT @userID) " +
+                    "AS tmp WHERE NOT EXISTS(SELECT user FROM usersInfo WHERE user = @userID) LIMIT 1";
+
+                /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@userID", userID);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
