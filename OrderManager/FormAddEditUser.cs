@@ -101,12 +101,16 @@ namespace OrderManager
                 dateTimePicker3.Visible = false;
                 label6.Visible = false;
                 dateTimePicker3.Value = dateTimePicker3.MinDate;
+
+                button3.Visible = true;
             }
             else
             {
                 dateTimePicker3.Visible = true;
                 label6.Visible = true;
                 dateTimePicker3.Text = getInfo.dateOfDismissal;
+
+                button3.Visible = false;
             }
 
             checkBox1.Checked = Convert.ToBoolean(getInfo.activeUser);
@@ -125,6 +129,8 @@ namespace OrderManager
 
             dateTimePicker3.Visible = false;
             dateTimePicker3.Value = dateTimePicker3.MinDate;
+
+            button3.Visible = false;
 
             LoadCategoryes();
         }
@@ -209,10 +215,14 @@ namespace OrderManager
             String patronymic = textBox3.Text;
 
             String dateOfBirth = dateTimePicker1.Value.ToString("dd.MM.yyyy");
-            String dateOfEmployment = dateTimePicker2.Value.ToString("dd.MM.yyyy"); ;
+            String dateOfEmployment = dateTimePicker2.Value.ToString("dd.MM.yyyy");
+            String dateOfDismissal = "";
             String activeUser = checkBox1.Checked.ToString();
 
             String categoryesMachine = GetCategoryesFromLV();
+
+            if (dateTimePicker3.Value != dateTimePicker3.MinDate)
+                dateOfDismissal = dateTimePicker3.Value.ToString("dd.MM.yyyy");
 
             String note = textBox4.Text;
 
@@ -224,9 +234,8 @@ namespace OrderManager
                         "VALUES (@nameUser, @surname, @name, @patronymic, @categoryesMachine, @dateOfBirth, @dateOfEmployment, @activeUser, @note)";
                 else
                     commandText = "UPDATE users SET nameUser = @nameUser, surname = @surname, name = @name, patronymic = @patronymic, categoryesMachine = @categoryesMachine, " +
-                    "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, note = @note " +
+                    "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, dateOfDismissal = @dateOfDismissal, note = @note " +
                     "WHERE id = @userIDLoad";
-
 
                 SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@userIDLoad", userIDLoad);
@@ -238,6 +247,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@dateOfBirth", dateOfBirth);
                 Command.Parameters.AddWithValue("@dateOfEmployment", dateOfEmployment);
                 Command.Parameters.AddWithValue("@activeUser", activeUser);
+                Command.Parameters.AddWithValue("@dateOfDismissal", dateOfDismissal);
                 Command.Parameters.AddWithValue("@note", note);
 
                 Connect.Open();
@@ -283,7 +293,14 @@ namespace OrderManager
 
         private void button3_Click(object sender, EventArgs e)
         {
+            dateTimePicker3.Visible = true;
+            dateTimePicker3.Value = DateTime.Now;
 
+            label6.Visible = true;
+
+            button3.Visible = false;
+
+            checkBox1.Checked = false;
         }
     }
 }
