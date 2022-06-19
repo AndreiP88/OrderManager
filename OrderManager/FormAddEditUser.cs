@@ -202,7 +202,7 @@ namespace OrderManager
         {
             GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
 
-            String shortName = textBox1.Text + " " + textBox2.Text;
+            String shortName = textBox2.Text + " " + textBox1.Text;
 
             String surname = textBox1.Text;
             String name = textBox2.Text;
@@ -250,9 +250,10 @@ namespace OrderManager
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
                 string commandText;
-                
-                commandText = "INSERT INTO settings (userID) SELECT * FROM (SELECT @userID) " +
-                    "AS tmp WHERE NOT EXISTS(SELECT userID FROM settings WHERE (userID = @userID) LIMIT 1";
+
+                commandText = "INSERT INTO settings (userID) " +
+                    "SELECT * FROM (SELECT @userID) " +
+                    "AS tmp WHERE NOT EXISTS(SELECT userID FROM settings WHERE userID = @userID) LIMIT 1";
 
                 /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
 
