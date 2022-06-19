@@ -1,0 +1,461 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace OrderManager
+{
+    internal class GetOrdersFromBase
+    {
+        public class OrdersMonth
+        {
+            public String numberOrder { get; set; }
+            public String modificationOrder { get; set; }
+
+            public OrdersMonth(string numberOrder, string modificationOrder)
+            {
+                this.numberOrder = numberOrder;
+                this.modificationOrder = modificationOrder;
+            }
+
+            public OrdersMonth()
+            {
+            }
+        }
+
+        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
+        String dataBase;
+
+        public GetOrdersFromBase(String dBase)
+        {
+            this.dataBase = dBase;
+
+            if (dataBase == "")
+                dataBase = dataBaseDefault;
+        }
+
+        public String GetNote(String startShift, String numberOfOrder, String modification, String counterRepeat)
+        {
+            return GetValue("note", startShift, numberOfOrder, modification, counterRepeat);
+        }
+
+        public String GetPrivateNote(String startShift, String numberOfOrder, String modification, String counterRepeat)
+        {
+            return GetValue("privateNote", startShift, numberOfOrder, modification, counterRepeat);
+        }
+        public String GetDone(String startShift, String numberOfOrder, String modification, String counterRepeat)
+        {
+            return GetValue("done", startShift, numberOfOrder, modification, counterRepeat);
+        }
+
+        private String GetValue(String nameOfColomn, String startShift, String numberOfOrder, String modification, String counterRepeat)
+        {
+            String result = "";
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE (startOfShift = @startOfShift AND numberOfOrder = @numberOfOrder) AND (modification = @modification AND counterRepeat = @counterRepeat)"
+                };
+                Command.Parameters.AddWithValue("@startOfShift", startShift);
+                Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
+                Command.Parameters.AddWithValue("@modification", modification);
+                Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader[nameOfColomn].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        public int GetCountOrdersFromMachineForTheMonth(DateTime currentDate, String machine)
+        {
+            int count = 0;
+
+            List<int> co = new List<int>((List<int>)GetOrdersFromMachineForTheMonth(currentDate, machine));
+            count = co[0];
+
+            return count;
+        }
+
+        public int GetAmountOrdersFromMachineForTheMonth(DateTime currentDate, String machine)
+        {
+            int amount = 0;
+
+            List<int> am = new List<int>((List<int>)GetOrdersFromMachineForTheMonth(currentDate, machine));
+            amount = am[1];
+
+            return amount;
+        }
+
+        public Object GetOrdersFromMachineForTheMonth(DateTime currentDate, String machine)
+        {
+            int count = 0;
+            int amount = 0;
+
+            List<int> ordersCountAmount = new List<int>();
+
+            List<String> orderList = new List<String>();
+            orderList.Add("null");
+
+            String commandLine;
+
+            commandLine = "(strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+            commandLine += currentDate.ToString("yyyy,MM") + "'";
+            commandLine += " AND machine = '" + machine + "')";
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    String line = sqlReader["numberOfOrder"].ToString() + "," + sqlReader["modification"].ToString();
+
+                    //MessageBox.Show((orderList.Count - 1).ToString() + "(" + orderList.Contains(line).ToString() + "): " + orderList[orderList.Count - 1] + " = " + line);
+
+                    if (!orderList.Contains(line))
+                    {
+                        //MessageBox.Show(orderList[orderList.Count - 1]);
+                        count++;
+                    }
+
+                    orderList.Add(line);
+
+                    amount += Convert.ToInt32(sqlReader["done"]);
+                }
+
+                Connect.Close();
+            }
+
+            ordersCountAmount.Add(count);
+            ordersCountAmount.Add(amount);
+
+            return ordersCountAmount;
+        }
+
+        public Object GetOrdersFromMachineForTheYear(DateTime currentDate, String machine)
+        {
+            int count = 0;
+            int amount = 0;
+
+            List<int> ordersCountAmount = new List<int>();
+
+            List<String> orderList = new List<String>();
+            orderList.Add("null");
+
+            String commandLine;
+
+            commandLine = "(strftime('%Y', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+            commandLine += currentDate.ToString("yyyy") + "'";
+            commandLine += " AND machine = '" + machine + "')";
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    String line = sqlReader["numberOfOrder"].ToString() + "," + sqlReader["modification"].ToString();
+
+                    //MessageBox.Show((orderList.Count - 1).ToString() + "(" + orderList.Contains(line).ToString() + "): " + orderList[orderList.Count - 1] + " = " + line);
+
+                    if (!orderList.Contains(line))
+                    {
+                        //MessageBox.Show(orderList[orderList.Count - 1]);
+                        count++;
+                    }
+
+                    orderList.Add(line);
+
+                    amount += Convert.ToInt32(sqlReader["done"]);
+                }
+
+                Connect.Close();
+            }
+
+            ordersCountAmount.Add(count);
+            ordersCountAmount.Add(amount);
+
+            return ordersCountAmount;
+        }
+
+        public Object GetNumbersOrders(String machine, String numberOfOrder, String modification)
+        {
+            List<String> numbers = new List<String>();
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND (numberOfOrder = @numberOfOrder AND modification = @modification)"
+                };
+                Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
+                Command.Parameters.AddWithValue("@modification", modification);
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    numbers.Add(sqlReader["count"].ToString());
+                }
+
+                Connect.Close();
+            }
+
+            return numbers;
+        }
+
+        public Object LoadAllOrdersFromBase(String startOfShift, String category)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+
+            List<Order> orders = new List<Order>();
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE startOfShift = '" + startOfShift + "'"
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    if (category == getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
+                    {
+                        GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
+                        GetCountOfDone orderCount = new GetCountOfDone(dataBase, startOfShift, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+
+                        int amountThisOrder = Convert.ToInt32(ordersBase.GetValue("amountOfOrder"));
+                        int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
+                        int orderNorm = amountThisOrder * 60 / Convert.ToInt32(ordersBase.GetValue("timeToWork"));
+                        int timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
+
+                        String lastTimeWork = timeOperations.TotalMinutesToHoursAndMinutesStr((lastCount * 60) / orderNorm);
+                        String lastTimeMakeready = LastTimeMakereadyStr(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
+
+                        timeWorkingOut += FullWorkoutTime(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString(),
+                            sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
+
+                        orders.Add(new Order(
+                            sqlReader["machine"].ToString(),
+                            sqlReader["numberOfOrder"].ToString(),
+                            sqlReader["modification"].ToString(),
+                            ordersBase.GetValue("nameOfOrder").ToString(),
+                            amountThisOrder,
+                            lastCount,
+                            lastTimeMakeready,
+                            lastTimeWork,
+                            timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()).ToString(),
+                            timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()).ToString(),
+                            Convert.ToInt32(sqlReader["done"]),
+                            orderNorm,
+                            timeWorkingOut,
+                            "<>",
+                            sqlReader["counterRepeat"].ToString(),
+                            sqlReader["note"].ToString(),
+                            sqlReader["privateNote"].ToString()
+                            ));
+                    }
+                }
+
+                Connect.Close();
+            }
+
+            return orders;
+        }
+
+        private String LastTimeMakereadyStr(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, machine, numberOrder, modificationOrder);
+            GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+
+            String lastTimeMakeready = "00:00";
+
+            String lastTimeMake = timeOperations.DateDifferent(lastTime.GetLastDateTime("timeMakereadyStop"), lastTime.GetLastDateTime("timeMakereadyStart"));
+            int makereadyTime = Convert.ToInt32(ordersBase.GetValue("timeMakeready"));
+
+            //разобраться с условиями не отображается остаток времени на приладку... вродебы работает)
+            //считает только одно предыдущее значение, т.е. если приладка заняла больше двух смен, тло считает только текущую смнену и предыдыдущую...
+            //вероятность того, что такие ситуации будут крайне мала, поэтому оставляю как есть)
+            if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") == "")
+            {
+                lastTimeMakeready = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake);
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") == "")
+            {
+                lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime);
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "")
+            {
+                lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime);
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "")
+            {
+                lastTimeMakeready = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake);
+            }
+            else
+                lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(0);
+
+            return lastTimeMakeready;
+        }
+
+        private int FullWorkoutTime(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat, String timeMkrStop, String timeMkrStart)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, machine, numberOrder, modificationOrder);
+            GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+
+            int makereadyTime = Convert.ToInt32(ordersBase.GetValue("timeMakeready"));
+            int mkrStartStop = timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);
+
+            int mkrWorkingOut = 0;
+
+            if (mkrStartStop > makereadyTime)
+            {
+                mkrWorkingOut = makereadyTime;
+            }
+            else
+            {
+                mkrWorkingOut = mkrStartStop;
+            }
+
+            String lastTimeMake = timeOperations.DateDifferent(lastTime.GetLastDateTime("timeMakereadyStop"), lastTime.GetLastDateTime("timeMakereadyStart")); ;
+
+            int timeWorkingOut = 0;
+
+            if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") == "")
+            {
+                timeWorkingOut += (timeOperations.TimeDifferentToMinutes(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake));
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") != "")
+            {
+                timeWorkingOut += mkrWorkingOut;
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") == "")
+            {
+                if (ordersBase.GetValue("statusOfOrder") != "1" && lastTime.GetNextDateTime("timeMakereadyStart") == "")
+                    timeWorkingOut += makereadyTime;
+                else
+                    timeWorkingOut += mkrWorkingOut;
+            }
+
+            return timeWorkingOut;
+        }
+
+
+
+
+
+
+
+
+        private int FullWorkoutTimeIncorrectJob(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat, String timeMkrStop, String timeMkrStart)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, machine, numberOrder, modificationOrder);
+            GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+
+            int amountThisOrder = Convert.ToInt32(ordersBase.GetValue("amountOfOrder"));
+            int makereadyTime = Convert.ToInt32(ordersBase.GetValue("timeMakeready"));
+
+            String lastTimeMake = timeOperations.DateDifferent(lastTime.GetLastDateTime("timeMakereadyStop"), lastTime.GetLastDateTime("timeMakereadyStart")); ;
+
+            int timeWorkingOut = 0;
+
+            if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") == "")
+            {
+                timeWorkingOut += (timeOperations.TimeDifferentToMinutes(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake));
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") != "")
+            {
+                timeWorkingOut += timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") == "")
+            {
+                timeWorkingOut += makereadyTime;
+            }
+
+            return timeWorkingOut;
+        }
+
+        private int FullWorkoutTimeOld(String startOfShift, String numberOrder, String modificationOrder, String machine, String timeMkrStop, String timeMkrStart)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, machine, numberOrder, modificationOrder);
+            GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, ordersBase.GetValue("counterRepeat").ToString());
+
+            int amountThisOrder = Convert.ToInt32(ordersBase.GetValue("amountOfOrder"));
+            int makereadyTime = Convert.ToInt32(ordersBase.GetValue("timeMakeready"));
+
+            String lastTimeMake = timeOperations.DateDifferent(lastTime.GetLastDateTime("timeMakereadyStop"), lastTime.GetLastDateTime("timeMakereadyStart")); ;
+
+            int timeWorkingOut = 0;
+
+            if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "")
+            {
+                if (ordersBase.GetValue("statusOfOrder") != "1")
+                    timeWorkingOut += (timeOperations.TimeDifferentToMinutes(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake));
+                else
+                    timeWorkingOut += timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);
+            }
+            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "")
+            {
+                if (ordersBase.GetValue("statusOfOrder") != "1")
+                    timeWorkingOut += makereadyTime;
+                else
+                    timeWorkingOut += timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);
+
+            }
+
+            return timeWorkingOut;
+        }
+
+
+
+
+
+
+
+
+
+    }
+}

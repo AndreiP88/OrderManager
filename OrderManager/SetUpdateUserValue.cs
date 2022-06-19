@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OrderManager
+{
+    internal class SetUpdateUsersBase
+    {
+        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
+        String dataBase;
+
+        public SetUpdateUsersBase(String dBase)
+        {
+            this.dataBase = dBase;
+
+            if (dataBase == "")
+                dataBase = dataBaseDefault;
+        }
+
+        public void UpdateLastMachine(String idUser, String newValue)
+        {
+            UpdateValue("lastMachine", idUser, newValue);
+        }
+
+        public void UpdateName(String idUser, String newValue)
+        {
+            UpdateValue("nameUser", idUser, newValue);
+        }
+
+        public void UpdatePassword(String idUser, String newValue)
+        {
+            UpdateValue("passwordUser", idUser, newValue);
+        }
+
+        public void UpdateCurrentShiftStart(String idUser, String newValue)
+        {
+            UpdateValue("currentShiftStart", idUser, newValue);
+        }
+
+        private void UpdateValue(String colomn, String id, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE users SET " + colomn + " = @value " +
+                    "WHERE (id = @id)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Command.Parameters.AddWithValue("@value", value);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+    }
+}
