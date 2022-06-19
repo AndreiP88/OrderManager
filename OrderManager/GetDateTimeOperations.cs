@@ -37,23 +37,28 @@ namespace OrderManager
         {
             String result;
 
-            switch (year % 10)
+            if (year > 4 && year < 21)
+                result = "лет";
+            else
             {
-                case 1:
-                    result = "год";
-                    break;
-                case 2:
-                    result = "года";
-                    break;
-                case 3:
-                    result = "года";
-                    break;
-                case 4:
-                    result = "года";
-                    break;
-                default:
-                    result = "лет";
-                    break;
+                switch (year % 10)
+                {
+                    case 1:
+                        result = "год";
+                        break;
+                    case 2:
+                        result = "года";
+                        break;
+                    case 3:
+                        result = "года";
+                        break;
+                    case 4:
+                        result = "года";
+                        break;
+                    default:
+                        result = "лет";
+                        break;
+                }
             }
 
             return result;
@@ -63,23 +68,28 @@ namespace OrderManager
         {
             String result;
 
-            switch (month % 10)
+            if (month > 4 && month < 21)
+                result = "месяцев";
+            else
             {
-                case 1:
-                    result = "месяц";
-                    break;
-                case 2:
-                    result = "месяца";
-                    break;
-                case 3:
-                    result = "месяца";
-                    break;
-                case 4:
-                    result = "месяца";
-                    break;
-                default:
-                    result = "месяцев";
-                    break;
+                switch (month % 10)
+                {
+                    case 1:
+                        result = "месяц";
+                        break;
+                    case 2:
+                        result = "месяца";
+                        break;
+                    case 3:
+                        result = "месяца";
+                        break;
+                    case 4:
+                        result = "месяца";
+                        break;
+                    default:
+                        result = "месяцев";
+                        break;
+                }
             }
 
             return result;

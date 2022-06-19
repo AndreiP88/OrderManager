@@ -132,11 +132,13 @@ namespace OrderManager
             "№;30",
             "Имя;180",
             "Полное имя;180",
-            "Рабочий участок;260",
+            "Рабочий участок;200",
             "Дата трудоустройства;160",
-            "Стаж;80",
+            "Дата увольнения;160",
+            "Стаж;120",
             "Дата рождения;160",
-            "Возраст;60"
+            "Возраст;90",
+            "Примечание;180",
         };
 
         private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
@@ -1950,9 +1952,11 @@ namespace OrderManager
                         item.SubItems.Add(currentUserInfo[i].surname + " " + currentUserInfo[i].name + " " + currentUserInfo[i].patronymic);
                         item.SubItems.Add(catLine);
                         item.SubItems.Add(currentUserInfo[i].dateOfEmployment);
+                        item.SubItems.Add(currentUserInfo[i].dateOfDismissal);
                         item.SubItems.Add(wExperience);
                         item.SubItems.Add(currentUserInfo[i].dateOfBirth);
                         item.SubItems.Add(userAge);
+                        item.SubItems.Add(currentUserInfo[i].note);
                         Invoke(new Action(() => listView.Items.Add(item)));
                     }
                 }
@@ -1960,7 +1964,6 @@ namespace OrderManager
                 break;
             }
         }
-
 
         private void LoadPage(int page)
         {
