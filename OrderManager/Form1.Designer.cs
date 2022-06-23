@@ -726,7 +726,7 @@ namespace OrderManager
             // columnHeader9
             // 
             this.columnHeader9.Text = "Примечание";
-            this.columnHeader9.Width = 223;
+            this.columnHeader9.Width = 167;
             // 
             // columnHeader13
             // 

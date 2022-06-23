@@ -401,7 +401,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                string commandText = "UPDATE Info SET nameOfExecutor = '', currentCounterRepeat = '', " +
+                string commandText = "UPDATE machinesInfo SET nameOfExecutor = '', currentCounterRepeat = '', " +
                     "currentOrder = '', currentModification = '', activeOrder = 'False' " + // проверить актив ордер
                     "WHERE (machine = @machine)";
 

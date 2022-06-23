@@ -184,6 +184,7 @@
             this.button8.Text = "Оборудование";
             this.button8.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // timer1
             // 

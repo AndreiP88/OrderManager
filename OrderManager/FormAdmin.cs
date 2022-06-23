@@ -141,6 +141,14 @@ namespace OrderManager
             "Примечание;180",
         };
 
+        String[] columnHeadersMachines = {
+            "№;30",
+            "Оборудование;180",
+            "Дата начала работы;200",
+            "Время работы;160",
+            "Примечание;360",
+        };
+
         private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
         {
             timer1.Enabled = false;
@@ -1965,6 +1973,73 @@ namespace OrderManager
             }
         }
 
+        private void LoadMachinesAndCategoryesFromBase()
+        {
+            CancellationToken token;
+
+            ValueCategory getCategoryes = new ValueCategory(dataBase);
+            GetValueFromInfoBase getMachines = new GetValueFromInfoBase(dataBase);
+
+            GetDateTimeOperations getTime = new GetDateTimeOperations();
+
+            Label label1 = (Label)ControlFromKey("tableLayoutPanelControl", "label1");
+            Label label2 = (Label)ControlFromKey("tableLayoutPanelControl", "label2");
+            Label label3 = (Label)ControlFromKey("tableLayoutPanelControl", "label3");
+
+            Label label4 = (Label)ControlFromKey("tableLayoutPanelControl", "label4");
+            Label label5 = (Label)ControlFromKey("tableLayoutPanelControl", "label5");
+            Label label6 = (Label)ControlFromKey("tableLayoutPanelControl", "label6");
+
+            List<String> categoryes = new List<String>(getCategoryes.GetCategoryesList());
+
+            while (!token.IsCancellationRequested)
+            {
+                thJob = true;
+
+                var name = "listView";
+                if (tableLayoutPanel1.Controls.ContainsKey(name))
+                {
+                    var control = tableLayoutPanel1.Controls.Find(name, false);
+                    ListView listView = (ListView)control[0];
+
+                    Invoke(new Action(() =>
+                    {
+                        listView.Items.Clear();
+                    }));
+
+                    for (int i = 0; i < categoryes.Count; i++)
+                    {
+                        List<String> machines = new List<String>(getMachines.GetMachinesList(getCategoryes.GetCategoryFromName(categoryes[i])));
+
+                        ListViewGroup listViewGroup = new ListViewGroup(categoryes[i]);
+                        listViewGroup.Name = categoryes[i];
+
+                        Invoke(new Action(() => listView.Groups.Add(listViewGroup)));
+
+                        for (int j = 0; j < machines.Count; j++)
+                        {
+                            String timeStartWork = getMachines.GetMachineStartWork(machines[j]);
+                            String timeWork = getTime.WorkExperience(DateTime.Now.ToString(), timeStartWork);
+
+                            ListViewItem itemMachine = new ListViewItem(listViewGroup);
+
+                            itemMachine.Name = machines[j];
+                            itemMachine.Text = (j + 1).ToString();
+                            itemMachine.SubItems.Add(getMachines.GetMachineName(machines[j]));
+                            itemMachine.SubItems.Add(timeStartWork);
+                            itemMachine.SubItems.Add(timeWork);
+                            itemMachine.SubItems.Add(getMachines.GetMachineNote(machines[j]));
+
+                            Invoke(new Action(() => listView.Items.Add(itemMachine)));
+                        }
+
+                    }
+                }
+                thJob = false;
+                break;
+            }
+        }
+
         private void LoadPage(int page)
         {
             List<ColumnHeader> head;
@@ -2019,6 +2094,13 @@ namespace OrderManager
                     head = new List<ColumnHeader>(ListHeaders(columnHeadersUsers));
                     CreateListView(head);
                     LoadUsersFromBase();
+                    break;
+                case 8:
+                    tableLayoutPanel1.RowStyles[1].Height = 90;
+                    CreateMachineControls();
+                    head = new List<ColumnHeader>(ListHeaders(columnHeadersMachines));
+                    CreateListView(head);
+                    LoadMachinesAndCategoryesFromBase();
                     break;
                 default:
                     break; 
@@ -2373,6 +2455,12 @@ namespace OrderManager
         private void button7_Click(object sender, EventArgs e)
         {
             currentPage = 7;
+            LoadPage(currentPage);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            currentPage = 8;
             LoadPage(currentPage);
         }
     }

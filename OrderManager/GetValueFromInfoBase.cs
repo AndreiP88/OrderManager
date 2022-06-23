@@ -37,6 +37,16 @@ namespace OrderManager
             return GetValueMachines("id", machine, "category");
         }
 
+        public String GetMachineStartWork(String machine)
+        {
+            return GetValueMachines("id", machine, "dateStartWork");
+        }
+
+        public String GetMachineNote(String machine)
+        {
+            return GetValueMachines("id", machine, "note");
+        }
+
         public String GetActiveOrder(String machine)
         {
             return GetValue("machine", machine, "activeOrder");
@@ -72,6 +82,58 @@ namespace OrderManager
             return GetValueTwoParam("currentOrder", orderNumber, "currentModification", orderModification, "machine");
         }
 
+        /// <summary>
+        /// Получить список всего оборудования
+        /// </summary>
+        /// <returns>List содержащий все оборудование</returns>
+        public List<String> GetMachinesList()
+        {
+            List<String> machinesList = new List<String>(GetMachines(""));
+
+            return machinesList;
+        }
+
+        /// <summary>
+        /// Получить список оборудования указанной категории
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns>List содержащий оборудование выбранной категории</returns>
+        public List<String> GetMachinesList(String category)
+        {
+            List<String> machinesList = new List<String>(GetMachines(category));
+
+            return machinesList;
+        }
+
+        private List<String> GetMachines(String category)
+        {
+            List<String> machinesList = new List<String>();
+
+            String commLine = "";
+
+            if (category != "")
+                commLine = " WHERE category = '" + category + "'";
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machines" + commLine
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    machinesList.Add(sqlReader["id"].ToString());
+                }
+
+                Connect.Close();
+            }
+
+            return machinesList;
+        }
         private String GetValueMachines(String findColomnName, String findParameter, String valueColomn)
         {
             String result = "";
