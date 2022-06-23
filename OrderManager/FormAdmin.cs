@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,36 @@ namespace OrderManager
             public MyListView()
             {
                 DoubleBuffered = true;
+            }
+
+            public event EventHandler<int> GroupHeaderClick;
+            protected virtual void OnGroupHeaderClick(int e)
+            {
+                var handler = GroupHeaderClick;
+                if (handler != null) handler(this, e);
+            }
+            private const int LVM_HITTEST = 0x1000 + 18;
+            private const int LVHT_EX_GROUP_HEADER = 0x10000000;
+            [StructLayout(LayoutKind.Sequential)]
+            private struct LVHITTESTINFO
+            {
+                public int pt_x;
+                public int pt_y;
+                public int flags;
+                public int iItem;
+                public int iSubItem;
+                public int iGroup;
+            }
+            [DllImport("user32.dll", EntryPoint = "SendMessage", CharSet = CharSet.Auto)]
+            private static extern int SendMessage(IntPtr hWnd, int msg,
+                int wParam, ref LVHITTESTINFO ht);
+            protected override void OnMouseDown(MouseEventArgs e)
+            {
+                base.OnMouseDown(e);
+                var ht = new LVHITTESTINFO() { pt_x = e.X, pt_y = e.Y };
+                var value = SendMessage(this.Handle, LVM_HITTEST, -1, ref ht);
+                if (value != -1 && (ht.flags & LVHT_EX_GROUP_HEADER) != 0)
+                    OnGroupHeaderClick(value);
             }
         }
 
@@ -254,6 +285,20 @@ namespace OrderManager
             form.ShowDialog();
         }
 
+        private void ShowAddCategoryForm()
+        {
+            FormAddEditCategory form = new FormAddEditCategory(dataBase);
+
+            form.ShowDialog();
+        }
+
+        private void ShowAddMachineForm()
+        {
+            FormAddEditMachine form = new FormAddEditMachine(dataBase);
+
+            form.ShowDialog();
+        }
+
         private void ShowEditUserForm(String userID)
         {
             FormAddEditUser form = new FormAddEditUser(dataBase, userID);
@@ -322,6 +367,7 @@ namespace OrderManager
 
             //listView.Tag = listView.SelectedItems[0].Name;
             listView.DoubleClick += new EventHandler(ListViewDoubleClick);
+            listView.GroupHeaderClick += myListView_GroupHeaderClick;
             //Controls.Add(listView);
         }
 
@@ -879,6 +925,17 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add(editButton, 0, 1);
             editButton.Click += new System.EventHandler(editButton_Click);
 
+            Button deleteButton = new Button();
+            deleteButton.Name = "deleteButton";
+            deleteButton.Dock = DockStyle.Fill;
+            deleteButton.Location = new System.Drawing.Point(3, 3);
+            deleteButton.Size = new System.Drawing.Size(144, 21);
+            deleteButton.TabIndex = 0;
+            deleteButton.Text = "Удалить";
+            deleteButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(deleteButton, 0, 2);
+            //deleteButton.Click += new System.EventHandler(deleteButton_Click);
+
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "Всего записей:", ContentAlignment.MiddleRight), 1, 0);
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label1", "", ContentAlignment.MiddleLeft), 2, 0);
 
@@ -904,8 +961,8 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
 
@@ -914,27 +971,74 @@ namespace OrderManager
             tableLayoutPanelControl.Visible = true;
             tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 1);
 
-            Button categoryButton = new Button();
-            categoryButton.Name = "categoryButton";
-            categoryButton.Dock = DockStyle.Fill;
-            categoryButton.Location = new System.Drawing.Point(3, 3);
-            categoryButton.Size = new System.Drawing.Size(144, 21);
-            categoryButton.TabIndex = 0;
-            categoryButton.Text = "Добавить";
-            categoryButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(categoryButton, 0, 0);
-            //categoryButton.Click += new System.EventHandler(categoryButton_Click);
+            Button addCategoryButton = new Button();
+            addCategoryButton.Name = "addCategoryButton";
+            addCategoryButton.Dock = DockStyle.Fill;
+            addCategoryButton.Location = new System.Drawing.Point(3, 3);
+            addCategoryButton.Size = new System.Drawing.Size(144, 21);
+            addCategoryButton.TabIndex = 0;
+            addCategoryButton.Text = "Добавить участок";
+            addCategoryButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(addCategoryButton, 0, 0);
+            addCategoryButton.Click += new System.EventHandler(addButton_Click);
 
-            Button addButton = new Button();
-            addButton.Name = "addButton";
-            addButton.Dock = DockStyle.Fill;
-            addButton.Location = new System.Drawing.Point(3, 3);
-            addButton.Size = new System.Drawing.Size(144, 21);
-            addButton.TabIndex = 0;
-            addButton.Text = "Добавить";
-            addButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
-            addButton.Click += new System.EventHandler(addButton_Click);
+            Button editCategoryButton = new Button();
+            editCategoryButton.Name = "editCategoryButton";
+            editCategoryButton.Dock = DockStyle.Fill;
+            editCategoryButton.Location = new System.Drawing.Point(3, 3);
+            editCategoryButton.Size = new System.Drawing.Size(144, 21);
+            editCategoryButton.TabIndex = 0;
+            editCategoryButton.Text = "Редактировать участок";
+            editCategoryButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(editCategoryButton, 0, 1);
+            editCategoryButton.Click += new System.EventHandler(editButton_Click);
+
+            Button deleteCategoryeButton = new Button();
+            deleteCategoryeButton.Name = "deleteCategoryeButton";
+            deleteCategoryeButton.Dock = DockStyle.Fill;
+            deleteCategoryeButton.Location = new System.Drawing.Point(3, 3);
+            deleteCategoryeButton.Size = new System.Drawing.Size(144, 21);
+            deleteCategoryeButton.TabIndex = 0;
+            deleteCategoryeButton.Text = "Удалить участок";
+            deleteCategoryeButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(deleteCategoryeButton, 0, 2);
+            //addMachineButton.Click += new System.EventHandler(deleteButton_Click);
+
+
+            Button addMachineButton = new Button();
+            addMachineButton.Name = "addMachineButton";
+            addMachineButton.Dock = DockStyle.Fill;
+            addMachineButton.Location = new System.Drawing.Point(3, 3);
+            addMachineButton.Size = new System.Drawing.Size(144, 21);
+            addMachineButton.TabIndex = 0;
+            addMachineButton.Text = "Добавить оборудование";
+            addMachineButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(addMachineButton, 1, 0);
+            addMachineButton.Click += new System.EventHandler(addButton_Click);
+
+            Button editMachineButton = new Button();
+            editMachineButton.Name = "editMachineButton";
+            editMachineButton.Dock = DockStyle.Fill;
+            editMachineButton.Location = new System.Drawing.Point(3, 3);
+            editMachineButton.Size = new System.Drawing.Size(144, 21);
+            editMachineButton.TabIndex = 0;
+            editMachineButton.Text = "Редактировать оборудование";
+            editMachineButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(editMachineButton, 1, 1);
+            editMachineButton.Click += new System.EventHandler(editButton_Click);
+
+            Button deleteMachineButton = new Button();
+            deleteMachineButton.Name = "deleteMachineButton";
+            deleteMachineButton.Dock = DockStyle.Fill;
+            deleteMachineButton.Location = new System.Drawing.Point(3, 3);
+            deleteMachineButton.Size = new System.Drawing.Size(144, 21);
+            deleteMachineButton.TabIndex = 0;
+            deleteMachineButton.Text = "Удалить оборудование";
+            deleteMachineButton.Visible = true;
+            tableLayoutPanelControl.Controls.Add(deleteMachineButton, 1, 2);
+            //deleteMachineButton.Click += new System.EventHandler(deleteButton_Click_Click);
+
+            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "", ContentAlignment.MiddleRight), 2, 0);
         }
 
         private void CreateNormControls()
@@ -2132,6 +2236,12 @@ namespace OrderManager
                 case 6:
                     StartLoadNormFromBase();
                     break;
+                case 7:
+                    LoadUsersFromBase();
+                    break;
+                case 8:
+                    LoadMachinesAndCategoryesFromBase();
+                    break;
                 default:
                     break;
             }
@@ -2221,13 +2331,27 @@ namespace OrderManager
                     LoadUsersFromBase();
                     break;
 
+                case 8:
+                    MessageBox.Show(((ListView)sender).Items[((ListView)sender).SelectedIndices[0]].Group.Name);
+                    LoadMachinesAndCategoryesFromBase();
+                    break;
+
                 default:
                     break;
             }            
         }
 
+        private void myListView_GroupHeaderClick(object sender, int e)
+        {
+            //Show ContextMenuStrip here. Or just for example:
+            //MessageBox.Show(((ListView)sender).Groups[e].Header);
+            //MessageBox.Show(e.ToString());
+        }
+
         private void addButton_Click(object sender, EventArgs e)
         {
+            Button addButton = (Button)ControlFromKey("tableLayoutPanelControl", "addCategoryButton");
+
             switch (currentPage)
             {
                 case 1:
@@ -2244,19 +2368,27 @@ namespace OrderManager
                     break;
                 case 5:
                     ShowFullOrdersForm(false, 0);
-                    StartLoadingAllOrders();
+                    //StartLoadingAllOrders();
                     break;
                 case 6:
 
                     break;
                 case 7:
                     ShowAddUserForm();
-                    LoadUsersFromBase();
+                    //LoadUsersFromBase();
+                    break;
+                case 8:
+                    if (((Button)sender).Name == "addCategoryButton")
+                        ShowAddCategoryForm();
+                    if (((Button)sender).Name == "addMachineButton")
+                        ShowAddMachineForm();
+                        //LoadUsersFromBase();
                     break;
 
                 default:
                     break;
             }
+            UpdatePage(currentPage);
         }
 
         private void editButton_Click(object sender, EventArgs e)

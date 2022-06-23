@@ -93,6 +93,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormAddEditMachine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddEditMachine.Designer.cs">
+      <DependentUpon>FormAddEditMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormAddEditCategory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddEditCategory.Designer.cs">
+      <DependentUpon>FormAddEditCategory.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAddEditUser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -210,6 +222,12 @@
     <Compile Include="SetUpdateInfoValue.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ValueCategory.cs" />
+    <EmbeddedResource Include="FormAddEditMachine.resx">
+      <DependentUpon>FormAddEditMachine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormAddEditCategory.resx">
+      <DependentUpon>FormAddEditCategory.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormAddEditUser.resx">
       <DependentUpon>FormAddEditUser.cs</DependentUpon>
     </EmbeddedResource>
