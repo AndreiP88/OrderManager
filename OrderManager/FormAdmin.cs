@@ -271,9 +271,9 @@ namespace OrderManager
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(true, dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectedIndex].numberOfOrder, ordersNumbers[selectedIndex].modificationOfOrder);
+                form = new FormAddNewOrder(dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectedIndex].numberOfOrder, ordersNumbers[selectedIndex].modificationOfOrder);
             else
-                form = new FormAddNewOrder(false, dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text), "", "");
+                form = new FormAddNewOrder(dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text));
 
             form.ShowDialog();
         }
@@ -285,11 +285,89 @@ namespace OrderManager
             form.ShowDialog();
         }
 
+        private void ShowEditUserForm(String userID)
+        {
+            FormAddEditUser form = new FormAddEditUser(dataBase, userID);
+
+            form.ShowDialog();
+        }
+
+        private void DeleteUser(String id)
+        {
+            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+
+            DialogResult result;
+            result = MessageBox.Show("Вы действительно хотите удалить сотрудника " + getUser.GetNameUser(id) + "?", "Удаление сотрудника", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    string commandText = "DELETE FROM users WHERE id = @id";
+
+                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", id);
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    string commandText = "DELETE FROM usersInfo WHERE user = @id";
+
+                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", id);
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    string commandText = "DELETE FROM usersSettings WHERE userID = @id";
+
+                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", id);
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+            }
+        }
+
         private void ShowAddCategoryForm()
         {
             FormAddEditCategory form = new FormAddEditCategory(dataBase);
 
             form.ShowDialog();
+        }
+
+        private void ShowEditCategoryForm(String categoryID)
+        {
+            FormAddEditCategory form = new FormAddEditCategory(dataBase, categoryID);
+
+            form.ShowDialog();
+        }
+
+        private void DeleteCategory(String id)
+        {
+            ValueCategory getCategory = new ValueCategory(dataBase);
+
+            DialogResult result;
+            result = MessageBox.Show("Вы действительно хотите удалить участок '" + getCategory.GetCategoryName(id) + "'?", "Удаление участка", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    string commandText = "DELETE FROM machinesCategoryes WHERE id = @id";
+
+                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", id);
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+            }
         }
 
         private void ShowAddMachineForm()
@@ -299,11 +377,43 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void ShowEditUserForm(String userID)
+        private void ShowEditMachineForm(String machineID)
         {
-            FormAddEditUser form = new FormAddEditUser(dataBase, userID);
+            FormAddEditMachine form = new FormAddEditMachine(dataBase, machineID);
 
             form.ShowDialog();
+        }
+
+        private void DeleteMachine(String id)
+        {
+            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+
+            DialogResult result;
+            result = MessageBox.Show("Вы действительно хотите удалить оборудование '" + getInfo.GetMachineName(id) + "'?", "Удаление оборудования", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    string commandText = "DELETE FROM machines WHERE id = @id";
+
+                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", id);
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    string commandText = "DELETE FROM machinesInfo WHERE machine = @id";
+
+                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", id);
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+            }
         }
 
         private void DeactivateOrder(String machine, String orderNumber, String orderModification, String newStatus)
@@ -367,6 +477,7 @@ namespace OrderManager
 
             //listView.Tag = listView.SelectedItems[0].Name;
             listView.DoubleClick += new EventHandler(ListViewDoubleClick);
+            listView.SelectedIndexChanged += new EventHandler(listView_SelectedIndexChanged);
             listView.GroupHeaderClick += myListView_GroupHeaderClick;
             //Controls.Add(listView);
         }
@@ -386,36 +497,133 @@ namespace OrderManager
 
             ContextMenuStrip menu = new ContextMenuStrip();
 
-            ToolStripMenuItem viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem deactivateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem deleteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem viewToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "viewToolStripMenuItem",
+                Text = "Просмотр"
+            }; 
 
-            menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            viewToolStripMenuItem,
-            editToolStripMenuItem,
-            deactivateToolStripMenuItem,
-            deleteToolStripMenuItem1});
+            ToolStripMenuItem editToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "editToolStripMenuItem",
+                Text = "Редактировать"
+            };
+
+            ToolStripMenuItem deactivateToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "deactivateToolStripMenuItem",
+                Text = "Деактивировать"
+            };
+            //Список заказов
+
+            ToolStripMenuItem editCategoryItem = new ToolStripMenuItem
+            {
+                Name = "editCategoryItem",
+                Text = "Редактировать участок"
+            };
+
+            ToolStripMenuItem editMachineItem = new ToolStripMenuItem
+            {
+                Name = "editMachineItem",
+                Text = "Редактировать оборудование"
+            };
+
+            ToolStripMenuItem deleteditCategoryItem = new ToolStripMenuItem
+            {
+                Name = "editCategoryItem",
+                Text = "Удалить участок"
+            };
+
+            ToolStripMenuItem deleteMachineItem = new ToolStripMenuItem
+            {
+                Name = "editMachineItem",
+                Text = "Удалить оборудование"
+            };
+            //Оборудование по категориям
+
+            ToolStripMenuItem editUserItem = new ToolStripMenuItem
+            {
+                Name = "editUserItem",
+                Text = "Редактировать"
+            };
+
+            ToolStripMenuItem deleteUserItem = new ToolStripMenuItem
+            {
+                Name = "deleteUserItem",
+                Text = "Удалить"
+            };
+            //Сотрудники
+
+            ToolStripMenuItem deleteItem = new ToolStripMenuItem
+            {
+                Name = "deleteToolStripMenuItem1",
+                Text = "Удалить"
+            };
+
+            ToolStripItem[] items = new ToolStripItem[] {};
+
+            switch (currentPage)
+            {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    items = new ToolStripItem[] 
+                    {
+                        viewToolStripMenuItem,
+                        editToolStripMenuItem,
+                        deactivateToolStripMenuItem
+                    };
+                   break;
+                case 6:
+
+                    break;
+                case 7:
+                    items = new ToolStripItem[]
+                    {
+                        editUserItem,
+                        deleteUserItem
+                    };
+                    break;
+
+                case 8:
+                    items = new ToolStripItem[]
+                    {
+                        editCategoryItem,
+                        editMachineItem,
+                        deleteditCategoryItem,
+                        deleteMachineItem
+                    };
+                    break;
+
+                default:
+                    break;
+            }
+
+            menu.Items.AddRange(items);
+
             menu.Name = "contextMenuStrip";
-            menu.Size = new System.Drawing.Size(163, 92);
-            menu.Opening += new System.ComponentModel.CancelEventHandler(contextMenuStrip_Opening);
+            menu.Size = new Size(163, 92);
+            menu.Opening += new CancelEventHandler(contextMenuStrip_Opening);
 
-            viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            viewToolStripMenuItem.Text = "Просмотр";
-            viewToolStripMenuItem.Click += new System.EventHandler(viewToolStripMenuItem_Click);
+            viewToolStripMenuItem.Click += new EventHandler(viewToolStripMenuItem_Click);
+            editToolStripMenuItem.Click += new EventHandler(editToolStripMenuItem_Click);
+            deactivateToolStripMenuItem.Click += new EventHandler(deactivateToolStripMenuItem_Click);
 
-            editToolStripMenuItem.Name = "editToolStripMenuItem";
-            editToolStripMenuItem.Text = "Редактировать";
-            editToolStripMenuItem.Click += new System.EventHandler(editToolStripMenuItem_Click);
+            editCategoryItem.Click += new EventHandler(editToolStripMenuItem_Click);
+            editMachineItem.Click += new EventHandler(editToolStripMenuItem_Click);
+            deleteditCategoryItem.Click += new EventHandler(deleteToolStripMenuItem_Click);
+            deleteMachineItem.Click += new EventHandler(deleteToolStripMenuItem_Click);
 
-            deactivateToolStripMenuItem.Name = "deactivateToolStripMenuItem";
-            deactivateToolStripMenuItem.Text = "Деактивировать";
-            deactivateToolStripMenuItem.Click += new System.EventHandler(deactivateToolStripMenuItem_Click);
+            editUserItem.Click += new EventHandler(editToolStripMenuItem_Click);
+            deleteUserItem.Click += new EventHandler(deleteToolStripMenuItem_Click);
 
-            deleteToolStripMenuItem1.Name = "deleteToolStripMenuItem1";
-            deleteToolStripMenuItem1.Size = new System.Drawing.Size(162, 22);
-            deleteToolStripMenuItem1.Text = "Удалить";
-            deleteToolStripMenuItem1.Visible = false;
+            deleteItem.Click += new EventHandler(deleteToolStripMenuItem_Click);
 
             listV.ContextMenuStrip = menu;
         }
@@ -914,28 +1122,6 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
             addButton.Click += new System.EventHandler(addButton_Click);
 
-            Button editButton = new Button();
-            editButton.Name = "editButton";
-            editButton.Dock = DockStyle.Fill;
-            editButton.Location = new System.Drawing.Point(3, 3);
-            editButton.Size = new System.Drawing.Size(144, 21);
-            editButton.TabIndex = 0;
-            editButton.Text = "Редактировать";
-            editButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(editButton, 0, 1);
-            editButton.Click += new System.EventHandler(editButton_Click);
-
-            Button deleteButton = new Button();
-            deleteButton.Name = "deleteButton";
-            deleteButton.Dock = DockStyle.Fill;
-            deleteButton.Location = new System.Drawing.Point(3, 3);
-            deleteButton.Size = new System.Drawing.Size(144, 21);
-            deleteButton.TabIndex = 0;
-            deleteButton.Text = "Удалить";
-            deleteButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(deleteButton, 0, 2);
-            //deleteButton.Click += new System.EventHandler(deleteButton_Click);
-
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "Всего записей:", ContentAlignment.MiddleRight), 1, 0);
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label1", "", ContentAlignment.MiddleLeft), 2, 0);
 
@@ -961,7 +1147,7 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
@@ -982,61 +1168,16 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add(addCategoryButton, 0, 0);
             addCategoryButton.Click += new System.EventHandler(addButton_Click);
 
-            Button editCategoryButton = new Button();
-            editCategoryButton.Name = "editCategoryButton";
-            editCategoryButton.Dock = DockStyle.Fill;
-            editCategoryButton.Location = new System.Drawing.Point(3, 3);
-            editCategoryButton.Size = new System.Drawing.Size(144, 21);
-            editCategoryButton.TabIndex = 0;
-            editCategoryButton.Text = "Редактировать участок";
-            editCategoryButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(editCategoryButton, 0, 1);
-            editCategoryButton.Click += new System.EventHandler(editButton_Click);
-
-            Button deleteCategoryeButton = new Button();
-            deleteCategoryeButton.Name = "deleteCategoryeButton";
-            deleteCategoryeButton.Dock = DockStyle.Fill;
-            deleteCategoryeButton.Location = new System.Drawing.Point(3, 3);
-            deleteCategoryeButton.Size = new System.Drawing.Size(144, 21);
-            deleteCategoryeButton.TabIndex = 0;
-            deleteCategoryeButton.Text = "Удалить участок";
-            deleteCategoryeButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(deleteCategoryeButton, 0, 2);
-            //addMachineButton.Click += new System.EventHandler(deleteButton_Click);
-
-
             Button addMachineButton = new Button();
             addMachineButton.Name = "addMachineButton";
             addMachineButton.Dock = DockStyle.Fill;
-            addMachineButton.Location = new System.Drawing.Point(3, 3);
+            addMachineButton.Location = new System.Drawing.Point(1, 0);
             addMachineButton.Size = new System.Drawing.Size(144, 21);
             addMachineButton.TabIndex = 0;
             addMachineButton.Text = "Добавить оборудование";
             addMachineButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(addMachineButton, 1, 0);
+            tableLayoutPanelControl.Controls.Add(addMachineButton, 0, 1);
             addMachineButton.Click += new System.EventHandler(addButton_Click);
-
-            Button editMachineButton = new Button();
-            editMachineButton.Name = "editMachineButton";
-            editMachineButton.Dock = DockStyle.Fill;
-            editMachineButton.Location = new System.Drawing.Point(3, 3);
-            editMachineButton.Size = new System.Drawing.Size(144, 21);
-            editMachineButton.TabIndex = 0;
-            editMachineButton.Text = "Редактировать оборудование";
-            editMachineButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(editMachineButton, 1, 1);
-            editMachineButton.Click += new System.EventHandler(editButton_Click);
-
-            Button deleteMachineButton = new Button();
-            deleteMachineButton.Name = "deleteMachineButton";
-            deleteMachineButton.Dock = DockStyle.Fill;
-            deleteMachineButton.Location = new System.Drawing.Point(3, 3);
-            deleteMachineButton.Size = new System.Drawing.Size(144, 21);
-            deleteMachineButton.TabIndex = 0;
-            deleteMachineButton.Text = "Удалить оборудование";
-            deleteMachineButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(deleteMachineButton, 1, 2);
-            //deleteMachineButton.Click += new System.EventHandler(deleteButton_Click_Click);
 
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "", ContentAlignment.MiddleRight), 2, 0);
         }
@@ -2116,27 +2257,39 @@ namespace OrderManager
                         List<String> machines = new List<String>(getMachines.GetMachinesList(getCategoryes.GetCategoryFromName(categoryes[i])));
 
                         ListViewGroup listViewGroup = new ListViewGroup(categoryes[i]);
-                        listViewGroup.Name = categoryes[i];
+                        listViewGroup.Name = getCategoryes.GetCategoryFromName(categoryes[i]);
 
                         Invoke(new Action(() => listView.Groups.Add(listViewGroup)));
 
-                        for (int j = 0; j < machines.Count; j++)
+                        if (machines.Count == 0)
                         {
-                            String timeStartWork = getMachines.GetMachineStartWork(machines[j]);
-                            String timeWork = getTime.WorkExperience(DateTime.Now.ToString(), timeStartWork);
-
                             ListViewItem itemMachine = new ListViewItem(listViewGroup);
 
-                            itemMachine.Name = machines[j];
-                            itemMachine.Text = (j + 1).ToString();
-                            itemMachine.SubItems.Add(getMachines.GetMachineName(machines[j]));
-                            itemMachine.SubItems.Add(timeStartWork);
-                            itemMachine.SubItems.Add(timeWork);
-                            itemMachine.SubItems.Add(getMachines.GetMachineNote(machines[j]));
+                            itemMachine.Name = "empty";
+                                itemMachine.Text = "";
+                                itemMachine.SubItems.Add("<пустой участок>");
 
-                            Invoke(new Action(() => listView.Items.Add(itemMachine)));
+                                Invoke(new Action(() => listView.Items.Add(itemMachine)));
                         }
+                        else
+                        {
+                            for (int j = 0; j < machines.Count; j++)
+                            {
+                                String timeStartWork = getMachines.GetMachineStartWork(machines[j]);
+                                String timeWork = getTime.WorkExperience(DateTime.Now.ToString(), timeStartWork);
 
+                                ListViewItem itemMachine = new ListViewItem(listViewGroup);
+
+                                itemMachine.Name = machines[j];
+                                itemMachine.Text = (j + 1).ToString();
+                                itemMachine.SubItems.Add(getMachines.GetMachineName(machines[j]));
+                                itemMachine.SubItems.Add(timeStartWork);
+                                itemMachine.SubItems.Add(timeWork);
+                                itemMachine.SubItems.Add(getMachines.GetMachineNote(machines[j]));
+
+                                Invoke(new Action(() => listView.Items.Add(itemMachine)));
+                            }
+                        }
                     }
                 }
                 thJob = false;
@@ -2197,6 +2350,7 @@ namespace OrderManager
                     CreateUsersControls();
                     head = new List<ColumnHeader>(ListHeaders(columnHeadersUsers));
                     CreateListView(head);
+                    ContextMenuToLV();
                     LoadUsersFromBase();
                     break;
                 case 8:
@@ -2204,6 +2358,7 @@ namespace OrderManager
                     CreateMachineControls();
                     head = new List<ColumnHeader>(ListHeaders(columnHeadersMachines));
                     CreateListView(head);
+                    ContextMenuToLV();
                     LoadMachinesAndCategoryesFromBase();
                     break;
                 default:
@@ -2302,43 +2457,69 @@ namespace OrderManager
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
 
-            String shiftStart = ((ListView) sender).SelectedItems[0].Name.ToString();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
+
+            int selectegIndex = ((ListView)sender).SelectedIndices[0];
+            String selectedName = ((ListView) sender).SelectedItems[0].Name.ToString();
+            
 
             switch (currentPage)
             {
                 case 1:
-                    LoadShiftdetails(shiftStart);
+                    LoadShiftdetails(selectedName);
                     break;
                 case 2:
 
                     break;
                 case 3:
-                    LoadShiftdetails(shiftStart);
+                    LoadShiftdetails(selectedName);
                     break;
                 case 4:
 
                     break;
                 case 5:
                     if (((ListView)sender).SelectedItems.Count != 0)
-                        LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[((ListView)sender).SelectedIndices[0]].numberOfOrder, ordersNumbers[((ListView)sender).SelectedIndices[0]].modificationOfOrder);
+                        LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectegIndex].numberOfOrder, ordersNumbers[selectegIndex].modificationOfOrder);
                     break;
                 case 6:
                     
                     break;
                 case 7:
                     ShowEditUserForm(((ListView)sender).Items[((ListView)sender).SelectedIndices[0]].Name);
-                    LoadUsersFromBase();
                     break;
 
                 case 8:
-                    MessageBox.Show(((ListView)sender).Items[((ListView)sender).SelectedIndices[0]].Group.Name);
-                    LoadMachinesAndCategoryesFromBase();
+                    ShowEditMachineForm(selectedName);
                     break;
 
                 default:
                     break;
-            }            
+            }
+            UpdatePage(currentPage);
+        }
+
+        private void listView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            String[] buttons = { "editButton", "editCategoryButton", "editMachineButton", "deleteButton", "deleteCategoryButton", "deleteMachineButton" };
+
+            if (((ListView)sender).SelectedIndices.Count == 0)
+            {
+                for (int i = 0; i < buttons.Length; i++)
+                {
+                    Button button = (Button)ControlFromKey("tableLayoutPanelControl", buttons[i]);
+                    if (button != null)
+                        button.Enabled = false;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < buttons.Length; i++)
+                {
+                    Button button = (Button)ControlFromKey("tableLayoutPanelControl", buttons[i]);
+                    if (button != null)
+                        button.Enabled = true;
+                }
+            }
         }
 
         private void myListView_GroupHeaderClick(object sender, int e)
@@ -2391,41 +2572,6 @@ namespace OrderManager
             UpdatePage(currentPage);
         }
 
-        private void editButton_Click(object sender, EventArgs e)
-        {
-            ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
-
-            switch (currentPage)
-            {
-                case 1:
-
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
-                case 4:
-
-                    break;
-                case 5:
-
-                    break;
-                case 6:
-
-                    break;
-                case 7:
-                    if (listV.SelectedIndices.Count > 0)
-                        ShowEditUserForm(listV.Items[listV.SelectedIndices[0]].Name);
-                    LoadUsersFromBase();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
         private void contextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
@@ -2468,6 +2614,11 @@ namespace OrderManager
         {
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
+            int selectedIndex = listV.SelectedIndices[0];
+            String selectedName = listV.Items[selectedIndex].Name;
+
+            String nameItem = ((ToolStripMenuItem)sender).Name;
+
             switch (currentPage)
             {
                 case 1:
@@ -2484,15 +2635,71 @@ namespace OrderManager
                     break;
                 case 5:
                     ShowFullOrdersForm(true, listV.SelectedIndices[0]);
-                    UpdatePage(currentPage);
                     break;
                 case 6:
                     
                     break;
-
+                case 7:
+                    if (listV.SelectedIndices.Count > 0)
+                        ShowEditUserForm(selectedName);
+                    break;
+                case 8:
+                    if (nameItem == "editCategoryItem")
+                        ShowEditCategoryForm(listV.Items[selectedIndex].Group.Name);
+                    if (nameItem == "editMachineItem")
+                        ShowEditMachineForm(selectedName);
+                    //LoadUsersFromBase();
+                    break;
                 default:
                     break;
             }
+            UpdatePage(currentPage);
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
+
+            int selectedIndex = listV.SelectedIndices[0];
+            String selectedName = listV.Items[selectedIndex].Name;
+
+            String nameItem = ((ToolStripMenuItem)sender).Name;
+
+            switch (currentPage)
+            {
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+                    ShowFullOrdersForm(true, listV.SelectedIndices[0]);
+                    break;
+                case 6:
+
+                    break;
+                case 7:
+                    if (listV.SelectedIndices.Count > 0)
+                        DeleteUser(selectedName);
+                    break;
+                case 8:
+                    if (nameItem == "editCategoryItem")
+                        DeleteCategory(listV.Items[selectedIndex].Group.Name);
+                    if (nameItem == "editMachineItem")
+                        DeleteMachine(selectedName);
+                    //LoadUsersFromBase();
+                    break;
+                default:
+                    break;
+            }
+            UpdatePage(currentPage);
         }
 
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)

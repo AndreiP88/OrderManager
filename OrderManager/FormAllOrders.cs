@@ -55,9 +55,9 @@ namespace OrderManager
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(true, dataBase, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+                form = new FormAddNewOrder(dataBase, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
             else
-                form = new FormAddNewOrder(false, dataBase, getInfo.GetMachineFromName(comboBox1.Text), "", "");
+                form = new FormAddNewOrder(dataBase, getInfo.GetMachineFromName(comboBox1.Text));
 
             form.ShowDialog();
         }

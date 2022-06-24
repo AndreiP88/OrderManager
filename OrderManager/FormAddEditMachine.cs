@@ -90,7 +90,7 @@ namespace OrderManager
 
             textBox4.Text = getMachine.GetMachineNote(machineIDLoad);
 
-            comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(machineIDLoad));
+            comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(getMachine.GetCategoryMachine(machineIDLoad)));
         }
 
         private void LoadForAdd()

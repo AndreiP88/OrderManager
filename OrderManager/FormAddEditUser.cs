@@ -261,9 +261,9 @@ namespace OrderManager
             {
                 string commandText;
 
-                commandText = "INSERT INTO settings (userID) " +
+                commandText = "INSERT INTO usersSettings (userID) " +
                     "SELECT * FROM (SELECT @userID) " +
-                    "AS tmp WHERE NOT EXISTS(SELECT userID FROM settings WHERE userID = @userID) LIMIT 1";
+                    "AS tmp WHERE NOT EXISTS(SELECT userID FROM usersSettings WHERE userID = @userID) LIMIT 1";
 
                 /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
 

@@ -24,15 +24,27 @@ namespace OrderManager
         List<String> numbersOrdersInProgress;
         String numbersOrder;
 
-        public FormAddNewOrder(bool editOrder, String dBase, String orderMachine, String orderNumber, String orderModification)
+        public FormAddNewOrder(String dBase, String orderMachine, String orderNumber, String orderModification)
         {
             InitializeComponent();
 
-            this.editOrderLoad = editOrder;
+            this.editOrderLoad = true;
             this.dataBase = dBase;
             this.orderrMachineLoad = orderMachine;
             this.orderNumberLoad = orderNumber;
             this.orderModificationLoad = orderModification;
+
+            if (dataBase == "")
+                dataBase = dataBaseDefault;
+        }
+
+        public FormAddNewOrder(String dBase, String orderMachine)
+        {
+            InitializeComponent();
+
+            this.editOrderLoad = false;
+            this.dataBase = dBase;
+            this.orderrMachineLoad = orderMachine;
 
             if (dataBase == "")
                 dataBase = dataBaseDefault;
@@ -58,13 +70,13 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT DISTINCT machine FROM Info"
+                    CommandText = @"SELECT DISTINCT id FROM machines"
                 };
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    comboBox1.Items.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                    comboBox1.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();
@@ -176,64 +188,6 @@ namespace OrderManager
                     commandText = "UPDATE orders SET orderAddedDate = @orderAddedDate, machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
                     "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp " +
                     "WHERE count = @orderCount";
-
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@orderCount", orderCount); // присваиваем переменной значение
-                Command.Parameters.AddWithValue("@orderAddedDate", orderAddedDate);
-                Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@number", number);
-                Command.Parameters.AddWithValue("@name", name);
-                Command.Parameters.AddWithValue("@modification", modification);
-                Command.Parameters.AddWithValue("@amount", amount);
-                Command.Parameters.AddWithValue("@timeM", timeM);
-                Command.Parameters.AddWithValue("@timeW", timeW);
-                Command.Parameters.AddWithValue("@stamp", stamp);
-                Command.Parameters.AddWithValue("@status", status);
-                Command.Parameters.AddWithValue("@counterR", counterR);
-
-
-                Connect.Open();
-                Command.ExecuteNonQuery();
-                Connect.Close();
-            }
-        }
-
-        private void EditOrderInDB()
-        {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
-            GetValueFromOrdersBase getOrderCount = new GetValueFromOrdersBase(dataBase, orderrMachineLoad, orderNumberLoad, orderModificationLoad);
-
-            String orderCount = getOrderCount.GetOrderCount();
-            String orderAddedDate = DateTime.Now.ToString();
-            String machine = getInfo.GetMachineFromName(comboBox1.Text);
-            String number = textBox1.Text;
-            String name = comboBox2.Text;
-            String modification = textBox5.Text;
-            String amount = numericUpDown1.Value.ToString();
-            String timeM = totalMinutes.TotalHoursToMinutesTS(TimeSpan.FromHours((int)numericUpDown5.Value).Add(TimeSpan.FromMinutes((int)numericUpDown6.Value))).ToString();
-            String timeW = totalMinutes.TotalHoursToMinutesTS(TimeSpan.FromHours((int)numericUpDown7.Value).Add(TimeSpan.FromMinutes((int)numericUpDown8.Value))).ToString();
-            String stamp = textBox2.Text;
-            String status = "0";
-            String counterR = "0";
-
-            if (!CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text))
-            {
-
-            }
-            else
-            {
-
-            }
-
-
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                string commandText;
-                commandText = "UPDATE orders SET orderAddedDate = @orderAddedDate, machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
-                    "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp " +
-                    "WHERE count = @orderCount";
-
 
                 SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@orderCount", orderCount); // присваиваем переменной значение
