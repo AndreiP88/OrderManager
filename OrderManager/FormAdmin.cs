@@ -1012,8 +1012,8 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
 
@@ -1030,6 +1030,7 @@ namespace OrderManager
             addButton.TabIndex = 0;
             addButton.Text = "Добавить";
             addButton.Visible = true;
+            tableLayoutPanelControl.SetRowSpan(addButton, 3);
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
             addButton.Click += new System.EventHandler(addButton_Click);
 
@@ -1101,12 +1102,12 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
 
-            tableLayoutPanelControl.RowCount = 3;
+            tableLayoutPanelControl.RowCount = 1;
 
             tableLayoutPanelControl.Visible = true;
             tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 1);
@@ -1122,11 +1123,7 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
             addButton.Click += new System.EventHandler(addButton_Click);
 
-            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "Всего записей:", ContentAlignment.MiddleRight), 1, 0);
-            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label1", "", ContentAlignment.MiddleLeft), 2, 0);
-
-            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label02", "Активных сотрудников:", ContentAlignment.MiddleRight), 1, 1);
-            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label2", "", ContentAlignment.MiddleLeft), 2, 1);
+            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "", ContentAlignment.MiddleRight), 1, 0);
         }
 
         private void CreateMachineControls()
@@ -1147,12 +1144,12 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
 
-            tableLayoutPanelControl.RowCount = 3;
+            tableLayoutPanelControl.RowCount = 1;
 
             tableLayoutPanelControl.Visible = true;
             tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 1);
@@ -1176,7 +1173,7 @@ namespace OrderManager
             addMachineButton.TabIndex = 0;
             addMachineButton.Text = "Добавить оборудование";
             addMachineButton.Visible = true;
-            tableLayoutPanelControl.Controls.Add(addMachineButton, 0, 1);
+            tableLayoutPanelControl.Controls.Add(addMachineButton, 1, 0);
             addMachineButton.Click += new System.EventHandler(addButton_Click);
 
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "", ContentAlignment.MiddleRight), 2, 0);
@@ -1222,7 +1219,74 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label001", "- фильтр", ContentAlignment.MiddleLeft), 1, 0);
         }
 
-        private Object CreateLabel(String name, String text, ContentAlignment contentAlignment)
+        private void CreateSettingsControls()
+        {
+            GetValueFromOrdersBase getOrders = new GetValueFromOrdersBase(dataBase);
+            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+
+            List<String> machine = new List<String>(LoadMachine());
+
+            IniFile ini = new IniFile("settings.ini");
+
+            String path = "";
+
+            if (ini.KeyExists("dataBasePath"))
+                path = ini.ReadINI("general", "dataBasePath");
+
+            if (ini.KeyExists("dataBaseFile"))
+                path = path + "/" + ini.ReadINI("general", "dataBaseFile");
+
+
+            String[] name = { "listView", "tableLayoutPanelControl" };
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (tableLayoutPanel1.Controls.ContainsKey(name[i]))
+                {
+                    var control = tableLayoutPanel1.Controls.Find(name[i], true);
+                    tableLayoutPanel1.Controls.Remove(control[0]);
+                }
+            }
+            
+
+
+            /*for (int i = 0; i < tableLayoutPanel1.Controls.Count; i++)
+            {
+                MessageBox.Show(tableLayoutPanel1.Controls[i].Name);
+
+                if (tableLayoutPanel1.Controls[i].Name != "tableLayoutPanel2")
+                    tableLayoutPanel1.Controls.RemoveAt(i);
+            }*/
+
+            TableLayoutPanel tableLayoutPanelControl = new TableLayoutPanel();
+
+            tableLayoutPanelControl.Dock = DockStyle.Fill;
+            tableLayoutPanelControl.Name = "tableLayoutPanelControl";
+
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+
+
+            //tableLayoutPanelControl.RowCount = 5;
+
+            tableLayoutPanelControl.Visible = true;
+            tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 2);
+
+            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", "Всего заказов в базе:", ContentAlignment.MiddleLeft), 0, 0);
+            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", getOrders.GetCountOrders().ToString("N0"), ContentAlignment.MiddleLeft), 1, 0);
+
+            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", "- фильтр", ContentAlignment.MiddleLeft), 0, 1);
+            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", "", ContentAlignment.MiddleLeft), 0, 5);
+        }
+
+        private Label CreateLabel(String name, String text, ContentAlignment contentAlignment)
         {
             Label label = new Label();
             label.AutoSize = true;
@@ -2361,6 +2425,10 @@ namespace OrderManager
                     ContextMenuToLV();
                     LoadMachinesAndCategoryesFromBase();
                     break;
+                case 9:
+                    tableLayoutPanel1.RowStyles[1].Height = 0;
+                    CreateSettingsControls();
+                    break;
                 default:
                     break; 
             }
@@ -2801,6 +2869,18 @@ namespace OrderManager
         {
             currentPage = 8;
             LoadPage(currentPage);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            currentPage = 9;
+            LoadPage(currentPage);
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+            Application.Exit();
         }
     }
 }

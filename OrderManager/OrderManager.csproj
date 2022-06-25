@@ -161,12 +161,6 @@
     <Compile Include="FormFullListOrders.Designer.cs">
       <DependentUpon>FormFullListOrders.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormSettings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormSettings.Designer.cs">
-      <DependentUpon>FormSettings.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormDetailsStatistic.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -254,9 +248,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormFullListOrders.resx">
       <DependentUpon>FormFullListOrders.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormSettings.resx">
-      <DependentUpon>FormSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormDetailsStatistic.resx">
       <DependentUpon>FormDetailsStatistic.cs</DependentUpon>

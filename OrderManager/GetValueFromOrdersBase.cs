@@ -27,6 +27,18 @@ namespace OrderManager
                 dataBase = dataBaseDefault;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dBase"></param>
+        public GetValueFromOrdersBase(String dBase)
+        {
+            this.dataBase = dBase;
+
+            if (dataBase == "")
+                dataBase = dataBaseDefault;
+        }
+
         public String GetOrderCount()
         {
             return GetValue("count");
@@ -57,6 +69,30 @@ namespace OrderManager
                 result = "Заказ в работе";
             if (status == "4")
                 result = "Заказ завершен";
+
+            return result;
+        }
+
+        public int GetCountOrders()
+        {
+            int result = 0;
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    //CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
+                    CommandText = @"SELECT COUNT(DISTINCT numberOfOrder) as count FROM orders"
+
+                };
+                //SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                result = Convert.ToInt32(Command.ExecuteScalar());
+
+                Connect.Close();
+            }
 
             return result;
         }
