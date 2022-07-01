@@ -695,6 +695,19 @@ namespace OrderManager
             };
             //Сотрудники
 
+            ToolStripMenuItem detailsShift = new ToolStripMenuItem
+            {
+                Name = "detailsShift",
+                Text = "Детали смены"
+            };
+
+            ToolStripMenuItem closeShift = new ToolStripMenuItem
+            {
+                Name = "closeShift",
+                Text = "Завершить смену"
+            };
+            //Активные исполнители
+
             ToolStripMenuItem deleteItem = new ToolStripMenuItem
             {
                 Name = "deleteToolStripMenuItem1",
@@ -706,6 +719,11 @@ namespace OrderManager
             switch (currentPage)
             {
                 case 1:
+                    items = new ToolStripItem[]
+                    {
+                        detailsShift,
+                        closeShift
+                    };
                     break;
                 case 2:
                     break;
@@ -763,6 +781,9 @@ namespace OrderManager
 
             editUserItem.Click += new EventHandler(editToolStripMenuItem_Click);
             deleteUserItem.Click += new EventHandler(deleteToolStripMenuItem_Click);
+
+            detailsShift.Click += new EventHandler(viewToolStripMenuItem_Click);
+            closeShift.Click += new EventHandler(closeShift_Click);
 
             deleteItem.Click += new EventHandler(deleteToolStripMenuItem_Click);
 
@@ -2586,6 +2607,7 @@ namespace OrderManager
                     CreatActivityControl();
                     head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
+                    ContextMenuToLV();
                     MainLVInsertValue();
                     break;
                 case 2:
@@ -2783,7 +2805,6 @@ namespace OrderManager
 
             int selectegIndex = ((ListView)sender).SelectedIndices[0];
             String selectedName = ((ListView) sender).SelectedItems[0].Name.ToString();
-            
 
             switch (currentPage)
             {
@@ -2915,10 +2936,12 @@ namespace OrderManager
 
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
+            String selectedName = listV.SelectedItems[0].Name.ToString();
+
             switch (currentPage)
             {
                 case 1:
-
+                    LoadShiftdetails(selectedName);
                     break;
                 case 2:
 
@@ -2936,6 +2959,14 @@ namespace OrderManager
                 default:
                     break;
             }
+        }
+
+        private void closeShift_Click(object sender, EventArgs e)
+        {
+            //Завершение смены с вводом всех времени завершения операций дляя каждой машины и количеством выполненной продукции
+
+            //FormAddCloseOrder form = new FormAddCloseOrder(dataBase, "", "", "");
+            //form.ShowDialog();
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)

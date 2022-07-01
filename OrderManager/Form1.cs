@@ -50,7 +50,7 @@ namespace OrderManager
         private void button1_Click(object sender, EventArgs e)
         {
             Info.active = false;
-            FormAddCloseOrder form = new FormAddCloseOrder(false, dataBase, "", "", "", "", "");
+            FormAddCloseOrder form = new FormAddCloseOrder(dataBase, Info.startOfShift, Info.nameOfExecutor);
             form.ShowDialog();
             LoadOrdersFromBase();
             Info.active = true;
@@ -654,11 +654,11 @@ namespace OrderManager
 
                 if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && Convert.ToBoolean(getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder)))
                 {
-                    form = new FormAddCloseOrder(false, dataBase, "", "", "", "", "");
+                    form = new FormAddCloseOrder(dataBase, Info.startOfShift, Info.nameOfExecutor);
                 }
                 else
                 {
-                    form = new FormAddCloseOrder(adminMode, dataBase, Info.startOfShift,
+                    form = new FormAddCloseOrder(dataBase, Info.startOfShift,
                         ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
                         ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
                         ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,

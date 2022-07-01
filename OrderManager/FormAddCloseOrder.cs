@@ -16,7 +16,8 @@ namespace OrderManager
     {
         bool aMode;
         String dataBase;
-        String loadStartOfShift;
+        String startOfShift;
+        String nameOfExecutor;
         String loadOrderNumber;
         String loadOrderModification;
         String loadMachine;
@@ -39,24 +40,57 @@ namespace OrderManager
             }
         }
 
+        public FormAddCloseOrder(String dBase, String lStartOfShift, String lNameOfExecutor)
+        {
+            InitializeComponent();
+
+            this.aMode = false;
+            this.dataBase = dBase;
+            this.startOfShift = lStartOfShift;
+            this.nameOfExecutor = lNameOfExecutor;
+            this.loadOrderNumber = "";
+            this.loadOrderModification = "";
+            this.loadMachine = "";
+            this.loadCounterRepeat = "";
+
+        }
+
         public FormAddCloseOrder(bool adminMode, String dBase, String lStartOfShift, String lOrderNumber, String lOrderModification, String lMachine, String lCounterRepeat)
         {
             InitializeComponent();
-            
+
             this.aMode = adminMode;
             this.dataBase = dBase;
-            this.loadStartOfShift = lStartOfShift;
+            this.startOfShift = lStartOfShift;
             this.loadOrderNumber = lOrderNumber;
             this.loadOrderModification = lOrderModification;
             this.loadMachine = lMachine;
             this.loadCounterRepeat = lCounterRepeat;
 
-            if ((loadStartOfShift == Form1.Info.startOfShift && loadOrderNumber != "") || adminMode)
+            if (adminMode)
             {
                 CreateTransparentPannels();
             }
-
         }
+
+        public FormAddCloseOrder(String dBase, String lStartOfShift, String lOrderNumber, String lOrderModification, String lMachine, String lCounterRepeat)
+        {
+            InitializeComponent();
+
+            this.aMode = false;
+            this.dataBase = dBase;
+            this.startOfShift = lStartOfShift;
+            this.loadOrderNumber = lOrderNumber;
+            this.loadOrderModification = lOrderModification;
+            this.loadMachine = lMachine;
+            this.loadCounterRepeat = lCounterRepeat;
+
+            if (lStartOfShift == Form1.Info.startOfShift && loadOrderNumber != "")
+            {
+                CreateTransparentPannels();
+            }
+        }
+
         class Order
         {
             public String numberOfOrder;
@@ -393,7 +427,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), Form1.Info.nameOfExecutor) == true)
+                    if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), nameOfExecutor) == true)
                         comboBox3.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                     //else
                         //comboBox3.Items.Add(sqlReader["machine"].ToString());
@@ -404,7 +438,7 @@ namespace OrderManager
 
             if (comboBox3.Items.Count > 0)
             {
-                SelectLastMschineToComboBox(Form1.Info.nameOfExecutor);
+                SelectLastMschineToComboBox(nameOfExecutor);
             }
         }
 
@@ -436,7 +470,7 @@ namespace OrderManager
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
 
             String orderAddedDate = DateTime.Now.ToString();
-            //String machine = Form1.Info.mashine;
+            //String machine = mashine;
             String machine = getInfo.GetMachineFromName(comboBox3.Text);
             String number = textBox1.Text;
             String name = comboBox2.Text;
@@ -512,8 +546,8 @@ namespace OrderManager
             SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
 
             //имя и время начала смены сделать через параметры
-            String executor = Form1.Info.nameOfExecutor;
-            String shiftStart = Form1.Info.startOfShift;
+            String executor = nameOfExecutor;
+            String shiftStart = startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
             String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
@@ -604,8 +638,8 @@ namespace OrderManager
             SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
             SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
 
-            String executor = Form1.Info.nameOfExecutor;
-            String shiftStart = Form1.Info.startOfShift;
+            String executor = nameOfExecutor;
+            String shiftStart = startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
             String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
@@ -671,8 +705,8 @@ namespace OrderManager
             SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
             SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
 
-            String executor = Form1.Info.nameOfExecutor;
-            String shiftStart = Form1.Info.startOfShift;
+            String executor = nameOfExecutor;
+            String shiftStart = startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
             String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
@@ -1185,7 +1219,7 @@ namespace OrderManager
 
             if (loadOrderNumber != "")
             {
-                LoadOrderForEdit(loadStartOfShift, loadOrderNumber, loadOrderModification, loadMachine, loadCounterRepeat);
+                LoadOrderForEdit(startOfShift, loadOrderNumber, loadOrderModification, loadMachine, loadCounterRepeat);
                 timer1.Enabled = false;
             }
             else
@@ -1216,10 +1250,10 @@ namespace OrderManager
                 SetVisibleElements(getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), number, modification), getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text)));
                 if (comboBox1.SelectedIndex != 0)
                 {
-                    LoadCurrentOrderInProgressFromDB(Form1.Info.startOfShift, number, modification, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
+                    LoadCurrentOrderInProgressFromDB(startOfShift, number, modification, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
 
                     GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase(dataBase);
-                    textBox6.Text = getOrdersInProgressValue.GetNote(Form1.Info.startOfShift, number, modification, getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
+                    textBox6.Text = getOrdersInProgressValue.GetNote(startOfShift, number, modification, getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
                 }
             }
         }
@@ -1229,9 +1263,9 @@ namespace OrderManager
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
-            if ((loadStartOfShift == Form1.Info.startOfShift && loadOrderNumber != "") || aMode)
+            if ((startOfShift == Form1.Info.startOfShift && loadOrderNumber != "") || aMode)
             {
-                SaveChanges(loadStartOfShift, loadOrderNumber, loadOrderModification, loadMachine, loadCounterRepeat);
+                SaveChanges(startOfShift, loadOrderNumber, loadOrderModification, loadMachine, loadCounterRepeat);
                 Close();
             }
             else
@@ -1354,7 +1388,7 @@ namespace OrderManager
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
-            LoadCurrentOrderInProgressFromDB(Form1.Info.startOfShift, textBox1.Text, textBox5.Text, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text));
+            LoadCurrentOrderInProgressFromDB(startOfShift, textBox1.Text, textBox5.Text, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text));
         }
 
         private void AddEditCloseOrder_FormClosing(object sender, FormClosingEventArgs e)
