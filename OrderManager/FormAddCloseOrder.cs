@@ -507,7 +507,7 @@ namespace OrderManager
         private void AcceptOrderInProgressToDB()
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
             SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
             SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
 
@@ -516,11 +516,11 @@ namespace OrderManager
             String shiftStart = Form1.Info.startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            String status = getValue.GetValue("statusOfOrder");
+            String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String newStatus = "0";
 
             String machineCurrent = getInfo.GetMachineFromName(comboBox3.Text);
-            String counterRepeat = getValue.GetValue("counterRepeat");
+            String counterRepeat = getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String currentOrderNumber = getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
             String lastOrderNumber = getInfo.GetLastOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));
 
@@ -600,7 +600,7 @@ namespace OrderManager
         private void CloseOrderInProgressToDB()
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
             SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
             SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
 
@@ -608,11 +608,11 @@ namespace OrderManager
             String shiftStart = Form1.Info.startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            String status = getValue.GetValue("statusOfOrder");
+            String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String newStatus = "0";
 
             String machineCurrent = getInfo.GetMachineFromName(comboBox3.Text);
-            String counterRepeat = getValue.GetValue("counterRepeat");
+            String counterRepeat = getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String currentOrderNumber = getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));
             String lastOrderNumber = getInfo.GetLastOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));
 
@@ -667,7 +667,7 @@ namespace OrderManager
         private void AbortOrderInProgressToDB()
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
             SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
             SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
 
@@ -675,11 +675,11 @@ namespace OrderManager
             String shiftStart = Form1.Info.startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            String status = getValue.GetValue("statusOfOrder");
+            String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String newStatus = "0";
 
             String machineCurrent = getInfo.GetMachineFromName(comboBox3.Text);
-            String counterRepeat = getValue.GetValue("counterRepeat");
+            String counterRepeat = getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String currentOrderNumber = getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));
             String lastOrderNumber = getInfo.GetLastOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));
 
@@ -914,7 +914,7 @@ namespace OrderManager
             GetDateTimeOperations timeDif = new GetDateTimeOperations();
             GetLeadTime leadTime = new GetLeadTime(dataBase, startOfShift, orderNumber, orderModification, machine, counterRepeat);
             GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, orderNumber, orderModification, counterRepeat);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), orderNumber, orderModification);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
             String currentTime = DateTime.Now.ToString();
             String prevMakereadyStart = leadTime.GetLastDateTime("timeMakereadyStart");
@@ -924,8 +924,8 @@ namespace OrderManager
             String curMakereadyStop = leadTime.GetCurrentDateTime("timeMakereadyStop");
             String curWorkStart = leadTime.GetCurrentDateTime("timeToWorkStart");
 
-            String status = getValue.GetValue("statusOfOrder");
-            String amountOrder = getValue.GetValue("amountOfOrder");
+            String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), orderNumber, orderModification);
+            String amountOrder = getValue.GetAmountOfOrder(getInfo.GetMachineFromName(comboBox3.Text), orderNumber, orderModification);
 
             int amountComplete = orderCalc.OrderFullCalculate();
             int amountFull = 0;
@@ -1017,14 +1017,14 @@ namespace OrderManager
             GetLeadTime leadTime = new GetLeadTime(dataBase, startOfShift, orderNumber, orderModification, machine, counterRepeat);
             GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, orderNumber, orderModification, counterRepeat);
             GetOrdersFromBase getOrder = new GetOrdersFromBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, machine, orderNumber, orderModification);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
             String nMakereadyStart = leadTime.GetCurrentDateTime("timeMakereadyStart");
             String nMakereadyStop = leadTime.GetCurrentDateTime("timeMakereadyStop");
             String nWorkStart = leadTime.GetCurrentDateTime("timeToWorkStart");
             String nWorkStop = leadTime.GetCurrentDateTime("timeToWorkStop");
 
-            String amountOrder = getValue.GetValue("amountOfOrder");
+            String amountOrder = getValue.GetAmountOfOrder(machine, orderNumber, orderModification);
 
             int amountComplete = orderCalc.OrderCalculate(true, false);
             int amountDone = orderCalc.OrderCalculate(false, true);
@@ -1102,7 +1102,7 @@ namespace OrderManager
 
         private void LoadOrderForEdit(String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
         {
-            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase, machine, orderNumber, orderModification);
+            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
 
             this.Text = "Детали заказа";
@@ -1113,7 +1113,7 @@ namespace OrderManager
 
             comboBox1.Items.Add("");
             comboBox1.Items.Add(orderNumber + ": " +
-                getOrder.GetOrderName() + strModification + " - " + Convert.ToInt32(getOrder.GetValue("amountOfOrder")).ToString("N0"));
+                getOrder.GetOrderName(machine, orderNumber, orderModification) + strModification + " - " + Convert.ToInt32(getOrder.GetAmountOfOrder(machine, orderNumber, orderModification)).ToString("N0"));
             comboBox1.SelectedIndex = 1;
             comboBox1.Enabled = false;
 
@@ -1208,18 +1208,18 @@ namespace OrderManager
                 String number = ordersNumbers[comboBox1.SelectedIndex].numberOfOrder;
                 String modification = ordersNumbers[comboBox1.SelectedIndex].modificationOfOrder;
 
-                GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), number, modification);
+                GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
                 ClearAllValue();
 
                 LoadOrderFromDB(getInfo.GetMachineFromName(comboBox3.Text), number, modification);
-                SetVisibleElements(getValue.GetValue("statusOfOrder"), getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text)));
+                SetVisibleElements(getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), number, modification), getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text)));
                 if (comboBox1.SelectedIndex != 0)
                 {
-                    LoadCurrentOrderInProgressFromDB(Form1.Info.startOfShift, number, modification, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetValue("counterRepeat"));
+                    LoadCurrentOrderInProgressFromDB(Form1.Info.startOfShift, number, modification, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
 
                     GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase(dataBase);
-                    textBox6.Text = getOrdersInProgressValue.GetNote(Form1.Info.startOfShift, number, modification, getValue.GetValue("counterRepeat"));
+                    textBox6.Text = getOrdersInProgressValue.GetNote(Form1.Info.startOfShift, number, modification, getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
                 }
             }
         }
@@ -1227,6 +1227,7 @@ namespace OrderManager
         private void button1_Click(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
             if ((loadStartOfShift == Form1.Info.startOfShift && loadOrderNumber != "") || aMode)
             {
@@ -1236,8 +1237,6 @@ namespace OrderManager
             else
             {
                 //сделать проверку статуса и в зависимости от статуса и условий выбирать
-                GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
-
                 if (CheckNotEmptyFields() == true)
                 {
                     DialogResult result;
@@ -1252,7 +1251,7 @@ namespace OrderManager
                         return;
                     }
 
-                    String status = getValue.GetValue("statusOfOrder");
+                    String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
                     if (numericUpDown5.Value == 0 && numericUpDown6.Value == 0 && status == "0")
                     {
@@ -1304,11 +1303,11 @@ namespace OrderManager
         private void button2_Click(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
             DialogResult result;
 
-            String status = getValue.GetValue("statusOfOrder");
+            String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
             if (numericUpDown4.Value < numericUpDown3.Value && status == "3")
             {
@@ -1354,8 +1353,8 @@ namespace OrderManager
         private void timer1_Tick(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
-            LoadCurrentOrderInProgressFromDB(Form1.Info.startOfShift, textBox1.Text, textBox5.Text, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetValue("counterRepeat"));
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
+            LoadCurrentOrderInProgressFromDB(Form1.Info.startOfShift, textBox1.Text, textBox5.Text, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text));
         }
 
         private void AddEditCloseOrder_FormClosing(object sender, FormClosingEventArgs e)

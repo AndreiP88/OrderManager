@@ -169,7 +169,7 @@ namespace OrderManager
             "Стаж;120",
             "Дата рождения;160",
             "Возраст;90",
-            "Примечание;180",
+            "Примечание;180"
         };
 
         String[] columnHeadersMachines = {
@@ -202,6 +202,114 @@ namespace OrderManager
             }
             
             return columnHeaders;
+        }
+
+        private List<ColumnHeader> Headers(int loadPage)
+        {
+            List<ColumnHeader> columnHeaders = new List<ColumnHeader>();
+
+            StringArray stringArray = new StringArray('|');
+            INISettings ini = new INISettings();
+
+            String inStr = "";
+
+            switch (loadPage)
+            {
+                case 1:
+                    inStr = ini.GetColumnHeadersMain();
+                    break;
+                case 2:
+                    inStr = ini.GetColumnHeadersStatistic();
+                    break;
+                case 3:
+                    inStr = ini.GetColumnHeadersShifts();
+                    break;
+                case 4:
+                    inStr = ini.GetColumnHeadersStatisticMachines();
+                    break;
+                case 5:
+                    inStr = ini.GetColumnHeadersAllOrders();
+                    break;
+                case 6:
+                    inStr = ini.GetColumnHeadersNorm();
+                    break;
+                case 7:
+                    inStr = ini.GetColumnHeadersUsers();
+                    break;
+                case 8:
+                    inStr = ini.GetColumnHeadersMachines();
+                    break;
+                case 9:
+
+                    break;
+
+                default:
+                    break;
+            }
+
+            String[] headersWidth = stringArray.ArrayFromTheString(inStr);
+
+            for (int i = 0; i < headersWidth.Length; i++)
+            {
+                String[] head = headersWidth[i].Split(';');
+
+                columnHeaders.Add(new ColumnHeader()
+                {
+                    Text = head[0].ToString(),
+                    Width = Convert.ToInt32(head[1])
+                });
+            }
+
+            //MessageBox.Show(currentPage.ToString() + ": " + inStr);
+
+            return columnHeaders;
+        }
+
+        private void SaveHeaders(ListView listView)
+        {
+            INISettings ini = new INISettings();
+
+            String hedersStr = "";
+
+                for (int i = 0; i < listView.Columns.Count - 1; i++)
+                {
+                    hedersStr += listView.Columns[i].Text + ";" + listView.Columns[i].Width + "|";
+                }
+                hedersStr += listView.Columns[listView.Columns.Count - 1].Text + ";" + listView.Columns[listView.Columns.Count - 1].Width;
+            if (hedersStr.Length > 0)
+            switch (currentPage)
+            {
+                case 1:
+                    ini.SetColumnHeadersMain(hedersStr);
+                    break;
+                case 2:
+                    ini.SetColumnHeadersStatistic(hedersStr);
+                    break;
+                case 3:
+                    ini.SetColumnHeadersShifts(hedersStr);
+                    break;
+                case 4:
+                    ini.SetColumnHeadersStatisticMachines(hedersStr);
+                    break;
+                case 5:
+                    ini.SetColumnHeadersAllOrders(hedersStr);
+                    break;
+                case 6:
+                    ini.SetColumnHeadersNorm(hedersStr);
+                    break;
+                case 7:
+                    ini.SetColumnHeadersUsers(hedersStr);
+                    break;
+                case 8:
+                    ini.SetColumnHeadersMachines(hedersStr);
+                    break;
+                case 9:
+
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private List<String> LoadYears()
@@ -290,6 +398,27 @@ namespace OrderManager
             FormAddEditUser form = new FormAddEditUser(dataBase, userID);
 
             form.ShowDialog();
+        }
+
+        private void ShowSelectDataBaseFile()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            INISettings ini = new INISettings();
+
+            String path = "";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                openFileDialog.Filter = "Файл базы данных *.db|*.db";
+                
+                openFileDialog.Multiselect = false;
+                openFileDialog.Title = "Открыть базу данных";
+
+                path = openFileDialog.FileName;
+
+                ini.SetDataBasePath(path);
+            }
+            
         }
 
         private void DeleteUser(String id)
@@ -440,6 +569,18 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+        }
+
+        private void CreatActivityControl()
+        {
+            var nameTab = "tableLayoutPanelControl";
+            if (tableLayoutPanel1.Controls.ContainsKey(nameTab))
+            {
+                var control = tableLayoutPanel1.Controls.Find(nameTab, true);
+                tableLayoutPanel1.Controls.Remove(control[0]);
+            }
+
+
         }
 
         private void CreateListView(List<ColumnHeader> headers)
@@ -1222,20 +1363,13 @@ namespace OrderManager
         private void CreateSettingsControls()
         {
             GetValueFromOrdersBase getOrders = new GetValueFromOrdersBase(dataBase);
+            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
             GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            INISettings ini = new INISettings();
 
             List<String> machine = new List<String>(LoadMachine());
 
-            IniFile ini = new IniFile("settings.ini");
-
-            String path = "";
-
-            if (ini.KeyExists("dataBasePath"))
-                path = ini.ReadINI("general", "dataBasePath");
-
-            if (ini.KeyExists("dataBaseFile"))
-                path = path + "/" + ini.ReadINI("general", "dataBaseFile");
-
+            String path = ini.DataBasePath();
 
             String[] name = { "listView", "tableLayoutPanelControl" };
 
@@ -1247,8 +1381,6 @@ namespace OrderManager
                     tableLayoutPanel1.Controls.Remove(control[0]);
                 }
             }
-            
-
 
             /*for (int i = 0; i < tableLayoutPanel1.Controls.Count; i++)
             {
@@ -1258,32 +1390,86 @@ namespace OrderManager
                     tableLayoutPanel1.Controls.RemoveAt(i);
             }*/
 
+            
+
             TableLayoutPanel tableLayoutPanelControl = new TableLayoutPanel();
 
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300));
-            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200));
-            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
 
-            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
-            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
+            tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
             tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             tableLayoutPanelControl.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
 
 
-            //tableLayoutPanelControl.RowCount = 5;
+            tableLayoutPanelControl.RowCount = 5;
 
             tableLayoutPanelControl.Visible = true;
             tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 2);
 
-            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", "Всего заказов в базе:", ContentAlignment.MiddleLeft), 0, 0);
-            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", getOrders.GetCountOrders().ToString("N0"), ContentAlignment.MiddleLeft), 1, 0);
+            TableLayoutPanel tableLayoutPanelPath = new TableLayoutPanel();
+            tableLayoutPanelPath.Dock = DockStyle.Fill;
+            tableLayoutPanelPath.Name = "tableLayoutPanelPath";
+            tableLayoutPanelPath.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
+            tableLayoutPanelPath.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            tableLayoutPanelPath.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
+            tableLayoutPanelPath.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            tableLayoutPanelPath.RowCount = 1;
+            tableLayoutPanelPath.Visible = true;
 
-            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", "- фильтр", ContentAlignment.MiddleLeft), 0, 1);
-            tableLayoutPanelControl.Controls.Add(CreateLabel("label001", "", ContentAlignment.MiddleLeft), 0, 5);
+            TextBox textBox = new TextBox();
+            textBox.Name = "textBoxDBPath";
+            textBox.Dock = DockStyle.Fill;
+            textBox.Location = new Point(3, 3);
+            textBox.Size = new Size(144, 21);
+            textBox.TabIndex = 2;
+            textBox.Text = path;
+            textBox.Visible = true;
+            tableLayoutPanelPath.Controls.Add(textBox, 0, 0);
+
+            Button addButton = new Button();
+            addButton.Name = "addButtonDBPath";
+            addButton.Dock = DockStyle.Top;
+            addButton.Location = new System.Drawing.Point(0, 0);
+            addButton.Size = new System.Drawing.Size(144, 21);
+            addButton.TabIndex = 0;
+            addButton.Text = "Обзор";
+            addButton.Visible = true;
+            tableLayoutPanelPath.Controls.Add(addButton, 1, 0);
+            addButton.Click += new System.EventHandler(addButton_Click);
+
+            CheckBox checkBox = new CheckBox();
+            checkBox.Name = "checkBoxDBLoacacion";
+            checkBox.Dock = DockStyle.Fill;
+            checkBox.Location = new Point(3, 3);
+            checkBox.Size = new Size(144, 21);
+            checkBox.TabIndex = 2;
+            checkBox.Text = "Использовать локальную базу данныx";
+            checkBox.Checked = ini.GetCheckDBLocalPath();
+            checkBox.Visible = true;
+            checkBox.CheckedChanged += checkBox_CheckedChanged;
+            tableLayoutPanelControl.Controls.Add(checkBox, 0, 0);
+
+            //Первая колонка
+            tableLayoutPanelControl.Controls.Add(tableLayoutPanelPath, 0, 1);
+
+            EnabledPathControls(checkBox.Checked);
+
+            //Вторая колонка
+            String countOrders = String.Format("{0,-35}{1,-25:f4}", "Всего заказов в базе:", getOrders.GetCountOrders().ToString("N0"));
+            String countUsers = String.Format("{0,-35}{1,-25:f4}", "Всего сотрудников:", getUser.GetCountUsers().ToString("N0"));
+
+            tableLayoutPanelControl.Controls.Add(CreateLabel("countOrders", countOrders, ContentAlignment.MiddleLeft, new Font("Consolas", 12)), 1, 0);
+            tableLayoutPanelControl.Controls.Add(CreateLabel("countUsers", countUsers, ContentAlignment.MiddleLeft, new Font("Consolas", 12)), 1, 1);
+
+            //tableLayoutPanelControl.Controls.Add(CreateLabel("label001", getOrders.GetCountOrders().ToString("N0"), ContentAlignment.MiddleLeft), 1, 0);
+
+            //tableLayoutPanelControl.Controls.Add(CreateLabel("labelX", (tableLayoutPanelControl.RowCount).ToString(), ContentAlignment.MiddleLeft), 0, 5);
         }
 
         private Label CreateLabel(String name, String text, ContentAlignment contentAlignment)
@@ -1302,11 +1488,30 @@ namespace OrderManager
             return label;
         }
 
+        private Label CreateLabel(String name, String text, ContentAlignment contentAlignment, Font font)
+        {
+            Label label = new Label();
+            label.AutoSize = true;
+            label.Dock = System.Windows.Forms.DockStyle.Fill;
+            label.Location = new System.Drawing.Point(1, 1);
+            label.Name = name;
+            label.Size = new System.Drawing.Size(64, 24);
+            label.TabIndex = 10;
+            label.Text = text;
+            label.TextAlign = contentAlignment;
+            label.Visible = true;
+            label.Font = font;
+
+            return label;
+        }
+
         private void MainLVInsertValue()
         {
             GetValueFromShiftsBase getShifts = new GetValueFromShiftsBase(dataBase);
             GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
             GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
@@ -1329,19 +1534,16 @@ namespace OrderManager
 
                     for (int j = 0; j < machines.Count; j++)
                     {
-                        GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase, machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]));
-                        GetLeadTime leadTimeCurr = new GetLeadTime(dataBase, userBase.GetCurrentShiftStart(users[i]), getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]), machines[j], getOrder.GetValue("counterRepeat"));
-                        GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
+                        GetLeadTime leadTimeCurr = new GetLeadTime(dataBase, userBase.GetCurrentShiftStart(users[i]), getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]), machines[j], getOrder.GetCounterRepeat(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
 
                         List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(userBase.GetCurrentShiftStart(users[i]), "");
-
 
                         String user = "";
                         String currentTime = "";
                         String order = "";
 
                         if (getInfo.GetCurrentOrderNumber(machines[j]) != "")
-                            order = getInfo.GetCurrentOrderNumber(machines[j]) + ", " + getOrder.GetValue("nameOfOrder");
+                            order = getInfo.GetCurrentOrderNumber(machines[j]) + ", " + getOrder.GetOrderName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]));
 
                         if (j == 0)
                             user = users[i];
@@ -1381,7 +1583,7 @@ namespace OrderManager
                         item.Text = userBase.GetNameUser(user);
                         item.SubItems.Add(getInfo.GetMachineName(machines[j]));
                         item.SubItems.Add(order);
-                        item.SubItems.Add(getOrder.GetOrderStatusName());
+                        item.SubItems.Add(getOrder.GetOrderStatusName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
                         item.SubItems.Add(currentTime);
                         item.SubItems.Add(timeDiff);
 
@@ -1399,7 +1601,7 @@ namespace OrderManager
         {
             if (tableLayoutPanel1.Controls.ContainsKey(panel))
             {
-                var controlPanel = tableLayoutPanel1.Controls.Find(panel, false);
+                var controlPanel = tableLayoutPanel1.Controls.Find(panel, true);
                 TableLayoutPanel tableLayoutPanelControl = (TableLayoutPanel)controlPanel[0];
 
                 if (tableLayoutPanelControl.Controls.ContainsKey(name))
@@ -2034,6 +2236,7 @@ namespace OrderManager
 
         private void LoadAllOrdersFromBase(CancellationToken token, DateTime dateTime, String filter)
         {
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
@@ -2095,7 +2298,6 @@ namespace OrderManager
                                 GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
                                 GetLeadTime leadTimeFirst = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
                                 GetLeadTime leadTimeLast = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
-                                GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
 
                                 ordersNumbers.Add(new OrderNM(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
@@ -2122,7 +2324,7 @@ namespace OrderManager
                                 item.SubItems.Add(leadTimeLast.GetLastValue("timeToWorkStop").ToString());
                                 //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
                                 item.SubItems.Add(orderCalc.OrderFullCalculate().ToString("N0"));
-                                item.SubItems.Add(ordersBase.GetOrderStatusName());
+                                item.SubItems.Add(ordersBase.GetOrderStatusName(getInfo.GetMachineFromName(comboBoxMachine.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
                                 Invoke(new Action(() => listView.Items.Add(item)));
 
@@ -2363,41 +2565,54 @@ namespace OrderManager
 
         private void LoadPage(int page)
         {
+            var name = "listView";
+            if (tableLayoutPanel1.Controls.ContainsKey(name))
+            {
+                var control = tableLayoutPanel1.Controls.Find(name, true);
+                
+                ListView listView = (ListView)control[0];
+
+                SaveHeaders(listView);
+            }
+
             List<ColumnHeader> head;
+
+            currentPage = page;
 
             switch (page)
             {
                 case 1:
                     tableLayoutPanel1.RowStyles[1].Height = 0;
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersMain));
+                    CreatActivityControl();
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     MainLVInsertValue();
                     break;
                 case 2:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateStatisticUsersControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersStatistic));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     StartLoadingStatisticUsers();
                     break;
                 case 3:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateShiftsControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersShifts));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     StartLoadingShifts();
                     break;
                 case 4:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateStatisticMachinesControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersStatisticMachines));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     StartLoadingStatisticMachines();
                     break;
                 case 5:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateAllOrdersControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersAllOrders));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     ContextMenuToLV();
                     StartLoadingAllOrders();
@@ -2405,14 +2620,14 @@ namespace OrderManager
                 case 6:
                     tableLayoutPanel1.RowStyles[1].Height = 35;
                     CreateNormControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersNorm));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     StartLoadNormFromBase();
                     break;
                 case 7:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateUsersControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersUsers));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     ContextMenuToLV();
                     LoadUsersFromBase();
@@ -2420,7 +2635,7 @@ namespace OrderManager
                 case 8:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateMachineControls();
-                    head = new List<ColumnHeader>(ListHeaders(columnHeadersMachines));
+                    head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     ContextMenuToLV();
                     LoadMachinesAndCategoryesFromBase();
@@ -2520,7 +2735,46 @@ namespace OrderManager
         {
             UpdatePage(currentPage);
         }
-        
+
+        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            INISettings ini = new INISettings();
+            CheckBox checkBox = (CheckBox)sender;
+
+            switch (currentPage)
+            {
+                case 1:
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+                    break;
+                case 6:
+
+                    break;
+                case 7:
+                    break;
+                case 8:
+                    break;
+                case 9:
+                    ini.SetCheckDBLocalPath(checkBox.Checked);
+
+                    EnabledPathControls(checkBox.Checked);
+                    break;
+
+                default:
+                    break;
+            }
+            UpdatePage(currentPage);
+        }
+
+
         private void ListViewDoubleClick(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
@@ -2632,6 +2886,12 @@ namespace OrderManager
                     if (((Button)sender).Name == "addMachineButton")
                         ShowAddMachineForm();
                         //LoadUsersFromBase();
+                    break;
+                case 9:
+                    ShowSelectDataBaseFile();
+                    GetDatBasePath();
+
+
                     break;
 
                 default:
@@ -2808,6 +3068,62 @@ namespace OrderManager
             form.ShowDialog();
         }
 
+        private void EnabledPathControls(bool eneble)
+        {
+            TextBox textBoxDBPath = null;
+            Button addButtonDBPath = null;
+
+            var name = "tableLayoutPanelControl";
+            if (tableLayoutPanel1.Controls.ContainsKey(name))
+            {
+                var control = tableLayoutPanel1.Controls.Find(name, false);
+                TableLayoutPanel panel = (TableLayoutPanel)control[0];
+
+                var subControl = panel.Controls.Find("tableLayoutPanelPath", false);
+                var textBox = subControl[0].Controls.Find("textBoxDBPath", false);
+                var button = subControl[0].Controls.Find("addButtonDBPath", false);
+
+                textBoxDBPath = (TextBox)textBox[0];
+                addButtonDBPath = (Button)button[0];
+            }
+
+            if (eneble)
+            {
+                textBoxDBPath.Enabled = false;
+                addButtonDBPath.Enabled = false;
+            }
+            else
+            {
+                textBoxDBPath.Enabled = true;
+                addButtonDBPath.Enabled = true;
+            }
+
+            GetDatBasePath();
+        }
+
+        private void GetDatBasePath()
+        {
+            INISettings ini = new INISettings();
+
+            TextBox textBoxDBPath;
+
+            var name = "tableLayoutPanelControl";
+            if (tableLayoutPanel1.Controls.ContainsKey(name))
+            {
+                var control = tableLayoutPanel1.Controls.Find(name, false);
+                TableLayoutPanel panel = (TableLayoutPanel)control[0];
+
+                var subControl = panel.Controls.Find("tableLayoutPanelPath", false);
+                var textBox = subControl[0].Controls.Find("textBoxDBPath", false);
+
+                textBoxDBPath = (TextBox)textBox[0];
+
+                textBoxDBPath.Text = ini.DataBasePath();
+
+                dataBase = ini.DataBasePath();
+            }
+        }
+
         private void FormAdmin_Load(object sender, EventArgs e)
         {
             selectedYear = DateTime.Now.Year;
@@ -2825,56 +3141,47 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            currentPage = 1;
-            LoadPage(currentPage);
+            LoadPage(1);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            currentPage = 2;
-            LoadPage(currentPage);
+            LoadPage(2);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            currentPage = 3;
-            LoadPage(currentPage);
+            LoadPage(3);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            currentPage = 4;
-            LoadPage(currentPage);
+            LoadPage(4);
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            currentPage = 5;
-            LoadPage(currentPage);
+            LoadPage(5);
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
-            currentPage = 6;
-            LoadPage(currentPage);
+            LoadPage(6);
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
-            currentPage = 7;
-            LoadPage(currentPage);
+            LoadPage(7);
         }
 
         private void button8_Click(object sender, EventArgs e)
         {
-            currentPage = 8;
-            LoadPage(currentPage);
+            LoadPage(8);
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
-            currentPage = 9;
-            LoadPage(currentPage);
+            LoadPage(9);
         }
 
         private void button10_Click(object sender, EventArgs e)

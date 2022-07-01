@@ -23,13 +23,15 @@ namespace OrderManager
         {
             InitializeComponent();
 
+            INISettings ini = new INISettings();
+
             if (args.Length > 0)
             {
                 if (args[0] == "adminMode")
                     adminMode = true;
             }
             
-            dataBase = DataBasePath();
+            dataBase = ini.DataBasePath();
         }
 
         List<Order> ordersCurrentShift;
@@ -43,32 +45,6 @@ namespace OrderManager
             public static int indexItem = -1;
             public static String nameOfExecutor = "";
             public static String startOfShift = "";
-        }
-
-        private String DataBasePath()
-        {
-            IniFile INI = new IniFile("settings.ini");
-            String result = "";
-
-            String path = "";
-            String file = "";
-
-            if (INI.KeyExists("dataBasePath"))
-                path = INI.ReadINI("general", "dataBasePath");
-
-            if (INI.KeyExists("dataBaseFile"))
-                file = INI.ReadINI("general", "dataBaseFile");
-
-            if (path != "")
-                result += path;
-            else
-                result += Directory.GetCurrentDirectory() + "\\data";
-
-            if (file != "")
-                result += "\\" + file;
-            else
-                result += "\\" + "data.db";
-            return result;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -464,7 +440,8 @@ namespace OrderManager
         {
             GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            
+            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
+
             GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
 
             List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
@@ -475,17 +452,15 @@ namespace OrderManager
             {
                 foreach (String machine in machines)
                 {
-                    GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase, machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
-
                     String order = "";
                     if (getInfo.GetCurrentOrderNumber(machine) != "")
-                        order = getInfo.GetCurrentOrderNumber(machine) + ", " + getOrder.GetValue("nameOfOrder");
+                        order = getInfo.GetCurrentOrderNumber(machine) + ", " + getOrder.GetOrderName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
 
                     ListViewItem item = new ListViewItem();
 
                     item.Name = machine;
                     item.Text = getInfo.GetMachineName(machine);
-                    item.SubItems.Add(getOrder.GetOrderStatusName());
+                    item.SubItems.Add(getOrder.GetOrderStatusName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine)));
                     item.SubItems.Add(order);
 
                     listView2.Items.Add(item);
@@ -743,5 +718,6 @@ namespace OrderManager
         {
             CancelShift();
         }
+
     }
 }

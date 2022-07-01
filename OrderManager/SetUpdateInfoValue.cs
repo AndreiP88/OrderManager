@@ -57,7 +57,7 @@ namespace OrderManager
         {
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                string commandText = "UPDATE Info SET " + parameter + " = @value " +
+                string commandText = "UPDATE machinesInfo SET " + parameter + " = @value " +
                     "WHERE (machine = @machine)";
 
                 SQLiteCommand Command = new SQLiteCommand(commandText, Connect);

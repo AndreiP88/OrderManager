@@ -12,20 +12,6 @@ namespace OrderManager
     {
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String dataBase;
-        String machine;
-        String numberOfOrder;
-        String modificationOfOrder;
-
-        public GetValueFromOrdersBase(String dBase, String currentMachine, String orderNumber, String orderModification)
-        {
-            this.dataBase = dBase;
-            this.machine = currentMachine;
-            this.numberOfOrder = orderNumber;
-            this.modificationOfOrder = orderModification;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
-        }
 
         /// <summary>
         /// 
@@ -39,25 +25,48 @@ namespace OrderManager
                 dataBase = dataBaseDefault;
         }
 
-        public String GetOrderCount()
+
+        public String GetOrderCount(String currentMachine, String orderNumber, String orderModification)
         {
-            return GetValue("count");
+            return GetValue(currentMachine, orderNumber, orderModification, "count");
         }
 
-        public String GetOrderStatus()
+        public String GetOrderStatus(String currentMachine, String orderNumber, String orderModification)
         {
-            return GetValue("statusOfOrder");
+            return GetValue(currentMachine, orderNumber, orderModification, "statusOfOrder");
         }
 
-        public String GetOrderName()
+        public String GetOrderName(String currentMachine, String orderNumber, String orderModification)
         {
-            return GetValue("nameOfOrder");
+            return GetValue(currentMachine, orderNumber, orderModification, "nameOfOrder");
         }
 
-        public String GetOrderStatusName()
+        public String GetCounterRepeat(String currentMachine, String orderNumber, String orderModification)
+        {
+            return GetValue(currentMachine, orderNumber, orderModification, "counterRepeat");
+        }
+
+        public String GetAmountOfOrder(String currentMachine, String orderNumber, String orderModification)
+        {
+            return GetValue(currentMachine, orderNumber, orderModification, "amountOfOrder");
+        }
+
+        public String GetTimeMakeready(String currentMachine, String orderNumber, String orderModification)
+        {
+            return GetValue(currentMachine, orderNumber, orderModification, "timeMakeready");
+        }
+
+        public String GetTimeToWork(String currentMachine, String orderNumber, String orderModification)
+        {
+            return GetValue(currentMachine, orderNumber, orderModification, "timeToWork");
+        }
+        
+
+
+        public String GetOrderStatusName(String currentMachine, String orderNumber, String orderModification)
         {
             String result = "";
-            String status = GetValue("statusOfOrder");
+            String status = GetValue(currentMachine, orderNumber, orderModification, "statusOfOrder");
 
             if (status == "0")
                 result = "Заказ не выполняется";
@@ -83,11 +92,9 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    //CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
                     CommandText = @"SELECT COUNT(DISTINCT numberOfOrder) as count FROM orders"
 
                 };
-                //SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                 result = Convert.ToInt32(Command.ExecuteScalar());
 
@@ -97,7 +104,7 @@ namespace OrderManager
             return result;
         }
 
-        public String GetValue(String nameOfColomn)
+        private String GetValue(String machine, String numberOfOrder, String modificationOfOrder, String nameOfColomn)
         {
             String result = "0";
 

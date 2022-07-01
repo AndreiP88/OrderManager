@@ -160,9 +160,9 @@ namespace OrderManager
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
-            GetValueFromOrdersBase getOrderCount = new GetValueFromOrdersBase(dataBase, orderrMachineLoad, orderNumberLoad, orderModificationLoad);
+            GetValueFromOrdersBase getOrderCount = new GetValueFromOrdersBase(dataBase);
 
-            String orderCount = getOrderCount.GetOrderCount();
+            String orderCount = getOrderCount.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
             String orderAddedDate = DateTime.Now.ToString();
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
@@ -260,12 +260,12 @@ namespace OrderManager
         {
             //int orderStatus = 0;
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getOrderValue = new GetValueFromOrdersBase(dataBase, orderMachine, orderNumber, orderModification);
+            GetValueFromOrdersBase getOrderValue = new GetValueFromOrdersBase(dataBase);
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
             numbersOrdersInProgress = (List<String>)ordersFromBase.GetNumbersOrders(orderMachine, orderNumber, orderModification);
-            numbersOrder = getOrderValue.GetOrderCount();
+            numbersOrder = getOrderValue.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
@@ -300,16 +300,16 @@ namespace OrderManager
         private void button1_Click(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text);
+            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
 
             if (CheckNotEmptyFields() == true)
             {
-                if (CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text) && numbersOrder != getValue.GetOrderCount())
+                if (CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text) && numbersOrder != getValue.GetOrderCount(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text))
                 {
                     MessageBox.Show("Заказ №" + textBox1.Text + " есть в базе, проверьте введенные данные.", "Добавление заказа", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                else if (CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text) && numbersOrder == getValue.GetOrderCount())
+                else if (CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text) && numbersOrder == getValue.GetOrderCount(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text))
                 {
                     AddOrderToDB();
 

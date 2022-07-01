@@ -25,6 +25,7 @@ namespace OrderManager
 
         public (Object, Object) LoadShiftsFromBase(DateTime currentDate, String category)
         {
+            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
@@ -75,9 +76,8 @@ namespace OrderManager
 
                     for (int i = 0; i < ordersCurrentShift.Count; i++)
                     {
-                        GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase, ordersCurrentShift[i].machineOfOrder, ordersCurrentShift[i].numberOfOrder, ordersCurrentShift[i].modificationOfOrder);
                         GetLeadTime leadTime = new GetLeadTime(dataBase, sqlReader["startShift"].ToString(),
-                            ordersCurrentShift[i].numberOfOrder, ordersCurrentShift[i].modificationOfOrder, ordersCurrentShift[i].machineOfOrder, getOrder.GetValue("counterRepeat"));
+                            ordersCurrentShift[i].numberOfOrder, ordersCurrentShift[i].modificationOfOrder, ordersCurrentShift[i].machineOfOrder, getOrder.GetCounterRepeat(ordersCurrentShift[i].machineOfOrder, ordersCurrentShift[i].numberOfOrder, ordersCurrentShift[i].modificationOfOrder));
 
                         if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")
                         {

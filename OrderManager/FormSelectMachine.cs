@@ -98,6 +98,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
+                GetValueFromOrdersBase order = new GetValueFromOrdersBase(dataBase);
                 GetUserIDOrMachineFromInfoBase getUser = new GetUserIDOrMachineFromInfoBase(dataBase);
                 GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
                 GetValueFromUserBase user = new GetValueFromUserBase(dataBase);
@@ -114,12 +115,10 @@ namespace OrderManager
                 {
                     String machine = sqlReader["id"].ToString();
 
-                    GetValueFromOrdersBase order = new GetValueFromOrdersBase(dataBase, machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
-
                     String orderName = getInfo.GetCurrentOrderNumber(machine);
 
                     if (orderName != "")
-                        orderName += ", " + order.GetOrderName();
+                        orderName += ", " + order.GetOrderName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
                     else
                         orderName = "";
 

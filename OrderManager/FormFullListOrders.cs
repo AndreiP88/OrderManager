@@ -170,6 +170,7 @@ namespace OrderManager
 
         private void LoadOrdersFromBase()
         {
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
@@ -217,8 +218,6 @@ namespace OrderManager
                 {
                     if (sqlReader["numberOfOrder"].ToString().Contains(textBox1.Text))
                     {
-                        GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
-
                         year = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("yyyy");
                         month = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("MMMM");
                         machine = sqlReader["machine"].ToString();
@@ -240,13 +239,13 @@ namespace OrderManager
 
                         //отображение общего количества тиража не в каждой строке, а только в первой
                         String amountOrder;
-                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetValue("amountOfOrder")) && tmpNumberOrders == sqlReader["numberOfOrder"].ToString() + ", " + sqlReader["modification"].ToString())
+                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString())) && tmpNumberOrders == sqlReader["numberOfOrder"].ToString() + ", " + sqlReader["modification"].ToString())
                         {
                             amountOrder = "";
                         }
                         else
                         {
-                            amountOrder = Convert.ToInt32(ordersBase.GetValue("amountOfOrder")).ToString("N0");
+                            amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString())).ToString("N0");
                         }
 
                         String modification = "";
@@ -258,7 +257,7 @@ namespace OrderManager
 
                         tmpStartShifts = sqlReader["startOfShift"].ToString();
                         tmpNumberOrders = sqlReader["numberOfOrder"].ToString() + ", " + sqlReader["modification"].ToString();
-                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetValue("amountOfOrder"));
+                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
                         amountAllOrders += Convert.ToInt32(sqlReader["done"]);
                     
@@ -269,7 +268,7 @@ namespace OrderManager
                         item.SubItems.Add(date);
                         item.SubItems.Add(name);
                         item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
-                        item.SubItems.Add(ordersBase.GetValue("nameOfOrder"));
+                        item.SubItems.Add(ordersBase.GetOrderName(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()));
                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()));
                         item.SubItems.Add(amountOrder);

@@ -166,6 +166,7 @@ namespace OrderManager
 
         private void LoadOrdersFromBase()
         {
+            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
@@ -197,7 +198,6 @@ namespace OrderManager
                         GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
                         GetLeadTime leadTimeFirst = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
                         GetLeadTime leadTimeLast = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
-                        GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase, getInfo.GetMachineFromName(comboBox1.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
 
                         ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
@@ -218,7 +218,7 @@ namespace OrderManager
                         item.SubItems.Add(leadTimeLast.GetLastValue("timeToWorkStop").ToString());
                         //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
                         item.SubItems.Add(orderCalc.OrderFullCalculate().ToString("N0"));
-                        item.SubItems.Add(ordersBase.GetOrderStatusName());
+                        item.SubItems.Add(ordersBase.GetOrderStatusName(getInfo.GetMachineFromName(comboBox1.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
                         listView1.Items.Add(item);
 

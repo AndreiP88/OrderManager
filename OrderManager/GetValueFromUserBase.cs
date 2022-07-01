@@ -97,6 +97,28 @@ namespace OrderManager
             return userList;
         }
 
+        public int GetCountUsers()
+        {
+            int result = 0;
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT COUNT(DISTINCT id) as count FROM users WHERE activeUser = 'True'"
+
+                };
+
+                result = Convert.ToInt32(Command.ExecuteScalar());
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
         public bool GetUserWorking(String id)
         {
             bool result = false;

@@ -111,6 +111,7 @@
     <Compile Include="FormAddEditUser.Designer.cs">
       <DependentUpon>FormAddEditUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="INISettings.cs" />
     <Compile Include="StringArray.cs" />
     <Compile Include="Cryption.cs" />
     <Compile Include="FormAddNewOrder.cs">
