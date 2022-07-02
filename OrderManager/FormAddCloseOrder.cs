@@ -15,6 +15,7 @@ namespace OrderManager
     public partial class FormAddCloseOrder : Form
     {
         bool aMode;
+        bool adminCloseOrder;
         String dataBase;
         String startOfShift;
         String nameOfExecutor;
@@ -40,11 +41,30 @@ namespace OrderManager
             }
         }
 
+        /*public FormAddCloseOrder(String dBase, String lStartOfShift)
+        {
+            InitializeComponent();
+
+            GetValueFromUserBase getUser = new GetValueFromUserBase(dBase);
+
+            this.aMode = false;
+            this.dataBase = dBase;
+            this.startOfShift = lStartOfShift;
+            this.nameOfExecutor = getUser.GetCurrentUserIDFromShiftStart(lStartOfShift);
+            this.loadOrderNumber = "";
+            this.loadOrderModification = "";
+            this.loadMachine = "";
+            this.loadCounterRepeat = "";
+
+        }*/
+
         public FormAddCloseOrder(String dBase, String lStartOfShift, String lNameOfExecutor)
         {
             InitializeComponent();
 
             this.aMode = false;
+            this.adminCloseOrder = false;
+
             this.dataBase = dBase;
             this.startOfShift = lStartOfShift;
             this.nameOfExecutor = lNameOfExecutor;
@@ -55,11 +75,30 @@ namespace OrderManager
 
         }
 
+        public FormAddCloseOrder(String dBase, String lStartOfShift, String lNameOfExecutor, String lMachine)
+        {
+            InitializeComponent();
+
+            this.aMode = false;
+            this.adminCloseOrder = true;
+
+            this.dataBase = dBase;
+            this.startOfShift = lStartOfShift;
+            this.nameOfExecutor = lNameOfExecutor;
+            this.loadOrderNumber = "";
+            this.loadOrderModification = "";
+            this.loadMachine = lMachine;
+            this.loadCounterRepeat = "";
+
+        }
+
         public FormAddCloseOrder(bool adminMode, String dBase, String lStartOfShift, String lOrderNumber, String lOrderModification, String lMachine, String lCounterRepeat)
         {
             InitializeComponent();
 
             this.aMode = adminMode;
+            this.adminCloseOrder = false;
+
             this.dataBase = dBase;
             this.startOfShift = lStartOfShift;
             this.loadOrderNumber = lOrderNumber;
@@ -78,6 +117,8 @@ namespace OrderManager
             InitializeComponent();
 
             this.aMode = false;
+            this.adminCloseOrder = false;
+
             this.dataBase = dBase;
             this.startOfShift = lStartOfShift;
             this.loadOrderNumber = lOrderNumber;
@@ -394,6 +435,13 @@ namespace OrderManager
                 textBox5.Enabled = false;
             }
 
+            if (adminCloseOrder)
+            {
+                comboBox3.Enabled = false;
+                checkBox1.Checked = false;
+                checkBox1.Enabled = false;
+            }
+
         }
 
         private void ClearAllValue()
@@ -444,7 +492,7 @@ namespace OrderManager
 
         private bool CheckUserToSelectedMachine(String machine, String user)
         {
-            GetUserIDOrMachineFromInfoBase getUserID = new GetUserIDOrMachineFromInfoBase(dataBase);
+            GetValueFromInfoBase getUserID = new GetValueFromInfoBase(dataBase);
             if (getUserID.GetIDUser(machine) == user)
                 return true;
             else
@@ -456,8 +504,18 @@ namespace OrderManager
             GetValueFromUserBase getMachine = new GetValueFromUserBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
 
-            String machine;
-            machine = getMachine.GetLastMachineForUser(idUser);
+            String machine = "";
+
+            if (!adminCloseOrder)
+            {
+                machine = getMachine.GetLastMachineForUser(idUser);
+            }
+            else
+            {
+                machine = loadMachine;
+                //comboBox3.Enabled = false;
+            }
+            
             if (machine != "" && comboBox3.Items.IndexOf(getInfo.GetMachineName(machine)) != -1)
                 comboBox3.SelectedIndex = comboBox3.Items.IndexOf(getInfo.GetMachineName(machine));
             else

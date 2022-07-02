@@ -769,6 +769,7 @@ namespace OrderManager
             menu.Name = "contextMenuStrip";
             menu.Size = new Size(163, 92);
             menu.Opening += new CancelEventHandler(contextMenuStrip_Opening);
+            menu.Closed += new ToolStripDropDownClosedEventHandler(contextMenuStrip_Closed);
 
             viewToolStripMenuItem.Click += new EventHandler(viewToolStripMenuItem_Click);
             editToolStripMenuItem.Click += new EventHandler(editToolStripMenuItem_Click);
@@ -1529,7 +1530,6 @@ namespace OrderManager
         private void MainLVInsertValue()
         {
             GetValueFromShiftsBase getShifts = new GetValueFromShiftsBase(dataBase);
-            GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
@@ -1551,7 +1551,7 @@ namespace OrderManager
 
                 for (int i = 0; i < users.Count; i++)
                 {
-                    List<String> machines = (List<String>)getMachine.GetMachines(users[i]);
+                    List<String> machines = (List<String>)getInfo.GetMachines(users[i]);
 
                     for (int j = 0; j < machines.Count; j++)
                     {
@@ -2923,9 +2923,16 @@ namespace OrderManager
 
         private void contextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
+            timer1.Enabled = false;
+
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
             e.Cancel = listV.SelectedItems.Count == 0;
+        }
+
+        private void contextMenuStrip_Closed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            timer1.Enabled = true;
         }
 
         private void viewToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2964,10 +2971,46 @@ namespace OrderManager
         private void closeShift_Click(object sender, EventArgs e)
         {
             //Завершение смены с вводом всех времени завершения операций дляя каждой машины и количеством выполненной продукции
+            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
 
-            //FormAddCloseOrder form = new FormAddCloseOrder(dataBase, "", "", "");
-            //form.ShowDialog();
+            ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
+
+            String startOfShift = listV.SelectedItems[0].Name.ToString();
+            String userId = getUser.GetCurrentUserIDFromShiftStart(startOfShift);
+
+            List<String> machines = (List<String>)getInfo.GetMachines(userId);
+
+            for (int i = 0; i < machines.Count; i++)
+            {
+                if (Convert.ToBoolean(getInfo.GetActiveOrder(machines[i])) == true)
+                {
+                    FormAddCloseOrder form = new FormAddCloseOrder(dataBase, startOfShift, userId, machines[i]);
+                    form.ShowDialog();
+                }     
+            }
+
+            if (getInfo.GetMachinesForUserActive(userId) == true)
+            {
+                MessageBox.Show("Смена не была завершена т.к. не все операции были завершены.", "Завершение смены", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
+                SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase);
+                GetValueFromShiftsBase getShift = new GetValueFromShiftsBase(dataBase);
+
+                getShift.CloseShift(startOfShift, DateTime.Now.ToString());
+                infoBase.CompleteTheShift(userId);
+                userBase.UpdateCurrentShiftStart(userId, "");
+
+                MessageBox.Show("Смена завершена в " + DateTime.Now.ToString(), "Завершение смены", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            UpdatePage(currentPage);
         }
+
+
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {

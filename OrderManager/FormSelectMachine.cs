@@ -58,7 +58,7 @@ namespace OrderManager
 
         private bool CheckUserToSelectedMachine(String machine, String user)
         {
-            GetUserIDOrMachineFromInfoBase getUserID = new GetUserIDOrMachineFromInfoBase(dataBase);
+            GetValueFromInfoBase getUserID = new GetValueFromInfoBase(dataBase);
             if (getUserID.GetIDUser(machine) == user)
                 return true;
             else
@@ -67,7 +67,7 @@ namespace OrderManager
 
         private bool CheckFreeMachine(String machine)
         {
-            GetUserIDOrMachineFromInfoBase getUserID = new GetUserIDOrMachineFromInfoBase(dataBase);
+            GetValueFromInfoBase getUserID = new GetValueFromInfoBase(dataBase);
 
             bool result;
 
@@ -99,7 +99,6 @@ namespace OrderManager
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
                 GetValueFromOrdersBase order = new GetValueFromOrdersBase(dataBase);
-                GetUserIDOrMachineFromInfoBase getUser = new GetUserIDOrMachineFromInfoBase(dataBase);
                 GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
                 GetValueFromUserBase user = new GetValueFromUserBase(dataBase);
 
@@ -126,15 +125,15 @@ namespace OrderManager
                     {
                         if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
                         {
-                            AddControl(machine, user.GetNameUser(getUser.GetIDUser(machine)), orderName, true, true);
+                            AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, true);
                         }
                         else if (CheckFreeMachine(machine) == true || CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
                         {
-                            AddControl(machine, user.GetNameUser(getUser.GetIDUser(machine)), orderName, true, false);
+                            AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, false);
                         }
                         else
                         {
-                            AddControl(machine, user.GetNameUser(getUser.GetIDUser(machine)), orderName, false, false);
+                            AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
                         }
                     }
                     

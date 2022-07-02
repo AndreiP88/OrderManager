@@ -35,7 +35,7 @@ namespace OrderManager
 
         private void LoadUsersList()
         {
-            GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
+            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
 
             int counter = 0;
 

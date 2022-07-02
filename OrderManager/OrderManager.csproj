@@ -188,7 +188,6 @@
     </Compile>
     <Compile Include="GetCountOfDone.cs" />
     <Compile Include="GetShiftsFromBase.cs" />
-    <Compile Include="GetUserIDOrMachineFromInfoBase.cs" />
     <Compile Include="GetLeadTime.cs" />
     <Compile Include="GetNumberShiftFromTimeStart.cs" />
     <Compile Include="GetOrdersFromBase.cs" />
@@ -205,7 +204,6 @@
       <DependentUpon>FormLoadUserForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GetDateTimeOperations.cs" />
-    <Compile Include="GetYearsFromBase.cs" />
     <Compile Include="IniFiles.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Shifts.cs" />

@@ -14,6 +14,14 @@ namespace OrderManager
         String dataBase;
         String machine;
 
+        public SetUpdateInfoBase(String dBase)
+        {
+            this.dataBase = dBase;
+            this.machine = "";
+
+            if (dataBase == "")
+                dataBase = dataBaseDefault;
+        }
         public SetUpdateInfoBase(String dBase, String activeMachine)
         {
             this.dataBase = dBase;
@@ -27,6 +35,36 @@ namespace OrderManager
         {
             UpdateInfoParameter("currentOrder", currentOrder);
             UpdateInfoParameter("currentModification", currentModification);
+        }
+
+        public void CompleteTheShift(String nameOfExecutor)
+        {
+            
+            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+
+            List<String> machines = (List<String>)getMachine.GetMachines(nameOfExecutor);
+
+            foreach (String machine in machines)
+            {
+                CompleteTheShiftFromMachines(machine);
+            }
+        }
+
+        private void CompleteTheShiftFromMachines(String selectMachine)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE machinesInfo SET nameOfExecutor = '', currentCounterRepeat = '', " +
+                    "currentOrder = '', currentModification = '', activeOrder = 'False' " + // проверить актив ордер
+                    "WHERE (machine = @machine)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@machine", selectMachine);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         public void UpdateInfo(String currentCounterRepeat, String currentOrder, String currentModification, String lastOrder, String lastModification, bool activeOrder)

@@ -47,6 +47,11 @@ namespace OrderManager
             return GetValueMachines("id", machine, "note");
         }
 
+        public String GetIDUser(String machine)
+        {
+            return GetValue("machine", machine, "nameOfExecutor");
+        }
+
         public String GetActiveOrder(String machine)
         {
             return GetValue("machine", machine, "activeOrder");
@@ -88,7 +93,7 @@ namespace OrderManager
         /// <returns>List содержащий все оборудование</returns>
         public List<String> GetMachinesList()
         {
-            List<String> machinesList = new List<String>(GetMachines(""));
+            List<String> machinesList = new List<String>(GetAllMachines(""));
 
             return machinesList;
         }
@@ -100,12 +105,12 @@ namespace OrderManager
         /// <returns>List содержащий оборудование выбранной категории</returns>
         public List<String> GetMachinesList(String category)
         {
-            List<String> machinesList = new List<String>(GetMachines(category));
+            List<String> machinesList = new List<String>(GetAllMachines(category));
 
             return machinesList;
         }
 
-        private List<String> GetMachines(String category)
+        private List<String> GetAllMachines(String category)
         {
             List<String> machinesList = new List<String>();
 
@@ -182,6 +187,70 @@ namespace OrderManager
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Список активного оборудования для выпранного пользователя
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public Object GetMachines(String userID)
+        {
+            List<String> result = new List<String>();
+            result.Clear();
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machinesInfo WHERE nameOfExecutor = '" + userID + "'"
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result.Add(sqlReader["machine"].ToString());
+                }
+
+                Connect.Close();
+            }
+            return result;
+        }
+
+        public String GetMachinesStr(String userID)
+        {
+            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+
+            List<String> orderMachines = (List<String>)GetMachines(userID);
+            String machines = "";
+
+            for (int i = 0; i < orderMachines.Count; i++)
+            {
+                machines += getInfo.GetMachineName(orderMachines[i]);
+
+                if (i != orderMachines.Count - 1)
+                    machines += ", ";
+                else
+                    machines += ".";
+            }
+
+            return machines;
+        }
+
+        public bool GetMachinesForUserActive(String userID)
+        {
+            List<String> orderMachines = (List<String>)GetMachines(userID);
+            bool machinesActive = false;
+
+            for (int i = 0; i < orderMachines.Count; i++)
+            {
+                if (Convert.ToBoolean(GetActiveOrder(orderMachines[i])) == true)
+                    machinesActive = true;
+            }
+
+            return machinesActive;
         }
 
         private String GetValueTwoParam(String findColomnName, String findParameter, String findColomnName2, String findParameter2, String valueColomn)

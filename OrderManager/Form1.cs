@@ -338,7 +338,7 @@ namespace OrderManager
             GetDateTimeOperations dtOperations = new GetDateTimeOperations();
             GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            GetUserIDOrMachineFromInfoBase getUserMachines = new GetUserIDOrMachineFromInfoBase(dataBase);               
+            GetValueFromInfoBase getUserMachines = new GetValueFromInfoBase(dataBase);               
 
             if (getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
                 button6.Enabled = false;
@@ -369,52 +369,9 @@ namespace OrderManager
             this.Text = "Менеджер заказов";
         }
 
-        private void CompleteTheShift(String machine)
-        {
-            SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
-
-            userBase.UpdateCurrentShiftStart(Form1.Info.nameOfExecutor, "");
-
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                string commandText = "UPDATE machinesInfo SET nameOfExecutor = '', currentCounterRepeat = '', " +
-                    "currentOrder = '', currentModification = '', activeOrder = 'False' " + // проверить актив ордер
-                    "WHERE (machine = @machine)";
-
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@machine", machine); 
-
-                Connect.Open();
-                Command.ExecuteNonQuery();
-                Connect.Close();
-            }
-
-            EraseInfo();
-        }
-
-        private void AddShiftToBase()
-        {
-            String startShift = Form1.Info.startOfShift;
-            String stopShift = DateTime.Now.ToString();
-
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                string commandText = "UPDATE shifts SET stopShift = @stopShift " +
-                    "WHERE startShift = @startShift";
-
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startShift", startShift);
-                Command.Parameters.AddWithValue("@stopShift", stopShift);
-
-                Connect.Open();
-                Command.ExecuteNonQuery();
-                Connect.Close();
-            }
-        }
-
         private void LoadUser()
         {
-            GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
+            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
             GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
 
             List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
@@ -438,13 +395,12 @@ namespace OrderManager
 
         private void LoadMachinesDetailsForUser()
         {
-            GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
 
             GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
 
-            List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
+            List<String> machines = (List<String>)getInfo.GetMachines(Form1.Info.nameOfExecutor);
 
             listView2.Items.Clear();
 
@@ -491,17 +447,19 @@ namespace OrderManager
             if (result == DialogResult.Yes)
             {
                 Info.active = false;
-                AddShiftToBase();
 
-                GetUserIDOrMachineFromInfoBase getMachine = new GetUserIDOrMachineFromInfoBase(dataBase);
-                List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
-                foreach (String machine in machines)
-                {
-                    CompleteTheShift(machine);
-                }
+                SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
+                SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase);
+                GetValueFromShiftsBase getShift = new GetValueFromShiftsBase(dataBase);
+
+                getShift.CloseShift(Info.startOfShift, DateTime.Now.ToString());
+                infoBase.CompleteTheShift(Info.nameOfExecutor);
+                userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "");
 
                 ClearAll();
+                EraseInfo();
                 ShowUserForm();
+
                 Info.active = true;
             }
         }

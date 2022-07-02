@@ -21,6 +21,11 @@ namespace OrderManager
                 dataBase = dataBaseDefault;
         }
 
+        /// <summary>
+        /// получить имя пользователя по id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Имя пользователя из поля nameUser базы данных</returns>
         public String GetNameUser(String id)
         {
             return GetValue("id", id, "nameUser");
@@ -59,10 +64,22 @@ namespace OrderManager
             return GetValue("id", id, "passwordUser");
         }
 
+
         public String GetCurrentShiftStart(String id)
         {
             return GetValueInfo("user", id, "currentShiftStart");
         }
+
+        /// <summary>
+        /// Получить id пользователя для активной смены по времени начала смены
+        /// </summary>
+        /// <param name="shiftStart"></param>
+        /// <returns></returns>
+        public String GetCurrentUserIDFromShiftStart(String shiftStart)
+        {
+            return GetValueInfo("currentShiftStart", shiftStart, "user");
+        }
+
         public List<String> GetUserList(bool activeUserOnly)
         {
             List<String> userList = new List<String>();

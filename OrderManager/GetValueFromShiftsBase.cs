@@ -41,6 +41,23 @@ namespace OrderManager
             return result;
         }
 
+        public void CloseShift(String startShift, String stopShift)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE shifts SET stopShift = @stopShift " +
+                    "WHERE startShift = @startShift";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@stopShift", stopShift);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
         private List<String> GetValue(String findColomnName, String findParameter, String valueColomn)
         {
             List<String> result = new List<String>();
