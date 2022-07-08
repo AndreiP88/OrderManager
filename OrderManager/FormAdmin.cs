@@ -2800,6 +2800,7 @@ namespace OrderManager
         private void ListViewDoubleClick(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
 
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -2812,7 +2813,8 @@ namespace OrderManager
                     LoadShiftdetails(selectedName);
                     break;
                 case 2:
-
+                    selectedUser = getUser.GetNameUser(selectedName);
+                    LoadPage(3);
                     break;
                 case 3:
                     LoadShiftdetails(selectedName);
@@ -2823,22 +2825,25 @@ namespace OrderManager
                 case 5:
                     if (((ListView)sender).SelectedItems.Count != 0)
                         LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectegIndex].numberOfOrder, ordersNumbers[selectegIndex].modificationOfOrder);
+                    UpdatePage(currentPage);
                     break;
                 case 6:
                     
                     break;
                 case 7:
                     ShowEditUserForm(((ListView)sender).Items[((ListView)sender).SelectedIndices[0]].Name);
+                    UpdatePage(currentPage);
                     break;
 
                 case 8:
                     ShowEditMachineForm(selectedName);
+                    UpdatePage(currentPage);
                     break;
 
                 default:
                     break;
             }
-            UpdatePage(currentPage);
+            
         }
 
         private void listView_SelectedIndexChanged(object sender, EventArgs e)
