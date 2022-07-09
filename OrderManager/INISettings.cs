@@ -46,12 +46,14 @@ namespace OrderManager
                 result = GetParameter("general", "dataBasePath");
             }
 
-            result = result.Replace(@"\", "\\\\");
-
             if (!File.Exists(result))
             {
                 result = Directory.GetCurrentDirectory() + "\\data\\data.db";
             }
+
+            result = result.Replace(@"\", @"\\");
+
+            //MessageBox.Show(File.Exists(result).ToString() + Environment.NewLine + result);
 
             return result;
         }

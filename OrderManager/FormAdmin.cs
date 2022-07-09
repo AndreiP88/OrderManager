@@ -559,8 +559,6 @@ namespace OrderManager
         {
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
-
-
             ValueOrdersBase orders = new ValueOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text));
@@ -572,8 +570,6 @@ namespace OrderManager
             if (statusOrder != "0" && statusOrder != "4")
             {
                 result = MessageBox.Show("Вы действительно хотите прервать заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-
             }
             
             if (result == DialogResult.Yes)
@@ -1589,16 +1585,23 @@ namespace OrderManager
 
                         String user = "";
                         String currentTime = "";
+                        String currentShiftStart = "";
                         String order = "";
 
                         if (getInfo.GetCurrentOrderNumber(machines[j]) != "")
                             order = getInfo.GetCurrentOrderNumber(machines[j]) + ", " + getOrder.GetOrderName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]));
 
                         if (j == 0)
+                        {
                             user = users[i];
+                            currentShiftStart = userBase.GetCurrentShiftStart(users[i]);
+                        }
                         else
+                        {
                             user = "";
-
+                            currentShiftStart = "";
+                        }
+                            
                         if (leadTimeCurr.GetCurrentDateTime("timeMakereadyStart") != "")
                             currentTime = leadTimeCurr.GetCurrentDateTime("timeMakereadyStart");
                         else
@@ -1630,6 +1633,7 @@ namespace OrderManager
 
                         item.Name = userBase.GetCurrentShiftStart(users[i]);
                         item.Text = userBase.GetNameUser(user);
+                        item.SubItems.Add(currentShiftStart);
                         item.SubItems.Add(getInfo.GetMachineName(machines[j]));
                         item.SubItems.Add(order);
                         item.SubItems.Add(getOrder.GetOrderStatusName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
@@ -2626,6 +2630,8 @@ namespace OrderManager
 
             List<ColumnHeader> head;
 
+            toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
+
             currentPage = page;
 
             switch (page)
@@ -2703,6 +2709,7 @@ namespace OrderManager
         private void UpdatePage(int page)
         {
             //MessageBox.Show(selectedYear.ToString() + ", " + selectedMonth.ToString());
+            toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
 
             switch (page)
             {
@@ -3257,9 +3264,10 @@ namespace OrderManager
 
                 textBoxDBPath = (TextBox)textBox[0];
 
-                textBoxDBPath.Text = ini.DataBasePath().Replace(@"\\", @"\");
-
                 dataBase = ini.DataBasePath();
+                textBoxDBPath.Text = dataBase.Replace(@"\\", @"\");
+
+                
             }
         }
 
