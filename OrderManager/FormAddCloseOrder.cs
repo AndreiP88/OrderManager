@@ -218,8 +218,6 @@ namespace OrderManager
                 groupBox3.Visible = false;
                 groupBox4.Visible = false;
 
-                checkBox1.Visible = false;
-
                 textBox6.Enabled = false;
             }
             if (status == "1") // начата приладка
@@ -239,8 +237,6 @@ namespace OrderManager
                     groupBox3.Visible = false;
                     groupBox4.Visible = false;
 
-                    checkBox1.Visible = false;
-
                     textBox6.Enabled = false;
                 }
                 else
@@ -259,8 +255,6 @@ namespace OrderManager
 
                     groupBox3.Visible = false;
                     groupBox4.Visible = false;
-
-                    checkBox1.Visible = true;
 
                     textBox6.Enabled = true;
                 }
@@ -285,8 +279,6 @@ namespace OrderManager
 
                 groupBox3.Visible = true;
                 groupBox4.Visible = false;
-
-                checkBox1.Visible = false;
 
                 textBox6.Enabled = false;
             }
@@ -314,8 +306,6 @@ namespace OrderManager
                     numericUpDown4.Visible = false;
                     label14.Visible = false;
 
-                    checkBox1.Visible = false;
-
                     textBox6.Enabled = false;
                 }
                 else
@@ -341,8 +331,6 @@ namespace OrderManager
 
                     groupBox3.Visible = true;
                     groupBox4.Visible = true;
-
-                    checkBox1.Visible = false;
 
                     textBox6.Enabled = true;
                 }
@@ -438,8 +426,6 @@ namespace OrderManager
             if (adminCloseOrder)
             {
                 comboBox3.Enabled = false;
-                checkBox1.Checked = false;
-                checkBox1.Enabled = false;
             }
 
         }
@@ -721,9 +707,15 @@ namespace OrderManager
             {
                 if (currentOrderNumber != "")
                 {
+                    DialogResult dialogResult = DialogResult.No;
+
+                    if (!adminCloseOrder)
+                        dialogResult = MessageBox.Show("Приладка завершена. Начать выполнение заказа?", "Завершение приладки", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
                     UpdateData("timeMakereadyStop", machineCurrent, shiftStart, number, modification, counterRepeat, makereadyStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
-                    if (checkBox1.Checked == true)
+
+                    if (dialogResult == DialogResult.Yes)
                     {
                         UpdateData("timeToWorkStart", machineCurrent, shiftStart, number, modification, counterRepeat, makereadyStop);
                         UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
@@ -731,7 +723,8 @@ namespace OrderManager
                         //убираем заказ из активных для возможности завершить смену
                         newStatus = "3";
                     }
-                    else
+
+                    if (dialogResult == DialogResult.No || adminCloseOrder)
                     {
                         infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, false);
                         //убираем заказ из активных для возможности завершить смену
@@ -1215,7 +1208,6 @@ namespace OrderManager
 
             button2.Visible = false;
             button3.Visible = false;
-            checkBox1.Visible = false;
 
             if (startOfShift == Form1.Info.startOfShift || aMode)
             {

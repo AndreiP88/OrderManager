@@ -1391,7 +1391,7 @@ namespace OrderManager
 
             List<String> machine = new List<String>(LoadMachine());
 
-            String path = ini.DataBasePath();
+            /*String path = ini.DataBasePath().Replace(@"\\", @"\");*/
 
             String[] name = { "listView", "tableLayoutPanelControl" };
 
@@ -1450,7 +1450,7 @@ namespace OrderManager
             textBox.Location = new Point(3, 3);
             textBox.Size = new Size(144, 21);
             textBox.TabIndex = 2;
-            textBox.Text = path;
+            textBox.Text = "";
             textBox.Visible = true;
             tableLayoutPanelPath.Controls.Add(textBox, 0, 0);
 
@@ -3173,7 +3173,7 @@ namespace OrderManager
             }
             else
             {
-                textBoxDBPath.Enabled = true;
+                textBoxDBPath.Enabled = false;
                 addButtonDBPath.Enabled = true;
             }
 
@@ -3197,7 +3197,7 @@ namespace OrderManager
 
                 textBoxDBPath = (TextBox)textBox[0];
 
-                textBoxDBPath.Text = ini.DataBasePath();
+                textBoxDBPath.Text = ini.DataBasePath().Replace(@"\\", @"\");
 
                 dataBase = ini.DataBasePath();
             }

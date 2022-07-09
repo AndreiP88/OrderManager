@@ -32,6 +32,7 @@ namespace OrderManager
             }
             
             dataBase = ini.DataBasePath();
+            toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
         }
 
         List<Order> ordersCurrentShift;

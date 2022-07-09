@@ -33,6 +33,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.button1 = new System.Windows.Forms.Button();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
@@ -40,10 +41,9 @@
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.button9 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
@@ -111,6 +111,32 @@
             this.button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "arrow-square-right-6407334.png");
+            this.imageList1.Images.SetKeyName(1, "exchange-6407194.png");
+            this.imageList1.Images.SetKeyName(2, "free-icon-add-3914248.png");
+            this.imageList1.Images.SetKeyName(3, "free-icon-align-justify-3917034.png");
+            this.imageList1.Images.SetKeyName(4, "free-icon-angle-double-right-3916755.png");
+            this.imageList1.Images.SetKeyName(5, "free-icon-angle-right-3916907.png");
+            this.imageList1.Images.SetKeyName(6, "free-icon-browser-3914415.png");
+            this.imageList1.Images.SetKeyName(7, "free-icon-copy-alt-3914174.png");
+            this.imageList1.Images.SetKeyName(8, "free-icon-cross-3917189.png");
+            this.imageList1.Images.SetKeyName(9, "free-icon-database-3914565.png");
+            this.imageList1.Images.SetKeyName(10, "free-icon-form-3914182.png");
+            this.imageList1.Images.SetKeyName(11, "free-icon-indent-3917045.png");
+            this.imageList1.Images.SetKeyName(12, "free-icon-shuffle-3917134.png");
+            this.imageList1.Images.SetKeyName(13, "free-icon-sign-in-3917365.png");
+            this.imageList1.Images.SetKeyName(14, "free-icon-sign-in-alt-5528136.png");
+            this.imageList1.Images.SetKeyName(15, "free-icon-sign-out-3917349.png");
+            this.imageList1.Images.SetKeyName(16, "free-icon-subtitles-3916608.png");
+            this.imageList1.Images.SetKeyName(17, "free-icon-user-3917688.png");
+            this.imageList1.Images.SetKeyName(18, "free-icon-user-add-3917698.png");
+            this.imageList1.Images.SetKeyName(19, "free-icon-user-delete-3914336.png");
+            this.imageList1.Images.SetKeyName(20, "free-icon-user-remove-3914320.png");
             // 
             // button2
             // 
@@ -217,37 +243,6 @@
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
-            // timer1
-            // 
-            this.timer1.Interval = 5000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "arrow-square-right-6407334.png");
-            this.imageList1.Images.SetKeyName(1, "exchange-6407194.png");
-            this.imageList1.Images.SetKeyName(2, "free-icon-add-3914248.png");
-            this.imageList1.Images.SetKeyName(3, "free-icon-align-justify-3917034.png");
-            this.imageList1.Images.SetKeyName(4, "free-icon-angle-double-right-3916755.png");
-            this.imageList1.Images.SetKeyName(5, "free-icon-angle-right-3916907.png");
-            this.imageList1.Images.SetKeyName(6, "free-icon-browser-3914415.png");
-            this.imageList1.Images.SetKeyName(7, "free-icon-copy-alt-3914174.png");
-            this.imageList1.Images.SetKeyName(8, "free-icon-cross-3917189.png");
-            this.imageList1.Images.SetKeyName(9, "free-icon-database-3914565.png");
-            this.imageList1.Images.SetKeyName(10, "free-icon-form-3914182.png");
-            this.imageList1.Images.SetKeyName(11, "free-icon-indent-3917045.png");
-            this.imageList1.Images.SetKeyName(12, "free-icon-shuffle-3917134.png");
-            this.imageList1.Images.SetKeyName(13, "free-icon-sign-in-3917365.png");
-            this.imageList1.Images.SetKeyName(14, "free-icon-sign-in-alt-5528136.png");
-            this.imageList1.Images.SetKeyName(15, "free-icon-sign-out-3917349.png");
-            this.imageList1.Images.SetKeyName(16, "free-icon-subtitles-3916608.png");
-            this.imageList1.Images.SetKeyName(17, "free-icon-user-3917688.png");
-            this.imageList1.Images.SetKeyName(18, "free-icon-user-add-3917698.png");
-            this.imageList1.Images.SetKeyName(19, "free-icon-user-delete-3914336.png");
-            this.imageList1.Images.SetKeyName(20, "free-icon-user-remove-3914320.png");
-            // 
             // button9
             // 
             this.button9.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -277,6 +272,11 @@
             this.button10.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 5000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // FormAdmin
             // 
