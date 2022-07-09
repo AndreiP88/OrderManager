@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -52,7 +45,7 @@ namespace OrderManager
             DataBasePatch(dataBase);
         }
 
-        private String DataBasePatch (String dBase)
+        private String DataBasePatch(String dBase)
         {
             String dataBase = dBase;
 
@@ -133,7 +126,7 @@ namespace OrderManager
                 AddNewCategory();
                 Close();
             }
-            
+
         }
 
         private void button2_Click(object sender, EventArgs e)

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -131,7 +127,7 @@ namespace OrderManager
                 comboBox2.SelectedIndex = month;
             }
 
-           
+
         }
 
         private void LoadYears()
@@ -255,7 +251,7 @@ namespace OrderManager
                         comboBox1.Enabled = true;
                         comboBox2.Enabled = true;
                     }
-                    
+
                 }));
 
                 thJob = false;

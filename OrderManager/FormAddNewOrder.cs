@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -181,9 +175,9 @@ namespace OrderManager
                 string commandText;
 
                 if (!editOrderLoad)
-                commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
-                    "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
-                    "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";
+                    commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
+                        "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
+                        "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";
                 else
                     commandText = "UPDATE orders SET orderAddedDate = @orderAddedDate, machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
                     "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp " +
@@ -216,9 +210,9 @@ namespace OrderManager
 
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
-            String modification = textBox5.Text;            
+            String modification = textBox5.Text;
 
-            for(int i = 0; i < numbersOrdersInProgress.Count; i++)
+            for (int i = 0; i < numbersOrdersInProgress.Count; i++)
             {
                 using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                 {
@@ -335,7 +329,7 @@ namespace OrderManager
             {
                 MessageBox.Show("Не все данные введены.", "Проверка введенных данных", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            
+
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -402,7 +396,7 @@ namespace OrderManager
                 LoadOrderFromDB(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
                 button1.Text = "Редактировать";
             }
-                
+
         }
     }
 

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -91,14 +87,14 @@ namespace OrderManager
         int selectedYear = 0;
         int selectedMonth = 0;
         String selectedCategory = "Все";
-        String selectedMachine  = "";
+        String selectedMachine = "";
         String selectedUser = "";
         DateTime selectedDateTime = DateTime.Now.AddMonths(-2);
 
         bool thJob = false;
         bool calculateNullShiftsFromUser = false;
 
-        String[] columnHeadersMain = { 
+        String[] columnHeadersMain = {
             "Исполнитель;200",
             "Оборудование;200",
             "Активный заказ;300",
@@ -200,7 +196,7 @@ namespace OrderManager
                     Width = Convert.ToInt32(head[1])
                 });
             }
-            
+
             return columnHeaders;
         }
 
@@ -271,45 +267,45 @@ namespace OrderManager
 
             String hedersStr = "";
 
-                for (int i = 0; i < listView.Columns.Count - 1; i++)
-                {
-                    hedersStr += listView.Columns[i].Text + ";" + listView.Columns[i].Width + "|";
-                }
-                hedersStr += listView.Columns[listView.Columns.Count - 1].Text + ";" + listView.Columns[listView.Columns.Count - 1].Width;
-            if (hedersStr.Length > 0)
-            switch (currentPage)
+            for (int i = 0; i < listView.Columns.Count - 1; i++)
             {
-                case 1:
-                    ini.SetColumnHeadersMain(hedersStr);
-                    break;
-                case 2:
-                    ini.SetColumnHeadersStatistic(hedersStr);
-                    break;
-                case 3:
-                    ini.SetColumnHeadersShifts(hedersStr);
-                    break;
-                case 4:
-                    ini.SetColumnHeadersStatisticMachines(hedersStr);
-                    break;
-                case 5:
-                    ini.SetColumnHeadersAllOrders(hedersStr);
-                    break;
-                case 6:
-                    ini.SetColumnHeadersNorm(hedersStr);
-                    break;
-                case 7:
-                    ini.SetColumnHeadersUsers(hedersStr);
-                    break;
-                case 8:
-                    ini.SetColumnHeadersMachines(hedersStr);
-                    break;
-                case 9:
-
-                    break;
-
-                default:
-                    break;
+                hedersStr += listView.Columns[i].Text + ";" + listView.Columns[i].Width + "|";
             }
+            hedersStr += listView.Columns[listView.Columns.Count - 1].Text + ";" + listView.Columns[listView.Columns.Count - 1].Width;
+            if (hedersStr.Length > 0)
+                switch (currentPage)
+                {
+                    case 1:
+                        ini.SetColumnHeadersMain(hedersStr);
+                        break;
+                    case 2:
+                        ini.SetColumnHeadersStatistic(hedersStr);
+                        break;
+                    case 3:
+                        ini.SetColumnHeadersShifts(hedersStr);
+                        break;
+                    case 4:
+                        ini.SetColumnHeadersStatisticMachines(hedersStr);
+                        break;
+                    case 5:
+                        ini.SetColumnHeadersAllOrders(hedersStr);
+                        break;
+                    case 6:
+                        ini.SetColumnHeadersNorm(hedersStr);
+                        break;
+                    case 7:
+                        ini.SetColumnHeadersUsers(hedersStr);
+                        break;
+                    case 8:
+                        ini.SetColumnHeadersMachines(hedersStr);
+                        break;
+                    case 9:
+
+                        break;
+
+                    default:
+                        break;
+                }
         }
 
         private List<String> LoadYears()
@@ -418,7 +414,7 @@ namespace OrderManager
 
                 ini.SetDataBasePath(path);
             }
-            
+
         }
 
         private void DeleteUser(String id)
@@ -571,7 +567,7 @@ namespace OrderManager
             {
                 result = MessageBox.Show("Вы действительно хотите прервать заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             }
-            
+
             if (result == DialogResult.Yes)
             {
                 orders.SetNewStatus(machine, orderNumber, orderModification, "0");
@@ -651,7 +647,7 @@ namespace OrderManager
             {
                 Name = "viewToolStripMenuItem",
                 Text = "Просмотр"
-            }; 
+            };
 
             ToolStripMenuItem editToolStripMenuItem = new ToolStripMenuItem
             {
@@ -735,7 +731,7 @@ namespace OrderManager
                 Text = "Удалить"
             };
 
-            ToolStripItem[] items = new ToolStripItem[] {};
+            ToolStripItem[] items = new ToolStripItem[] { };
 
             switch (currentPage)
             {
@@ -753,7 +749,7 @@ namespace OrderManager
                 case 4:
                     break;
                 case 5:
-                    items = new ToolStripItem[] 
+                    items = new ToolStripItem[]
                     {
                         viewToolStripMenuItem,
                         editToolStripMenuItem,
@@ -761,7 +757,7 @@ namespace OrderManager
                         //reactivateToolStripMenuItem,
                         deactivateToolStripMenuItem
                     };
-                   break;
+                    break;
                 case 6:
 
                     break;
@@ -872,7 +868,7 @@ namespace OrderManager
             comboBoxYear.SelectedIndex = comboBoxYear.Items.IndexOf(selectedYear.ToString());
             comboBoxYear.Visible = true;
             tableLayoutPanelControl.Controls.Add(comboBoxYear, 0, 0);
-            
+
             comboBoxYear.SelectedIndexChanged += new System.EventHandler(comboBoxYear_SelectedIndexChanged);
 
 
@@ -1244,7 +1240,7 @@ namespace OrderManager
             comboBoxMachine.TabIndex = 1;
             comboBoxMachine.Items.AddRange(machine.ToArray());
             comboBoxMachine.SelectedIndex = 0;
-            
+
             tableLayoutPanelControl.Controls.Add(comboBoxMachine, 2, 1);
 
             comboBoxMachine.Visible = true;
@@ -1436,7 +1432,7 @@ namespace OrderManager
                     tableLayoutPanel1.Controls.RemoveAt(i);
             }*/
 
-            
+
 
             TableLayoutPanel tableLayoutPanelControl = new TableLayoutPanel();
 
@@ -1601,7 +1597,7 @@ namespace OrderManager
                             user = "";
                             currentShiftStart = "";
                         }
-                            
+
                         if (leadTimeCurr.GetCurrentDateTime("timeMakereadyStart") != "")
                             currentTime = leadTimeCurr.GetCurrentDateTime("timeMakereadyStart");
                         else
@@ -1611,7 +1607,7 @@ namespace OrderManager
                         int idx = ordersCurrentShift.FindLastIndex((v) => v.numberOfOrder == getInfo.GetCurrentOrderNumber(machines[j]) &&
                                                                           v.modificationOfOrder == getInfo.GetCurrentOrderModification(machines[j]) &&
                                                                           v.machineOfOrder == machines[j]);
-                        
+
                         String fullLastTime = "00:00";
                         String fullFactTime = "00:00";
                         String timeDiff = "";
@@ -1628,7 +1624,7 @@ namespace OrderManager
                             else
                                 timeDiff = "00:00";
                         }
-                        
+
                         ListViewItem item = new ListViewItem();
 
                         item.Name = userBase.GetCurrentShiftStart(users[i]);
@@ -1645,7 +1641,7 @@ namespace OrderManager
 
 
                 }
-                
+
 
             }
         }
@@ -1667,17 +1663,17 @@ namespace OrderManager
             }
             else
                 if (panel == "tableLayoutPanel1")
+            {
+                if (tableLayoutPanel1.Controls.ContainsKey(name))
                 {
-                    if (tableLayoutPanel1.Controls.ContainsKey(name))
-                    {
-                        var control = tableLayoutPanel1.Controls.Find(name, true);
-                        return control[0];
-                    }
-                    else
-                        return null;
+                    var control = tableLayoutPanel1.Controls.Find(name, true);
+                    return control[0];
                 }
                 else
                     return null;
+            }
+            else
+                return null;
         }
 
         private void StartLoadingStatisticUsers()
@@ -1785,7 +1781,7 @@ namespace OrderManager
                     {
                         listView.Items.Clear();
                     }));
-                    
+
                     using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                     {
                         Connect.Open();
@@ -2094,7 +2090,7 @@ namespace OrderManager
             {
                 thJob = true;
 
-                int fullCountOrdersMonth = 0;;
+                int fullCountOrdersMonth = 0; ;
                 int fullAmountOrdersMonth = 0;
                 int fullCountOrdersYear = 0; ;
                 int fullAmountOrdersYear = 0;
@@ -2109,7 +2105,7 @@ namespace OrderManager
                     {
                         listView.Items.Clear();
                     }));
-                    
+
                     using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                     {
                         Connect.Open();
@@ -2262,16 +2258,16 @@ namespace OrderManager
             if (comboBoxMachine.SelectedIndex != -1)
             {
                 //ClearAll();
-                
+
                 DateTime date;
                 date = dateTime.Value;
-                
+
                 String filterKey;
                 filterKey = textBoxFilter.Text;
 
                 CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
                 CancellationToken token = cancelTokenSource.Token;
-                
+
                 Task task = new Task(() => LoadAllOrdersFromBase(token, date, filterKey));
 
                 if (thJob == true)
@@ -2313,7 +2309,7 @@ namespace OrderManager
                     {
                         listView.Items.Clear();
                     }));
-                    
+
 
                     ordersNumbers.Clear();
                     //ordersNumbers.Add(new Order("", ""));
@@ -2345,7 +2341,7 @@ namespace OrderManager
                                 }));
                                 break;
                             }
-                                
+
                             if (sqlReader["numberOfOrder"].ToString().Contains(filter))
                             {
                                 GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
@@ -2397,7 +2393,7 @@ namespace OrderManager
 
                 break;
             }
-            
+
         }
 
         private void StartLoadNormFromBase()
@@ -2450,7 +2446,7 @@ namespace OrderManager
                             item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
                             item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
                             item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
-                            item.SubItems.Add((60*Convert.ToInt32(sqlReader["amountOfOrder"])/Convert.ToInt32(sqlReader["timeToWork"])).ToString("N0"));
+                            item.SubItems.Add((60 * Convert.ToInt32(sqlReader["amountOfOrder"]) / Convert.ToInt32(sqlReader["timeToWork"])).ToString("N0"));
 
                             listView.Items.Add(item);
 
@@ -2506,8 +2502,8 @@ namespace OrderManager
                     {
                         String[] catArr = categoryArray.ArrayFromTheString(currentUserInfo[i].categoryesMachine);
                         String catLine = "";
-                        
-                        
+
+
                         for (int j = 0; j < catArr.Length; j++)
                         {
                             catLine += valueCategory.GetCategoryName(catArr[j]) + "; ";
@@ -2585,10 +2581,10 @@ namespace OrderManager
                             ListViewItem itemMachine = new ListViewItem(listViewGroup);
 
                             itemMachine.Name = "empty";
-                                itemMachine.Text = "";
-                                itemMachine.SubItems.Add("<пустой участок>");
+                            itemMachine.Text = "";
+                            itemMachine.SubItems.Add("<пустой участок>");
 
-                                Invoke(new Action(() => listView.Items.Add(itemMachine)));
+                            Invoke(new Action(() => listView.Items.Add(itemMachine)));
                         }
                         else
                         {
@@ -2622,7 +2618,7 @@ namespace OrderManager
             if (tableLayoutPanel1.Controls.ContainsKey(name))
             {
                 var control = tableLayoutPanel1.Controls.Find(name, true);
-                
+
                 ListView listView = (ListView)control[0];
 
                 SaveHeaders(listView);
@@ -2701,7 +2697,7 @@ namespace OrderManager
                     CreateSettingsControls();
                     break;
                 default:
-                    break; 
+                    break;
             }
 
         }
@@ -2747,7 +2743,7 @@ namespace OrderManager
         {
             selectedYear = Convert.ToInt32(((ComboBox)sender).Text);
 
-            UpdatePage(currentPage);           
+            UpdatePage(currentPage);
         }
 
         private void comboBoxMount_SelectedIndexChanged(object sender, EventArgs e)
@@ -2840,7 +2836,7 @@ namespace OrderManager
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
             int selectegIndex = ((ListView)sender).SelectedIndices[0];
-            String selectedName = ((ListView) sender).SelectedItems[0].Name.ToString();
+            String selectedName = ((ListView)sender).SelectedItems[0].Name.ToString();
 
             switch (currentPage)
             {
@@ -2863,7 +2859,7 @@ namespace OrderManager
                     UpdatePage(currentPage);
                     break;
                 case 6:
-                    
+
                     break;
                 case 7:
                     ShowEditUserForm(((ListView)sender).Items[((ListView)sender).SelectedIndices[0]].Name);
@@ -2878,7 +2874,7 @@ namespace OrderManager
                 default:
                     break;
             }
-            
+
         }
 
         private void listView_SelectedIndexChanged(object sender, EventArgs e)
@@ -2919,7 +2915,7 @@ namespace OrderManager
             switch (currentPage)
             {
                 case 1:
-                    
+
                     break;
                 case 2:
 
@@ -2946,7 +2942,7 @@ namespace OrderManager
                         ShowAddCategoryForm();
                     if (((Button)sender).Name == "addMachineButton")
                         ShowAddMachineForm();
-                        //LoadUsersFromBase();
+                    //LoadUsersFromBase();
                     break;
                 case 9:
                     ShowSelectDataBaseFile();
@@ -3027,7 +3023,7 @@ namespace OrderManager
                 {
                     FormAddCloseOrder form = new FormAddCloseOrder(dataBase, startOfShift, userId, machines[i]);
                     form.ShowDialog();
-                }     
+                }
             }
 
             if (getInfo.GetMachinesForUserActive(userId) == true)
@@ -3079,7 +3075,7 @@ namespace OrderManager
                     ShowFullOrdersForm(true, listV.SelectedIndices[0]);
                     break;
                 case 6:
-                    
+
                     break;
                 case 7:
                     if (listV.SelectedIndices.Count > 0)
@@ -3267,7 +3263,7 @@ namespace OrderManager
                 dataBase = ini.DataBasePath();
                 textBoxDBPath.Text = dataBase.Replace(@"\\", @"\");
 
-                
+
             }
         }
 

@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -260,7 +254,7 @@ namespace OrderManager
                         tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
                         amountAllOrders += Convert.ToInt32(sqlReader["done"]);
-                    
+
                         ListViewItem item = new ListViewItem();
 
                         item.Name = sqlReader["numberOfOrder"].ToString();
@@ -279,7 +273,7 @@ namespace OrderManager
 
                         index++;
                     }
-                    
+
                 }
 
                 Connect.Close();
@@ -324,7 +318,7 @@ namespace OrderManager
                 LoadMachine();
                 SetItemsComboBox();
             }
-                
+
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)

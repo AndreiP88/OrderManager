@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Data.SQLite;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -106,8 +100,8 @@ namespace OrderManager
             else
                 ApplyParameterLine(getSettings.GetParameterLine("0", nameForm));
         }
-        
-        private bool PrivateData (String shiftStart, String userID)
+
+        private bool PrivateData(String shiftStart, String userID)
         {
             bool result = false;
 
@@ -281,7 +275,7 @@ namespace OrderManager
 
         private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
         {
-            if(e.Item != null)
+            if (e.Item != null)
             {
 
                 //toolTip1.Show(e.Item.Index + ": " + listView1.Items[e.Item.Index].SubItems[12].Text, listView1);

@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -245,7 +241,7 @@ namespace OrderManager
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
 
-            List <Order> orders = new List<Order>();
+            List<Order> orders = new List<Order>();
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {

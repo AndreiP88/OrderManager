@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -464,7 +458,7 @@ namespace OrderManager
                     if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), nameOfExecutor) == true)
                         comboBox3.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
                     //else
-                        //comboBox3.Items.Add(sqlReader["machine"].ToString());
+                    //comboBox3.Items.Add(sqlReader["machine"].ToString());
                 }
 
                 Connect.Close();
@@ -501,7 +495,7 @@ namespace OrderManager
                 machine = loadMachine;
                 //comboBox3.Enabled = false;
             }
-            
+
             if (machine != "" && comboBox3.Items.IndexOf(getInfo.GetMachineName(machine)) != -1)
                 comboBox3.SelectedIndex = comboBox3.Items.IndexOf(getInfo.GetMachineName(machine));
             else
@@ -525,7 +519,7 @@ namespace OrderManager
             String stamp = textBox2.Text;
             String status = "0";
             String counterR = "0";
-            
+
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
@@ -731,7 +725,7 @@ namespace OrderManager
                         infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, false);
                         //убираем заказ из активных для возможности завершить смену
                         newStatus = "2";
-                    }    
+                    }
                 }
             }
             if (status == "3") // начата склейка
@@ -799,7 +793,7 @@ namespace OrderManager
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
                     UpdateData("done", machineCurrent, shiftStart, number, modification, counterRepeat, done.ToString());
                     newStatus = "0";
-                    
+
                 }
             }
 
@@ -862,7 +856,7 @@ namespace OrderManager
                     if (sqlReader["modification"].ToString() != "")
                         strModification = " (" + sqlReader["modification"].ToString() + ")";
 
-                    comboBox1.Items.Add(sqlReader["numberOfOrder"].ToString() + ": " + 
+                    comboBox1.Items.Add(sqlReader["numberOfOrder"].ToString() + ": " +
                         sqlReader["nameOfOrder"].ToString() + strModification + " - " + Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0"));
 
                     ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
@@ -922,7 +916,7 @@ namespace OrderManager
                 comboBox1.SelectedIndex = 0;
                 comboBox1.Enabled = true;
             }
-                
+
         }
 
         private void LoadOrderFromDB(String orderMachine, String orderNumber, String orderModification)
@@ -1247,7 +1241,7 @@ namespace OrderManager
 
                 timer1.Enabled = true;
             }
-            
+
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -1349,8 +1343,8 @@ namespace OrderManager
                 }
             }
 
-            
-            
+
+
         }
         private void button2_Click(object sender, EventArgs e)
         {
@@ -1387,7 +1381,7 @@ namespace OrderManager
                 Close();
             }
 
-            
+
             Close();
         }
 

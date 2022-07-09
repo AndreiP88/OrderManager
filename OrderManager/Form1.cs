@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Data.SQLite;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,7 +25,7 @@ namespace OrderManager
                 if (args[0] == "adminMode")
                     adminMode = true;
             }
-            
+
             dataBase = ini.DataBasePath();
             toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
         }
@@ -339,7 +334,7 @@ namespace OrderManager
             GetDateTimeOperations dtOperations = new GetDateTimeOperations();
             GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            GetValueFromInfoBase getUserMachines = new GetValueFromInfoBase(dataBase);               
+            GetValueFromInfoBase getUserMachines = new GetValueFromInfoBase(dataBase);
 
             if (getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
                 button6.Enabled = false;
@@ -384,7 +379,7 @@ namespace OrderManager
             if (machines.Count > 0)
             {
                 int index = machines.IndexOf(userBase.GetLastMachineForUser(Form1.Info.nameOfExecutor));
-               
+
 
                 LoadParametersForTheSelectedUserFromBase();
                 //LoadOrdersFromBase();
@@ -498,7 +493,7 @@ namespace OrderManager
                 FormAdmin form = new FormAdmin(adminMode, dataBase);
                 form.ShowDialog();
             }
-            
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -551,7 +546,7 @@ namespace OrderManager
                 LoadParametersFromBase("mainForm");
                 LoadUser();
             }
-            
+
         }
 
         private void отработанныеСменыToolStripMenuItem_Click(object sender, EventArgs e)
@@ -602,7 +597,7 @@ namespace OrderManager
             LoadOrderDetails();
         }
 
-        private void LoadOrderDetails ()
+        private void LoadOrderDetails()
         {
             if (listView1.SelectedItems.Count != 0)
             {

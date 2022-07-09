@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderManager
 {
@@ -31,7 +28,7 @@ namespace OrderManager
                 dataBase = dataBaseDefault;
         }
 
-        public void UpdateCurrentOrder (String currentOrder, String currentModification)
+        public void UpdateCurrentOrder(String currentOrder, String currentModification)
         {
             UpdateInfoParameter("currentOrder", currentOrder);
             UpdateInfoParameter("currentModification", currentModification);
@@ -39,7 +36,7 @@ namespace OrderManager
 
         public void CompleteTheShift(String nameOfExecutor)
         {
-            
+
             GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
 
             List<String> machines = (List<String>)getMachine.GetMachines(nameOfExecutor);

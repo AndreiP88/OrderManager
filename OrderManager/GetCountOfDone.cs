@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderManager
 {
@@ -17,7 +14,7 @@ namespace OrderManager
         String orderModification;
         String counterRepeat;
 
-        public GetCountOfDone (String dBase, String startOfShift, String orderOfNumber, String orderOfModification, String counterOfRepeat)
+        public GetCountOfDone(String dBase, String startOfShift, String orderOfNumber, String orderOfModification, String counterOfRepeat)
         {
             this.dataBase = dBase;
             this.startShift = startOfShift;
@@ -75,7 +72,7 @@ namespace OrderManager
 
                 Connect.Close();
             }
-            
+
             for (int i = 0; i < countOfShifts.Count; i++)
             {
                 if (i < indexCurrentShift)
@@ -133,5 +130,5 @@ namespace OrderManager
         */
     }
 
-    
+
 }

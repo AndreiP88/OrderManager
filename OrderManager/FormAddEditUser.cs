@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -52,7 +46,7 @@ namespace OrderManager
             DataBasePatch(dataBase);
         }
 
-        private String DataBasePatch (String dBase)
+        private String DataBasePatch(String dBase)
         {
             String dataBase = dBase;
 
@@ -161,7 +155,7 @@ namespace OrderManager
             String[] indexes = new String[listView1.CheckedIndices.Count];
             //listView1.CheckedIndices[]
             //indexes.Concat<int>(listView1.CheckedIndices);
-            
+
             for (int i = 0; i < listView1.CheckedIndices.Count; i++)
             {
                 indexes[i] = listView1.Items[listView1.CheckedIndices[i]].Name;
@@ -181,7 +175,7 @@ namespace OrderManager
                 MessageBox.Show("Не введена фамилия", "Ошибка", MessageBoxButtons.OK);
                 return false;
             }
-                
+
 
             if (textBox2.Text == "")
             {
@@ -301,7 +295,7 @@ namespace OrderManager
                 AddNewUser();
                 Close();
             }
-            
+
         }
 
         private void button2_Click(object sender, EventArgs e)

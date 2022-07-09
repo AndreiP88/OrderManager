@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderManager
 {
@@ -13,7 +9,7 @@ namespace OrderManager
 
         }
 
-        private DateTime DifferentDate (DateTime firstDate, DateTime secondDate)
+        private DateTime DifferentDate(DateTime firstDate, DateTime secondDate)
         {
             DateTime result = DateTime.MinValue;
 
@@ -23,7 +19,7 @@ namespace OrderManager
             return result;
         }
 
-        private DateTime StringToDateTime (String date)
+        private DateTime StringToDateTime(String date)
         {
             DateTime result = DateTime.Now;
 
@@ -33,7 +29,7 @@ namespace OrderManager
             return result;
         }
 
-        private String YearsString (int year)
+        private String YearsString(int year)
         {
             String result;
 

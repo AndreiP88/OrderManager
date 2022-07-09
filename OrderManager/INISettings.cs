@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -32,6 +27,25 @@ namespace OrderManager
                 INI.Write(section, key, value);
 
             //MessageBox.Show("SET: [" + section + "][" + key + "]: " + value);
+        }
+
+        public String DataBasePathNEW()//Incorrect
+        {
+            String result = Directory.GetCurrentDirectory() + "\\data\\data.db";
+            String value = GetParameter("general", "dataBaseLocalFile");
+
+            bool localDB = Convert.ToBoolean(value);
+
+            if (!localDB && File.Exists(result))
+            {
+                result = GetParameter("general", "dataBasePath");
+            }
+
+            //result = result.Replace(@"\", @"\\");
+
+            //MessageBox.Show(File.Exists(result).ToString() + Environment.NewLine + result);
+
+            return @result;
         }
 
         public String DataBasePath()
@@ -76,7 +90,7 @@ namespace OrderManager
         public String GetColumnHeadersShifts()
         {
             String result = GetParameter("colomns", "columnHeadersShifts");
-            
+
             return result;
         }
 
@@ -166,5 +180,5 @@ namespace OrderManager
 
     }
 
-    
+
 }

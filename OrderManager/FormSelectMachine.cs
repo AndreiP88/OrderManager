@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -136,7 +130,7 @@ namespace OrderManager
                             AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
                         }
                     }
-                    
+
                 }
 
                 Connect.Close();
@@ -197,7 +191,7 @@ namespace OrderManager
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
 
-            
+
 
             for (int i = 0; i < checkBoxesMachines.Count; i++)
             {
@@ -246,14 +240,14 @@ namespace OrderManager
             {
                 Pen pen = new Pen(Color.Black, 1);
                 g.DrawLine(pen, p1, p2);
-            }            
+            }
         }
 
 
         private void AddControl(String name, String user, String order, bool enabled, bool check)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-                
+
             int x = 12;
             int y = 35;
             int h = 20;
@@ -271,7 +265,7 @@ namespace OrderManager
                 labelCaption.Visible = true;
                 Controls.Add(labelCaption);
             }
-            
+
 
             checkBoxesMachines.Add(new CheckBox());
 
@@ -284,7 +278,7 @@ namespace OrderManager
             checkBoxesMachines[checkBoxesMachines.Count - 1].AutoSize = true;
             checkBoxesMachines[checkBoxesMachines.Count - 1].Font = new Font("Consolas", 9);
             checkBoxesMachines[checkBoxesMachines.Count - 1].Font = new Font(checkBoxesMachines[checkBoxesMachines.Count - 1].Font, FontStyle.Underline);
-            
+
             Controls.Add(checkBoxesMachines[checkBoxesMachines.Count - 1]);
             checkBoxesMachines[checkBoxesMachines.Count - 1].CheckedChanged += new EventHandler(checkBoxMachine_CheckedChanged);
 

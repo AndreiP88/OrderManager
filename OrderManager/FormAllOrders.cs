@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -80,7 +75,7 @@ namespace OrderManager
                 pLine += this.RestoreBounds.Width.ToString() + ";";
                 pLine += this.RestoreBounds.Height.ToString() + ";";
             }
-            
+
             pLine += this.WindowState.ToString() + ";";
 
             for (int i = 0; i < listView1.Columns.Count; i++)
@@ -96,7 +91,7 @@ namespace OrderManager
             if (pLine != "" && parameter.Length == listView1.Columns.Count + 6)
             {
                 this.Location = new Point(Convert.ToInt32(parameter[0]), Convert.ToInt32(parameter[1]));
-                
+
                 if (parameter[4] == "Normal")
                 {
                     WindowState = FormWindowState.Normal;
@@ -108,14 +103,14 @@ namespace OrderManager
                 {
                     WindowState = FormWindowState.Maximized;
                 }
-                    
+
                 if (parameter[4] == "Minimized")
                     WindowState = FormWindowState.Minimized;
 
                 for (int i = 0; i < listView1.Columns.Count; i++)
                     listView1.Columns[i].Width = Convert.ToInt32(parameter[5 + i]);
             }
-            
+
         }
 
         private void SaveParameterToBase()
@@ -204,7 +199,7 @@ namespace OrderManager
                         String modification = "";
                         if (sqlReader["modification"].ToString() != "")
                             modification = " (" + sqlReader["modification"].ToString() + ")";
-                    
+
                         ListViewItem item = new ListViewItem();
 
                         item.Name = sqlReader["numberOfOrder"].ToString();
@@ -224,7 +219,7 @@ namespace OrderManager
 
                         index++;
                     }
-                    
+
                 }
 
                 Connect.Close();
@@ -293,7 +288,7 @@ namespace OrderManager
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
