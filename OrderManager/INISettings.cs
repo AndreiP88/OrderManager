@@ -41,14 +41,9 @@ namespace OrderManager
 
             bool localDB = Convert.ToBoolean(value);
 
-            if (!localDB)
+            if (!localDB && File.Exists(result))
             {
                 result = GetParameter("general", "dataBasePath");
-            }
-
-            if (!File.Exists(result))
-            {
-                result = Directory.GetCurrentDirectory() + "\\data\\data.db";
             }
 
             result = result.Replace(@"\", @"\\");
