@@ -170,7 +170,7 @@ namespace OrderManager
 
         private void LoadOrdersFromBase()
         {
-            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();

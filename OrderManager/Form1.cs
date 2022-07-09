@@ -397,7 +397,7 @@ namespace OrderManager
         private void LoadMachinesDetailsForUser()
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
 
             GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
 

@@ -243,7 +243,7 @@ namespace OrderManager
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
 
             List <Order> orders = new List<Order>();
 
@@ -306,7 +306,7 @@ namespace OrderManager
         private String LastTimeMakereadyStr(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
             GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
 
             String lastTimeMakeready = "00:00";
@@ -342,7 +342,7 @@ namespace OrderManager
         private int FullWorkoutTime(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat, String timeMkrStop, String timeMkrStart)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
             GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
 
             int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(machine, numberOrder, modificationOrder));

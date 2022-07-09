@@ -407,13 +407,13 @@ namespace OrderManager
 
             String path = "";
 
+            openFileDialog.Filter = "Файл базы данных *.db|*.db";
+
+            openFileDialog.Multiselect = false;
+            openFileDialog.Title = "Открыть базу данных";
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                openFileDialog.Filter = "Файл базы данных *.db|*.db";
-                
-                openFileDialog.Multiselect = false;
-                openFileDialog.Title = "Открыть базу данных";
-
                 path = openFileDialog.FileName;
 
                 ini.SetDataBasePath(path);
@@ -545,29 +545,42 @@ namespace OrderManager
             }
         }
 
-        private void DeactivateOrder(String machine, String orderNumber, String orderModification, String newStatus)
+        private void DeactivateOrder(String machine, String orderNumber, String orderModification)
         {
+            ValueOrdersBase orders = new ValueOrdersBase(dataBase);
+
             DialogResult result;
-            result = MessageBox.Show("Вы действительно хотите деактивировать заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            result = MessageBox.Show("Вы действительно хотите завершить заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
-                SetNewStatus(machine, orderNumber, orderModification, newStatus);
+                orders.SetNewStatus(machine, orderNumber, orderModification, "4");
         }
 
-        private void SetNewStatus(String orderMachine, String numberOfOrder, String orderModification, String newStatus)
+        private void AbortOrder(String machine, String orderNumber, String orderModification)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                string commandText = "UPDATE orders SET statusOfOrder = @status " +
-                    "WHERE machine = @orderMachine AND (numberOfOrder = @number AND modification = @orderModification)";
+            ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@status", newStatus);
-                Command.Parameters.AddWithValue("@orderMachine", orderMachine);
-                Command.Parameters.AddWithValue("@number", numberOfOrder);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
-                Connect.Open();
-                Command.ExecuteNonQuery();
-                Connect.Close();
+
+
+            ValueOrdersBase orders = new ValueOrdersBase(dataBase);
+            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text));
+
+            DialogResult result = DialogResult.No;
+
+            String statusOrder = orders.GetOrderStatus(machine, orderNumber, orderModification);
+
+            if (statusOrder != "0" && statusOrder != "4")
+            {
+                result = MessageBox.Show("Вы действительно хотите прервать заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+
+            }
+            
+            if (result == DialogResult.Yes)
+            {
+                orders.SetNewStatus(machine, orderNumber, orderModification, "0");
+                orders.IncrementCounterRepeat(machine, orderNumber, orderModification);
+                infoBase.UpdateInfo("", "", "", "", "", false);
             }
         }
 
@@ -650,10 +663,22 @@ namespace OrderManager
                 Text = "Редактировать"
             };
 
+            ToolStripMenuItem abortToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "abortToolStripMenuItem",
+                Text = "Прервать "
+            };
+
+            ToolStripMenuItem reactivateToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "reactivateToolStripMenuItem",
+                Text = "Возобновить"
+            };
+
             ToolStripMenuItem deactivateToolStripMenuItem = new ToolStripMenuItem
             {
                 Name = "deactivateToolStripMenuItem",
-                Text = "Деактивировать"
+                Text = "Завершить"
             };
             //Список заказов
 
@@ -736,6 +761,8 @@ namespace OrderManager
                     {
                         viewToolStripMenuItem,
                         editToolStripMenuItem,
+                        abortToolStripMenuItem,
+                        //reactivateToolStripMenuItem,
                         deactivateToolStripMenuItem
                     };
                    break;
@@ -773,6 +800,7 @@ namespace OrderManager
 
             viewToolStripMenuItem.Click += new EventHandler(viewToolStripMenuItem_Click);
             editToolStripMenuItem.Click += new EventHandler(editToolStripMenuItem_Click);
+            abortToolStripMenuItem.Click += new EventHandler(abortToolStripMenuItem_Click);
             deactivateToolStripMenuItem.Click += new EventHandler(deactivateToolStripMenuItem_Click);
 
             editCategoryItem.Click += new EventHandler(editToolStripMenuItem_Click);
@@ -1384,7 +1412,7 @@ namespace OrderManager
 
         private void CreateSettingsControls()
         {
-            GetValueFromOrdersBase getOrders = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getOrders = new ValueOrdersBase(dataBase);
             GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
             GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
             INISettings ini = new INISettings();
@@ -1531,7 +1559,7 @@ namespace OrderManager
         {
             GetValueFromShiftsBase getShifts = new GetValueFromShiftsBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
@@ -2257,7 +2285,7 @@ namespace OrderManager
 
         private void LoadAllOrdersFromBase(CancellationToken token, DateTime dateTime, String filter)
         {
-            GetValueFromOrdersBase ordersBase = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
@@ -3109,6 +3137,38 @@ namespace OrderManager
             UpdatePage(currentPage);
         }
 
+        private void abortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+
+            ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
+
+            ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
+
+            switch (currentPage)
+            {
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+                    AbortOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[listV.SelectedIndices[0]].numberOfOrder, ordersNumbers[listV.SelectedIndices[0]].modificationOfOrder);
+                    UpdatePage(currentPage);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
@@ -3132,7 +3192,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    DeactivateOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[listV.SelectedIndices[0]].numberOfOrder, ordersNumbers[listV.SelectedIndices[0]].modificationOfOrder, "4");
+                    DeactivateOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[listV.SelectedIndices[0]].numberOfOrder, ordersNumbers[listV.SelectedIndices[0]].modificationOfOrder);
                     UpdatePage(currentPage);
                     break;
 

@@ -196,7 +196,7 @@
     <Compile Include="GetValueFromSettingsBase.cs" />
     <Compile Include="GetValueFromShiftsBase.cs" />
     <Compile Include="GetValueFromUserBase.cs" />
-    <Compile Include="GetValueFromOrdersBase.cs" />
+    <Compile Include="ValueOrdersBase.cs" />
     <Compile Include="FormLoadUserForm.cs">
       <SubType>Form</SubType>
     </Compile>

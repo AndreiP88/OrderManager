@@ -25,7 +25,7 @@ namespace OrderManager
 
         public (Object, Object) LoadShiftsFromBase(DateTime currentDate, String category)
         {
-            GetValueFromOrdersBase getOrder = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();

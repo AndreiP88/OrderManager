@@ -160,7 +160,7 @@ namespace OrderManager
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
-            GetValueFromOrdersBase getOrderCount = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getOrderCount = new ValueOrdersBase(dataBase);
 
             String orderCount = getOrderCount.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
             String orderAddedDate = DateTime.Now.ToString();
@@ -260,7 +260,7 @@ namespace OrderManager
         {
             //int orderStatus = 0;
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getOrderValue = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getOrderValue = new ValueOrdersBase(dataBase);
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
@@ -300,7 +300,7 @@ namespace OrderManager
         private void button1_Click(object sender, EventArgs e)
         {
             GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromOrdersBase getValue = new GetValueFromOrdersBase(dataBase);
+            ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
 
             if (CheckNotEmptyFields() == true)
             {

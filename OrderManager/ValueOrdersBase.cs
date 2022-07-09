@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OrderManager
 {
-    internal class GetValueFromOrdersBase
+    internal class ValueOrdersBase
     {
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String dataBase;
@@ -17,7 +17,7 @@ namespace OrderManager
         /// 
         /// </summary>
         /// <param name="dBase"></param>
-        public GetValueFromOrdersBase(String dBase)
+        public ValueOrdersBase(String dBase)
         {
             this.dataBase = dBase;
 
@@ -60,8 +60,25 @@ namespace OrderManager
         {
             return GetValue(currentMachine, orderNumber, orderModification, "timeToWork");
         }
-        
 
+        public void SetNewStatus(String currentMachine, String orderNumber, String orderModification, String newStatus)
+        {
+            SetValue(currentMachine, orderNumber, orderModification, "statusOfOrder", newStatus);
+        }
+
+        public void SetNewCounterRepeat(String currentMachine, String orderNumber, String orderModification, String newCounterRepaeat)
+        {
+            SetValue(currentMachine, orderNumber, orderModification, "counterRepeat", newCounterRepaeat);
+        }
+
+        public void IncrementCounterRepeat(String currentMachine, String orderNumber, String orderModification)
+        {
+            int newCounterRep = 1;
+
+            newCounterRep += Convert.ToInt32(GetCounterRepeat(currentMachine, orderNumber, orderModification));
+
+            SetValue(currentMachine, orderNumber, orderModification, "counterRepeat", newCounterRep.ToString());
+        }
 
         public String GetOrderStatusName(String currentMachine, String orderNumber, String orderModification)
         {
@@ -130,6 +147,24 @@ namespace OrderManager
             }
 
             return result;
+        }
+
+        private void SetValue(String orderMachine, String numberOfOrder, String orderModification, String key, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE orders SET " + key + " = @value " +
+                    "WHERE machine = @orderMachine AND (numberOfOrder = @number AND modification = @orderModification)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@orderMachine", orderMachine);
+                Command.Parameters.AddWithValue("@number", numberOfOrder);
+                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                Command.Parameters.AddWithValue("@value", value);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
     }
 }

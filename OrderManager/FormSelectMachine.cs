@@ -98,7 +98,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromOrdersBase order = new GetValueFromOrdersBase(dataBase);
+                ValueOrdersBase order = new ValueOrdersBase(dataBase);
                 GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
                 GetValueFromUserBase user = new GetValueFromUserBase(dataBase);
 
