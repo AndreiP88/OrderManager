@@ -201,6 +201,7 @@ namespace OrderManager
             GetShiftsFromBase getShifts = new GetShiftsFromBase(dataBase, nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
+            GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
 
             Invoke(new Action(() =>
             {
@@ -212,36 +213,62 @@ namespace OrderManager
             {
                 thJob = true;
 
-                List<Shifts> currentShift = (List<Shifts>)getShifts.LoadShiftsFromBase(date, "").Item1;// Добавить выбор категорий
+                List<String> shifts = (List<String>)getShifts.LoadShiftsList(date);
 
-                for (int i = 0; i < currentShift.Count; i++)
+                for (int i = 0; i < shifts.Count; i++)
                 {
+                    String dateStr;
+
+                    dateStr = Convert.ToDateTime(shifts[i]).ToString("d");
+                    dateStr += ", " + getNumberShift.NumberShift(shifts[i]);
+
                     ListViewItem item = new ListViewItem();
 
-                    item.Name = currentShift[i].startShift;
+                    item.Name = shifts[i];
                     item.Text = (i + 1).ToString();
-                    item.SubItems.Add(currentShift[i].dateShift);
-                    item.SubItems.Add(currentShift[i].machinesShift);
-                    item.SubItems.Add(currentShift[i].workingTimeShift);
-                    item.SubItems.Add(currentShift[i].countOrdersShift.ToString());
-                    item.SubItems.Add(currentShift[i].amountOrdersShift.ToString("N0"));
-                    item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift[i].workingOutShift));
-                    item.SubItems.Add(getPercent.PercentString(currentShift[i].workingOutShift));
+                    item.SubItems.Add(dateStr);
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
 
                     Invoke(new Action(() => listView1.Items.Add(item)));
                 }
 
-                List<ShiftsDetails> shiftsDetails = (List<ShiftsDetails>)getShifts.LoadShiftsFromBase(date, "").Item2; //добавить выбор категорий
+                for (int i = 0; i < shifts.Count; i++)
+                {
+                    Shifts currentShift = getShifts.LoadCurrentShift(shifts[i]);
+
+                    Invoke(new Action(() =>
+                    {
+                        int index = listView1.Items.IndexOfKey(shifts[i]);
+
+                        ListViewItem item = listView1.Items[index];
+                        if (item != null)
+                        {
+                            item.SubItems[2].Text = currentShift.machinesShift;
+                            item.SubItems[3].Text = currentShift.workingTimeShift;
+                            item.SubItems[4].Text = currentShift.countOrdersShift.ToString();
+                            item.SubItems[5].Text = currentShift.amountOrdersShift.ToString("N0");
+                            item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift);
+                            item.SubItems[7].Text = getPercent.PercentString(currentShift.workingOutShift);
+                        }
+                    }));
+                }
+
+                ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, ""); //добавить выбор категорий
 
                 Invoke(new Action(() =>
                 {
-                    label7.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails[shiftsDetails.Count - 1].countShifts * 680);
-                    label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails[shiftsDetails.Count - 1].allTimeShift);
-                    label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails[shiftsDetails.Count - 1].allTimeWorkingOutShift);
+                    label7.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.countShifts * 680);
+                    label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
+                    label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
 
-                    label13.Text = shiftsDetails[shiftsDetails.Count - 1].countOrdersShift.ToString() + "/" + shiftsDetails[shiftsDetails.Count - 1].countMakereadyShift.ToString();
-                    label14.Text = shiftsDetails[shiftsDetails.Count - 1].amountAllOrdersShift.ToString("N0");
-                    label15.Text = shiftsDetails[shiftsDetails.Count - 1].percentWorkingOutShift.ToString("N1") + "%";
+                    label13.Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
+                    label14.Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
+                    label15.Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
                 }));
 
                 Invoke(new Action(() =>

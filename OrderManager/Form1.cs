@@ -269,18 +269,18 @@ namespace OrderManager
 
             while (!token.IsCancellationRequested)
             {
-                List<ShiftsDetails> currentShift = (List<ShiftsDetails>)getShifts.LoadShiftsFromBase(date, "").Item2;
+                ShiftsDetails currentShift = getShifts.LoadCurrentDateShiftsDetails(date, "");
 
                 Invoke(new Action(() =>
                 {
-                    label18.Text = currentShift[currentShift.Count - 1].countShifts.ToString("N0");
-                    label19.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift[currentShift.Count - 1].allTimeShift);
+                    label18.Text = currentShift.countShifts.ToString("N0");
+                    label19.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeShift);
 
-                    label20.Text = currentShift[currentShift.Count - 1].countOrdersShift.ToString() + "/" + currentShift[currentShift.Count - 1].countMakereadyShift.ToString();
-                    label21.Text = currentShift[currentShift.Count - 1].amountAllOrdersShift.ToString("N0");
+                    label20.Text = currentShift.countOrdersShift.ToString() + "/" + currentShift.countMakereadyShift.ToString();
+                    label21.Text = currentShift.amountAllOrdersShift.ToString("N0");
 
-                    label22.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift[currentShift.Count - 1].allTimeWorkingOutShift);
-                    label23.Text = (currentShift[currentShift.Count - 1].percentWorkingOutShift).ToString("N1") + "%";
+                    label22.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeWorkingOutShift);
+                    label23.Text = currentShift.percentWorkingOutShift.ToString("N1") + "%";
 
                 }));
 

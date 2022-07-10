@@ -29,25 +29,6 @@ namespace OrderManager
             //MessageBox.Show("SET: [" + section + "][" + key + "]: " + value);
         }
 
-        public String DataBasePathNEW()//Incorrect
-        {
-            String result = Directory.GetCurrentDirectory() + "\\data\\data.db";
-            String value = GetParameter("general", "dataBaseLocalFile");
-
-            bool localDB = Convert.ToBoolean(value);
-
-            if (!localDB && File.Exists(result))
-            {
-                result = GetParameter("general", "dataBasePath");
-            }
-
-            //result = result.Replace(@"\", @"\\");
-
-            //MessageBox.Show(File.Exists(result).ToString() + Environment.NewLine + result);
-
-            return @result;
-        }
-
         public String DataBasePath()
         {
             String result = Directory.GetCurrentDirectory() + "\\data\\data.db";

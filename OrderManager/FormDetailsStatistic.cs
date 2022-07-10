@@ -219,20 +219,20 @@ namespace OrderManager
                     {
                         GetShiftsFromBase getShifts = new GetShiftsFromBase(dataBase, sqlReader["id"].ToString());
 
-                        List<ShiftsDetails> shiftsDetails = (List<ShiftsDetails>)getShifts.LoadShiftsFromBase(date, "").Item2;
+                        ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, "");
 
-                        fullCountShifts += shiftsDetails[shiftsDetails.Count - 1].countShifts;
-                        fullTimeShifts += shiftsDetails[shiftsDetails.Count - 1].allTimeShift;
-                        fullCountOrders += shiftsDetails[shiftsDetails.Count - 1].countOrdersShift;
-                        fullCountMakeready += shiftsDetails[shiftsDetails.Count - 1].countMakereadyShift;
-                        fullAmountOrders += shiftsDetails[shiftsDetails.Count - 1].amountAllOrdersShift;
-                        fullTimeWorkingOut += shiftsDetails[shiftsDetails.Count - 1].allTimeWorkingOutShift;
-                        fullPercentWorkingOut += shiftsDetails[shiftsDetails.Count - 1].percentWorkingOutShift;
+                        fullCountShifts += shiftsDetails.countShifts;
+                        fullTimeShifts += shiftsDetails.allTimeShift;
+                        fullCountOrders += shiftsDetails.countOrdersShift;
+                        fullCountMakeready += shiftsDetails.countMakereadyShift;
+                        fullAmountOrders += shiftsDetails.amountAllOrdersShift;
+                        fullTimeWorkingOut += shiftsDetails.allTimeWorkingOutShift;
+                        fullPercentWorkingOut += shiftsDetails.percentWorkingOutShift;
 
                         if (calculateNullShiftsFromUser)
                             countActiveUser++;
                         else
-                            if (shiftsDetails[shiftsDetails.Count - 1].countShifts != 0)
+                            if (shiftsDetails.countShifts != 0)
                             countActiveUser++;
 
                         Invoke(new Action(() =>
@@ -242,12 +242,12 @@ namespace OrderManager
                             item.Name = sqlReader["id"].ToString();
                             item.Text = (listView1.Items.Count + 1).ToString();
                             item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-                            item.SubItems.Add(shiftsDetails[shiftsDetails.Count - 1].countShifts.ToString());
-                            item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails[shiftsDetails.Count - 1].allTimeShift));
-                            item.SubItems.Add(shiftsDetails[shiftsDetails.Count - 1].countOrdersShift.ToString() + "/" + shiftsDetails[shiftsDetails.Count - 1].countMakereadyShift.ToString());
-                            item.SubItems.Add(shiftsDetails[shiftsDetails.Count - 1].amountAllOrdersShift.ToString("N0"));
-                            item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails[shiftsDetails.Count - 1].allTimeWorkingOutShift));
-                            item.SubItems.Add(shiftsDetails[shiftsDetails.Count - 1].percentWorkingOutShift.ToString("N1") + "%");
+                            item.SubItems.Add(shiftsDetails.countShifts.ToString());
+                            item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift));
+                            item.SubItems.Add(shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString());
+                            item.SubItems.Add(shiftsDetails.amountAllOrdersShift.ToString("N0"));
+                            item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift));
+                            item.SubItems.Add(shiftsDetails.percentWorkingOutShift.ToString("N1") + "%");
 
                             listView1.Items.Add(item);
                         }));
