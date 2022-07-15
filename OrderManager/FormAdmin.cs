@@ -94,88 +94,6 @@ namespace OrderManager
         bool thJob = false;
         bool calculateNullShiftsFromUser = false;
 
-        String[] columnHeadersMain = {
-            "Исполнитель;200",
-            "Оборудование;200",
-            "Активный заказ;300",
-            "Статус заказ;200",
-            "Начало выполнения;150",
-            "Остаток времени;150"
-        };
-
-        String[] columnHeadersStatistic = {
-            "№;30",
-            "Исполнитель;200",
-            "Смен отработано;150",
-            "Фактически отработано;150",
-            "Сделано заказов/приладок;170",
-            "Сделано продукции;150",
-            "Выработка, ч.;120",
-            "Выработка, %;120"
-        };
-
-        String[] columnHeadersShifts = {
-            "№;30",
-            "Дата, смена;90",
-            "Оборудование;200",
-            "Отработано;80",
-            "Сделано заказов;100",
-            "Сделано продукции;100",
-            "Выработка, ч.;120",
-            "Выработка, %;120"
-        };
-
-        String[] columnHeadersStatisticMachines = {
-            "№;30",
-            "Участок;200",
-            "Оборудование;150",
-            "Сделано заказов за месяц (год);200",
-            "Сделано продукции за месяц (год);200"
-        };
-
-        String[] columnHeadersAllOrders = {
-            "№;30",
-            "Заказ;180",
-            "Звквзчик;160",
-            "Приладка;80",
-            "Работа;80",
-            "Тираж;80",
-            "Начато выполнение;120",
-            "Завершено выполнени;120",
-            "Сделано;80",
-            "Статус выполнения;120"
-        };
-
-        String[] columnHeadersNorm = {
-            "№;30",
-            "Штамп;180",
-            "Оборудование;180",
-            "Звказчик;160",
-            "Приладка;80",
-            "Работа;80"
-        };
-
-        String[] columnHeadersUsers = {
-            "№;30",
-            "Имя;180",
-            "Полное имя;180",
-            "Рабочий участок;200",
-            "Дата трудоустройства;160",
-            "Дата увольнения;160",
-            "Стаж;120",
-            "Дата рождения;160",
-            "Возраст;90",
-            "Примечание;180"
-        };
-
-        String[] columnHeadersMachines = {
-            "№;30",
-            "Оборудование;180",
-            "Дата начала работы;200",
-            "Время работы;160",
-            "Примечание;360",
-        };
-
         private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
         {
             timer1.Enabled = false;
@@ -198,6 +116,34 @@ namespace OrderManager
             }
 
             return columnHeaders;
+        }
+
+        private void EnabledButtons(bool enabled)
+        {
+            button1.Enabled = enabled;
+            button2.Enabled = enabled;
+            button3.Enabled = enabled;
+            button4.Enabled = enabled;
+            button5.Enabled = enabled;
+            button6.Enabled = enabled;
+            button7.Enabled = enabled;
+            button8.Enabled = enabled;
+            button9.Enabled = enabled;
+            button10.Enabled = enabled;
+        }
+
+        private void SelectedButton(int page)
+        {
+            Button[] buttons = { button1, button2, button3, button4, button5, button6, button7, button8, button9, button10 };
+
+            buttons[page - 1].BackColor = Color.FromKnownColor(KnownColor.Cornsilk);
+            this.Text = "Администрирование - " + buttons[page - 1].Text;
+
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (i != page - 1)
+                    buttons[i].BackColor = Color.FromKnownColor(KnownColor.Control);
+            }
         }
 
         private List<ColumnHeader> Headers(int loadPage)
@@ -923,34 +869,6 @@ namespace OrderManager
 
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label06", "Средняя выработка:", ContentAlignment.MiddleRight), 4, 2);
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label6", "", ContentAlignment.MiddleLeft), 5, 2);
-
-            /*
-            Label label01 = new Label();
-            label01.AutoSize = true;
-            label01.Dock = System.Windows.Forms.DockStyle.Fill;
-            label01.Location = new System.Drawing.Point(1, 1);
-            label01.Name = "label01";
-            label01.Size = new System.Drawing.Size(64, 24);
-            label01.TabIndex = 10;
-            label01.Text = "Сумма отработанных смен:";
-            label01.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            label01.Visible = true;
-            tableLayoutPanelControl.Controls.Add(label01, 1, 0);
-
-            Label label1 = new Label();
-            label1.AutoSize = true;
-            label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            label1.Location = new System.Drawing.Point(1, 1);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(64, 24);
-            label1.TabIndex = 10;
-            label1.Text = "";
-            label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            label1.Visible = true;
-            tableLayoutPanelControl.Controls.Add(label1, 2, 0);
-            */
-
-
         }
 
         private void CreateShiftsControls()
@@ -1565,6 +1483,8 @@ namespace OrderManager
                 var control = tableLayoutPanel1.Controls.Find(name, false);
                 ListView listView = (ListView)control[0];
 
+                //EnabledButtons(false);
+
                 listView.Items.Clear();
 
                 //this.Text += " - " + users.Count;
@@ -1642,7 +1562,7 @@ namespace OrderManager
 
                 }
 
-
+                //EnabledButtons(true);
             }
         }
 
@@ -1743,6 +1663,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
+                EnabledButtons(false);
+
                 comboBoxYear.Enabled = false;
                 comboBoxMount.Enabled = false;
                 comboBoxCategory.Enabled = false;
@@ -1901,6 +1823,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
+                EnabledButtons(true);
+
                 comboBoxYear.Enabled = true;
                 comboBoxMount.Enabled = true;
                 comboBoxCategory.Enabled = true;
@@ -1963,6 +1887,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
+                EnabledButtons(false);
+
                 comboBoxYear.Enabled = false;
                 comboBoxMount.Enabled = false;
                 comboBoxUser.Enabled = false;
@@ -2056,6 +1982,8 @@ namespace OrderManager
 
                     Invoke(new Action(() =>
                     {
+                        EnabledButtons(true);
+
                         comboBoxYear.Enabled = true;
                         comboBoxMount.Enabled = true;
                         comboBoxUser.Enabled = true;
@@ -2127,6 +2055,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
+                EnabledButtons(false);
+
                 comboBoxYear.Enabled = false;
                 comboBoxMount.Enabled = false;
                 comboBoxCategory.Enabled = false;
@@ -2258,6 +2188,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
+                EnabledButtons(true);
+
                 comboBoxYear.Enabled = true;
                 comboBoxMount.Enabled = true;
                 comboBoxCategory.Enabled = true;
@@ -2343,6 +2275,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
+                EnabledButtons(false);
+
                 comboBoxMachine.Enabled = false;
             }));
 
@@ -2437,6 +2371,8 @@ namespace OrderManager
                     }
                     Invoke(new Action(() =>
                     {
+                        EnabledButtons(true);
+
                         comboBoxMachine.Enabled = true;
                     }));
                 }
@@ -2470,6 +2406,8 @@ namespace OrderManager
                 ListView listView = (ListView)control[0];
 
                 listView.Items.Clear();
+
+                EnabledButtons(false);
 
                 using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                 {
@@ -2507,6 +2445,8 @@ namespace OrderManager
 
                     Connect.Close();
                 }
+
+                EnabledButtons(true);
             }
         }
 
@@ -2539,6 +2479,8 @@ namespace OrderManager
 
                     Invoke(new Action(() =>
                     {
+                        EnabledButtons(false);
+
                         listView.Items.Clear();
                     }));
 
@@ -2580,6 +2522,12 @@ namespace OrderManager
                     }
                 }
                 thJob = false;
+
+                Invoke(new Action(() =>
+                {
+                    EnabledButtons(true);
+                }));
+
                 break;
             }
         }
@@ -2615,6 +2563,8 @@ namespace OrderManager
 
                     Invoke(new Action(() =>
                     {
+                        EnabledButtons(false);
+
                         listView.Items.Clear();
                     }));
 
@@ -2659,12 +2609,20 @@ namespace OrderManager
                     }
                 }
                 thJob = false;
+
+                Invoke(new Action(() =>
+                {
+                    EnabledButtons(true);
+                }));
+
                 break;
             }
         }
 
         private void LoadPage(int page)
         {
+            SelectedButton(page);
+
             var name = "listView";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
             {
