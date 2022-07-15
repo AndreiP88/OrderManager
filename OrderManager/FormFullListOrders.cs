@@ -82,7 +82,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            SetUpdateSettingsValue setting = new SetUpdateSettingsValue(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -92,7 +92,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            GetValueFromSettingsBase getSettings = new GetValueFromSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -111,7 +111,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
@@ -165,7 +165,7 @@ namespace OrderManager
         private void LoadOrdersFromBase()
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
 
@@ -183,7 +183,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase(dataBase);
 
                 String commandLine;
                 commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";

@@ -52,7 +52,7 @@ namespace OrderManager
 
         private bool CheckUserToSelectedMachine(String machine, String user)
         {
-            GetValueFromInfoBase getUserID = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getUserID = new ValueInfoBase(dataBase);
             if (getUserID.GetIDUser(machine) == user)
                 return true;
             else
@@ -61,7 +61,7 @@ namespace OrderManager
 
         private bool CheckFreeMachine(String machine)
         {
-            GetValueFromInfoBase getUserID = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getUserID = new ValueInfoBase(dataBase);
 
             bool result;
 
@@ -75,8 +75,8 @@ namespace OrderManager
 
         private bool CheckCategoryForUser(String user, String machine)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             String categoryCurrentMachine = getInfo.GetCategoryMachine(machine);
             String categoryesCurrentUser = getUser.GetCategoryesMachine(user);
@@ -93,8 +93,8 @@ namespace OrderManager
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
                 ValueOrdersBase order = new ValueOrdersBase(dataBase);
-                GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-                GetValueFromUserBase user = new GetValueFromUserBase(dataBase);
+                ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+                ValueUserBase user = new ValueUserBase(dataBase);
 
                 Connect.Open();
                 SQLiteCommand Command = new SQLiteCommand
@@ -165,7 +165,7 @@ namespace OrderManager
 
         private void ShiftStart(String currentUser, String startOfShift)
         {
-            SetUpdateUsersBase usersBase = new SetUpdateUsersBase(dataBase);
+            ValueUserBase usersBase = new ValueUserBase(dataBase);
 
             usersBase.UpdateCurrentShiftStart(currentUser, startOfShift);
 
@@ -189,7 +189,7 @@ namespace OrderManager
 
         private void ActivateDeactivateMachines(String currentUser)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
 
 
@@ -246,7 +246,7 @@ namespace OrderManager
 
         private void AddControl(String name, String user, String order, bool enabled, bool check)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             int x = 12;
             int y = 35;

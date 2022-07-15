@@ -28,7 +28,7 @@ namespace OrderManager
 
         private void LoadUsersList()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
 
             int counter = 0;
 
@@ -63,9 +63,9 @@ namespace OrderManager
         private void LoadSelectedUser()
         {
             Cryption pass = new Cryption();
-            GetValueFromUserBase userValue = new GetValueFromUserBase(dataBase);
-            GetValueFromSettingsBase settingsValue = new GetValueFromSettingsBase(dataBase);
-            GetValueFromInfoBase infoBase = new GetValueFromInfoBase(dataBase);
+            ValueUserBase userValue = new ValueUserBase(dataBase);
+            ValueSettingsBase settingsValue = new ValueSettingsBase(dataBase);
+            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
 
             if (listView1.SelectedItems.Count != 0)
             {

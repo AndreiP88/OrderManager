@@ -45,7 +45,7 @@ namespace OrderManager
 
         private void ShowFullOrdersForm(bool editOrder)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             FormAddNewOrder form;
 
@@ -115,7 +115,7 @@ namespace OrderManager
 
         private void SaveParameterToBase()
         {
-            SetUpdateSettingsValue setting = new SetUpdateSettingsValue(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, "allOrdersForm", GetParametersLine());
@@ -125,7 +125,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase()
         {
-            GetValueFromSettingsBase getSettings = new GetValueFromSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, "allOrdersForm"));
@@ -135,7 +135,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
@@ -162,7 +162,7 @@ namespace OrderManager
         private void LoadOrdersFromBase()
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
             listView1.Items.Clear();
@@ -280,7 +280,7 @@ namespace OrderManager
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             if (listView1.SelectedItems.Count != 0)
                 LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
@@ -298,7 +298,7 @@ namespace OrderManager
 
         private void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             if (listView1.SelectedItems.Count != 0)
                 LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
@@ -312,7 +312,7 @@ namespace OrderManager
 
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             SetNewStatus(getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder, "4");
             LoadOrdersFromBase();

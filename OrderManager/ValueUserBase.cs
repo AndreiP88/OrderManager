@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace OrderManager
 {
-    internal class GetValueFromUserBase
+    internal class ValueUserBase
     {
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String dataBase;
 
-        public GetValueFromUserBase(String dBase)
+        public ValueUserBase(String dBase)
         {
             this.dataBase = dBase;
 
@@ -61,7 +61,6 @@ namespace OrderManager
         {
             return GetValue("id", id, "passwordUser");
         }
-
 
         public String GetCurrentShiftStart(String id)
         {
@@ -150,7 +149,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -190,7 +189,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -222,6 +221,60 @@ namespace OrderManager
             }
 
             return userInfos;
+        }
+
+        public void UpdateLastMachine(String idUser, String newValue)
+        {
+            UpdateValueInfo("lastMachine", idUser, newValue);
+        }
+
+        public void UpdateName(String idUser, String newValue)
+        {
+            UpdateValue("nameUser", idUser, newValue);
+        }
+
+        public void UpdatePassword(String idUser, String newValue)
+        {
+            UpdateValue("passwordUser", idUser, newValue);
+        }
+
+        public void UpdateCurrentShiftStart(String idUser, String newValue)
+        {
+            UpdateValueInfo("currentShiftStart", idUser, newValue);
+        }
+
+        private void UpdateValue(String colomn, String id, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE users SET " + colomn + " = @value " +
+                    "WHERE (id = @id)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Command.Parameters.AddWithValue("@value", value);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        private void UpdateValueInfo(String colomn, String id, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE usersInfo SET " + colomn + " = @value " +
+                    "WHERE (user = @id)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Command.Parameters.AddWithValue("@value", value);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         private String GetValue(String findColomnName, String findParameter, String valueColomn)

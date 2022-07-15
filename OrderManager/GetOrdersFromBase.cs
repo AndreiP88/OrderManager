@@ -115,7 +115,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -170,7 +170,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -238,7 +238,7 @@ namespace OrderManager
         public Object LoadAllOrdersFromBase(String startOfShift, String category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
 
             List<Order> orders = new List<Order>();

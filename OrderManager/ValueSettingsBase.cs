@@ -4,12 +4,12 @@ using System.IO;
 
 namespace OrderManager
 {
-    internal class GetValueFromSettingsBase
+    internal class ValueSettingsBase
     {
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String dataBase;
 
-        public GetValueFromSettingsBase(String dBase)
+        public ValueSettingsBase(String dBase)
         {
             this.dataBase = dBase;
 
@@ -52,7 +52,32 @@ namespace OrderManager
             return result;
         }
 
+        public void UpdateCheckPassword(String idUser, String newValue)
+        {
+            UpdateValue("checkPassword", idUser, newValue);
+        }
 
+        public void UpdateParameterLine(String idUser, String selectForm, String newValue)
+        {
+            UpdateValue(selectForm, idUser, newValue);
+        }
+
+        private void UpdateValue(String colomn, String id, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE usersSettings SET " + colomn + " = @value " +
+                    "WHERE (userID = @id)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Command.Parameters.AddWithValue("@value", value);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
 
     }
 }

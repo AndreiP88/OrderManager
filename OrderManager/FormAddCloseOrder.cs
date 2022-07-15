@@ -439,7 +439,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             comboBox3.Items.Clear();
 
@@ -472,7 +472,7 @@ namespace OrderManager
 
         private bool CheckUserToSelectedMachine(String machine, String user)
         {
-            GetValueFromInfoBase getUserID = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getUserID = new ValueInfoBase(dataBase);
             if (getUserID.GetIDUser(machine) == user)
                 return true;
             else
@@ -481,8 +481,8 @@ namespace OrderManager
 
         private void SelectLastMschineToComboBox(String idUser)
         {
-            GetValueFromUserBase getMachine = new GetValueFromUserBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueUserBase getMachine = new ValueUserBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             String machine = "";
 
@@ -504,7 +504,7 @@ namespace OrderManager
 
         private void AddOrderToDB()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
 
             String orderAddedDate = DateTime.Now.ToString();
@@ -578,10 +578,10 @@ namespace OrderManager
 
         private void AcceptOrderInProgressToDB()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
-            SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
-            SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
+            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
             ValueOrdersBase orders = new ValueOrdersBase(dataBase);
 
             //имя и время начала смены сделать через параметры
@@ -609,7 +609,7 @@ namespace OrderManager
             if (status == "0") //новая запись
             {
                 AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, makereadyStart, "", "", "", "", counterRepeat, note);
-                infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, true);
+                infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                 newStatus = "1";
             }
             if (status == "1") // начата приладка
@@ -617,14 +617,14 @@ namespace OrderManager
                 if (currentOrderNumber == "")
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, makereadyStart, "", "", "", "", counterRepeat, note);
-                    infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, true);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = "1";
                 }
                 else
                 {
                     UpdateData("timeMakereadyStop", machineCurrent, shiftStart, number, modification, counterRepeat, makereadyStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
-                    infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, false);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, false);
                     //убираем заказ из активных для возможности завершить смену
                     newStatus = status;
                 }
@@ -635,14 +635,14 @@ namespace OrderManager
                 if (currentOrderNumber == "")
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, "", "", workStart, "", "", counterRepeat, note);
-                    infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, true);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = "3";
                 }
                 else
                 {
                     UpdateData("timeToWorkStart", machineCurrent, shiftStart, number, modification, counterRepeat, workStart);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
-                    infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, true);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = "3";
                 }
             }
@@ -651,7 +651,7 @@ namespace OrderManager
                 if (currentOrderNumber == "")
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, "", "", workStart, "", "", counterRepeat, note);
-                    infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, true);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = status;
                 }
                 else
@@ -661,7 +661,7 @@ namespace OrderManager
                     UpdateData("timeToWorkStop", machineCurrent, shiftStart, number, modification, counterRepeat, workStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
                     UpdateData("done", machineCurrent, shiftStart, number, modification, counterRepeat, done.ToString());
-                    infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, false);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, false);
                     //убираем заказ из активных для возможности завершить смену
                     newStatus = status;
                 }
@@ -672,10 +672,9 @@ namespace OrderManager
 
         private void CloseOrderInProgressToDB()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
-            SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
-            SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
             ValueOrdersBase orders = new ValueOrdersBase(dataBase);
 
             String executor = nameOfExecutor;
@@ -715,14 +714,14 @@ namespace OrderManager
                     {
                         UpdateData("timeToWorkStart", machineCurrent, shiftStart, number, modification, counterRepeat, makereadyStop);
                         UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
-                        infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, true);
+                        getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, number, modification, number, modification, true);
                         //убираем заказ из активных для возможности завершить смену
                         newStatus = "3";
                     }
 
                     if (dialogResult == DialogResult.No || adminCloseOrder)
                     {
-                        infoBase.UpdateInfo(counterRepeat, number, modification, number, modification, false);
+                        getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, number, modification, number, modification, false);
                         //убираем заказ из активных для возможности завершить смену
                         newStatus = "2";
                     }
@@ -738,7 +737,7 @@ namespace OrderManager
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
                     UpdateData("done", machineCurrent, shiftStart, number, modification, counterRepeat, done.ToString());
                     newStatus = "4";
-                    infoBase.UpdateInfo("", "", "", "", "", false);
+                    getInfo.UpdateInfo(machineCurrent, "", "", "", "", "", false);
                 }
             }
 
@@ -747,10 +746,9 @@ namespace OrderManager
 
         private void AbortOrderInProgressToDB()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
-            SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBox3.Text));
-            SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
             ValueOrdersBase orders = new ValueOrdersBase(dataBase);
 
             String executor = nameOfExecutor;
@@ -799,7 +797,7 @@ namespace OrderManager
 
             orders.IncrementCounterRepeat(machineCurrent, number, modification);
             orders.SetNewStatus(machineCurrent, number, modification, newStatus);
-            infoBase.UpdateInfo("", "", "", "", "", false);
+            getInfo.UpdateInfo(machineCurrent, "", "", "", "", "", false);
         }
 
         private void UpdateData(String nameOfColomn, String machineCurrent, String shiftStart, String number, String modification, String counterRepeat, String value)
@@ -825,7 +823,7 @@ namespace OrderManager
 
         private void LoadOrdersToComboBox()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             String cLine = "";
 
@@ -956,7 +954,7 @@ namespace OrderManager
 
         private void LoadCurrentOrderInProgressFromDB(String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeDif = new GetDateTimeOperations();
             GetLeadTime leadTime = new GetLeadTime(dataBase, startOfShift, orderNumber, orderModification, machine, counterRepeat);
             GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, orderNumber, orderModification, counterRepeat);
@@ -1149,7 +1147,7 @@ namespace OrderManager
         private void LoadOrderForEdit(String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
         {
             ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             this.Text = "Детали заказа";
 
@@ -1248,7 +1246,7 @@ namespace OrderManager
         {
             if (loadOrderNumber == "")
             {
-                GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+                ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
                 String number = ordersNumbers[comboBox1.SelectedIndex].numberOfOrder;
                 String modification = ordersNumbers[comboBox1.SelectedIndex].modificationOfOrder;
@@ -1271,7 +1269,7 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
             ValueOrdersBase orders = new ValueOrdersBase(dataBase);
 
@@ -1348,7 +1346,7 @@ namespace OrderManager
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
 
             DialogResult result;
@@ -1398,7 +1396,7 @@ namespace OrderManager
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
             LoadCurrentOrderInProgressFromDB(startOfShift, textBox1.Text, textBox5.Text, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text));
         }

@@ -93,7 +93,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            SetUpdateSettingsValue setting = new SetUpdateSettingsValue(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -103,7 +103,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            GetValueFromSettingsBase getSettings = new GetValueFromSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -294,7 +294,7 @@ namespace OrderManager
 
         private void FormShiftsDetails_Load(object sender, EventArgs e)
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             this.Text += " - " + getUser.GetNameUser(nameOfExecutor);
 

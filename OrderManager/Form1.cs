@@ -172,7 +172,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            SetUpdateSettingsValue setting = new SetUpdateSettingsValue(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -182,7 +182,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            GetValueFromSettingsBase getSettings = new GetValueFromSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -192,7 +192,7 @@ namespace OrderManager
 
         private void LoadParametersForTheSelectedUserFromBase()
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             Info.startOfShift = getUser.GetCurrentShiftStart(Info.nameOfExecutor);
 
@@ -201,7 +201,7 @@ namespace OrderManager
 
         private void AddOrdersToListViewFromList()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
 
@@ -332,9 +332,9 @@ namespace OrderManager
         private void ViewDetailsForUser()
         {
             GetDateTimeOperations dtOperations = new GetDateTimeOperations();
-            GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+            ValueUserBase usersBase = new ValueUserBase(dataBase);
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            GetValueFromInfoBase getUserMachines = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getUserMachines = new ValueInfoBase(dataBase);
 
             if (getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
                 button6.Enabled = false;
@@ -367,8 +367,8 @@ namespace OrderManager
 
         private void LoadUser()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
-            GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
 
             List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
 
@@ -391,10 +391,10 @@ namespace OrderManager
 
         private void LoadMachinesDetailsForUser()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
 
-            GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
 
             List<String> machines = (List<String>)getInfo.GetMachines(Form1.Info.nameOfExecutor);
 
@@ -444,9 +444,9 @@ namespace OrderManager
             {
                 Info.active = false;
 
-                SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
-                SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase);
-                GetValueFromShiftsBase getShift = new GetValueFromShiftsBase(dataBase);
+                ValueUserBase userBase = new ValueUserBase(dataBase);
+                ValueInfoBase infoBase = new ValueInfoBase(dataBase);
+                ValueShiftsBase getShift = new ValueShiftsBase(dataBase);
 
                 getShift.CloseShift(Info.startOfShift, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(Info.nameOfExecutor);
@@ -601,7 +601,7 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+                ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
                 Info.active = false;
                 FormAddCloseOrder form;
@@ -627,7 +627,7 @@ namespace OrderManager
 
         private void LoadOrderNote()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             Info.active = false;
             FormPrivateNote form;

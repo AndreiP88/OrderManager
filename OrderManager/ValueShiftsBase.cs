@@ -5,12 +5,12 @@ using System.IO;
 
 namespace OrderManager
 {
-    internal class GetValueFromShiftsBase
+    internal class ValueShiftsBase
     {
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String dataBase;
 
-        public GetValueFromShiftsBase(String dBase)
+        public ValueShiftsBase(String dBase)
         {
             this.dataBase = dBase;
 

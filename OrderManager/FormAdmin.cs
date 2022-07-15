@@ -282,7 +282,7 @@ namespace OrderManager
 
         private List<String> LoadMachine()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             List<String> machine = new List<String>();
 
@@ -315,7 +315,7 @@ namespace OrderManager
 
         private void ShowFullOrdersForm(bool editOrder, int selectedIndex)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
             FormAddNewOrder form;
@@ -365,7 +365,7 @@ namespace OrderManager
 
         private void DeleteUser(String id)
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             DialogResult result;
             result = MessageBox.Show("Вы действительно хотите удалить сотрудника " + getUser.GetNameUser(id) + "?", "Удаление сотрудника", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -457,7 +457,7 @@ namespace OrderManager
 
         private void DeleteMachine(String id)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             DialogResult result;
             result = MessageBox.Show("Вы действительно хотите удалить оборудование '" + getInfo.GetMachineName(id) + "'?", "Удаление оборудования", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -502,8 +502,8 @@ namespace OrderManager
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
             ValueOrdersBase orders = new ValueOrdersBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase, getInfo.GetMachineFromName(comboBoxMachine.Text));
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
 
             DialogResult result = DialogResult.No;
 
@@ -518,7 +518,7 @@ namespace OrderManager
             {
                 orders.SetNewStatus(machine, orderNumber, orderModification, "0");
                 orders.IncrementCounterRepeat(machine, orderNumber, orderModification);
-                infoBase.UpdateInfo("", "", "", "", "", false);
+                infoBase.UpdateInfo(getInfo.GetMachineFromName(comboBoxMachine.Text), "", "", "", "", "", false);
             }
         }
 
@@ -873,7 +873,7 @@ namespace OrderManager
 
         private void CreateShiftsControls()
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             List<String> years = new List<String>(LoadYears());
             String[] mounts = new String[] {
@@ -1097,7 +1097,7 @@ namespace OrderManager
 
         private void CreateAllOrdersControls()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
 
             List<String> machine = new List<String>(LoadMachine());
 
@@ -1187,7 +1187,7 @@ namespace OrderManager
 
         private void CreateUsersControls()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
 
             List<String> machine = new List<String>(LoadMachine());
 
@@ -1229,7 +1229,7 @@ namespace OrderManager
 
         private void CreateMachineControls()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
 
             List<String> machine = new List<String>(LoadMachine());
 
@@ -1282,7 +1282,7 @@ namespace OrderManager
 
         private void CreateNormControls()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
 
             List<String> machine = new List<String>(LoadMachine());
 
@@ -1323,8 +1323,8 @@ namespace OrderManager
         private void CreateSettingsControls()
         {
             ValueOrdersBase getOrders = new ValueOrdersBase(dataBase);
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
             INISettings ini = new INISettings();
 
             List<String> machine = new List<String>(LoadMachine());
@@ -1467,13 +1467,13 @@ namespace OrderManager
 
         private void MainLVInsertValue()
         {
-            GetValueFromShiftsBase getShifts = new GetValueFromShiftsBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueShiftsBase getShifts = new ValueShiftsBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
-            GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
 
             List<String> users = new List<String>(getShifts.GetActiveUser());
 
@@ -1638,7 +1638,7 @@ namespace OrderManager
         private void LoadUsersFromBase(CancellationToken token, DateTime date)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
             ValueCategory categoryValue = new ValueCategory(dataBase);
 
             ComboBox comboBoxYear = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxYear");
@@ -1833,7 +1833,7 @@ namespace OrderManager
 
         private void StartLoadingShifts()
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             ComboBox comboBoxYear = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxYear");
             ComboBox comboBoxMount = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMount");
@@ -2036,9 +2036,9 @@ namespace OrderManager
         private void LoadMachinesFromBase(CancellationToken token, DateTime date)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
             ValueCategory categoryValue = new ValueCategory(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             ComboBox comboBoxYear = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxYear");
             ComboBox comboBoxMount = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMount");
@@ -2209,7 +2209,7 @@ namespace OrderManager
         }
         private void LoadingAllOrders()
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             DateTimePicker dateTime = (DateTimePicker)ControlFromKey("tableLayoutPanelControl", "dateTime");
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
@@ -2232,7 +2232,7 @@ namespace OrderManager
 
         private void StartLoadingAllOrdersthRead()
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             DateTimePicker dateTime = (DateTimePicker)ControlFromKey("tableLayoutPanelControl", "dateTime");
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
@@ -2269,7 +2269,7 @@ namespace OrderManager
         private void LoadAllOrdersFromBase(CancellationToken token, DateTime dateTime, String filter)
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -2397,7 +2397,7 @@ namespace OrderManager
         private void LoadNormFromBase(String filter)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             var name = "listView";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
@@ -2456,7 +2456,7 @@ namespace OrderManager
 
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             Label label1 = (Label)ControlFromKey("tableLayoutPanelControl", "label1");
             Label label2 = (Label)ControlFromKey("tableLayoutPanelControl", "label2");
@@ -2537,7 +2537,7 @@ namespace OrderManager
             CancellationToken token;
 
             ValueCategory getCategoryes = new ValueCategory(dataBase);
-            GetValueFromInfoBase getMachines = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachines = new ValueInfoBase(dataBase);
 
             GetDateTimeOperations getTime = new GetDateTimeOperations();
 
@@ -2779,7 +2779,7 @@ namespace OrderManager
 
         private void comboBoxMachine_SelectedIndexChanged(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
             selectedMachine = getMachine.GetMachineFromName(((ComboBox)sender).Text);
 
             UpdatePage(currentPage);
@@ -2787,7 +2787,7 @@ namespace OrderManager
 
         private void dateTime_ValueChanged(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
             selectedDateTime = ((DateTimePicker)sender).Value;
 
             UpdatePage(currentPage);
@@ -2839,8 +2839,8 @@ namespace OrderManager
 
         private void ListViewDoubleClick(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -2982,7 +2982,7 @@ namespace OrderManager
 
         private void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -3016,8 +3016,8 @@ namespace OrderManager
         private void closeShift_Click(object sender, EventArgs e)
         {
             //Завершение смены с вводом всех времени завершения операций дляя каждой машины и количеством выполненной продукции
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
@@ -3041,9 +3041,9 @@ namespace OrderManager
             }
             else
             {
-                SetUpdateUsersBase userBase = new SetUpdateUsersBase(dataBase);
-                SetUpdateInfoBase infoBase = new SetUpdateInfoBase(dataBase);
-                GetValueFromShiftsBase getShift = new GetValueFromShiftsBase(dataBase);
+                ValueUserBase userBase = new ValueUserBase(dataBase);
+                ValueInfoBase infoBase = new ValueInfoBase(dataBase);
+                ValueShiftsBase getShift = new ValueShiftsBase(dataBase);
 
                 getShift.CloseShift(startOfShift, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(userId);
@@ -3151,7 +3151,7 @@ namespace OrderManager
 
         private void abortToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -3183,7 +3183,7 @@ namespace OrderManager
 
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 

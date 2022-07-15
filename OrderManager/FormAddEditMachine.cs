@@ -74,7 +74,7 @@ namespace OrderManager
             button1.Text = "Сохранить";
 
             ValueCategory category = new ValueCategory(dataBase);
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
 
             LoadCategoryes();
 
@@ -125,7 +125,7 @@ namespace OrderManager
 
         private void AddNewMachine()
         {
-            GetValueFromInfoBase getMachine = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
             ValueCategory valueCategory = new ValueCategory(dataBase);
 
             String name = textBox1.Text;

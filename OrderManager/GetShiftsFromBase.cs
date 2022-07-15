@@ -38,7 +38,7 @@ namespace OrderManager
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
-                GetValueFromUserBase usersBase = new GetValueFromUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -70,10 +70,10 @@ namespace OrderManager
             Shifts shifts = null;
 
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
-            GetValueFromShiftsBase getValueFromShiftsBase = new GetValueFromShiftsBase(dataBase);
+            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase(dataBase);
 
             List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shiftStart, "");
 
@@ -133,7 +133,7 @@ namespace OrderManager
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
             ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
-            GetValueFromShiftsBase getValueFromShiftsBase = new GetValueFromShiftsBase(dataBase);
+            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase(dataBase);
 
             int countShifts = 0;
             int countOrders = 0;

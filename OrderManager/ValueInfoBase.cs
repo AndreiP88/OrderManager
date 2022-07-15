@@ -5,13 +5,13 @@ using System.IO;
 
 namespace OrderManager
 {
-    internal class GetValueFromInfoBase
+    internal class ValueInfoBase
     {
 
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String dataBase;
 
-        public GetValueFromInfoBase(String dBase)
+        public ValueInfoBase(String dBase)
         {
             this.dataBase = dBase;
 
@@ -218,7 +218,7 @@ namespace OrderManager
 
         public String GetMachinesStr(String userID)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             List<String> orderMachines = (List<String>)GetMachines(userID);
             String machines = "";
@@ -273,6 +273,84 @@ namespace OrderManager
             }
 
             return result;
+        }
+
+        public void UpdateCurrentOrder(String machine, String currentOrder, String currentModification)
+        {
+            UpdateInfoParameter(machine, "currentOrder", currentOrder);
+            UpdateInfoParameter(machine, "currentModification", currentModification);
+        }
+
+        public void CompleteTheShift(String nameOfExecutor)
+        {
+
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
+
+            List<String> machines = (List<String>)getMachine.GetMachines(nameOfExecutor);
+
+            foreach (String machine in machines)
+            {
+                CompleteTheShiftFromMachines(machine);
+            }
+        }
+
+        private void CompleteTheShiftFromMachines(String selectMachine)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE machinesInfo SET nameOfExecutor = '', currentCounterRepeat = '', " +
+                    "currentOrder = '', currentModification = '', activeOrder = 'False' " + // проверить актив ордер
+                    "WHERE (machine = @machine)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@machine", selectMachine);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public void UpdateInfo(String machine, String currentCounterRepeat, String currentOrder, String currentModification, String lastOrder, String lastModification, bool activeOrder)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE machinesInfo SET currentCounterRepeat = @currentCounterRepeat, currentOrder = @currentOrder, " +
+                    "currentModification = @currentModification, lastOrder = @lastOrder, lastModification = @lastModification, activeOrder = @activeOrder " +
+                    "WHERE (machine = @machine)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@currentOrder", currentOrder);
+                Command.Parameters.AddWithValue("@currentModification", currentModification);
+                Command.Parameters.AddWithValue("@lastOrder", lastOrder);
+                Command.Parameters.AddWithValue("@lastModification", lastModification);
+                Command.Parameters.AddWithValue("@currentCounterRepeat", currentCounterRepeat);
+                Command.Parameters.AddWithValue("@activeOrder", activeOrder.ToString());
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+
+        }
+
+        private void UpdateInfoParameter(String machine, String parameter, String value)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "UPDATE machinesInfo SET " + parameter + " = @value " +
+                    "WHERE (machine = @machine)";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@value", value);
+                Command.Parameters.AddWithValue("@machine", machine);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+
         }
 
     }

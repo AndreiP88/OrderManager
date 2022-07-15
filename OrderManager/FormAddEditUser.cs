@@ -76,7 +76,7 @@ namespace OrderManager
             ValueCategory category = new ValueCategory(dataBase);
             StringArray stringArray = new StringArray();
 
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
             UserInfo getInfo = (UserInfo)getUser.GetUserInfoFromID(userIDLoad);
 
             LoadCategoryes();
@@ -200,7 +200,7 @@ namespace OrderManager
 
         private void AddNewUser()
         {
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase(dataBase);
 
             String shortName = textBox2.Text + " " + textBox1.Text;
 

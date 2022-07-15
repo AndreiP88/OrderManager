@@ -46,7 +46,7 @@ namespace OrderManager
 
         private void SelectCurrentMachineToComboBox(String machine)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             if (machine != "" && comboBox1.Items.IndexOf(getInfo.GetMachineName(machine)) != -1)
                 comboBox1.SelectedIndex = comboBox1.Items.IndexOf(getInfo.GetMachineName(machine));
@@ -56,7 +56,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
@@ -152,7 +152,7 @@ namespace OrderManager
 
         private void AddOrderToDB()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
             ValueOrdersBase getOrderCount = new ValueOrdersBase(dataBase);
 
@@ -206,7 +206,7 @@ namespace OrderManager
 
         private void EditOrderInProgress()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
@@ -235,17 +235,17 @@ namespace OrderManager
 
         private void EditCurrentOrderInfo()
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
 
-            SetUpdateInfoBase setInfo = new SetUpdateInfoBase(dataBase, machine);
+            ValueInfoBase setInfo = new ValueInfoBase(dataBase);
 
             String number = textBox1.Text;
             String modification = textBox5.Text;
 
             if (getInfo.GetCurrentOrderNumber(machine) == orderNumberLoad && getInfo.GetCurrentOrderModification(machine) == orderModificationLoad)
             {
-                setInfo.UpdateCurrentOrder(number, modification);
+                setInfo.UpdateCurrentOrder(machine, number, modification);
             }
 
         }
@@ -253,7 +253,7 @@ namespace OrderManager
         private void LoadOrderFromDB(String orderMachine, String orderNumber, String orderModification)
         {
             //int orderStatus = 0;
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getOrderValue = new ValueOrdersBase(dataBase);
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
@@ -293,7 +293,7 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            GetValueFromInfoBase getInfo = new GetValueFromInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
 
             if (CheckNotEmptyFields() == true)

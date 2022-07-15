@@ -25,8 +25,8 @@ namespace OrderManager
         void LoadUser()
         {
             Cryption pass = new Cryption();
-            GetValueFromUserBase userBase = new GetValueFromUserBase(dataBase);
-            GetValueFromSettingsBase settingsBase = new GetValueFromSettingsBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
+            ValueSettingsBase settingsBase = new ValueSettingsBase(dataBase);
 
             bool checkPass = false;
 
@@ -41,8 +41,8 @@ namespace OrderManager
         void SaveUser()
         {
             Cryption pass = new Cryption();
-            SetUpdateUsersBase setUpdateUsers = new SetUpdateUsersBase(dataBase);
-            SetUpdateSettingsValue updateSettingsValue = new SetUpdateSettingsValue(dataBase);
+            ValueUserBase setUpdateUsers = new ValueUserBase(dataBase);
+            ValueSettingsBase updateSettingsValue = new ValueSettingsBase(dataBase);
 
             setUpdateUsers.UpdateName(idUser, textBox1.Text);
             setUpdateUsers.UpdatePassword(idUser, pass.Code(textBox2.Text, passKey));
