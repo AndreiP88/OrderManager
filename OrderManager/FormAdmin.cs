@@ -1071,6 +1071,9 @@ namespace OrderManager
             addButton.TabIndex = 0;
             addButton.Text = "Добавить";
             addButton.Visible = true;
+            addButton.ImageList = imageList1;
+            addButton.ImageIndex = 2;
+            addButton.TextImageRelation = TextImageRelation.ImageAboveText;
             tableLayoutPanelControl.SetRowSpan(addButton, 3);
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
             addButton.Click += new System.EventHandler(addButton_Click);
@@ -1161,6 +1164,9 @@ namespace OrderManager
             addButton.TabIndex = 0;
             addButton.Text = "Добавить";
             addButton.Visible = true;
+            addButton.ImageList = imageList1;
+            addButton.ImageIndex = 2;
+            addButton.TextImageRelation = TextImageRelation.ImageAboveText;
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
             addButton.Click += new System.EventHandler(addButton_Click);
 
@@ -1203,6 +1209,9 @@ namespace OrderManager
             addCategoryButton.TabIndex = 0;
             addCategoryButton.Text = "Добавить участок";
             addCategoryButton.Visible = true;
+            addCategoryButton.ImageList = imageList1;
+            addCategoryButton.ImageIndex = 2;
+            addCategoryButton.TextImageRelation = TextImageRelation.ImageAboveText;
             tableLayoutPanelControl.Controls.Add(addCategoryButton, 0, 0);
             addCategoryButton.Click += new System.EventHandler(addButton_Click);
 
@@ -1214,6 +1223,9 @@ namespace OrderManager
             addMachineButton.TabIndex = 0;
             addMachineButton.Text = "Добавить оборудование";
             addMachineButton.Visible = true;
+            addMachineButton.ImageList = imageList1;
+            addMachineButton.ImageIndex = 2;
+            addMachineButton.TextImageRelation = TextImageRelation.ImageAboveText;
             tableLayoutPanelControl.Controls.Add(addMachineButton, 1, 0);
             addMachineButton.Click += new System.EventHandler(addButton_Click);
 
@@ -1508,6 +1520,14 @@ namespace OrderManager
 
         private Object ControlFromKey(String panel, String name)
         {
+            /*Control[] controls = Controls.Find(name, true);
+
+            //MessageBox.Show(control.Length.ToString());
+
+            return controls[0];*/
+
+
+
             if (tableLayoutPanel1.Controls.ContainsKey(panel))
             {
                 var controlPanel = tableLayoutPanel1.Controls.Find(panel, true);
@@ -1522,7 +1542,7 @@ namespace OrderManager
                     return null;
             }
             else
-                if (panel == "tableLayoutPanel1")
+            if (panel == "tableLayoutPanel1")
             {
                 if (tableLayoutPanel1.Controls.ContainsKey(name))
                 {
@@ -1536,7 +1556,7 @@ namespace OrderManager
                 return null;
         }
 
-        private void StartLoadingStatisticUsers()
+            private void StartLoadingStatisticUsers()
         {
             /*
             var name = "comboBoxYear";
@@ -2372,8 +2392,9 @@ namespace OrderManager
                             item.Name = sqlReader["orderStamp"].ToString();
                             item.Text = (index + 1).ToString();
                             item.SubItems.Add(sqlReader["orderStamp"].ToString());
-                            item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
                             item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
+                            item.SubItems.Add(sqlReader["modification"].ToString());
+                            item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
                             item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
                             item.SubItems.Add((60 * Convert.ToInt32(sqlReader["amountOfOrder"]) / Convert.ToInt32(sqlReader["timeToWork"])).ToString("N0"));
 

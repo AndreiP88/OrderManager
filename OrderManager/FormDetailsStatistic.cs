@@ -116,29 +116,14 @@ namespace OrderManager
 
         private void LoadYears()
         {
-            List<String> years = new List<String>();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase(dataBase);
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT DISTINCT startShift FROM shifts"
-                };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+            List<String> years = shiftsBase.LoadYears();
 
-                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
-                {
-                    if (years.IndexOf(Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy")) == -1)
-                        years.Add(Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy"));
-                }
+            comboBox1.Items.AddRange(years.ToArray());
 
-                Connect.Close();
-            }
-
-            for (int i = years.Count - 1; i >= 0; i--)
-                comboBox1.Items.Add(years[i].ToString());
+            /*for (int i = years.Count - 1; i >= 0; i--)
+                comboBox1.Items.Add(years[i].ToString());*/
         }
 
         private void ClearAll()
@@ -186,6 +171,8 @@ namespace OrderManager
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             ValueUserBase getUser = new ValueUserBase(dataBase);
 
+            String cLine = " WHERE activeUser = 'True'";
+
             Invoke(new Action(() =>
             {
                 comboBox1.Enabled = false;
@@ -205,13 +192,51 @@ namespace OrderManager
                 float fullPercentWorkingOut = 0;
                 int countActiveUser = 0;
 
+                Invoke(new Action(() =>
+                {
+                    listView1.Items.Clear();
+                }));
+
                 using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                 {
                     Connect.Open();
                     SQLiteCommand Command = new SQLiteCommand
                     {
                         Connection = Connect,
-                        CommandText = @"SELECT * FROM users WHERE activeUser = 'True'"
+                        CommandText = @"SELECT * FROM users" + cLine
+                    };
+                    SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                    {
+                        ListViewItem item = new ListViewItem();
+
+                        item.Name = sqlReader["id"].ToString();
+                        item.Text = (listView1.Items.Count + 1).ToString();
+                        item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+
+                        Invoke(new Action(() =>
+                            {
+                                listView1.Items.Add(item);
+                            }));
+
+                    }
+                    Connect.Close();
+                }
+
+                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                {
+                    Connect.Open();
+                    SQLiteCommand Command = new SQLiteCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT * FROM users" + cLine
                     };
                     SQLiteDataReader sqlReader = Command.ExecuteReader();
 
@@ -219,7 +244,7 @@ namespace OrderManager
                     {
                         GetShiftsFromBase getShifts = new GetShiftsFromBase(dataBase, sqlReader["id"].ToString());
 
-                        ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, "");
+                        ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "");
 
                         fullCountShifts += shiftsDetails.countShifts;
                         fullTimeShifts += shiftsDetails.allTimeShift;
@@ -237,19 +262,18 @@ namespace OrderManager
 
                         Invoke(new Action(() =>
                         {
-                            ListViewItem item = new ListViewItem();
+                            int index = listView1.Items.IndexOfKey(sqlReader["id"].ToString());
 
-                            item.Name = sqlReader["id"].ToString();
-                            item.Text = (listView1.Items.Count + 1).ToString();
-                            item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-                            item.SubItems.Add(shiftsDetails.countShifts.ToString());
-                            item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift));
-                            item.SubItems.Add(shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString());
-                            item.SubItems.Add(shiftsDetails.amountAllOrdersShift.ToString("N0"));
-                            item.SubItems.Add(dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift));
-                            item.SubItems.Add(shiftsDetails.percentWorkingOutShift.ToString("N1") + "%");
-
-                            listView1.Items.Add(item);
+                            ListViewItem item = listView1.Items[index];
+                            if (item != null)
+                            {
+                                item.SubItems[2].Text = shiftsDetails.countShifts.ToString();
+                                item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
+                                item.SubItems[4].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
+                                item.SubItems[5].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
+                                item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
+                                item.SubItems[7].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+                            }
                         }));
 
                         Invoke(new Action(() =>
@@ -262,7 +286,6 @@ namespace OrderManager
                             label14.Text = fullAmountOrders.ToString("N0");
                             label15.Text = (fullPercentWorkingOut / countActiveUser).ToString("N1") + "%";
                         }));
-
                     }
 
                     Connect.Close();

@@ -55,6 +55,32 @@ namespace OrderManager
             }
         }
 
+        public List<String> LoadYears()
+        {
+            List<String> years = new List<String>();
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                Connect.Open();
+                SQLiteCommand Command = new SQLiteCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT DISTINCT startShift FROM shifts"
+                };
+                SQLiteDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                {
+                    if (years.IndexOf(Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy")) == -1)
+                        years.Add(Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy"));
+                }
+
+                Connect.Close();
+            }
+
+            return years;
+        }
+
         private List<String> GetValue(String findColomnName, String findParameter, String valueColomn)
         {
             List<String> result = new List<String>();
