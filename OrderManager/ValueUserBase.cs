@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -241,6 +242,42 @@ namespace OrderManager
         public void UpdateCurrentShiftStart(String idUser, String newValue)
         {
             UpdateValueInfo("currentShiftStart", idUser, newValue);
+        }
+
+        public void DeleteUser(String id)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "DELETE FROM users WHERE id = @id";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "DELETE FROM usersInfo WHERE user = @id";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "DELETE FROM usersSettings WHERE userID = @id";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         private void UpdateValue(String colomn, String id, String value)

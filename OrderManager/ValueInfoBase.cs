@@ -353,5 +353,30 @@ namespace OrderManager
 
         }
 
+        public void DeleteMachine(String id)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "DELETE FROM machines WHERE id = @id";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "DELETE FROM machinesInfo WHERE machine = @id";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
     }
 }

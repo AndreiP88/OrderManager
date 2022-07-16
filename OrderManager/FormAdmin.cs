@@ -365,44 +365,13 @@ namespace OrderManager
 
         private void DeleteUser(String id)
         {
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
 
             DialogResult result;
-            result = MessageBox.Show("Вы действительно хотите удалить сотрудника " + getUser.GetNameUser(id) + "?", "Удаление сотрудника", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            result = MessageBox.Show("Вы действительно хотите удалить сотрудника " + userBase.GetNameUser(id) + "?", "Удаление сотрудника", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-                {
-                    string commandText = "DELETE FROM users WHERE id = @id";
-
-                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                    Command.Parameters.AddWithValue("@id", id);
-                    Connect.Open();
-                    Command.ExecuteNonQuery();
-                    Connect.Close();
-                }
-
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-                {
-                    string commandText = "DELETE FROM usersInfo WHERE user = @id";
-
-                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                    Command.Parameters.AddWithValue("@id", id);
-                    Connect.Open();
-                    Command.ExecuteNonQuery();
-                    Connect.Close();
-                }
-
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-                {
-                    string commandText = "DELETE FROM usersSettings WHERE userID = @id";
-
-                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                    Command.Parameters.AddWithValue("@id", id);
-                    Connect.Open();
-                    Command.ExecuteNonQuery();
-                    Connect.Close();
-                }
+                userBase.DeleteUser(id);
             }
         }
 
@@ -428,16 +397,7 @@ namespace OrderManager
             result = MessageBox.Show("Вы действительно хотите удалить участок '" + getCategory.GetCategoryName(id) + "'?", "Удаление участка", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-                {
-                    string commandText = "DELETE FROM machinesCategoryes WHERE id = @id";
-
-                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                    Command.Parameters.AddWithValue("@id", id);
-                    Connect.Open();
-                    Command.ExecuteNonQuery();
-                    Connect.Close();
-                }
+                getCategory.DeleteCategory(id);
             }
         }
 
@@ -457,33 +417,13 @@ namespace OrderManager
 
         private void DeleteMachine(String id)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
 
             DialogResult result;
-            result = MessageBox.Show("Вы действительно хотите удалить оборудование '" + getInfo.GetMachineName(id) + "'?", "Удаление оборудования", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            result = MessageBox.Show("Вы действительно хотите удалить оборудование '" + infoBase.GetMachineName(id) + "'?", "Удаление оборудования", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-                {
-                    string commandText = "DELETE FROM machines WHERE id = @id";
-
-                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                    Command.Parameters.AddWithValue("@id", id);
-                    Connect.Open();
-                    Command.ExecuteNonQuery();
-                    Connect.Close();
-                }
-
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-                {
-                    string commandText = "DELETE FROM machinesInfo WHERE machine = @id";
-
-                    SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                    Command.Parameters.AddWithValue("@id", id);
-                    Connect.Open();
-                    Command.ExecuteNonQuery();
-                    Connect.Close();
-                }
+                infoBase.DeleteMachine(id);
             }
         }
 

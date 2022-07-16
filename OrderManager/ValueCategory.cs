@@ -78,5 +78,19 @@ namespace OrderManager
             return result;
         }
 
+        public void DeleteCategory(String id)
+        {
+            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            {
+                string commandText = "DELETE FROM machinesCategoryes WHERE id = @id";
+
+                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
     }
 }
