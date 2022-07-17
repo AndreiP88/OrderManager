@@ -86,36 +86,54 @@ namespace OrderManager
         int currentPage = 1;
         int selectedYear = 0;
         int selectedMonth = 0;
+        int selectedMonthLengthNorm = 0;
         String selectedCategory = "Все";
         String selectedMachine = "";
         String selectedUser = "";
         DateTime selectedDateTime = DateTime.Now.AddMonths(-2);
+        DateTime selectedDateTimeNorm = DateTime.Now;
 
         bool thJob = false;
         bool calculateNullShiftsFromUser = false;
 
+        private void FormAdmin_Load(object sender, EventArgs e)
+        {
+            selectedYear = DateTime.Now.Year;
+            selectedMonth = DateTime.Now.Month;
+
+            LoadVariables();
+
+            LoadPage(currentPage);
+            timer1.Enabled = true;
+        }
+
         private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
         {
             timer1.Enabled = false;
+            SaveVariables();
             Application.Exit();
         }
 
-        private List<ColumnHeader> ListHeaders(String[] headersWidth)
+        private void LoadVariables()
         {
-            List<ColumnHeader> columnHeaders = new List<ColumnHeader>();
+            INISettings ini = new INISettings();
 
-            for (int i = 0; i < headersWidth.Length; i++)
-            {
-                String[] head = headersWidth[i].Split(';');
+            selectedMonthLengthNorm = Convert.ToInt32(ini.GetSelectedMonthLengthNorm());
+            selectedCategory = ini.GetSelectedCategory();
+            selectedMachine = ini.GetSelectedMachine();
+            selectedDateTime = Convert.ToDateTime(ini.GetSelectedDateTime());
+            selectedDateTimeNorm = Convert.ToDateTime(ini.GetSelectedDateTimeNorm());
+        }
 
-                columnHeaders.Add(new ColumnHeader()
-                {
-                    Text = head[0].ToString(),
-                    Width = Convert.ToInt32(head[1])
-                });
-            }
+        private void SaveVariables()
+        {
+            INISettings ini = new INISettings();
 
-            return columnHeaders;
+            ini.SetSelectedMonthLengthNorm(selectedMonthLengthNorm.ToString());
+            ini.SetSelectedCategory(selectedCategory);
+            ini.SetSelectedMachine(selectedMachine);
+            ini.SetSelectedDateTime(selectedDateTime.ToString("d"));
+            ini.SetSelectedDateTimeNorm(selectedDateTimeNorm.ToString("d"));
         }
 
         private void EnabledButtons(bool enabled)
@@ -890,7 +908,6 @@ namespace OrderManager
 
             comboBoxMount.SelectedIndexChanged += new System.EventHandler(comboBoxMount_SelectedIndexChanged);
 
-
             ComboBox comboBoxUser = new ComboBox();
             comboBoxUser.Name = "comboBoxUser";
             comboBoxUser.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1238,6 +1255,8 @@ namespace OrderManager
 
             List<String> machine = new List<String>(LoadMachine());
 
+            String[] m = { "1 месяц", "2 месяца", "3 месяца", "4 месяца", "5 месяцев", "6 месяцев", "7 месяцев", "8 месяцев", "9 месяцев", "10 месяцев", "11 месяцев", "12 месяцев" };
+
             var name = "tableLayoutPanelControl";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
             {
@@ -1253,10 +1272,35 @@ namespace OrderManager
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
             tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
 
-            tableLayoutPanelControl.RowCount = 1;
+            tableLayoutPanelControl.RowCount = 3;
 
             tableLayoutPanelControl.Visible = true;
             tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 1);
+
+            DateTimePicker dateTime = new DateTimePicker();
+            dateTime.Name = "dateTimeNorm";
+            dateTime.Dock = DockStyle.Fill;
+            dateTime.Location = new System.Drawing.Point(3, 3);
+            dateTime.Size = new System.Drawing.Size(144, 21);
+            dateTime.TabIndex = 0;
+            dateTime.Value = selectedDateTimeNorm;
+            dateTime.Visible = true;
+            tableLayoutPanelControl.Controls.Add(dateTime, 0, 0);
+            dateTime.ValueChanged += new System.EventHandler(dateTimeNorm_ValueChanged);
+
+            ComboBox comboBoxLength = new ComboBox();
+            comboBoxLength.Name = "comboBoxLength";
+            comboBoxLength.Dock = System.Windows.Forms.DockStyle.Fill;
+            comboBoxLength.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comboBoxLength.FormattingEnabled = true;
+            comboBoxLength.Location = new System.Drawing.Point(3, 3);
+            comboBoxLength.Size = new System.Drawing.Size(144, 21);
+            comboBoxLength.TabIndex = 1;
+            comboBoxLength.Items.AddRange(m);
+            comboBoxLength.SelectedIndex = selectedMonthLengthNorm;
+            comboBoxLength.SelectedIndexChanged += new EventHandler(comboBoxLength_SelectedIndexChanged);
+
+            tableLayoutPanelControl.Controls.Add(comboBoxLength, 0, 1);
 
             TextBox textBox = new TextBox();
             textBox.Name = "textBoxFilter";
@@ -1266,10 +1310,12 @@ namespace OrderManager
             textBox.TabIndex = 2;
             textBox.Text = "";
             textBox.Visible = true;
-            tableLayoutPanelControl.Controls.Add(textBox, 0, 0);
+            tableLayoutPanelControl.Controls.Add(textBox, 0, 2);
             textBox.TextChanged += new System.EventHandler(textBoxFilter_TextChanged);
 
-            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label001", "- фильтр", ContentAlignment.MiddleLeft), 1, 0);
+            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label001", "- начало периода", ContentAlignment.MiddleLeft), 1, 0);
+            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label002", "- продолжительность", ContentAlignment.MiddleLeft), 1, 1);
+            tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label003", "- фильтр", ContentAlignment.MiddleLeft), 1, 2);
         }
 
         private void CreateSettingsControls()
@@ -2342,19 +2388,24 @@ namespace OrderManager
             }
 
         }
-
         private void StartLoadNormFromBase()
         {
             TextBox textBoxFilter = (TextBox)ControlFromKey("tableLayoutPanelControl", "textBoxFilter");
+            DateTimePicker dateTimePicker = (DateTimePicker)ControlFromKey("tableLayoutPanelControl", "dateTimeNorm");
+            ComboBox comboBoxLength = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxLength");
 
             String filterKey;
             filterKey = textBoxFilter.Text;
 
-            LoadNormFromBase(filterKey);
+            DateTime dateTimeStart = dateTimePicker.Value;
+
+            DateTime dateTimeEnd = dateTimePicker.Value.AddMonths(comboBoxLength.SelectedIndex + 1);
+
+            LoadNormFromBase(dateTimeStart, dateTimeEnd, filterKey);
 
         }
 
-        private void LoadNormFromBase(String filter)
+        private void LoadNormFromBase(DateTime dateTimeStart, DateTime dateTimeEnd, String filter)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase getInfo = new ValueInfoBase(dataBase);
@@ -2369,6 +2420,14 @@ namespace OrderManager
 
                 EnabledButtons(false);
 
+                String commandLine;
+                commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                commandLine += dateTimeStart.ToString("yyyy-MM-dd 00:00:00") + "'";
+                commandLine += " AND ";
+                commandLine += "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) <= '";
+                commandLine += dateTimeEnd.ToString("yyyy-MM-dd 00:00:00") + "'";
+                //commandLine += 
+
                 using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
                 {
                     int index = 0;
@@ -2377,31 +2436,27 @@ namespace OrderManager
                     SQLiteCommand Command = new SQLiteCommand
                     {
                         Connection = Connect,
-                        CommandText = @"SELECT * FROM orders"
+                        CommandText = @"SELECT * FROM orders WHERE (" + commandLine + ") AND orderStamp LIKE '%" + filter + "%'"
                     };
                     SQLiteDataReader sqlReader = Command.ExecuteReader();
 
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {
-                        if (sqlReader["orderStamp"].ToString().Contains(filter))
-                        {
-                            index++;
+                        index++;
 
-                            ListViewItem item = new ListViewItem();
+                        ListViewItem item = new ListViewItem();
 
-                            item.Name = sqlReader["orderStamp"].ToString();
-                            item.Text = (index + 1).ToString();
-                            item.SubItems.Add(sqlReader["orderStamp"].ToString());
-                            item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
-                            item.SubItems.Add(sqlReader["modification"].ToString());
-                            item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
-                            item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
-                            item.SubItems.Add((60 * Convert.ToInt32(sqlReader["amountOfOrder"]) / Convert.ToInt32(sqlReader["timeToWork"])).ToString("N0"));
+                        item.Name = sqlReader["orderStamp"].ToString();
+                        item.Text = (index).ToString();
+                        item.SubItems.Add(sqlReader["orderStamp"].ToString());
+                        item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
+                        item.SubItems.Add(sqlReader["modification"].ToString());
+                        item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                        item.SubItems.Add(Convert.ToDateTime(sqlReader["orderAddedDate"]).ToString("D"));
+                        item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
+                        item.SubItems.Add((60 * Convert.ToInt32(sqlReader["amountOfOrder"]) / Convert.ToInt32(sqlReader["timeToWork"])).ToString("N0"));
 
-                            listView.Items.Add(item);
-
-                        }
-
+                        listView.Items.Add(item);
                     }
 
                     Connect.Close();
@@ -2640,7 +2695,7 @@ namespace OrderManager
                     StartLoadingAllOrders();
                     break;
                 case 6:
-                    tableLayoutPanel1.RowStyles[1].Height = 35;
+                    tableLayoutPanel1.RowStyles[1].Height = 90;
                     CreateNormControls();
                     head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
@@ -2723,6 +2778,13 @@ namespace OrderManager
             UpdatePage(currentPage);
         }
 
+        private void comboBoxLength_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            selectedMonthLengthNorm = ((ComboBox)sender).SelectedIndex;
+
+            UpdatePage(currentPage);
+        }
+
         private void comboBoxCategory_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectedCategory = ((ComboBox)sender).Text;
@@ -2750,6 +2812,14 @@ namespace OrderManager
         {
             ValueInfoBase getMachine = new ValueInfoBase(dataBase);
             selectedDateTime = ((DateTimePicker)sender).Value;
+
+            UpdatePage(currentPage);
+        }
+
+        private void dateTimeNorm_ValueChanged(object sender, EventArgs e)
+        {
+            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
+            selectedDateTimeNorm = ((DateTimePicker)sender).Value;
 
             UpdatePage(currentPage);
         }
@@ -3235,15 +3305,6 @@ namespace OrderManager
 
 
             }
-        }
-
-        private void FormAdmin_Load(object sender, EventArgs e)
-        {
-            selectedYear = DateTime.Now.Year;
-            selectedMonth = DateTime.Now.Month;
-
-            LoadPage(currentPage);
-            timer1.Enabled = true;
         }
 
         private void timer1_Tick(object sender, EventArgs e)

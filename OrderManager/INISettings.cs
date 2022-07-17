@@ -10,9 +10,10 @@ namespace OrderManager
         private String GetParameter(String section, String key)
         {
             IniFile INI = new IniFile(_settingsFile);
+
             String result = "";
 
-            if (INI.KeyExists("dataBasePath"))
+            if (INI.KeyExists(key))
                 result = INI.ReadINI(section, key);
 
             //MessageBox.Show("GET: [" + section + "][" + key + "]: " + result);
@@ -23,7 +24,7 @@ namespace OrderManager
         {
             IniFile INI = new IniFile(_settingsFile);
 
-            if (INI.KeyExists("dataBasePath"))
+            if (INI.KeyExists(key))
                 INI.Write(section, key, value);
 
             //MessageBox.Show("SET: [" + section + "][" + key + "]: " + value);
@@ -54,6 +55,71 @@ namespace OrderManager
 
             return result;
         }
+
+        public String GetSelectedMonthLengthNorm()
+        {
+            String result = GetParameter("variables", "selectedMonthLengthNorm");
+
+            return result;
+        }
+
+        public String GetSelectedCategory()
+        {
+            String result = GetParameter("variables", "selectedCategory");
+
+            return result;
+        }
+
+        public String GetSelectedMachine()
+        {
+            String result = GetParameter("variables", "selectedMachine");
+
+            return result;
+        }
+
+        public String GetSelectedDateTime()
+        {
+            String result = GetParameter("variables", "selectedDateTime");
+
+            return result;
+        }
+
+        public String GetSelectedDateTimeNorm()
+        {
+            String result = GetParameter("variables", "selectedDateTimeNorm");
+
+            return result;
+        }
+
+
+        public void SetSelectedMonthLengthNorm(String value)
+        {
+            SetParameter("variables", "selectedMonthLengthNorm", value);
+        }
+
+        public void SetSelectedCategory(String value)
+        {
+            SetParameter("variables", "selectedCategory", value);
+        }
+
+        public void SetSelectedMachine(String value)
+        {
+            SetParameter("variables", "selectedMachine", value);
+        }
+
+        public void SetSelectedDateTime(String value)
+        {
+            SetParameter("variables", "selectedDateTime", value);
+        }
+
+        public void SetSelectedDateTimeNorm(String value)
+        {
+            SetParameter("variables", "selectedDateTimeNorm", value);
+        }
+
+
+
+
 
         public String GetColumnHeadersMain()
         {

@@ -179,7 +179,7 @@ namespace OrderManager
                         "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
                         "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";
                 else
-                    commandText = "UPDATE orders SET orderAddedDate = @orderAddedDate, machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
+                    commandText = "UPDATE orders SET machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
                     "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp " +
                     "WHERE count = @orderCount";
 
