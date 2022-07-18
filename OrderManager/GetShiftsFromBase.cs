@@ -11,6 +11,9 @@ namespace OrderManager
         String dataBase;
         String executorName;
 
+        //Учитывать в общую выработку смены с нулевой производительностью
+        bool _calculateAllPercent = true;
+
         public GetShiftsFromBase(String dBase, String nameOfExecutor)
         {
             this.dataBase = dBase;
@@ -136,6 +139,7 @@ namespace OrderManager
             ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase(dataBase);
 
             int countShifts = 0;
+            int countEffectiveShift = 0;
             int countOrders = 0;
             int countMakeready = 0;
             int amountAllOrders = 0;
@@ -168,21 +172,32 @@ namespace OrderManager
                     countOrders++;
                 }
 
+                if (fullTimeWorkingOut > 0)
+                    countEffectiveShift++;
+
                 amountAllOrders += fullDone;
                 allTimeWorkingOut += fullTimeWorkingOut;
                 allTime += dateTimeOperations.DateDifferentToMinutes(getValueFromShiftsBase.GetStopShift(shifts[i]), shifts[i]);
                 allPercentWorkingOut += getPercent.Percent(fullTimeWorkingOut);
 
                 countShifts++;
+
             }
 
-            if (countShifts == 0)
+            int countShiftForPercent;
+
+            if (_calculateAllPercent)
+                countShiftForPercent = countShifts;
+            else
+                countShiftForPercent = countEffectiveShift;
+
+            if (countShiftForPercent == 0)
             {
                 percent = 0;
             }
             else
             {
-                percent = allPercentWorkingOut / countShifts;
+                percent = allPercentWorkingOut / countShiftForPercent;
             }
 
             shiftsDetails = new ShiftsDetails(

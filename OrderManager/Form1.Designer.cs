@@ -858,6 +858,7 @@ namespace OrderManager
             this.normToolStripMenuItem.Name = "normToolStripMenuItem";
             this.normToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.normToolStripMenuItem.Text = "Нормы";
+            this.normToolStripMenuItem.Visible = false;
             // 
             // toolStripDropDownButton3
             // 

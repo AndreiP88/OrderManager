@@ -80,6 +80,10 @@ namespace OrderManager
 
         public void DeleteCategory(String id)
         {
+            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
+
+            List<String> machinesList = infoBase.GetMachinesList(id);
+
             using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
             {
                 string commandText = "DELETE FROM machinesCategoryes WHERE id = @id";
@@ -89,6 +93,11 @@ namespace OrderManager
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();
+            }
+
+            for (int i = 0; i < machinesList.Count; i++)
+            {
+                infoBase.DeleteMachine(machinesList[i]);
             }
         }
 

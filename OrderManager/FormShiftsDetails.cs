@@ -132,26 +132,9 @@ namespace OrderManager
 
         private void LoadYears()
         {
-            List<String> years = new List<String>();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase(dataBase);
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT DISTINCT startShift FROM shifts"
-                };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
-                {
-                    if (years.IndexOf(Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy")) == -1)
-                        years.Add(Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy"));
-                }
-
-                Connect.Close();
-            }
+            List<String> years = shiftsBase.LoadYears();
 
             comboBox1.Items.AddRange(years.ToArray());
         }
