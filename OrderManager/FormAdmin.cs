@@ -2279,6 +2279,8 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
+            String machine = getInfo.GetMachineFromName(comboBoxMachine.Text);
+
             Invoke(new Action(() =>
             {
                 EnabledButtons(false);
@@ -2335,7 +2337,7 @@ namespace OrderManager
 
                             if (sqlReader["numberOfOrder"].ToString().Contains(filter))
                             {
-                                GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
+                                GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
                                 GetLeadTime leadTimeFirst = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
                                 GetLeadTime leadTimeLast = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
 

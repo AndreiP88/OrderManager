@@ -656,7 +656,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    GetCountOfDone orderCalc = new GetCountOfDone(dataBase, shiftStart, number, modification, counterRepeat);
+                    GetCountOfDone orderCalc = new GetCountOfDone(dataBase, shiftStart, machineCurrent, number, modification, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
                     UpdateData("timeToWorkStop", machineCurrent, shiftStart, number, modification, counterRepeat, workStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
@@ -731,7 +731,7 @@ namespace OrderManager
             {
                 if (currentOrderNumber != "")
                 {
-                    GetCountOfDone orderCalc = new GetCountOfDone(dataBase, shiftStart, number, modification, counterRepeat);
+                    GetCountOfDone orderCalc = new GetCountOfDone(dataBase, shiftStart, machineCurrent, number, modification, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
                     UpdateData("timeToWorkStop", machineCurrent, shiftStart, number, modification, counterRepeat, workStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
@@ -785,7 +785,7 @@ namespace OrderManager
             {
                 if (currentOrderNumber != "")
                 {
-                    GetCountOfDone orderCalc = new GetCountOfDone(dataBase, shiftStart, number, modification, counterRepeat);
+                    GetCountOfDone orderCalc = new GetCountOfDone(dataBase, shiftStart, machineCurrent, number, modification, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
                     UpdateData("timeToWorkStop", machineCurrent, shiftStart, number, modification, counterRepeat, workStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
@@ -957,7 +957,7 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeDif = new GetDateTimeOperations();
             GetLeadTime leadTime = new GetLeadTime(dataBase, startOfShift, orderNumber, orderModification, machine, counterRepeat);
-            GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, orderNumber, orderModification, counterRepeat);
+            GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, machine, orderNumber, orderModification, counterRepeat);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
 
             String currentTime = DateTime.Now.ToString();
@@ -1059,7 +1059,7 @@ namespace OrderManager
         {
             GetDateTimeOperations timeDif = new GetDateTimeOperations();
             GetLeadTime leadTime = new GetLeadTime(dataBase, startOfShift, orderNumber, orderModification, machine, counterRepeat);
-            GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, orderNumber, orderModification, counterRepeat);
+            GetCountOfDone orderCalc = new GetCountOfDone(dataBase, startOfShift, machine, orderNumber, orderModification, counterRepeat);
             GetOrdersFromBase getOrder = new GetOrdersFromBase(dataBase);
             ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
 

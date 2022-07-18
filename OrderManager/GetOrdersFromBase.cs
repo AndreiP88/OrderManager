@@ -258,7 +258,7 @@ namespace OrderManager
                     if (category == getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
                     {
                         //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                        GetCountOfDone orderCount = new GetCountOfDone(dataBase, startOfShift, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+                        GetCountOfDone orderCount = new GetCountOfDone(dataBase, startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
 
                         int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);

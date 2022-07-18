@@ -165,6 +165,8 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase(dataBase);
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
+            String machine = getInfo.GetMachineFromName(comboBox1.Text);
+
             listView1.Items.Clear();
 
             ordersNumbers.Clear();
@@ -190,7 +192,7 @@ namespace OrderManager
                 {
                     if (sqlReader["numberOfOrder"].ToString().Contains(textBox1.Text))
                     {
-                        GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
+                        GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
                         GetLeadTime leadTimeFirst = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
                         GetLeadTime leadTimeLast = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
 

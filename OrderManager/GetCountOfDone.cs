@@ -10,14 +10,16 @@ namespace OrderManager
         String dataBase;
         String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String startShift;
+        String machine;
         String orderNumber;
         String orderModification;
         String counterRepeat;
 
-        public GetCountOfDone(String dBase, String startOfShift, String orderOfNumber, String orderOfModification, String counterOfRepeat)
+        public GetCountOfDone(String dBase, String startOfShift, String machine, String orderOfNumber, String orderOfModification, String counterOfRepeat)
         {
             this.dataBase = dBase;
             this.startShift = startOfShift;
+            this.machine = machine;
             this.orderNumber = orderOfNumber;
             this.orderModification = orderOfModification;
             this.counterRepeat = counterOfRepeat;
@@ -56,8 +58,9 @@ namespace OrderManager
                 SQLiteCommand Command = new SQLiteCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE numberOfOrder = @number AND modification = @orderModification"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
                 };
+                Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", orderNumber);
                 Command.Parameters.AddWithValue("@orderModification", orderModification);
                 SQLiteDataReader sqlReader = Command.ExecuteReader();
