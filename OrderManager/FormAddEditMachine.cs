@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
@@ -136,7 +137,7 @@ namespace OrderManager
 
             String note = textBox4.Text;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
@@ -146,7 +147,7 @@ namespace OrderManager
                     commandText = "UPDATE machines SET category = @category, name = @name, dateStartWork = @dateStartWork, note = @note " +
                     "WHERE id = @machineIDLoad";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machineIDLoad", machineIDLoad);
                 Command.Parameters.AddWithValue("@category", category);
                 Command.Parameters.AddWithValue("@name", name);
@@ -160,7 +161,7 @@ namespace OrderManager
 
             String machineID = getMachine.GetMachineFromName(name);
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
 
@@ -170,7 +171,7 @@ namespace OrderManager
 
                 /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machineID", machineID);
 
                 Connect.Open();

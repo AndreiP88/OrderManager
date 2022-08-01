@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Windows.Forms;
@@ -113,15 +115,15 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase(dataBase);
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT id FROM machines"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -139,15 +141,15 @@ namespace OrderManager
         {
             List<String> years = new List<String>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT startOfShift FROM ordersInProgress"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -181,12 +183,14 @@ namespace OrderManager
             String month = "";
             String machine = "";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueUserBase usersBase = new ValueUserBase(dataBase);
 
                 String commandLine;
-                commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+                //commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+                commandLine = "DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
+                //commandLine = "DATE_FORMAT(startOfShift, '%Y,%m') = '";
                 commandLine += comboBox1.Text + ",";
                 if (comboBox2.SelectedIndex + 1 < 10)
                     commandLine += "0" + (comboBox2.SelectedIndex + 1).ToString() + "'";
@@ -200,13 +204,13 @@ namespace OrderManager
                     commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @commandText
                     //CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + comboBox3.Text + "'"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {

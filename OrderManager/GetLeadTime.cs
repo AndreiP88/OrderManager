@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 
@@ -64,10 +66,10 @@ namespace OrderManager
             int indexCurrent = 0;
             List<String> datetimes = new List<String>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE " +
@@ -77,7 +79,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@orderModification", modificationOfOrder);
                 Command.Parameters.AddWithValue("@machine", orderMachine);
                 Command.Parameters.AddWithValue("@counterRepeat", repeatCounter);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {

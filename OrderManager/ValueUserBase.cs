@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
@@ -82,15 +84,15 @@ namespace OrderManager
         {
             List<String> userList = new List<String>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM users"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -107,6 +109,7 @@ namespace OrderManager
                 }
 
                 Connect.Close();
+                Connect.Dispose();
             }
 
             return userList;
@@ -116,10 +119,10 @@ namespace OrderManager
         {
             int result = 0;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT COUNT(DISTINCT id) as count FROM users WHERE activeUser = 'True'"
@@ -148,18 +151,18 @@ namespace OrderManager
         {
             List<UserInfo> userInfos = new List<UserInfo>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM users"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -188,18 +191,18 @@ namespace OrderManager
         {
             UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "", "");
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM users WHERE id = '" + userID + "'"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -246,33 +249,33 @@ namespace OrderManager
 
         public void DeleteUser(String id)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "DELETE FROM users WHERE id = @id";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "DELETE FROM usersInfo WHERE user = @id";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "DELETE FROM usersSettings WHERE userID = @id";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);
                 Connect.Open();
                 Command.ExecuteNonQuery();
@@ -282,12 +285,12 @@ namespace OrderManager
 
         private void UpdateValue(String colomn, String id, String value)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE users SET " + colomn + " = @value " +
                     "WHERE (id = @id)";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);
                 Command.Parameters.AddWithValue("@value", value);
 
@@ -299,12 +302,12 @@ namespace OrderManager
 
         private void UpdateValueInfo(String colomn, String id, String value)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE usersInfo SET " + colomn + " = @value " +
                     "WHERE (user = @id)";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);
                 Command.Parameters.AddWithValue("@value", value);
 
@@ -318,15 +321,15 @@ namespace OrderManager
         {
             String result = "";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM users WHERE " + findColomnName + " = '" + findParameter + "'"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -343,15 +346,15 @@ namespace OrderManager
         {
             String result = "";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM usersInfo WHERE " + findColomnName + " = '" + findParameter + "'"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 
@@ -52,10 +54,10 @@ namespace OrderManager
         {
             String result = "";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE (startOfShift = @startOfShift AND numberOfOrder = @numberOfOrder) AND (modification = @modification AND counterRepeat = @counterRepeat)"
@@ -64,7 +66,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
                 Command.Parameters.AddWithValue("@modification", modification);
                 Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -109,22 +111,23 @@ namespace OrderManager
 
             String commandLine;
 
-            commandLine = "(strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+            //commandLine = "(strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+            commandLine = "(DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
             commandLine += currentDate.ToString("yyyy,MM") + "'";
             commandLine += " AND machine = '" + machine + "')";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -164,22 +167,23 @@ namespace OrderManager
 
             String commandLine;
 
-            commandLine = "(strftime('%Y', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+            //commandLine = "(strftime('%Y', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+            commandLine = "(DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y') = '";
             commandLine += currentDate.ToString("yyyy") + "'";
             commandLine += " AND machine = '" + machine + "')";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -211,10 +215,10 @@ namespace OrderManager
         {
             List<String> numbers = new List<String>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND (numberOfOrder = @numberOfOrder AND modification = @modification)"
@@ -222,7 +226,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
                 Command.Parameters.AddWithValue("@modification", modification);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -243,15 +247,15 @@ namespace OrderManager
 
             List<Order> orders = new List<Order>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE startOfShift = '" + startOfShift + "'"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -262,10 +266,19 @@ namespace OrderManager
 
                         int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
-                        int orderNorm = amountThisOrder * 60 / Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-                        int timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
 
-                        String lastTimeWork = timeOperations.TotalMinutesToHoursAndMinutesStr((lastCount * 60) / orderNorm);
+                        int workTime = Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                        int orderNorm = 0;
+                        int timeWorkingOut = 0;
+                        String lastTimeWork = "00:00";
+
+                        if (workTime != 0)
+                        {
+                            orderNorm = amountThisOrder * 60 / Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                            timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
+                            lastTimeWork = timeOperations.TotalMinutesToHoursAndMinutesStr((lastCount * 60) / orderNorm);
+                        }
+
                         String lastTimeMakeready = LastTimeMakereadyStr(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
 
                         timeWorkingOut += FullWorkoutTime(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString(),

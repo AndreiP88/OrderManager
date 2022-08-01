@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
@@ -32,12 +33,12 @@ namespace OrderManager
 
         private void UpdateData(String nameOfColomn, String machineCurrent, String shiftStart, String number, String modification, String counterRepeat, String value)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE ordersInProgress SET " + nameOfColomn + " = @value " +
                     "WHERE ((machine = @machineCurrent AND startOfShift = @shiftStart) AND (numberOfOrder = @number AND modification = @modification) AND (counterRepeat = @counterRepeat))";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machineCurrent", machineCurrent); // присваиваем переменной значение
                 Command.Parameters.AddWithValue("@shiftStart", shiftStart);
                 Command.Parameters.AddWithValue("@number", number);

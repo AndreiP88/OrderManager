@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 
@@ -99,10 +101,10 @@ namespace OrderManager
         {
             int result = 0;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT COUNT(DISTINCT numberOfOrder) as count FROM orders"
@@ -121,10 +123,10 @@ namespace OrderManager
         {
             String result = "0";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
@@ -132,7 +134,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", numberOfOrder);
                 Command.Parameters.AddWithValue("@orderModification", modificationOfOrder);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -147,12 +149,12 @@ namespace OrderManager
 
         private void SetValue(String orderMachine, String numberOfOrder, String orderModification, String key, String value)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE orders SET " + key + " = @value " +
                     "WHERE machine = @orderMachine AND (numberOfOrder = @number AND modification = @orderModification)";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@orderMachine", orderMachine);
                 Command.Parameters.AddWithValue("@number", numberOfOrder);
                 Command.Parameters.AddWithValue("@orderModification", orderModification);

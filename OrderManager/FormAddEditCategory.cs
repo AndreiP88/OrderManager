@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
@@ -99,7 +100,7 @@ namespace OrderManager
         {
             String category = textBox1.Text;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
@@ -109,7 +110,7 @@ namespace OrderManager
                     commandText = "UPDATE machinesCategoryes SET category = @category " +
                     "WHERE id = @categoryIDLoad";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@categoryIDLoad", categoryIDLoad);
                 Command.Parameters.AddWithValue("@category", category);
 

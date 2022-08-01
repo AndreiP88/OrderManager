@@ -1,6 +1,8 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
@@ -101,6 +103,7 @@ namespace OrderManager
             selectedYear = DateTime.Now.Year;
             selectedMonth = DateTime.Now.Month;
 
+            LoadBaseInfo();
             LoadVariables();
 
             LoadPage(currentPage);
@@ -123,6 +126,12 @@ namespace OrderManager
             selectedMachine = ini.GetSelectedMachine();
             selectedDateTime = Convert.ToDateTime(ini.GetSelectedDateTime());
             selectedDateTimeNorm = Convert.ToDateTime(ini.GetSelectedDateTimeNorm());
+        }
+
+        private void LoadBaseInfo()
+        {
+            toolStripStatusLabel2.Text = Form1.BaseConnectionParameters.host;
+            toolStripStatusLabel5.Text = Form1.BaseConnectionParameters.database;
         }
 
         private void SaveVariables()
@@ -276,15 +285,15 @@ namespace OrderManager
         {
             List<String> years = new List<String>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT startShift FROM shifts"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -304,15 +313,15 @@ namespace OrderManager
 
             List<String> machine = new List<String>();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT id FROM machines"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -1721,15 +1730,15 @@ namespace OrderManager
                         listView.Items.Clear();
                     }));
 
-                    using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
                     {
                         Connect.Open();
-                        SQLiteCommand Command = new SQLiteCommand
+                        MySqlCommand Command = new MySqlCommand
                         {
                             Connection = Connect,
                             CommandText = @"SELECT * FROM users" + cLine
                         };
-                        SQLiteDataReader sqlReader = Command.ExecuteReader();
+                        DbDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
@@ -1757,15 +1766,15 @@ namespace OrderManager
                         Connect.Close();
                     }
 
-                    using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
                     {
                         Connect.Open();
-                        SQLiteCommand Command = new SQLiteCommand
+                        MySqlCommand Command = new MySqlCommand
                         {
                             Connection = Connect,
                             CommandText = @"SELECT * FROM users" + cLine
                         };
-                        SQLiteDataReader sqlReader = Command.ExecuteReader();
+                        DbDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
@@ -2093,15 +2102,15 @@ namespace OrderManager
                         listView.Items.Clear();
                     }));
 
-                    using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
                     {
                         Connect.Open();
-                        SQLiteCommand Command = new SQLiteCommand
+                        MySqlCommand Command = new MySqlCommand
                         {
                             Connection = Connect,
                             CommandText = @"SELECT * FROM machines"
                         };
-                        SQLiteDataReader sqlReader = Command.ExecuteReader();
+                        DbDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
@@ -2132,15 +2141,15 @@ namespace OrderManager
                     int countYear = 0;
                     int amountYear = 0;
 
-                    using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
                     {
                         Connect.Open();
-                        SQLiteCommand Command = new SQLiteCommand
+                        MySqlCommand Command = new MySqlCommand
                         {
                             Connection = Connect,
                             CommandText = @"SELECT * FROM machines"
                         };
-                        SQLiteDataReader sqlReader = Command.ExecuteReader();
+                        DbDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
@@ -2309,19 +2318,20 @@ namespace OrderManager
 
                     int index = 0;
 
-                    using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
                     {
                         String commandLine;
-                        commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                        //commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                        commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') >= '";
                         commandLine += dateTime.ToString("yyyy-MM-dd 00:00:00") + "'";
 
                         Connect.Open();
-                        SQLiteCommand Command = new SQLiteCommand
+                        MySqlCommand Command = new MySqlCommand
                         {
                             Connection = Connect,
                             CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBoxMachine.Text) + "'"
                         };
-                        SQLiteDataReader sqlReader = Command.ExecuteReader();
+                        DbDataReader sqlReader = Command.ExecuteReader();
 
                         while (sqlReader.Read() && !token.IsCancellationRequested) // считываем и вносим в комбобокс список заголовков
                         {
@@ -2423,24 +2433,26 @@ namespace OrderManager
                 EnabledButtons(false);
 
                 String commandLine;
-                commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                //commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') >= '";
                 commandLine += dateTimeStart.ToString("yyyy-MM-dd 00:00:00") + "'";
                 commandLine += " AND ";
-                commandLine += "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) <= '";
+                //commandLine += "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) <= '";
+                commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') <= '";
                 commandLine += dateTimeEnd.ToString("yyyy-MM-dd 00:00:00") + "'";
                 //commandLine += 
 
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
                     int index = 0;
 
                     Connect.Open();
-                    SQLiteCommand Command = new SQLiteCommand
+                    MySqlCommand Command = new MySqlCommand
                     {
                         Connection = Connect,
                         CommandText = @"SELECT * FROM orders WHERE (" + commandLine + ") AND orderStamp LIKE '%" + filter + "%'"
                     };
-                    SQLiteDataReader sqlReader = Command.ExecuteReader();
+                    DbDataReader sqlReader = Command.ExecuteReader();
 
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {
@@ -2653,8 +2665,6 @@ namespace OrderManager
 
             List<ColumnHeader> head;
 
-            toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
-
             currentPage = page;
 
             switch (page)
@@ -2732,7 +2742,6 @@ namespace OrderManager
         private void UpdatePage(int page)
         {
             //MessageBox.Show(selectedYear.ToString() + ", " + selectedMonth.ToString());
-            toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
 
             switch (page)
             {

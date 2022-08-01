@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Windows.Forms;
@@ -365,10 +367,10 @@ namespace OrderManager
         {
             bool result = false;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
@@ -376,7 +378,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@machine", orderMachine);
                 Command.Parameters.AddWithValue("@number", orderNumber);
                 Command.Parameters.AddWithValue("@orderModification", orderModification);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
                 //result = sqlReader.Read();
                 while (sqlReader.Read())
                 {
@@ -443,15 +445,15 @@ namespace OrderManager
 
             comboBox3.Items.Clear();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT id FROM machines"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -520,59 +522,107 @@ namespace OrderManager
             String status = "0";
             String counterR = "0";
 
+            //SELECT COUNT(*) FROM YourTable WHERE YourKeyCol = YourKeyValue
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            int result = 0;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
-                    "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
-                    "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT COUNT(*) FROM orders WHERE ((numberOfOrder = @number AND modification = @modification) AND machine = @machine)"
+                };
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@orderAddedDate", orderAddedDate); // присваиваем переменной значение
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", number);
-                Command.Parameters.AddWithValue("@name", name);
                 Command.Parameters.AddWithValue("@modification", modification);
-                Command.Parameters.AddWithValue("@amount", amount);
-                Command.Parameters.AddWithValue("@timeM", timeM);
-                Command.Parameters.AddWithValue("@timeW", timeW);
-                Command.Parameters.AddWithValue("@stamp", stamp);
-                Command.Parameters.AddWithValue("@status", status);
-                Command.Parameters.AddWithValue("@counterR", counterR);
-
 
                 Connect.Open();
-                Command.ExecuteNonQuery();
+                result = Convert.ToInt32(Command.ExecuteScalar());
                 Connect.Close();
+            }
+
+            if (result == 0)
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    /*string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
+                        "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
+                        "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";*/
+
+                    string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
+                        "VALUES (@orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR)";
+
+                    MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@orderAddedDate", orderAddedDate); // присваиваем переменной значение
+                    Command.Parameters.AddWithValue("@machine", machine);
+                    Command.Parameters.AddWithValue("@number", number);
+                    Command.Parameters.AddWithValue("@name", name);
+                    Command.Parameters.AddWithValue("@modification", modification);
+                    Command.Parameters.AddWithValue("@amount", amount);
+                    Command.Parameters.AddWithValue("@timeM", timeM);
+                    Command.Parameters.AddWithValue("@timeW", timeW);
+                    Command.Parameters.AddWithValue("@stamp", stamp);
+                    Command.Parameters.AddWithValue("@status", status);
+                    Command.Parameters.AddWithValue("@counterR", counterR);
+
+
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
             }
         }
 
         private void AddNewOrderInProgress(String machine, String executor, String shiftStart, String number, String modification, String makereadyStart,
             String makereadyStop, String workStart, String workStop, String done, String counterRepeat, String note)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
-            {
-                string commandText = "INSERT INTO ordersInProgress (machine, executor, startOfShift, numberOfOrder, modification, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, done, counterRepeat, note) " +
-                    "SELECT * FROM (SELECT @machine, @executor, @shiftStart, @number, @modification, @makereadyStart, @makereadyStop, @workStart, @workStop, @done, @counterRepeat, @note) " +
-                    "AS tmp WHERE NOT EXISTS(SELECT * FROM ordersInProgress WHERE startOfShift = @shiftStart AND numberOfOrder = @number AND modification = @modification AND counterRepeat = @counterRepeat) LIMIT 1";
+            int result = 0;
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@machine", machine); // присваиваем переменной значение
-                Command.Parameters.AddWithValue("@executor", executor);
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT COUNT(*) FROM ordersInProgress WHERE ((startOfShift = @shiftStart AND counterRepeat = @counterRepeat) AND (numberOfOrder = @number AND modification = @modification))"
+                };
+
                 Command.Parameters.AddWithValue("@shiftStart", shiftStart);
-                Command.Parameters.AddWithValue("@number", number);
-                Command.Parameters.AddWithValue("modification", modification);
-                Command.Parameters.AddWithValue("@makereadyStart", makereadyStart);
-                Command.Parameters.AddWithValue("@makereadyStop", makereadyStop);
-                Command.Parameters.AddWithValue("@workStart", workStart);
-                Command.Parameters.AddWithValue("@workStop", workStop);
-                Command.Parameters.AddWithValue("@done", done);
                 Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
-                Command.Parameters.AddWithValue("@note", note);
+                Command.Parameters.AddWithValue("@number", number);
+                Command.Parameters.AddWithValue("@modification", modification);
 
                 Connect.Open();
-                Command.ExecuteNonQuery();
+                result = Convert.ToInt32(Command.ExecuteScalar());
                 Connect.Close();
+            }
+
+            if (result == 0)
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    string commandText = "INSERT INTO ordersInProgress (machine, executor, startOfShift, numberOfOrder, modification, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, done, counterRepeat, note) " +
+                        "VALUES(@machine, @executor, @shiftStart, @number, @modification, @makereadyStart, @makereadyStop, @workStart, @workStop, @done, @counterRepeat, @note)";
+
+                    MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@machine", machine); // присваиваем переменной значение
+                    Command.Parameters.AddWithValue("@executor", executor);
+                    Command.Parameters.AddWithValue("@shiftStart", shiftStart);
+                    Command.Parameters.AddWithValue("@number", number);
+                    Command.Parameters.AddWithValue("modification", modification);
+                    Command.Parameters.AddWithValue("@makereadyStart", makereadyStart);
+                    Command.Parameters.AddWithValue("@makereadyStop", makereadyStop);
+                    Command.Parameters.AddWithValue("@workStart", workStart);
+                    Command.Parameters.AddWithValue("@workStop", workStop);
+                    Command.Parameters.AddWithValue("@done", done);
+                    Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
+                    Command.Parameters.AddWithValue("@note", note);
+
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
             }
         }
 
@@ -608,7 +658,7 @@ namespace OrderManager
 
             if (status == "0") //новая запись
             {
-                AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, makereadyStart, "", "", "", "", counterRepeat, note);
+                AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, makereadyStart, "", "", "", done.ToString(), counterRepeat, note);
                 infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                 newStatus = "1";
             }
@@ -616,7 +666,7 @@ namespace OrderManager
             {
                 if (currentOrderNumber == "")
                 {
-                    AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, makereadyStart, "", "", "", "", counterRepeat, note);
+                    AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, makereadyStart, "", "", "", done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = "1";
                 }
@@ -634,7 +684,7 @@ namespace OrderManager
             {
                 if (currentOrderNumber == "")
                 {
-                    AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, "", "", workStart, "", "", counterRepeat, note);
+                    AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, "", "", workStart, "", done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = "3";
                 }
@@ -650,7 +700,7 @@ namespace OrderManager
             {
                 if (currentOrderNumber == "")
                 {
-                    AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, "", "", workStart, "", "", counterRepeat, note);
+                    AddNewOrderInProgress(machineCurrent, executor, shiftStart, number, modification, "", "", workStart, "", done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, true);
                     newStatus = status;
                 }
@@ -802,12 +852,12 @@ namespace OrderManager
 
         private void UpdateData(String nameOfColomn, String machineCurrent, String shiftStart, String number, String modification, String counterRepeat, String value)
         {
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE ordersInProgress SET " + nameOfColomn + " = @value " +
                     "WHERE ((machine = @machineCurrent AND startOfShift = @shiftStart) AND (numberOfOrder = @number AND modification = @modification) AND (counterRepeat = @counterRepeat))";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machineCurrent", machineCurrent); // присваиваем переменной значение
                 Command.Parameters.AddWithValue("@shiftStart", shiftStart);
                 Command.Parameters.AddWithValue("@number", number);
@@ -838,15 +888,15 @@ namespace OrderManager
             if (loadAllOrdersToCurrentMachine == true)
                 cLine = " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM orders WHERE statusOfOrder <> 4" + cLine
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -863,15 +913,15 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT nameOfOrder FROM orders"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -922,10 +972,10 @@ namespace OrderManager
             //int orderStatus = 0;
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
@@ -933,7 +983,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@machine", orderMachine);
                 Command.Parameters.AddWithValue("@number", orderNumber);
                 Command.Parameters.AddWithValue("@orderModification", orderModification);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {

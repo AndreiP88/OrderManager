@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
@@ -29,18 +30,37 @@ namespace OrderManager
         private void LoadUsersList()
         {
             ValueInfoBase getMachine = new ValueInfoBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase(dataBase);
+
+            List<String> users = userBase.GetUserList(true);
 
             int counter = 0;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            for (int i = 0; i < users.Count; i++) // считываем и вносим в комбобокс список заголовков
+            {
+                String machines = getMachine.GetMachinesStr(users[i].ToString());
+
+                counter++;
+
+                ListViewItem item = new ListViewItem();
+                item.Name = users[i].ToString();
+                item.Text = counter.ToString();
+                item.SubItems.Add(userBase.GetNameUser(users[i]));
+                item.SubItems.Add(machines);
+                listView1.Items.Add(item);
+            }
+
+
+
+            /*using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM users WHERE activeUser = 'True'"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
@@ -57,7 +77,7 @@ namespace OrderManager
                 }
 
                 Connect.Close();
-            }
+            }*/
         }
 
         private void LoadSelectedUser()

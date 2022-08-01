@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 
@@ -34,23 +36,24 @@ namespace OrderManager
 
             String commandLine;
 
-            commandLine = "(strftime('%Y,%m', date(substr(startShift, 7, 4) || '-' || substr(startShift, 4, 2) || '-' || substr(startShift, 1, 2))) = '";
+            //commandLine = "(strftime('%Y,%m', date(substr(startShift, 7, 4) || '-' || substr(startShift, 4, 2) || '-' || substr(startShift, 1, 2))) = '";
+            commandLine = "(DATE_FORMAT(STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
             commandLine += selectDate.ToString("yyyy,MM") + "'";
             commandLine += " AND nameUser = '" + executorName + "')";
             commandLine += " AND stopShift != ''";
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueUserBase usersBase = new ValueUserBase(dataBase);
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM shifts WHERE " + commandLine
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {

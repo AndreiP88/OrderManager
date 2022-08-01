@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 
@@ -52,10 +54,10 @@ namespace OrderManager
             List<int> countOfShifts = new List<int>();
             int indexCurrentShift = 0;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
@@ -63,7 +65,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", orderNumber);
                 Command.Parameters.AddWithValue("@orderModification", orderModification);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -95,17 +97,17 @@ namespace OrderManager
             int previous = 0, current = 0;
             int value = 0;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE numberOfOrder = @number AND modification = @orderModification"
                 };
                 Command.Parameters.AddWithValue("@number", orderNumber);
                 Command.Parameters.AddWithValue("@orderModification", orderModification);
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {

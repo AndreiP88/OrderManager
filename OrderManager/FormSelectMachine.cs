@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
@@ -90,19 +92,19 @@ namespace OrderManager
         {
             checkBoxesMachines.Clear();
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 ValueOrdersBase order = new ValueOrdersBase(dataBase);
                 ValueInfoBase getInfo = new ValueInfoBase(dataBase);
                 ValueUserBase user = new ValueUserBase(dataBase);
 
                 Connect.Open();
-                SQLiteCommand Command = new SQLiteCommand
+                MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
                     CommandText = @"SELECT DISTINCT id FROM machines"
                 };
-                SQLiteDataReader sqlReader = Command.ExecuteReader();
+                DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
                 {
@@ -169,13 +171,13 @@ namespace OrderManager
 
             usersBase.UpdateCurrentShiftStart(currentUser, startOfShift);
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "INSERT INTO shifts (nameUser, startShift) " +
                     "SELECT * FROM (SELECT @nameUser, @startShift) " +
                     "AS tmp WHERE NOT EXISTS(SELECT startShift FROM shifts WHERE startShift = @startShift) LIMIT 1";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@nameUser", currentUser);
                 Command.Parameters.AddWithValue("@startShift", startOfShift);
 
@@ -213,12 +215,12 @@ namespace OrderManager
                         else
                             user = "";
 
-                        using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
                         {
                             string commandText = "UPDATE machinesInfo SET nameOfExecutor = @currentUser " +
                                 "WHERE (machine = @machine)";
 
-                            SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                            MySqlCommand Command = new MySqlCommand(commandText, Connect);
                             Command.Parameters.AddWithValue("@machine", checkBoxesMachines[i].Name);
                             Command.Parameters.AddWithValue("@currentUser", user);
 

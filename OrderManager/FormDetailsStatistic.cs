@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
@@ -197,15 +199,15 @@ namespace OrderManager
                     listView1.Items.Clear();
                 }));
 
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
                     Connect.Open();
-                    SQLiteCommand Command = new SQLiteCommand
+                    MySqlCommand Command = new MySqlCommand
                     {
                         Connection = Connect,
                         CommandText = @"SELECT * FROM users" + cLine
                     };
-                    SQLiteDataReader sqlReader = Command.ExecuteReader();
+                    DbDataReader sqlReader = Command.ExecuteReader();
 
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {
@@ -230,15 +232,15 @@ namespace OrderManager
                     Connect.Close();
                 }
 
-                using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
                     Connect.Open();
-                    SQLiteCommand Command = new SQLiteCommand
+                    MySqlCommand Command = new MySqlCommand
                     {
                         Connection = Connect,
                         CommandText = @"SELECT * FROM users" + cLine
                     };
-                    SQLiteDataReader sqlReader = Command.ExecuteReader();
+                    DbDataReader sqlReader = Command.ExecuteReader();
 
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
@@ -220,7 +221,7 @@ namespace OrderManager
 
             String note = textBox4.Text;
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
@@ -231,7 +232,7 @@ namespace OrderManager
                     "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, dateOfDismissal = @dateOfDismissal, note = @note " +
                     "WHERE id = @userIDLoad";
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@userIDLoad", userIDLoad);
                 Command.Parameters.AddWithValue("@nameUser", shortName);
                 Command.Parameters.AddWithValue("@surname", surname);
@@ -251,7 +252,7 @@ namespace OrderManager
 
             String userID = getUser.GetIDUserFromName(shortName);
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
 
@@ -261,7 +262,7 @@ namespace OrderManager
 
                 /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@userID", userID);
 
                 Connect.Open();
@@ -269,7 +270,7 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            using (SQLiteConnection Connect = new SQLiteConnection(@"Data Source=" + dataBase + "; Version=3;"))
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
 
@@ -279,7 +280,7 @@ namespace OrderManager
 
                 /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
 
-                SQLiteCommand Command = new SQLiteCommand(commandText, Connect);
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@userID", userID);
 
                 Connect.Open();

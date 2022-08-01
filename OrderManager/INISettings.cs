@@ -49,6 +49,41 @@ namespace OrderManager
             return result;
         }
 
+        public String GetDBHost()
+        {
+            String result = GetParameter("database", "host");
+
+            return result;
+        }
+
+        public String GetDBPort()
+        {
+            String result = GetParameter("database", "port");
+
+            return result;
+        }
+
+        public String GetDBDatabase()
+        {
+            String result = GetParameter("database", "database");
+
+            return result;
+        }
+
+        public String GetDBUsername()
+        {
+            String result = GetParameter("database", "username");
+
+            return result;
+        }
+
+        public String GetDBPassword()
+        {
+            String result = GetParameter("database", "password");
+
+            return result;
+        }
+
         public bool GetCheckDBLocalPath()
         {
             bool result = Convert.ToBoolean(GetParameter("general", "dataBaseLocalFile"));

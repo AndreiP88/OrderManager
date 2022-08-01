@@ -25,9 +25,6 @@ namespace OrderManager
                 if (args[0] == "adminMode")
                     adminMode = true;
             }
-
-            dataBase = ini.DataBasePath();
-            toolStripStatusLabel1.Text = "База данных: " + dataBase.Replace(@"\\", @"\");
         }
 
         List<Order> ordersCurrentShift;
@@ -43,6 +40,15 @@ namespace OrderManager
             public static String startOfShift = "";
         }
 
+        public static class BaseConnectionParameters
+        {
+            public static string host = "25.21.38.172";
+            public static int port = 3309;
+            public static string database = "order_manager";
+            public static string username = "oxyfox";
+            public static string password = "root";
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             Info.active = false;
@@ -50,6 +56,20 @@ namespace OrderManager
             form.ShowDialog();
             LoadOrdersFromBase();
             Info.active = true;
+        }
+
+        private void LoadBaseConnectionParameters()
+        {
+            INISettings ini = new INISettings();
+
+            BaseConnectionParameters.host = ini.GetDBHost();
+            BaseConnectionParameters.port = Convert.ToInt32(ini.GetDBPort());
+            BaseConnectionParameters.database = ini.GetDBDatabase();
+            BaseConnectionParameters.username = ini.GetDBUsername();
+            BaseConnectionParameters.password = ini.GetDBPassword();
+
+            toolStripStatusLabel2.Text = BaseConnectionParameters.host;
+            toolStripStatusLabel5.Text = BaseConnectionParameters.database;
         }
 
         private void ShowUserForm()
@@ -522,6 +542,7 @@ namespace OrderManager
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            LoadBaseConnectionParameters();
             LoadParametersFromBase("mainForm");
 
             //LoadUser();
@@ -673,5 +694,79 @@ namespace OrderManager
             CancelShift();
         }
 
+        private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            ValueOrdersBase valueOrders = new ValueOrdersBase(dataBase);
+
+            ToolTip tooltp = new ToolTip();
+
+            int idx = e.Item.Index;
+
+            String status = valueOrders.GetOrderStatus(ordersCurrentShift[idx].machineOfOrder, ordersCurrentShift[idx].numberOfOrder, ordersCurrentShift[idx].modificationOfOrder);
+
+
+            String fullLastTime = "00:00";
+            String fullFactTime = "00:00";
+            String timeDiff = "";
+
+            if (idx != -1 && e.Item != null)
+            {
+                bool positive;
+                String message = "";
+                String statusStr = "";
+
+                fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
+                fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
+
+                if (timeOperations.TimeDifferent(fullLastTime, fullFactTime) == "00:00")
+                {
+                    positive = false;
+                    timeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, fullLastTime);
+                }
+                    
+                else if (timeOperations.TimeDifferent(fullFactTime, fullLastTime) == "00:00")
+                {
+                    timeDiff = timeOperations.TimeDifferent(fullLastTime, fullFactTime);
+                }
+                    
+                else
+                    timeDiff = "00:00";
+
+                if(status == "4")
+                {
+                    statusStr = " - заказ завершен";
+
+                    if (timeDiff.Substring(0, 1) == "-")
+                        message = "Отставание: " + timeDiff.Substring(1, timeDiff.Length - 1);
+                    else
+                        message = "Опережение: " + timeDiff;
+                }
+                else
+                {
+                    statusStr = "";
+                    message = "Оставшееся время: " + timeDiff;
+                    message += Environment.NewLine;
+                    message += "Сделать подсчёт времени завершения заказа, количества, которое должно быть сделано на текущий момент по норме";
+                }
+                
+                /*message += Environment.NewLine;
+                message += MousePosition.X + ", " + MousePosition.Y;
+                message += Environment.NewLine;
+                message += e.Item.Position.X + ", " + e.Item.Position.Y;*/
+
+                tooltp.Active = true;
+                tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder + statusStr;
+                tooltp.SetToolTip(listView1, message);
+            }
+            else
+            {
+                tooltp.Active = false;
+            }
+
+            
+
+            
+        }
     }
 }
