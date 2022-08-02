@@ -708,7 +708,17 @@ namespace OrderManager
 
             String fullLastTime = "00:00";
             String fullFactTime = "00:00";
+
+            String mkLastTime = "00:00";
+            String mkFactTime = "00:00";
+
+            String workingOutTime = "00:00";
+
             String timeDiff = "";
+            String mkTimeDiff = "";
+            String woTimeDiff = "";
+
+            String plannedCountDone = "0";
 
             if (idx != -1 && e.Item != null)
             {
@@ -719,36 +729,122 @@ namespace OrderManager
                 fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
                 fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
 
+                mkLastTime = ordersCurrentShift[idx].plannedTimeMakeready;
+                mkFactTime = ordersCurrentShift[idx].facticalTimeMakeready;
+                workingOutTime = timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[idx].workingOut);
+
                 if (timeOperations.TimeDifferent(fullLastTime, fullFactTime) == "00:00")
                 {
-                    positive = false;
                     timeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, fullLastTime);
                 }
-                    
                 else if (timeOperations.TimeDifferent(fullFactTime, fullLastTime) == "00:00")
                 {
                     timeDiff = timeOperations.TimeDifferent(fullLastTime, fullFactTime);
                 }
-                    
                 else
-                    timeDiff = "00:00";
-
-                if(status == "4")
                 {
-                    statusStr = " - заказ завершен";
+                    timeDiff = "00:00";
+                }
+
+                if (timeOperations.TimeDifferent(mkLastTime, mkFactTime) == "00:00")
+                {
+                    mkTimeDiff = "-" + timeOperations.TimeDifferent(mkFactTime, mkLastTime);
+                }
+                else if (timeOperations.TimeDifferent(mkFactTime, mkLastTime) == "00:00")
+                {
+                    mkTimeDiff = timeOperations.TimeDifferent(mkLastTime, mkFactTime);
+                }
+                else
+                {
+                    mkTimeDiff = "00:00";
+                }
+
+                if (timeOperations.TimeDifferent(workingOutTime, fullFactTime) == "00:00")
+                {
+                    woTimeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, workingOutTime);
+                }
+                else if (timeOperations.TimeDifferent(fullFactTime, workingOutTime) == "00:00")
+                {
+                    woTimeDiff = timeOperations.TimeDifferent(workingOutTime, fullFactTime);
+                }
+                else
+                {
+                    woTimeDiff = "00:00";
+                }
+
+                if (timeOperations.TimeDifferent(mkLastTime, fullFactTime) == "00:00")
+                {
+                    //String diff = timeOperations.TimeDifferent(fullLastTime, mkLastTime);
+                    int diff = timeOperations.TimeDifferentToMinutes(fullFactTime, mkLastTime);
+
+                    plannedCountDone = (diff * ordersCurrentShift[idx].norm / 60).ToString("N0");
+                }
+                else
+                {
+                    plannedCountDone = "0";
+                }
+
+                if (status == "1" || status == "2")
+                {
+                    String plannedTimeDone = timeOperations.DateAmount(DateTime.Now.ToString(), mkTimeDiff);
+                    String plannedTimeDoneOrder = timeOperations.DateAmount(DateTime.Now.ToString(), timeDiff);
+
+                    statusStr = " - приладка заказа";
+
+                    if (mkTimeDiff.Substring(0, 1) == "-")
+                        message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
+                    else
+                        message = "Остаток времени на приладку: " + mkTimeDiff;
+
+                    message += Environment.NewLine;
+
+                    message += "Остаток времени для выполнение заказа: " + timeDiff;
+
+                    message += Environment.NewLine;
+
+                    message += "Планирумое время завершения приладки: " + plannedTimeDone;
+
+                    message += Environment.NewLine;
+
+                    message += "Планирумое время завершения заказа: " + plannedTimeDoneOrder;
+                }
+
+                if (status == "3")
+                {
+                    String plannedTimeDone = timeOperations.DateAmount(DateTime.Now.ToString(), timeDiff);
+
+                    statusStr = " - заказ выполняется";
 
                     if (timeDiff.Substring(0, 1) == "-")
                         message = "Отставание: " + timeDiff.Substring(1, timeDiff.Length - 1);
                     else
-                        message = "Опережение: " + timeDiff;
+                        message = "Остаток времени: " + timeDiff;
+
+                    message += Environment.NewLine;
+
+                    message += "Плановая выработка: " + plannedCountDone;
+
+                    message += Environment.NewLine;
+
+                    message += "Планирумое время завершения: " + plannedTimeDone;
                 }
-                else
+
+                if (status == "4")
+                {
+                    statusStr = " - заказ завершен";
+
+                    if (woTimeDiff.Substring(0, 1) == "-")
+                        message = "Отставание: " + woTimeDiff.Substring(1, woTimeDiff.Length - 1);
+                    else
+                        message = "Опережение: " + woTimeDiff;
+                }
+                /*else
                 {
                     statusStr = "";
                     message = "Оставшееся время: " + timeDiff;
                     message += Environment.NewLine;
                     message += "Сделать подсчёт времени завершения заказа, количества, которое должно быть сделано на текущий момент по норме";
-                }
+                }*/
                 
                 /*message += Environment.NewLine;
                 message += MousePosition.X + ", " + MousePosition.Y;

@@ -746,6 +746,7 @@ namespace OrderManager
             String note = textBox6.Text;
             int done = (int)numericUpDown4.Value;
 
+
             userBase.UpdateLastMachine(executor, getInfo.GetMachineFromName(comboBox3.Text));
 
             if (status == "1") // начата приладка

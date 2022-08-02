@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -51,35 +52,35 @@ namespace OrderManager
 
         public String GetDBHost()
         {
-            String result = GetParameter("database", "host");
+            String result = GetParameter("mysqlbase", "host");
 
             return result;
         }
 
         public String GetDBPort()
         {
-            String result = GetParameter("database", "port");
+            String result = GetParameter("mysqlbase", "port");
 
             return result;
         }
 
         public String GetDBDatabase()
         {
-            String result = GetParameter("database", "database");
+            String result = GetParameter("mysqlbase", "database");
 
             return result;
         }
 
         public String GetDBUsername()
         {
-            String result = GetParameter("database", "username");
+            String result = GetParameter("mysqlbase", "username");
 
             return result;
         }
 
         public String GetDBPassword()
         {
-            String result = GetParameter("database", "password");
+            String result = GetParameter("mysqlbase", "password");
 
             return result;
         }
