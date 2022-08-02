@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
 
@@ -163,15 +162,32 @@ namespace OrderManager
             String status = "0";
             String counterR = "0";
 
+            int result = 0;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT COUNT(*) FROM orders WHERE ((numberOfOrder = @number AND modification = @modification) AND machine = @machine)"
+                };
+
+                Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@number", number);
+                Command.Parameters.AddWithValue("@modification", modification);
+
+                Connect.Open();
+                result = Convert.ToInt32(Command.ExecuteScalar());
+                Connect.Close();
+            }
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
 
-                if (!editOrderLoad)
+                if (!editOrderLoad && result == 0)
                     commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
-                        "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
-                        "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";
+                        "VALUES (@orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR)";
                 else
                     commandText = "UPDATE orders SET machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
                     "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp " +

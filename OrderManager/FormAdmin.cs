@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
-using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -1383,7 +1382,7 @@ namespace OrderManager
             tableLayoutPanelPath.RowCount = 1;
             tableLayoutPanelPath.Visible = true;
 
-            TextBox textBox = new TextBox();
+            /*TextBox textBox = new TextBox();
             textBox.Name = "textBoxDBPath";
             textBox.Dock = DockStyle.Fill;
             textBox.Location = new Point(3, 3);
@@ -1420,6 +1419,8 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add(tableLayoutPanelPath, 0, 1);
 
             EnabledPathControls(checkBox.Checked);
+            */
+
 
             //Вторая колонка
             String countOrders = String.Format("{0,-35}{1,-25:f4}", "Всего заказов в базе:", getOrders.GetCountOrders().ToString("N0"));
