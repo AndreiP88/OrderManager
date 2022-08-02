@@ -9,8 +9,6 @@ namespace OrderManager
 {
     public partial class FormAddEditUser : Form
     {
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String userIDLoad;
 
         bool _loadForEdit;
@@ -18,43 +16,27 @@ namespace OrderManager
         /// <summary>
         /// Добавление нового сотрудника
         /// </summary>
-        /// <param name="dataBase"></param>
-        public FormAddEditUser(String dataBase)
+        /// <param name=""></param>
+        public FormAddEditUser()
         {
             InitializeComponent();
 
-            this.dataBase = dataBase;
-
             _loadForEdit = false;
-
-            DataBasePatch(dataBase);
         }
 
         /// <summary>
         /// Редактировние выбранного сотрудника
         /// </summary>
-        /// <param name="dataBase"></param>
+        /// <param name=""></param>
         /// <param name="userID"></param>
-        public FormAddEditUser(String dataBase, String userID)
+        public FormAddEditUser(String userID)
         {
             InitializeComponent();
 
-            this.dataBase = dataBase;
             this.userIDLoad = userID;
 
             _loadForEdit = true;
 
-            DataBasePatch(dataBase);
-        }
-
-        private String DataBasePatch(String dBase)
-        {
-            String dataBase = dBase;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
-
-            return dataBase;
         }
 
         private void FormAddEditUser_Load(object sender, EventArgs e)
@@ -74,10 +56,10 @@ namespace OrderManager
             this.Text = "Редактирование сотрудника";
             button1.Text = "Сохранить";
 
-            ValueCategory category = new ValueCategory(dataBase);
+            ValueCategory category = new ValueCategory();
             StringArray stringArray = new StringArray();
 
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase();
             UserInfo getInfo = (UserInfo)getUser.GetUserInfoFromID(userIDLoad);
 
             LoadCategoryes();
@@ -132,7 +114,7 @@ namespace OrderManager
 
         private void LoadCategoryes()
         {
-            ValueCategory getCategory = new ValueCategory(dataBase);
+            ValueCategory getCategory = new ValueCategory();
 
             List<String> categoryes = new List<String>(getCategory.GetCategoryesList());
 
@@ -201,7 +183,7 @@ namespace OrderManager
 
         private void AddNewUser()
         {
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase();
 
             String shortName = textBox2.Text + " " + textBox1.Text;
 

@@ -8,21 +8,14 @@ namespace OrderManager
 {
     internal class ValueOrdersBase
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dBase"></param>
-        public ValueOrdersBase(String dBase)
+        public ValueOrdersBase()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
-
 
         public String GetOrderCount(String currentMachine, String orderNumber, String orderModification)
         {

@@ -10,16 +10,10 @@ namespace OrderManager
     {
 
         String passKey = "key";
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
 
-        public FormLoadUserForm(String dBase)
+        public FormLoadUserForm()
         {
             InitializeComponent();
-
-            this.dataBase = dBase;
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         private void LoadUserForm_Load(object sender, EventArgs e)
@@ -29,8 +23,8 @@ namespace OrderManager
 
         private void LoadUsersList()
         {
-            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
-            ValueUserBase userBase = new ValueUserBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase();
+            ValueUserBase userBase = new ValueUserBase();
 
             List<String> users = userBase.GetUserList(true);
 
@@ -83,9 +77,9 @@ namespace OrderManager
         private void LoadSelectedUser()
         {
             Cryption pass = new Cryption();
-            ValueUserBase userValue = new ValueUserBase(dataBase);
-            ValueSettingsBase settingsValue = new ValueSettingsBase(dataBase);
-            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
+            ValueUserBase userValue = new ValueUserBase();
+            ValueSettingsBase settingsValue = new ValueSettingsBase();
+            ValueInfoBase infoBase = new ValueInfoBase();
 
             if (listView1.SelectedItems.Count != 0)
             {
@@ -132,7 +126,7 @@ namespace OrderManager
 
         private void ShowFullOrdersForm()
         {
-            FormFullListOrders form = new FormFullListOrders(dataBase, false, "", "", "");
+            FormFullListOrders form = new FormFullListOrders(false, "", "", "");
             form.ShowDialog();
         }
 

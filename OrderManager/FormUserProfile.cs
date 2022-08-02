@@ -5,15 +5,13 @@ namespace OrderManager
 {
     public partial class FormUserProfile : Form
     {
-        String dataBase;
         String idUser;
         String passKey = "key";
 
-        public FormUserProfile(String dBase, String userID)
+        public FormUserProfile(String userID)
         {
             InitializeComponent();
 
-            this.dataBase = dBase;
             this.idUser = userID;
         }
 
@@ -25,8 +23,8 @@ namespace OrderManager
         void LoadUser()
         {
             Cryption pass = new Cryption();
-            ValueUserBase userBase = new ValueUserBase(dataBase);
-            ValueSettingsBase settingsBase = new ValueSettingsBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase();
+            ValueSettingsBase settingsBase = new ValueSettingsBase();
 
             bool checkPass = false;
 
@@ -41,8 +39,8 @@ namespace OrderManager
         void SaveUser()
         {
             Cryption pass = new Cryption();
-            ValueUserBase setUpdateUsers = new ValueUserBase(dataBase);
-            ValueSettingsBase updateSettingsValue = new ValueSettingsBase(dataBase);
+            ValueUserBase setUpdateUsers = new ValueUserBase();
+            ValueSettingsBase updateSettingsValue = new ValueSettingsBase();
 
             setUpdateUsers.UpdateName(idUser, textBox1.Text);
             setUpdateUsers.UpdatePassword(idUser, pass.Code(textBox2.Text, passKey));

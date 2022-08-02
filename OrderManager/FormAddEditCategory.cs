@@ -8,8 +8,6 @@ namespace OrderManager
 {
     public partial class FormAddEditCategory : Form
     {
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String categoryIDLoad;
 
         bool _loadForEdit;
@@ -17,43 +15,26 @@ namespace OrderManager
         /// <summary>
         /// Добавление нового сотрудника
         /// </summary>
-        /// <param name="dataBase"></param>
-        public FormAddEditCategory(String dataBase)
+        /// <param name=""></param>
+        public FormAddEditCategory()
         {
             InitializeComponent();
 
-            this.dataBase = dataBase;
-
             _loadForEdit = false;
-
-            DataBasePatch(dataBase);
         }
 
         /// <summary>
         /// Редактировние выбранного сотрудника
         /// </summary>
-        /// <param name="dataBase"></param>
+        /// <param name=""></param>
         /// <param name="userID"></param>
-        public FormAddEditCategory(String dataBase, String categoryID)
+        public FormAddEditCategory(String categoryID)
         {
             InitializeComponent();
 
-            this.dataBase = dataBase;
             this.categoryIDLoad = categoryID;
 
             _loadForEdit = true;
-
-            DataBasePatch(dataBase);
-        }
-
-        private String DataBasePatch(String dBase)
-        {
-            String dataBase = dBase;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
-
-            return dataBase;
         }
 
         private void FormAddEditUser_Load(object sender, EventArgs e)
@@ -73,7 +54,7 @@ namespace OrderManager
             this.Text = "Редактирование участок";
             button1.Text = "Сохранить";
 
-            ValueCategory category = new ValueCategory(dataBase);
+            ValueCategory category = new ValueCategory();
 
             textBox1.Text = category.GetCategoryName(categoryIDLoad);
         }

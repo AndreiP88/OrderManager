@@ -11,13 +11,10 @@ namespace OrderManager
 {
     public partial class FormAllOrders : Form
     {
-        String dataBase;
-
-        public FormAllOrders(String dBase)
+        public FormAllOrders()
         {
             InitializeComponent();
 
-            this.dataBase = dBase;
         }
 
         class Order
@@ -41,20 +38,20 @@ namespace OrderManager
 
         private void LoadSelectedOrder(bool detailsLoad, String orderMachine, String orderNumberm, String orderModification)
         {
-            FormFullListOrders form = new FormFullListOrders(dataBase, detailsLoad, orderMachine, orderNumberm, orderModification);
+            FormFullListOrders form = new FormFullListOrders(detailsLoad, orderMachine, orderNumberm, orderModification);
             form.ShowDialog();
         }
 
         private void ShowFullOrdersForm(bool editOrder)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(dataBase, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
             else
-                form = new FormAddNewOrder(dataBase, getInfo.GetMachineFromName(comboBox1.Text));
+                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text));
 
             form.ShowDialog();
         }
@@ -117,7 +114,7 @@ namespace OrderManager
 
         private void SaveParameterToBase()
         {
-            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, "allOrdersForm", GetParametersLine());
@@ -127,7 +124,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase()
         {
-            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, "allOrdersForm"));
@@ -137,7 +134,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -163,8 +160,8 @@ namespace OrderManager
 
         private void LoadOrdersFromBase()
         {
-            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
@@ -195,9 +192,9 @@ namespace OrderManager
                 {
                     if (sqlReader["numberOfOrder"].ToString().Contains(textBox1.Text))
                     {
-                        GetCountOfDone orderCalc = new GetCountOfDone(dataBase, "", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
-                        GetLeadTime leadTimeFirst = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
-                        GetLeadTime leadTimeLast = new GetLeadTime(dataBase, "", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
+                        GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
+                        GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
+                        GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
 
                         ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
@@ -285,7 +282,7 @@ namespace OrderManager
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             if (listView1.SelectedItems.Count != 0)
                 LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
@@ -303,7 +300,7 @@ namespace OrderManager
 
         private void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             if (listView1.SelectedItems.Count != 0)
                 LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
@@ -317,7 +314,7 @@ namespace OrderManager
 
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             SetNewStatus(getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder, "4");
             LoadOrdersFromBase();

@@ -25,15 +25,9 @@ namespace OrderManager
             }
         }
 
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
-
-        public GetOrdersFromBase(String dBase)
+        public GetOrdersFromBase()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         public String GetNote(String startShift, String numberOfOrder, String modification, String counterRepeat)
@@ -118,7 +112,7 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase();
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -174,7 +168,7 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase();
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -242,8 +236,8 @@ namespace OrderManager
         public Object LoadAllOrdersFromBase(String startOfShift, String category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
-            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
 
             List<Order> orders = new List<Order>();
 
@@ -262,7 +256,7 @@ namespace OrderManager
                     if (category == getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
                     {
                         //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                        GetCountOfDone orderCount = new GetCountOfDone(dataBase, startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+                        GetCountOfDone orderCount = new GetCountOfDone(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
 
                         int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
@@ -315,8 +309,8 @@ namespace OrderManager
         private String LastTimeMakereadyStr(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetLeadTime lastTime = new GetLeadTime(startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
 
             String lastTimeMakeready = "00:00";
 
@@ -351,8 +345,8 @@ namespace OrderManager
         private int FullWorkoutTime(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat, String timeMkrStop, String timeMkrStart)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            GetLeadTime lastTime = new GetLeadTime(dataBase, startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetLeadTime lastTime = new GetLeadTime(startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
 
             int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(machine, numberOrder, modificationOrder));
             int mkrStartStop = timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);

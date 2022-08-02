@@ -11,8 +11,6 @@ namespace OrderManager
     public partial class FormAddNewOrder : Form
     {
         bool editOrderLoad;
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String orderrMachineLoad;
         String orderNumberLoad;
         String orderModificationLoad;
@@ -20,35 +18,29 @@ namespace OrderManager
         List<String> numbersOrdersInProgress;
         String numbersOrder;
 
-        public FormAddNewOrder(String dBase, String orderMachine, String orderNumber, String orderModification)
+        public FormAddNewOrder(String orderMachine, String orderNumber, String orderModification)
         {
             InitializeComponent();
 
             this.editOrderLoad = true;
-            this.dataBase = dBase;
             this.orderrMachineLoad = orderMachine;
             this.orderNumberLoad = orderNumber;
             this.orderModificationLoad = orderModification;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
-        public FormAddNewOrder(String dBase, String orderMachine)
+        public FormAddNewOrder(String orderMachine)
         {
             InitializeComponent();
 
             this.editOrderLoad = false;
-            this.dataBase = dBase;
             this.orderrMachineLoad = orderMachine;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         private void SelectCurrentMachineToComboBox(String machine)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             if (machine != "" && comboBox1.Items.IndexOf(getInfo.GetMachineName(machine)) != -1)
                 comboBox1.SelectedIndex = comboBox1.Items.IndexOf(getInfo.GetMachineName(machine));
@@ -58,7 +50,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -154,9 +146,9 @@ namespace OrderManager
 
         private void AddOrderToDB()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
-            ValueOrdersBase getOrderCount = new ValueOrdersBase(dataBase);
+            ValueOrdersBase getOrderCount = new ValueOrdersBase();
 
             String orderCount = getOrderCount.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
             String orderAddedDate = DateTime.Now.ToString();
@@ -208,7 +200,7 @@ namespace OrderManager
 
         private void EditOrderInProgress()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
@@ -237,10 +229,10 @@ namespace OrderManager
 
         private void EditCurrentOrderInfo()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
 
-            ValueInfoBase setInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase setInfo = new ValueInfoBase();
 
             String number = textBox1.Text;
             String modification = textBox5.Text;
@@ -255,11 +247,11 @@ namespace OrderManager
         private void LoadOrderFromDB(String orderMachine, String orderNumber, String orderModification)
         {
             //int orderStatus = 0;
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
-            ValueOrdersBase getOrderValue = new ValueOrdersBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueOrdersBase getOrderValue = new ValueOrdersBase();
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
-            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
             numbersOrdersInProgress = (List<String>)ordersFromBase.GetNumbersOrders(orderMachine, orderNumber, orderModification);
             numbersOrder = getOrderValue.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
 
@@ -295,8 +287,8 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
-            ValueOrdersBase getValue = new ValueOrdersBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueOrdersBase getValue = new ValueOrdersBase();
 
             if (CheckNotEmptyFields() == true)
             {

@@ -9,15 +9,10 @@ namespace OrderManager
 {
     internal class ValueCategory
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
 
-        public ValueCategory(String dBase)
+        public ValueCategory()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         public String GetCategoryName(String id)
@@ -82,7 +77,7 @@ namespace OrderManager
 
         public void DeleteCategory(String id)
         {
-            ValueInfoBase infoBase = new ValueInfoBase(dataBase);
+            ValueInfoBase infoBase = new ValueInfoBase();
 
             List<String> machinesList = infoBase.GetMachinesList(id);
 

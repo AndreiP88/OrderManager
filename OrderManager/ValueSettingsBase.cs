@@ -8,15 +8,9 @@ namespace OrderManager
 {
     internal class ValueSettingsBase
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
-
-        public ValueSettingsBase(String dBase)
+        public ValueSettingsBase()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         public String GetPasswordChecked(String id)

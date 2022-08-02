@@ -31,25 +31,6 @@ namespace OrderManager
             //MessageBox.Show("SET: [" + section + "][" + key + "]: " + value);
         }
 
-        public String DataBasePath()
-        {
-            String result = Directory.GetCurrentDirectory() + "\\data\\data.db";
-            String value = GetParameter("general", "dataBaseLocalFile");
-
-            bool localDB = Convert.ToBoolean(value);
-
-            if (!localDB && File.Exists(result))
-            {
-                result = GetParameter("general", "dataBasePath");
-            }
-
-            result = result.Replace(@"\", @"\\");
-
-            //MessageBox.Show(File.Exists(result).ToString() + Environment.NewLine + result);
-
-            return result;
-        }
-
         public String GetDBHost()
         {
             String result = GetParameter("mysqlbase", "host");
@@ -87,7 +68,7 @@ namespace OrderManager
 
         public bool GetCheckDBLocalPath()
         {
-            bool result = Convert.ToBoolean(GetParameter("general", "dataBaseLocalFile"));
+            bool result = Convert.ToBoolean(GetParameter("general", "LocalFile"));
 
             return result;
         }
@@ -214,12 +195,12 @@ namespace OrderManager
 
         public void SetCheckDBLocalPath(bool value)
         {
-            SetParameter("general", "dataBaseLocalFile", value.ToString());
+            SetParameter("general", "LocalFile", value.ToString());
         }
 
-        public void SetDataBasePath(String path)
+        public void SetPath(String path)
         {
-            SetParameter("general", "dataBasePath", path.ToString());
+            SetParameter("general", "Path", path.ToString());
         }
 
         public void SetColumnHeadersMain(String value)

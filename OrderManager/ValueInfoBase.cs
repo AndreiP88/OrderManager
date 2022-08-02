@@ -9,16 +9,9 @@ namespace OrderManager
 {
     internal class ValueInfoBase
     {
-
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
-
-        public ValueInfoBase(String dBase)
+        public ValueInfoBase()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         public String GetMachineName(String machine)
@@ -220,7 +213,7 @@ namespace OrderManager
 
         public String GetMachinesStr(String userID)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             List<String> orderMachines = (List<String>)GetMachines(userID);
             String machines = "";
@@ -286,7 +279,7 @@ namespace OrderManager
         public void CompleteTheShift(String nameOfExecutor)
         {
 
-            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase();
 
             List<String> machines = (List<String>)getMachine.GetMachines(nameOfExecutor);
 

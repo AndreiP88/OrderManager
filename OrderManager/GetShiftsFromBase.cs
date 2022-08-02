@@ -9,20 +9,14 @@ namespace OrderManager
 {
     internal class GetShiftsFromBase
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
         String executorName;
 
         //Учитывать в общую выработку смены с нулевой производительностью
         bool _calculateAllPercent = true;
 
-        public GetShiftsFromBase(String dBase, String nameOfExecutor)
+        public GetShiftsFromBase(String nameOfExecutor)
         {
-            this.dataBase = dBase;
             this.executorName = nameOfExecutor;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         /// <summary>
@@ -44,7 +38,7 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase();
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -75,11 +69,11 @@ namespace OrderManager
         {
             Shifts shifts = null;
 
-            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
-            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase(dataBase);
+            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase();
 
             List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shiftStart, "");
 
@@ -136,10 +130,10 @@ namespace OrderManager
             ShiftsDetails shiftsDetails = null;
 
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
-            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
-            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase(dataBase);
+            ValueOrdersBase getOrder = new ValueOrdersBase();
+            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase();
 
             int countShifts = 0;
             int countEffectiveShift = 0;
@@ -162,7 +156,7 @@ namespace OrderManager
 
                 for (int j = 0; j < ordersCurrentShift.Count; j++)
                 {
-                    GetLeadTime leadTime = new GetLeadTime(dataBase, shifts[i],
+                    GetLeadTime leadTime = new GetLeadTime(shifts[i],
                         ordersCurrentShift[j].numberOfOrder, ordersCurrentShift[j].modificationOfOrder, ordersCurrentShift[j].machineOfOrder, getOrder.GetCounterRepeat(ordersCurrentShift[j].machineOfOrder, ordersCurrentShift[j].numberOfOrder, ordersCurrentShift[j].modificationOfOrder));
 
                     if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")

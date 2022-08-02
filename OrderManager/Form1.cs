@@ -12,8 +12,6 @@ namespace OrderManager
     {
         bool adminMode = false;
 
-        String dataBase;
-
         public Form1(string[] args)
         {
             InitializeComponent();
@@ -52,7 +50,7 @@ namespace OrderManager
         private void button1_Click(object sender, EventArgs e)
         {
             Info.active = false;
-            FormAddCloseOrder form = new FormAddCloseOrder(dataBase, Info.startOfShift, Info.nameOfExecutor);
+            FormAddCloseOrder form = new FormAddCloseOrder(Info.startOfShift, Info.nameOfExecutor);
             form.ShowDialog();
             LoadOrdersFromBase();
             Info.active = true;
@@ -76,7 +74,7 @@ namespace OrderManager
         {
             Info.active = false;
 
-            FormLoadUserForm form = new FormLoadUserForm(dataBase);
+            FormLoadUserForm form = new FormLoadUserForm();
             //this.Visible = false;
             form.ShowDialog();
 
@@ -95,7 +93,7 @@ namespace OrderManager
         private void ShowUserSelectMachineForm()
         {
             Info.active = false;
-            FormSelectMachine form = new FormSelectMachine(dataBase);
+            FormSelectMachine form = new FormSelectMachine();
             form.ShowDialog();
 
             //LoadUser();
@@ -106,20 +104,20 @@ namespace OrderManager
 
         private void ShowFullOrdersForm()
         {
-            FormFullListOrders form = new FormFullListOrders(dataBase, false, "", "", "");
+            FormFullListOrders form = new FormFullListOrders(false, "", "", "");
             form.ShowDialog();
         }
 
         private void ShowAllOrdersForm()
         {
-            FormAllOrders form = new FormAllOrders(dataBase);
+            FormAllOrders form = new FormAllOrders();
             form.ShowDialog();
         }
 
         private void ShowShiftsForm()
         {
             Info.active = false;
-            FormShiftsDetails form = new FormShiftsDetails(adminMode, dataBase, Form1.Info.nameOfExecutor, 0, 0);
+            FormShiftsDetails form = new FormShiftsDetails(adminMode, Form1.Info.nameOfExecutor, 0, 0);
             form.ShowDialog();
 
             //LoadUser();
@@ -129,7 +127,7 @@ namespace OrderManager
 
         private void ShowSetUserForm()
         {
-            FormUserProfile form = new FormUserProfile(dataBase, Form1.Info.nameOfExecutor);
+            FormUserProfile form = new FormUserProfile(Form1.Info.nameOfExecutor);
             form.ShowDialog();
             ViewDetailsForUser();
         }
@@ -192,7 +190,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -202,7 +200,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -212,7 +210,7 @@ namespace OrderManager
 
         private void LoadParametersForTheSelectedUserFromBase()
         {
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase();
 
             Info.startOfShift = getUser.GetCurrentShiftStart(Info.nameOfExecutor);
 
@@ -221,9 +219,9 @@ namespace OrderManager
 
         private void AddOrdersToListViewFromList()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
             ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.startOfShift, "");
 
@@ -278,7 +276,7 @@ namespace OrderManager
 
         private void LoadDetailsMount(CancellationToken token)
         {
-            GetShiftsFromBase getShifts = new GetShiftsFromBase(dataBase, Form1.Info.nameOfExecutor);
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(Form1.Info.nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
             DateTime date;
@@ -352,9 +350,9 @@ namespace OrderManager
         private void ViewDetailsForUser()
         {
             GetDateTimeOperations dtOperations = new GetDateTimeOperations();
-            ValueUserBase usersBase = new ValueUserBase(dataBase);
+            ValueUserBase usersBase = new ValueUserBase();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            ValueInfoBase getUserMachines = new ValueInfoBase(dataBase);
+            ValueInfoBase getUserMachines = new ValueInfoBase();
 
             if (getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
                 button6.Enabled = false;
@@ -387,8 +385,8 @@ namespace OrderManager
 
         private void LoadUser()
         {
-            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
-            ValueUserBase userBase = new ValueUserBase(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase();
+            ValueUserBase userBase = new ValueUserBase();
 
             List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
 
@@ -411,10 +409,10 @@ namespace OrderManager
 
         private void LoadMachinesDetailsForUser()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
-            ValueOrdersBase getOrder = new ValueOrdersBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueOrdersBase getOrder = new ValueOrdersBase();
 
-            ValueUserBase userBase = new ValueUserBase(dataBase);
+            ValueUserBase userBase = new ValueUserBase();
 
             List<String> machines = (List<String>)getInfo.GetMachines(Form1.Info.nameOfExecutor);
 
@@ -452,7 +450,7 @@ namespace OrderManager
 
         private void ShowStatisticForm()
         {
-            FormDetailsStatistic form = new FormDetailsStatistic(false, dataBase);
+            FormDetailsStatistic form = new FormDetailsStatistic(false);
             form.ShowDialog();
         }
 
@@ -464,9 +462,9 @@ namespace OrderManager
             {
                 Info.active = false;
 
-                ValueUserBase userBase = new ValueUserBase(dataBase);
-                ValueInfoBase infoBase = new ValueInfoBase(dataBase);
-                ValueShiftsBase getShift = new ValueShiftsBase(dataBase);
+                ValueUserBase userBase = new ValueUserBase();
+                ValueInfoBase infoBase = new ValueInfoBase();
+                ValueShiftsBase getShift = new ValueShiftsBase();
 
                 getShift.CloseShift(Info.startOfShift, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(Info.nameOfExecutor);
@@ -510,7 +508,7 @@ namespace OrderManager
             else
             {
                 this.Visible = false;
-                FormAdmin form = new FormAdmin(adminMode, dataBase);
+                FormAdmin form = new FormAdmin(adminMode);
                 form.ShowDialog();
             }
 
@@ -561,7 +559,7 @@ namespace OrderManager
         {
             if (Form1.Info.nameOfExecutor == "1")
             {
-                FormAdmin form = new FormAdmin(adminMode, dataBase);
+                FormAdmin form = new FormAdmin(adminMode);
                 form.ShowDialog();
 
                 LoadParametersFromBase("mainForm");
@@ -622,18 +620,18 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+                ValueInfoBase getInfo = new ValueInfoBase();
 
                 Info.active = false;
                 FormAddCloseOrder form;
 
                 if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && Convert.ToBoolean(getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder)))
                 {
-                    form = new FormAddCloseOrder(dataBase, Info.startOfShift, Info.nameOfExecutor);
+                    form = new FormAddCloseOrder(Info.startOfShift, Info.nameOfExecutor);
                 }
                 else
                 {
-                    form = new FormAddCloseOrder(dataBase, Info.startOfShift,
+                    form = new FormAddCloseOrder(Info.startOfShift,
                         ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
                         ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
                         ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
@@ -648,12 +646,12 @@ namespace OrderManager
 
         private void LoadOrderNote()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             Info.active = false;
             FormPrivateNote form;
 
-            form = new FormPrivateNote(dataBase, Info.startOfShift,
+            form = new FormPrivateNote(Info.startOfShift,
                 ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
@@ -697,7 +695,7 @@ namespace OrderManager
         private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase(dataBase);
+            ValueOrdersBase valueOrders = new ValueOrdersBase();
 
             ToolTip tooltp = new ToolTip();
 

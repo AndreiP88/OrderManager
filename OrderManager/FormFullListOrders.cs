@@ -10,16 +10,14 @@ namespace OrderManager
 {
     public partial class FormFullListOrders : Form
     {
-        String dataBase;
         bool detailsLoad;
         String orderrMachineLoad;
         String orderNumberLoad;
         String orderModificationLoad;
-        public FormFullListOrders(String dBase, bool details, String orderMachine, String orderNumber, String orderModification)
+        public FormFullListOrders(bool details, String orderMachine, String orderNumber, String orderModification)
         {
             InitializeComponent();
 
-            this.dataBase = dBase;
             this.detailsLoad = details;
             this.orderrMachineLoad = orderMachine;
             this.orderNumberLoad = orderNumber;
@@ -84,7 +82,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -94,7 +92,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -113,7 +111,7 @@ namespace OrderManager
 
         private void LoadMachine()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -166,8 +164,8 @@ namespace OrderManager
 
         private void LoadOrdersFromBase()
         {
-            ValueOrdersBase ordersBase = new ValueOrdersBase(dataBase);
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
 
@@ -185,7 +183,7 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase();
 
                 String commandLine;
                 //commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";

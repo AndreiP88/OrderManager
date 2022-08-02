@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OrderManager.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="DataBase" Type="System.String" Scope="Application">
+    <Setting Name="" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Directory.GetCurrentDirectory() + "\\data.db";</Value>
     </Setting>
   </Settings>

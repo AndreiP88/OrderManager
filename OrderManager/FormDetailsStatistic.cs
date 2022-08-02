@@ -14,18 +14,12 @@ namespace OrderManager
     public partial class FormDetailsStatistic : Form
     {
         bool adminMode;
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
 
-        public FormDetailsStatistic(bool aMode, String dBase)
+        public FormDetailsStatistic(bool aMode)
         {
             InitializeComponent();
 
             this.adminMode = aMode;
-            this.dataBase = dBase;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         bool thJob = false;
@@ -89,7 +83,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -99,7 +93,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -118,7 +112,7 @@ namespace OrderManager
 
         private void LoadYears()
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase(dataBase);
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             List<String> years = shiftsBase.LoadYears();
 
@@ -171,7 +165,7 @@ namespace OrderManager
         private void LoadUsersFromBase(CancellationToken token, DateTime date)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase();
 
             String cLine = " WHERE activeUser = 'True'";
 
@@ -244,7 +238,7 @@ namespace OrderManager
 
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {
-                        GetShiftsFromBase getShifts = new GetShiftsFromBase(dataBase, sqlReader["id"].ToString());
+                        GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
 
                         ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "");
 
@@ -304,9 +298,9 @@ namespace OrderManager
             }));
         }
 
-        private void LoadShiftdetails(String dBase, String user, int yearCur, int monthCur)
+        private void LoadShiftdetails(String user, int yearCur, int monthCur)
         {
-            FormShiftsDetails form = new FormShiftsDetails(adminMode, dBase, user, yearCur, monthCur);
+            FormShiftsDetails form = new FormShiftsDetails(adminMode, user, yearCur, monthCur);
             form.ShowDialog();
         }
 
@@ -335,7 +329,7 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                LoadShiftdetails(dataBase, listView1.SelectedItems[0].Name, Convert.ToInt32(comboBox1.Text), comboBox2.SelectedIndex);
+                LoadShiftdetails(listView1.SelectedItems[0].Name, Convert.ToInt32(comboBox1.Text), comboBox2.SelectedIndex);
             }
         }
 

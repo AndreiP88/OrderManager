@@ -12,24 +12,19 @@ namespace OrderManager
     public partial class FormShiftsDetails : Form
     {
         bool adminMode;
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
+
         String nameOfExecutor;
         int yearOfStatistic;
         int monthOfStatistic;
 
-        public FormShiftsDetails(bool aMode, String dBase, String executor, int yearSt, int mouthSt)
+        public FormShiftsDetails(bool aMode, String executor, int yearSt, int mouthSt)
         {
             InitializeComponent();
 
             this.adminMode = aMode;
-            this.dataBase = dBase;
             this.nameOfExecutor = executor;
             this.yearOfStatistic = yearSt;
             this.monthOfStatistic = mouthSt;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         String nameThread = "";
@@ -93,7 +88,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -103,7 +98,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -132,7 +127,7 @@ namespace OrderManager
 
         private void LoadYears()
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase(dataBase);
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             List<String> years = shiftsBase.LoadYears();
 
@@ -181,7 +176,7 @@ namespace OrderManager
 
         private void LoadShiftsFromBase(CancellationToken token, DateTime date)
         {
-            GetShiftsFromBase getShifts = new GetShiftsFromBase(dataBase, nameOfExecutor);
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
@@ -271,13 +266,13 @@ namespace OrderManager
 
         private void LoadShiftdetails(String timeStartShift)
         {
-            FormOneShiftDetails form = new FormOneShiftDetails(adminMode, dataBase, timeStartShift);
+            FormOneShiftDetails form = new FormOneShiftDetails(adminMode, timeStartShift);
             form.ShowDialog();
         }
 
         private void FormShiftsDetails_Load(object sender, EventArgs e)
         {
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase();
 
             this.Text += " - " + getUser.GetNameUser(nameOfExecutor);
 

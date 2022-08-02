@@ -8,27 +8,21 @@ namespace OrderManager
 {
     public partial class FormPrivateNote : Form
     {
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String loadStartOfShift;
         String loadOrderNumber;
         String loadOrderModification;
         String loadMachine;
         String loadCounterRepeat;
 
-        public FormPrivateNote(String dBase, String lStartOfShift, String lOrderNumber, String lOrderModification, String lMachine, String lCounterRepeat)
+        public FormPrivateNote(String lStartOfShift, String lOrderNumber, String lOrderModification, String lMachine, String lCounterRepeat)
         {
             InitializeComponent();
 
-            this.dataBase = dBase;
             this.loadStartOfShift = lStartOfShift;
             this.loadOrderNumber = lOrderNumber;
             this.loadOrderModification = lOrderModification;
             this.loadMachine = lMachine;
             this.loadCounterRepeat = lCounterRepeat;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         private void UpdateData(String nameOfColomn, String machineCurrent, String shiftStart, String number, String modification, String counterRepeat, String value)
@@ -54,7 +48,7 @@ namespace OrderManager
 
         private void LoadNote()
         {
-            GetOrdersFromBase getOrder = new GetOrdersFromBase(dataBase);
+            GetOrdersFromBase getOrder = new GetOrdersFromBase();
             String pNote = getOrder.GetPrivateNote(loadStartOfShift, loadOrderNumber, loadOrderModification, loadCounterRepeat);
             textBox1.Text = pNote;
         }

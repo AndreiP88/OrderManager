@@ -9,25 +9,19 @@ namespace OrderManager
 {
     internal class GetLeadTime
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
         String shiftStart;
         String numberOfOrder;
         String modificationOfOrder;
         String orderMachine;
         String repeatCounter;
 
-        public GetLeadTime(String dBase, String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
+        public GetLeadTime(String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
         {
-            this.dataBase = dBase;
             this.shiftStart = startOfShift;
             this.numberOfOrder = orderNumber;
             this.modificationOfOrder = orderModification;
             this.orderMachine = machine;
             this.repeatCounter = counterRepeat;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         public String GetLastDateTime(String nameOfColomn)

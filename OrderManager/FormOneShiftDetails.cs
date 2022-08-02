@@ -8,14 +8,12 @@ namespace OrderManager
 {
     public partial class FormOneShiftDetails : Form
     {
-        readonly String timeShiftStart;
-        String dataBase;
+        String timeShiftStart;
         bool adminMode;
 
-        public FormOneShiftDetails(bool aMode, String dBase, String shiftStart)
+        public FormOneShiftDetails(bool aMode, String shiftStart)
         {
             InitializeComponent();
-            this.dataBase = dBase;
             this.timeShiftStart = shiftStart;
             this.adminMode = aMode;
         }
@@ -83,7 +81,7 @@ namespace OrderManager
 
         private void SaveParameterToBase(String nameForm)
         {
-            ValueSettingsBase setting = new ValueSettingsBase(dataBase);
+            ValueSettingsBase setting = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 setting.UpdateParameterLine(Form1.Info.nameOfExecutor, nameForm, GetParametersLine());
@@ -93,7 +91,7 @@ namespace OrderManager
 
         private void LoadParametersFromBase(String nameForm)
         {
-            ValueSettingsBase getSettings = new ValueSettingsBase(dataBase);
+            ValueSettingsBase getSettings = new ValueSettingsBase();
 
             if (Form1.Info.nameOfExecutor != "")
                 ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -105,7 +103,7 @@ namespace OrderManager
         {
             bool result = false;
 
-            ValueShiftsBase getUserShift = new ValueShiftsBase(dataBase);
+            ValueShiftsBase getUserShift = new ValueShiftsBase();
 
             if (getUserShift.GetNameUserFromStartShift(shiftStart) == userID)
             {
@@ -122,9 +120,9 @@ namespace OrderManager
 
         private void AddOrdersToListViewFromList()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase(dataBase);
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
             ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(timeShiftStart, "");
 
@@ -169,8 +167,8 @@ namespace OrderManager
         {
             GetDateTimeOperations dtOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
-            ValueUserBase getUser = new ValueUserBase(dataBase);
-            ValueShiftsBase getShift = new ValueShiftsBase(dataBase);
+            ValueUserBase getUser = new ValueUserBase();
+            ValueShiftsBase getShift = new ValueShiftsBase();
 
 
             label4.Text = getUser.GetNameUser(getShift.GetNameUserFromStartShift(timeShiftStart));
@@ -208,11 +206,11 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+                ValueInfoBase getInfo = new ValueInfoBase();
 
                 FormAddCloseOrder form;
 
-                form = new FormAddCloseOrder(adminMode, dataBase, timeShiftStart,
+                form = new FormAddCloseOrder(adminMode, timeShiftStart,
                 ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
@@ -225,11 +223,11 @@ namespace OrderManager
 
         private void LoadOrderNote()
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             FormPrivateNote form;
 
-            form = new FormPrivateNote(dataBase, timeShiftStart,
+            form = new FormPrivateNote(timeShiftStart,
                 ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,

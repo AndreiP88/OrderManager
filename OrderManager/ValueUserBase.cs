@@ -11,15 +11,9 @@ namespace OrderManager
 {
     internal class ValueUserBase
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
-
-        public ValueUserBase(String dBase)
+        public ValueUserBase()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         /// <summary>
@@ -153,7 +147,7 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase();
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();
@@ -193,7 +187,7 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase(dataBase);
+                ValueUserBase usersBase = new ValueUserBase();
                 GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
 
                 Connect.Open();

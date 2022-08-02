@@ -9,15 +9,9 @@ namespace OrderManager
 {
     internal class ValueShiftsBase
     {
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
-        String dataBase;
-
-        public ValueShiftsBase(String dBase)
+        public ValueShiftsBase()
         {
-            this.dataBase = dBase;
 
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
         }
 
         public String GetStopShift(String startShift)

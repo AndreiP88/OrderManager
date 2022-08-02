@@ -132,7 +132,7 @@
             this.imageList1.Images.SetKeyName(6, "free-icon-browser-3914415.png");
             this.imageList1.Images.SetKeyName(7, "free-icon-copy-alt-3914174.png");
             this.imageList1.Images.SetKeyName(8, "free-icon-cross-3917189.png");
-            this.imageList1.Images.SetKeyName(9, "free-icon-database-3914565.png");
+            this.imageList1.Images.SetKeyName(9, "free-icon--3914565.png");
             this.imageList1.Images.SetKeyName(10, "free-icon-form-3914182.png");
             this.imageList1.Images.SetKeyName(11, "free-icon-indent-3917045.png");
             this.imageList1.Images.SetKeyName(12, "free-icon-shuffle-3917134.png");

@@ -26,9 +26,9 @@ namespace OrderManager.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Directory.GetCurrentDirectory() + \"\\\\data.db\";")]
-        public string DataBase {
+        public string Параметр {
             get {
-                return ((string)(this["DataBase"]));
+                return ((string)(this["Параметр"]));
             }
         }
     }

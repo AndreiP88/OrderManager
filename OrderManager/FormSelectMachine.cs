@@ -11,13 +11,9 @@ namespace OrderManager
 {
     public partial class FormSelectMachine : Form
     {
-        String dataBase;
-
-        public FormSelectMachine(String dBase)
+        public FormSelectMachine()
         {
             InitializeComponent();
-
-            this.dataBase = dBase;
         }
 
         List<CheckBox> checkBoxesMachines = new List<CheckBox>();
@@ -54,7 +50,7 @@ namespace OrderManager
 
         private bool CheckUserToSelectedMachine(String machine, String user)
         {
-            ValueInfoBase getUserID = new ValueInfoBase(dataBase);
+            ValueInfoBase getUserID = new ValueInfoBase();
             if (getUserID.GetIDUser(machine) == user)
                 return true;
             else
@@ -63,7 +59,7 @@ namespace OrderManager
 
         private bool CheckFreeMachine(String machine)
         {
-            ValueInfoBase getUserID = new ValueInfoBase(dataBase);
+            ValueInfoBase getUserID = new ValueInfoBase();
 
             bool result;
 
@@ -77,8 +73,8 @@ namespace OrderManager
 
         private bool CheckCategoryForUser(String user, String machine)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
-            ValueUserBase getUser = new ValueUserBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueUserBase getUser = new ValueUserBase();
 
             String categoryCurrentMachine = getInfo.GetCategoryMachine(machine);
             String categoryesCurrentUser = getUser.GetCategoryesMachine(user);
@@ -94,9 +90,9 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueOrdersBase order = new ValueOrdersBase(dataBase);
-                ValueInfoBase getInfo = new ValueInfoBase(dataBase);
-                ValueUserBase user = new ValueUserBase(dataBase);
+                ValueOrdersBase order = new ValueOrdersBase();
+                ValueInfoBase getInfo = new ValueInfoBase();
+                ValueUserBase user = new ValueUserBase();
 
                 Connect.Open();
                 MySqlCommand Command = new MySqlCommand
@@ -167,7 +163,7 @@ namespace OrderManager
 
         private void ShiftStart(String currentUser, String startOfShift)
         {
-            ValueUserBase usersBase = new ValueUserBase(dataBase);
+            ValueUserBase usersBase = new ValueUserBase();
 
             usersBase.UpdateCurrentShiftStart(currentUser, startOfShift);
 
@@ -191,7 +187,7 @@ namespace OrderManager
 
         private void ActivateDeactivateMachines(String currentUser)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
 
 
@@ -248,7 +244,7 @@ namespace OrderManager
 
         private void AddControl(String name, String user, String order, bool enabled, bool check)
         {
-            ValueInfoBase getInfo = new ValueInfoBase(dataBase);
+            ValueInfoBase getInfo = new ValueInfoBase();
 
             int x = 12;
             int y = 35;

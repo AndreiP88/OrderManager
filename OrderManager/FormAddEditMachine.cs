@@ -9,8 +9,6 @@ namespace OrderManager
 {
     public partial class FormAddEditMachine : Form
     {
-        String dataBase;
-        String dataBaseDefault = Directory.GetCurrentDirectory() + "\\data.db";
         String machineIDLoad;
 
         bool _loadForEdit;
@@ -18,43 +16,26 @@ namespace OrderManager
         /// <summary>
         /// Добавление нового сотрудника
         /// </summary>
-        /// <param name="dataBase"></param>
-        public FormAddEditMachine(String dataBase)
+        /// <param name=""></param>
+        public FormAddEditMachine()
         {
             InitializeComponent();
 
-            this.dataBase = dataBase;
-
             _loadForEdit = false;
-
-            DataBasePatch(dataBase);
         }
 
         /// <summary>
         /// Редактировние выбранного сотрудника
         /// </summary>
-        /// <param name="dataBase"></param>
+        /// <param name=""></param>
         /// <param name="userID"></param>
-        public FormAddEditMachine(String dataBase, String machineID)
+        public FormAddEditMachine(String machineID)
         {
             InitializeComponent();
 
-            this.dataBase = dataBase;
             this.machineIDLoad = machineID;
 
             _loadForEdit = true;
-
-            DataBasePatch(dataBase);
-        }
-
-        private String DataBasePatch(String dBase)
-        {
-            String dataBase = dBase;
-
-            if (dataBase == "")
-                dataBase = dataBaseDefault;
-
-            return dataBase;
         }
 
         private void FormAddEditUser_Load(object sender, EventArgs e)
@@ -74,8 +55,8 @@ namespace OrderManager
             this.Text = "Редактирование оборудование";
             button1.Text = "Сохранить";
 
-            ValueCategory category = new ValueCategory(dataBase);
-            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
+            ValueCategory category = new ValueCategory();
+            ValueInfoBase getMachine = new ValueInfoBase();
 
             LoadCategoryes();
 
@@ -98,7 +79,7 @@ namespace OrderManager
 
         private void LoadCategoryes()
         {
-            ValueCategory getCategory = new ValueCategory(dataBase);
+            ValueCategory getCategory = new ValueCategory();
 
             List<String> categoryes = new List<String>(getCategory.GetCategoryesList());
 
@@ -126,8 +107,8 @@ namespace OrderManager
 
         private void AddNewMachine()
         {
-            ValueInfoBase getMachine = new ValueInfoBase(dataBase);
-            ValueCategory valueCategory = new ValueCategory(dataBase);
+            ValueInfoBase getMachine = new ValueInfoBase();
+            ValueCategory valueCategory = new ValueCategory();
 
             String name = textBox1.Text;
 
