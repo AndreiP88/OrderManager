@@ -227,23 +227,19 @@ namespace OrderManager
 
         public int TimeDifferentToMinutes(String firstTime, String secondTime)
         {
-            TimeSpan totalTime;
-            DateTime firstD;
-            DateTime secondD;
+            int totalTime = 0;
+            int firstD;
+            int secondD;
 
-            firstD = Convert.ToDateTime(firstTime);
-            secondD = Convert.ToDateTime(secondTime);
+            firstD = totallTimeHHMMToMinutes(firstTime);
+            secondD = totallTimeHHMMToMinutes(secondTime);
 
             if (firstD > secondD)
             {
                 totalTime = firstD - secondD;
             }
-            else
-            {
-                totalTime = TimeSpan.Zero;
-            }
 
-            return TotalHoursToMinutesTS(totalTime);
+            return (totalTime);
         }
 
         public int TotalHoursToMinutes(int hours, int minutes)

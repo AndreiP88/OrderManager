@@ -103,6 +103,12 @@
     <Compile Include="FormAddEditCategory.Designer.cs">
       <DependentUpon>FormAddEditCategory.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormAddEditTestMySQL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddEditTestMySQL.Designer.cs">
+      <DependentUpon>FormAddEditTestMySQL.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAddEditUser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -216,6 +222,9 @@
     <EmbeddedResource Include="FormAddEditCategory.resx">
       <DependentUpon>FormAddEditCategory.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormAddEditTestMySQL.resx">
+      <DependentUpon>FormAddEditTestMySQL.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormAddEditUser.resx">
       <DependentUpon>FormAddEditUser.cs</DependentUpon>
     </EmbeddedResource>
@@ -302,8 +311,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
   </Target>
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
-  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
 </Project>

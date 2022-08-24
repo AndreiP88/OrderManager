@@ -735,7 +735,7 @@ namespace OrderManager
 
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
-            String workStart = dateTimePicker3.Text;
+            String workStart = dateTimePicker2.Value.AddMinutes(1).ToString();
             String workStop = dateTimePicker4.Text;
             String note = textBox6.Text;
             int done = (int)numericUpDown4.Value;
@@ -757,7 +757,7 @@ namespace OrderManager
 
                     if (dialogResult == DialogResult.Yes)
                     {
-                        UpdateData("timeToWorkStart", machineCurrent, shiftStart, number, modification, counterRepeat, makereadyStop);
+                        UpdateData("timeToWorkStart", machineCurrent, shiftStart, number, modification, counterRepeat, workStart);
                         UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
                         getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, number, modification, number, modification, true);
                         //убираем заказ из активных для возможности завершить смену

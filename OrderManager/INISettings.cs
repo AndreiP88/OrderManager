@@ -15,7 +15,7 @@ namespace OrderManager
             String result = "";
 
             if (INI.KeyExists(key))
-                result = INI.ReadINI(section, key);
+                result = INI.ReadString(key, section);
 
             //MessageBox.Show("GET: [" + section + "][" + key + "]: " + result);
             return result;
@@ -26,7 +26,7 @@ namespace OrderManager
             IniFile INI = new IniFile(_settingsFile);
 
             if (INI.KeyExists(key))
-                INI.Write(section, key, value);
+                INI.Write(key, value, section);
 
             //MessageBox.Show("SET: [" + section + "][" + key + "]: " + value);
         }

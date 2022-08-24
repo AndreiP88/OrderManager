@@ -718,9 +718,10 @@ namespace OrderManager
 
             String plannedCountDone = "0";
 
+            //MessageBox.Show(e.Item.Name);
+
             if (idx != -1 && e.Item != null)
             {
-                bool positive;
                 String message = "";
                 String statusStr = "";
 
@@ -858,9 +859,12 @@ namespace OrderManager
                 tooltp.Active = false;
             }
 
-            
+        }
 
-            
+        private void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL();
+            form.ShowDialog();
         }
     }
 }
