@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,8 @@ namespace OrderManager
 
         bool availableDB = false;
         bool edit = false;
+        bool edited = false;
+
         String connectionFile = "connections.ini";
 
         String selectedItemForEdit = "";
@@ -98,9 +101,18 @@ namespace OrderManager
 
                 if (ini.ReadString("selected", "general").Substring(5) == comboBox1.Text)
                 {
-                    button3.Text = "Активен";
-                    button3.Enabled = false;
-                    
+                    if (edited)
+                    {
+                        button3.Text = "Применить";
+                        button3.Enabled = true;
+
+                        button4.Enabled = false;
+                    }
+                    else
+                    {
+                        button3.Text = "Активен";
+                        button3.Enabled = false;
+                    }
                 }
                 else
                 {
@@ -296,6 +308,8 @@ namespace OrderManager
                 button4.Enabled = true;
 
                 button2.Text = "Редактировать";
+
+                edited = true;
 
                 ini.DeleteSection(selectedItemForEdit);
 
