@@ -25,5 +25,16 @@ namespace OrderManager
 
             return DBMySQLUtils.GetDBConnection(host, port, database, username, password);
         }
+
+        public static MySqlConnection GetDBConnection(string host, int port, string database, string username, string password)
+        {
+            /*string host = "25.21.38.172";
+            int port = 3309;
+            string database = "order_manager";
+            string username = "oxyfox";
+            string password = "root";*/
+
+            return DBMySQLUtils.GetDBConnection(host, port, database, username, password);
+        }
     }
 }

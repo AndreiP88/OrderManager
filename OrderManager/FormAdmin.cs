@@ -2433,7 +2433,7 @@ namespace OrderManager
                 commandLine += dateTimeStart.ToString("yyyy-MM-dd 00:00:00") + "'";
                 commandLine += " AND ";
                 //commandLine += "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) <= '";
-                commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') <= '";
+                commandLine += "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') <= '";
                 commandLine += dateTimeEnd.ToString("yyyy-MM-dd 00:00:00") + "'";
                 //commandLine += 
 

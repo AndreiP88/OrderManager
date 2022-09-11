@@ -267,7 +267,7 @@ namespace OrderManager
 
                         if (workTime != 0)
                         {
-                            orderNorm = amountThisOrder * 60 / Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                            orderNorm = amountThisOrder * 60 / workTime;
                             timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
                             lastTimeWork = timeOperations.TotalMinutesToHoursAndMinutesStr((lastCount * 60) / orderNorm);
                         }
@@ -313,25 +313,29 @@ namespace OrderManager
 
             String lastTimeMakeready = "00:00";
 
-            String lastTimeMake = timeOperations.DateDifferent(lastTime.GetLastDateTime("timeMakereadyStop"), lastTime.GetLastDateTime("timeMakereadyStart"));
+            String lastTimeMakereadyStop = lastTime.GetLastDateTime("timeMakereadyStop");
+            String currentTimeMakereadyStart = lastTime.GetCurrentDateTime("timeMakereadyStart");
+            String currentTimeMakereadyStop = lastTime.GetCurrentDateTime("timeMakereadyStop");
+
+            String lastTimeMake = timeOperations.DateDifferent(lastTimeMakereadyStop, lastTime.GetLastDateTime("timeMakereadyStart"));
             int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(machine, numberOrder, modificationOrder));
 
             //разобраться с условиями не отображается остаток времени на приладку... вродебы работает)
             //считает только одно предыдущее значение, т.е. если приладка заняла больше двух смен, тло считает только текущую смнену и предыдыдущую...
             //вероятность того, что такие ситуации будут крайне мала, поэтому оставляю как есть)
-            if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") == "")
+            if (lastTimeMakereadyStop != "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop == "")
             {
                 lastTimeMakeready = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake);
             }
-            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") == "")
+            else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop == "")
             {
                 lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime);
             }
-            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "")
+            else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop != "")
             {
                 lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime);
             }
-            else if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStart") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "")
+            else if (lastTimeMakereadyStop != "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop != "")
             {
                 lastTimeMakeready = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake);
             }
@@ -352,6 +356,10 @@ namespace OrderManager
 
             int mkrWorkingOut = 0;
 
+            String lastTimeMakereadyStop = lastTime.GetLastDateTime("timeMakereadyStop");
+            String currentTimeMakereadyStop = lastTime.GetCurrentDateTime("timeMakereadyStop");
+            String nextTimeMakereadyStop = lastTime.GetNextDateTime("timeMakereadyStop");
+
             if (mkrStartStop > makereadyTime)
             {
                 mkrWorkingOut = makereadyTime;
@@ -361,19 +369,19 @@ namespace OrderManager
                 mkrWorkingOut = mkrStartStop;
             }
 
-            String lastTimeMake = timeOperations.DateDifferent(lastTime.GetLastDateTime("timeMakereadyStop"), lastTime.GetLastDateTime("timeMakereadyStart")); ;
+            String lastTimeMake = timeOperations.DateDifferent(lastTimeMakereadyStop, lastTime.GetLastDateTime("timeMakereadyStart")); ;
 
             int timeWorkingOut = 0;
 
-            if (lastTime.GetLastDateTime("timeMakereadyStop") != "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") == "")
+            if (lastTimeMakereadyStop != "" && currentTimeMakereadyStop != "" && nextTimeMakereadyStop == "")
             {
                 timeWorkingOut += (timeOperations.TimeDifferentToMinutes(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake));
             }
-            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") != "")
+            else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStop != "" && nextTimeMakereadyStop != "")
             {
                 timeWorkingOut += mkrWorkingOut;
             }
-            else if (lastTime.GetLastDateTime("timeMakereadyStop") == "" && lastTime.GetCurrentDateTime("timeMakereadyStop") != "" && lastTime.GetNextDateTime("timeMakereadyStop") == "")
+            else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStop != "" && nextTimeMakereadyStop == "")
             {
                 if (ordersBase.GetOrderStatus(machine, numberOrder, modificationOrder) != "1" && lastTime.GetNextDateTime("timeMakereadyStart") == "")
                     timeWorkingOut += makereadyTime;

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using ToolTip = System.Windows.Forms.ToolTip;
 
 namespace OrderManager
 {
@@ -30,10 +33,12 @@ namespace OrderManager
         int fullTimeWorkingOut;
         int fullDone;
 
+        String connectionFile = "connections.ini";
+
         public static class Info
         {
             public static bool active = false;
-            public static int indexItem = -1;
+            //public static int indexItem = -1;
             public static String nameOfExecutor = "";
             public static String startOfShift = "";
         }
@@ -47,6 +52,30 @@ namespace OrderManager
             public static string password = "root";
         }
 
+        public bool IsServerConnected()
+        {
+            string host = Form1.BaseConnectionParameters.host;
+            int port = Form1.BaseConnectionParameters.port;
+            string database = Form1.BaseConnectionParameters.database;
+            string username = Form1.BaseConnectionParameters.username;
+            string password = Form1.BaseConnectionParameters.password;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection(host, port, database, username, password))
+            {
+                try
+                {
+                    Connect.Open();
+                    Connect.Close();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             Info.active = false;
@@ -58,16 +87,37 @@ namespace OrderManager
 
         private void LoadBaseConnectionParameters()
         {
-            INISettings ini = new INISettings();
+            /*INISettings ini = new INISettings();
 
             BaseConnectionParameters.host = ini.GetDBHost();
             BaseConnectionParameters.port = Convert.ToInt32(ini.GetDBPort());
             BaseConnectionParameters.database = ini.GetDBDatabase();
             BaseConnectionParameters.username = ini.GetDBUsername();
-            BaseConnectionParameters.password = ini.GetDBPassword();
+            BaseConnectionParameters.password = ini.GetDBPassword();*/
+
+            IniFile ini = new IniFile(connectionFile);
+
+            String section = ini.ReadString("selected", "general");
+
+            String host = "host";
+            String port = "port";
+            String database = "database";
+            String username = "username";
+            String password = "password";
+
+            BaseConnectionParameters.host = ini.ReadString(host, section);
+            BaseConnectionParameters.port = ini.ReadInt(port, section);
+            BaseConnectionParameters.database = ini.ReadString(database, section);
+            BaseConnectionParameters.username = ini.ReadString(username, section);
+            BaseConnectionParameters.password = ini.ReadString(password, section);
 
             toolStripStatusLabel2.Text = BaseConnectionParameters.host;
             toolStripStatusLabel5.Text = BaseConnectionParameters.database;
+
+            if(!IsServerConnected())
+            {
+                DataBaseSelect();
+            }
         }
 
         private void ShowUserForm()
@@ -228,10 +278,10 @@ namespace OrderManager
             fullTimeWorkingOut = 0;
             fullDone = 0;
 
-            if (listView1.SelectedItems.Count > 0)
+            /*if (listView1.SelectedItems.Count > 0)
             {
                 Info.indexItem = listView1.SelectedIndices[0];
-            }
+            }*/
 
             listView1.Items.Clear();
 
@@ -264,13 +314,13 @@ namespace OrderManager
                 fullDone += ordersCurrentShift[index].done;
             }
 
-            if (listView1.Items.Count > 0)
+            /*if (listView1.Items.Count > 0)
             {
                 if (Info.indexItem >= 0)
                     listView1.Items[Info.indexItem].Selected = true;
                 else
                     listView1.Items[listView1.Items.Count - 1].Selected = true;
-            }
+            }*/
             //listView1.Items[0].Selected = false;
         }
 
@@ -331,7 +381,7 @@ namespace OrderManager
             listView1.Items.Clear();
             listView2.Items.Clear();
 
-            Info.indexItem = -1;
+            //Info.indexItem = -1;
 
             label6.Text = "";
             label7.Text = "";
@@ -861,10 +911,20 @@ namespace OrderManager
 
         }
 
-        private void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DataBaseSelect()
         {
             FormAddEditTestMySQL form = new FormAddEditTestMySQL();
             form.ShowDialog();
+            LoadBaseConnectionParameters();
+            LoadUser();
+            if (Form1.Info.nameOfExecutor != "")
+                LoadParametersForTheSelectedUserFromBase();
+            LoadOrdersFromBase();
+        }
+
+        private void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataBaseSelect();
         }
     }
 }
