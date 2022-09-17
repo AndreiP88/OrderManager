@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -124,7 +126,7 @@ namespace OrderManager
         /// <param name="selectDate"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        public ShiftsDetails LoadCurrentDateShiftsDetails(DateTime selectDate, String category)
+        public ShiftsDetails LoadCurrentDateShiftsDetails(DateTime selectDate, String category, CancellationToken token)
         {
             ShiftsDetails shiftsDetails = null;
 
@@ -148,6 +150,14 @@ namespace OrderManager
 
             for (int i = 0; i < shifts.Count; i++)
             {
+                /*if (token.IsCancellationRequested)
+                {
+                    MessageBox.Show("Отмена");
+                    break;
+                }*/
+
+                
+
                 List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shifts[i], category);
 
                 int fullDone = 0;
@@ -178,6 +188,7 @@ namespace OrderManager
 
                 countShifts++;
 
+                token.ThrowIfCancellationRequested();
             }
 
             int countShiftForPercent;

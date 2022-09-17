@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Management;
 
 namespace OrderManager
 {
@@ -85,6 +87,61 @@ namespace OrderManager
             return Encoding.UTF8.GetString(plainTextBytes, 0, byteCount);
         }
 
+
+
+
+
+
+
+
+        public string GetMotherBoard_ID()
+        {
+            string result = string.Empty;
+            string MotherBoardID = string.Empty;
+            SelectQuery query = new SelectQuery("Win32_BaseBoard");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+
+
+            ManagementObjectCollection.ManagementObjectEnumerator enumerator = searcher.Get().GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                ManagementObject info = (ManagementObject)enumerator.Current;
+                MotherBoardID = info["SerialNumber"].ToString().Trim();
+            }
+
+            result = "USER:" + Environment.UserName + ";MB:" + MotherBoardID;
+
+            return result;
+        }
+
+
+        private static string identifier(string wmiClass, string wmiProperty)
+        {
+            string result = "";
+            System.Management.ManagementClass mc = new System.Management.ManagementClass(wmiClass);
+            System.Management.ManagementObjectCollection moc = mc.GetInstances();
+            foreach (System.Management.ManagementObject mo in moc)
+            {
+                //Only get the first one
+                if (result == "")
+                {
+                    try
+                    {
+                        result = mo[wmiProperty].ToString();
+                        break;
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            return result;
+        }
+
+        public string GetId()
+        {
+            return identifier("Win32_BaseBoard", "SerialNumber");
+        }
 
     }
 }

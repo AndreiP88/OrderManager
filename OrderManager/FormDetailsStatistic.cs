@@ -239,7 +239,7 @@ namespace OrderManager
                     {
                         GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
 
-                        ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "");
+                        ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "", token);
 
                         fullCountShifts += shiftsDetails.countShifts;
                         fullTimeShifts += shiftsDetails.allTimeShift;

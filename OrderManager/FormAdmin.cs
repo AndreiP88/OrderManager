@@ -1777,7 +1777,7 @@ namespace OrderManager
                             {
                                 GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
 
-                                ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, category);
+                                ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, category, token);
 
                                 fullCountShifts += shiftsDetails.countShifts;
                                 fullTimeShifts += shiftsDetails.allTimeShift;
@@ -1977,7 +1977,7 @@ namespace OrderManager
                         }));
                     }
 
-                    ShiftsDetails shiftsDetailsSumm = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "");
+                    ShiftsDetails shiftsDetailsSumm = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "", token);
 
                     Invoke(new Action(() =>
                     {

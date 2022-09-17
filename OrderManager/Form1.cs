@@ -33,6 +33,8 @@ namespace OrderManager
         int fullTimeWorkingOut;
         int fullDone;
 
+        CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+
         String connectionFile = "connections.ini";
 
         public static class Info
@@ -337,7 +339,12 @@ namespace OrderManager
 
             while (!token.IsCancellationRequested)
             {
-                ShiftsDetails currentShift = getShifts.LoadCurrentDateShiftsDetails(date, "");
+                token.ThrowIfCancellationRequested();
+
+                ShiftsDetails currentShift = getShifts.LoadCurrentDateShiftsDetails(date, "", token);
+
+                if (currentShift == null)
+                    break;
 
                 Invoke(new Action(() =>
                 {
@@ -358,12 +365,15 @@ namespace OrderManager
 
         private void LaodDetailsForCurrentMount()
         {
-            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-            CancellationToken token = cancelTokenSource.Token;
+            //cancelTokenSource = new CancellationTokenSource();
+
+            var task = Task.Run(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
+
+            /*CancellationToken token = cancelTokenSource.Token;
 
             Task task = new Task(() => LoadDetailsMount(token));
 
-            task.Start();
+            task.Start();*/
         }
 
         private void LoadOrdersFromBase()
@@ -376,6 +386,9 @@ namespace OrderManager
 
         private void ClearAll()
         {
+            CancellationToken token = cancelTokenSource.Token;
+            token.ThrowIfCancellationRequested();
+
             SaveParameterToBase("mainForm");
 
             listView1.Items.Clear();
@@ -602,7 +615,10 @@ namespace OrderManager
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            cancelTokenSource.Cancel();
+
             SaveParameterToBase("mainForm");
+            
         }
 
         private void labelTime_Click(object sender, EventArgs e)

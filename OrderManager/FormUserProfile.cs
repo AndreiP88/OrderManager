@@ -57,5 +57,12 @@ namespace OrderManager
             SaveUser();
             Close();
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ValueUserBase setValueUsers = new ValueUserBase();
+
+            setValueUsers.UpdateLastUID(idUser, "");
+        }
     }
 }

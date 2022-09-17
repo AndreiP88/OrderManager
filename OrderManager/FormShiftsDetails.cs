@@ -235,7 +235,7 @@ namespace OrderManager
                     }));
                 }
 
-                ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, ""); //добавить выбор категорий
+                ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, "", token); //добавить выбор категорий
 
                 Invoke(new Action(() =>
                 {

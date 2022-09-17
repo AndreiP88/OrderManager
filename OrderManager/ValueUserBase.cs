@@ -63,6 +63,11 @@ namespace OrderManager
             return GetValueInfo("user", id, "currentShiftStart");
         }
 
+        public String GetLastUID(String id)
+        {
+            return GetValueInfo("user", id, "lastUID");
+        }
+
         /// <summary>
         /// Получить id пользователя для активной смены по времени начала смены
         /// </summary>
@@ -238,6 +243,11 @@ namespace OrderManager
         public void UpdateCurrentShiftStart(String idUser, String newValue)
         {
             UpdateValueInfo("currentShiftStart", idUser, newValue);
+        }
+
+        public void UpdateLastUID(String idUser, String newValue)
+        {
+            UpdateValueInfo("lastUID", idUser, newValue);
         }
 
         public void DeleteUser(String id)

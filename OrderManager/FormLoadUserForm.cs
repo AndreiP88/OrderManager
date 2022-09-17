@@ -10,6 +10,8 @@ namespace OrderManager
 
         String passKey = "key";
 
+        public static bool enteredPasswordSuccess = false;
+
         public FormLoadUserForm()
         {
             InitializeComponent();
@@ -42,35 +44,6 @@ namespace OrderManager
                 item.SubItems.Add(machines);
                 listView1.Items.Add(item);
             }
-
-
-
-            /*using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT * FROM users WHERE activeUser = 'True'"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
-                {
-                    String machines = getMachine.GetMachinesStr(sqlReader["id"].ToString());
-
-                    counter++;
-
-                    ListViewItem item = new ListViewItem();
-                    item.Name = sqlReader["id"].ToString();
-                    item.Text = counter.ToString();
-                    item.SubItems.Add(sqlReader["nameUser"].ToString());
-                    item.SubItems.Add(machines);
-                    listView1.Items.Add(item);
-                }
-
-                Connect.Close();
-            }*/
         }
 
         private void LoadSelectedUser()
@@ -84,7 +57,6 @@ namespace OrderManager
             {
                 String currentUser = listView1.SelectedItems[0].Name;
                 String userPass = userValue.GetPasswordUser(currentUser);
-                String enterPass = textBox1.Text;
                 bool checkPass = false;
                 bool checkPassword = false;
 
@@ -94,19 +66,32 @@ namespace OrderManager
                 if (userValue.GetUserWorking(currentUser) == true && checkPass == true)
                     checkPassword = true;
 
-                if (enterPass == pass.DeCode(userPass, passKey) || checkPassword == true)
+                if ((checkPassword == true && pass.GetMotherBoard_ID() == userValue.GetLastUID(currentUser)) || userPass == "")
                 {
                     Form1.Info.nameOfExecutor = currentUser;
                     Close();
                 }
-                else
+                else if (ChekPassword(currentUser))
                 {
-                    MessageBox.Show("Введен неверный пароль!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                 }
             }
 
             //Form1 form = new Form1();
             //form.Visible = true;
+        }
+
+        private bool ChekPassword(String loadUser)
+        {
+            bool result = false;
+
+            FormLoadUserPasswordForm form = new FormLoadUserPasswordForm(loadUser);
+            form.ShowDialog();
+
+            if (enteredPasswordSuccess)
+                result = true;
+
+            return result;
         }
 
         private void EnabledButton()
