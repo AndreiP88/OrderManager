@@ -179,6 +179,7 @@ namespace OrderManager
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
+            ValueShiftsBase shiftValue = new ValueShiftsBase();
 
             Invoke(new Action(() =>
             {
@@ -210,6 +211,7 @@ namespace OrderManager
                     item.SubItems.Add("");
                     item.SubItems.Add("");
                     item.SubItems.Add("");
+                    item.SubItems.Add(shiftValue.GetNoteShift(shifts[i]));
 
                     Invoke(new Action(() => listView1.Items.Add(item)));
                 }

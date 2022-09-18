@@ -122,6 +122,12 @@
     <Compile Include="FormLoadUserPasswordForm.Designer.cs">
       <DependentUpon>FormLoadUserPasswordForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormCloseShift.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCloseShift.Designer.cs">
+      <DependentUpon>FormCloseShift.cs</DependentUpon>
+    </Compile>
     <Compile Include="INISettings.cs" />
     <Compile Include="StringArray.cs" />
     <Compile Include="Cryption.cs" />
@@ -249,6 +255,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormOneShiftDetails.resx">
       <DependentUpon>FormOneShiftDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCloseShift.resx">
+      <DependentUpon>FormCloseShift.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSelectMachine.resx">
       <DependentUpon>FormSelectMachine.cs</DependentUpon>

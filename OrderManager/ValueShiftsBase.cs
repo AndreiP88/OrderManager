@@ -26,11 +26,35 @@ namespace OrderManager
 
             return result[result.Count - 1];
         }
+
+        public String GetNoteShift(String startShift)
+        {
+            List<String> result = new List<String>(GetValue("startShift", startShift, "note"));
+
+            return result[result.Count - 1];
+        }
         public List<String> GetActiveUser()
         {
             List<String> result = new List<String>(GetValue("stopShift", "", "nameUser"));
 
             return result;
+        }
+
+        public void SetNoteShift(String startShift, String note)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE shifts SET note = @note " +
+                    "WHERE startShift = @startShift";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@note", note);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         public void CloseShift(String startShift, String stopShift)

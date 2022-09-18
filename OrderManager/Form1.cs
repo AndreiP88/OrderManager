@@ -519,7 +519,7 @@ namespace OrderManager
 
         private void CancelShift()
         {
-            DialogResult result;
+            /*DialogResult result;
             result = MessageBox.Show("Вы действительно хотите завершить смену?", "Завершение смены", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
@@ -538,7 +538,31 @@ namespace OrderManager
                 ShowUserForm();
 
                 Info.active = true;
+            }*/
+
+            Info.active = false;
+
+            FormCloseShift form = new FormCloseShift();
+            form.ShowDialog();
+            bool result = form.ShiftVal;
+
+            if (result)
+            {
+                ValueUserBase userBase = new ValueUserBase();
+                ValueInfoBase infoBase = new ValueInfoBase();
+                ValueShiftsBase getShift = new ValueShiftsBase();
+
+                getShift.CloseShift(Info.startOfShift, DateTime.Now.ToString());
+                infoBase.CompleteTheShift(Info.nameOfExecutor);
+                userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "");
+                getShift.SetNoteShift(Info.startOfShift, form.NoteVal);
+
+                ClearAll();
+                EraseInfo();
+                ShowUserForm();
             }
+
+            Info.active = true;
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -557,7 +581,17 @@ namespace OrderManager
 
         private void button6_Click(object sender, EventArgs e)
         {
-            CancelShift();
+            if (Form1.Info.startOfShift == "")
+            {
+                Info.active = false;
+                ClearAll();
+                ShowUserForm();
+                Info.active = true;
+            }
+            else
+            {
+                CancelShift();
+            }
         }
 
         private void Form1_Shown(object sender, EventArgs e)
