@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -35,6 +36,43 @@ namespace OrderManager
             string password = "root";*/
 
             return DBMySQLUtils.GetDBConnection(host, port, database, username, password);
+        }
+
+        public bool IsServerConnected(string host, int port, string database, string username, string password)
+        {
+            using (MySqlConnection Connect = GetDBConnection(host, port, database, username, password))
+            {
+                try
+                {
+                    Connect.Open();
+                    Connect.Close();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+
+            }
+        }
+
+        public void SetDBParameter()
+        {
+            IniFile ini = new IniFile(Form1.connectionFile);
+
+            String section = ini.ReadString("selected", "general");
+
+            String host = "host";
+            String port = "port";
+            String database = "database";
+            String username = "username";
+            String password = "password";
+
+            Form1.BaseConnectionParameters.host = ini.ReadString(host, section);
+            Form1.BaseConnectionParameters.port = ini.ReadInt(port, section);
+            Form1.BaseConnectionParameters.database = ini.ReadString(database, section);
+            Form1.BaseConnectionParameters.username = ini.ReadString(username, section);
+            Form1.BaseConnectionParameters.password = ini.ReadString(password, section);
         }
     }
 }

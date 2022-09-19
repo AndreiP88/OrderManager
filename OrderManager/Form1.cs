@@ -14,6 +14,7 @@ namespace OrderManager
     public partial class Form1 : Form
     {
         bool adminMode = false;
+        String loadMode = "";
 
         public Form1(string[] args)
         {
@@ -23,8 +24,15 @@ namespace OrderManager
 
             if (args.Length > 0)
             {
-                if (args[0] == "adminMode")
+                if (args[0] == "adminMode" || args[0] == "-adminMode")
+                {
                     adminMode = true;
+                }
+                else
+                {
+                    loadMode = args[0].Replace("-", "");
+                }
+
             }
         }
 
@@ -35,7 +43,7 @@ namespace OrderManager
 
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
-        String connectionFile = "connections.ini";
+        public static String connectionFile = "connections.ini";
 
         public static class Info
         {
@@ -97,26 +105,15 @@ namespace OrderManager
             BaseConnectionParameters.username = ini.GetDBUsername();
             BaseConnectionParameters.password = ini.GetDBPassword();*/
 
-            IniFile ini = new IniFile(connectionFile);
+            DBConnection connection = new DBConnection();
 
-            String section = ini.ReadString("selected", "general");
-
-            String host = "host";
-            String port = "port";
-            String database = "database";
-            String username = "username";
-            String password = "password";
-
-            BaseConnectionParameters.host = ini.ReadString(host, section);
-            BaseConnectionParameters.port = ini.ReadInt(port, section);
-            BaseConnectionParameters.database = ini.ReadString(database, section);
-            BaseConnectionParameters.username = ini.ReadString(username, section);
-            BaseConnectionParameters.password = ini.ReadString(password, section);
+            connection.SetDBParameter();
 
             toolStripStatusLabel2.Text = BaseConnectionParameters.host;
             toolStripStatusLabel5.Text = BaseConnectionParameters.database;
 
-            if(!IsServerConnected())
+            if(!connection.IsServerConnected(BaseConnectionParameters.host, BaseConnectionParameters.port, BaseConnectionParameters.database, 
+                BaseConnectionParameters.username, BaseConnectionParameters.password))
             {
                 DataBaseSelect();
             }
@@ -126,7 +123,7 @@ namespace OrderManager
         {
             Info.active = false;
 
-            FormLoadUserForm form = new FormLoadUserForm();
+            FormLoadUserForm form = new FormLoadUserForm(loadMode);
             //this.Visible = false;
             form.ShowDialog();
 

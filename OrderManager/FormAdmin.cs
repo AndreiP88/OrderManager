@@ -123,6 +123,10 @@ namespace OrderManager
 
         private void LoadBaseInfo()
         {
+            DBConnection connection = new DBConnection();
+
+            connection.SetDBParameter();
+
             toolStripStatusLabel2.Text = Form1.BaseConnectionParameters.host;
             toolStripStatusLabel5.Text = Form1.BaseConnectionParameters.database;
         }
@@ -1342,6 +1346,19 @@ namespace OrderManager
                 }
             }
 
+            IniFile iniBase = new IniFile(Form1.connectionFile);
+
+            List<String> conections = new List<String>();
+            String[] sections = iniBase.GetAllSections();
+
+            for (int i = 0; i < sections.Length; i++)
+            {
+                if (sections[i].StartsWith("mysql"))
+                    conections.Add(sections[i].Substring(5));
+            }
+
+
+
             /*for (int i = 0; i < tableLayoutPanel1.Controls.Count; i++)
             {
                 MessageBox.Show(tableLayoutPanel1.Controls[i].Name);
@@ -1372,15 +1389,62 @@ namespace OrderManager
             tableLayoutPanelControl.Visible = true;
             tableLayoutPanel1.Controls.Add(tableLayoutPanelControl, 0, 2);
 
-            TableLayoutPanel tableLayoutPanelPath = new TableLayoutPanel();
-            tableLayoutPanelPath.Dock = DockStyle.Fill;
-            tableLayoutPanelPath.Name = "tableLayoutPanelPath";
-            tableLayoutPanelPath.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
-            tableLayoutPanelPath.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            tableLayoutPanelPath.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
-            tableLayoutPanelPath.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
-            tableLayoutPanelPath.RowCount = 1;
-            tableLayoutPanelPath.Visible = true;
+            TableLayoutPanel tableLayoutPanelBase = new TableLayoutPanel();
+            tableLayoutPanelBase.Dock = DockStyle.Fill;
+            tableLayoutPanelBase.Name = "tableLayoutPanelBase";
+            tableLayoutPanelBase.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
+            tableLayoutPanelBase.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55));
+            tableLayoutPanelBase.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
+            tableLayoutPanelBase.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
+            tableLayoutPanelBase.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+            tableLayoutPanelBase.RowStyles.Add(new RowStyle(SizeType.Absolute, 28));
+            tableLayoutPanelBase.RowCount = 1;
+            tableLayoutPanelBase.Visible = true;
+
+            ComboBox comboBoxBase = new ComboBox();
+            comboBoxBase.Name = "comboBoxBase";
+            comboBoxBase.Dock = System.Windows.Forms.DockStyle.Fill;
+            comboBoxBase.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comboBoxBase.FormattingEnabled = true;
+            comboBoxBase.Location = new System.Drawing.Point(3, 3);
+            comboBoxBase.Size = new System.Drawing.Size(144, 21);
+            comboBoxBase.TabIndex = 1;
+            comboBoxBase.Items.AddRange(conections.ToArray());
+            comboBoxBase.SelectedIndex = selectedMonthLengthNorm;
+            //comboBoxBase.SelectedIndexChanged += new EventHandler(comboBoxBase_SelectedIndexChanged);
+
+            String currentConnection = iniBase.ReadString("selected", "general").Substring(5);
+
+            if (comboBoxBase.Items.Contains(currentConnection))
+                comboBoxBase.SelectedItem = currentConnection;
+            else
+                comboBoxBase.SelectedIndex = 0;
+
+            tableLayoutPanelBase.Controls.Add(comboBoxBase, 0, 0);
+
+            Button acceptButton = new Button();
+            acceptButton.Name = "acceptButton";
+            acceptButton.Dock = DockStyle.Fill;
+            acceptButton.Location = new System.Drawing.Point(0, 0);
+            acceptButton.Size = new System.Drawing.Size(144, 21);
+            acceptButton.TabIndex = 0;
+            acceptButton.Text = "Применить";
+            acceptButton.Visible = true;
+            tableLayoutPanelBase.Controls.Add(acceptButton, 1, 0);
+            acceptButton.Click += new System.EventHandler(acceptBaseButton_Click);
+
+            Button editButton = new Button();
+            editButton.Name = "editButton";
+            editButton.Dock = DockStyle.Fill;
+            editButton.Location = new System.Drawing.Point(0, 0);
+            editButton.Size = new System.Drawing.Size(144, 21);
+            editButton.TabIndex = 0;
+            editButton.Text = "Редактировать";
+            editButton.Visible = true;
+            tableLayoutPanelBase.Controls.Add(editButton, 2, 0);
+            editButton.Click += new System.EventHandler(editBaseButton_Click);
+
+            tableLayoutPanelBase.Controls.Add(CreateLabel("labelBase", "", ContentAlignment.MiddleLeft), 3, 0);
 
             /*TextBox textBox = new TextBox();
             textBox.Name = "textBoxDBPath";
@@ -1415,12 +1479,14 @@ namespace OrderManager
             checkBox.CheckedChanged += checkBox_CheckedChanged;
             tableLayoutPanelControl.Controls.Add(checkBox, 0, 0);
 
-            //Первая колонка
-            tableLayoutPanelControl.Controls.Add(tableLayoutPanelPath, 0, 1);
+            
 
             EnabledPathControls(checkBox.Checked);
             */
 
+
+            //Первая колонка
+            tableLayoutPanelControl.Controls.Add(tableLayoutPanelBase, 0, 0);
 
             //Вторая колонка
             String countOrders = String.Format("{0,-35}{1,-25:f4}", "Всего заказов в базе:", getOrders.GetCountOrders().ToString("N0"));
@@ -2952,6 +3018,72 @@ namespace OrderManager
             //Show ContextMenuStrip here. Or just for example:
             //MessageBox.Show(((ListView)sender).Groups[e].Header);
             //MessageBox.Show(e.ToString());
+        }
+
+        private void acceptBaseButton_Click(object sender, EventArgs e)
+        {
+            ComboBox comboBoxBase = null;
+
+            var name = "tableLayoutPanelControl";
+            if (tableLayoutPanel1.Controls.ContainsKey(name))
+            {
+                var control = tableLayoutPanel1.Controls.Find(name, false);
+                TableLayoutPanel panel = (TableLayoutPanel)control[0];
+
+                var subControl = panel.Controls.Find("tableLayoutPanelBase", false);
+                var comboBox = subControl[0].Controls.Find("comboBoxBase", false);
+
+                comboBoxBase = (ComboBox)comboBox[0];
+            }
+
+            DBConnection connection = new DBConnection();
+
+            IniFile ini = new IniFile(Form1.connectionFile);
+
+            String section = "mysql" + comboBoxBase.Text;
+
+            string host = "";
+            int port = 0;
+            string database = "";
+            string username = "";
+            string password = "";
+
+            if (ini.KeyExists("host", section))
+                host = ini.ReadString("host", section);
+
+            if (ini.KeyExists("port", section))
+                port = ini.ReadInt("port", section);
+
+            if (ini.KeyExists("database", section))
+                database = ini.ReadString("database", section);
+
+            if (ini.KeyExists("username", section))
+                username = ini.ReadString("username", section);
+
+            if (ini.KeyExists("password", section))
+                password = ini.ReadString("password", section);
+
+            if (connection.IsServerConnected(host, port, database, username, password))
+            {
+                ini.Write("selected", section, "general");
+
+                LoadBaseInfo();
+
+                LoadPage(currentPage);
+            }
+            else
+            {
+                MessageBox.Show("Соединение не установлено!", "Ошибка", MessageBoxButtons.OK);
+            }
+        }
+
+        private void editBaseButton_Click(object sender, EventArgs e)
+        {
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL();
+            form.ShowDialog();
+            LoadBaseInfo();
+
+            LoadPage(currentPage);
         }
 
         private void addButton_Click(object sender, EventArgs e)

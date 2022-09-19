@@ -113,6 +113,22 @@ namespace OrderManager
             return userList;
         }
 
+        public List<String> GetUserListForCategory(bool activeUserOnly, String loadMode)
+        {
+            List<String> userList = new List<String>(GetUserList(activeUserOnly));
+            List<String> result = new List<String>();
+
+            for (int i = 0; i < userList.Count; i++)
+            {
+                if (CategoryForUser(userList[i], loadMode) || loadMode == "")
+                {
+                    result.Add(userList[i].ToString());
+                }
+            }
+
+            return result;
+        }
+
         public int GetCountUsers()
         {
             int result = 0;

@@ -31,11 +31,11 @@ namespace OrderManager
         bool edit = false;
         bool edited = false;
 
-        String connectionFile = "connections.ini";
+        
 
         String selectedItemForEdit = "";
 
-        public bool IsServerConnected()
+        /*public bool IsServerConnected()
         {
             string host = textBox1.Text;
             int port = Convert.ToInt32(textBox2.Text);
@@ -57,7 +57,7 @@ namespace OrderManager
                 }
 
             }
-        }
+        }*/
 
         private void EnabledTextBoxes(bool enabled)
         {
@@ -70,7 +70,7 @@ namespace OrderManager
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            IniFile ini = new IniFile(connectionFile);
+            IniFile ini = new IniFile(Form1.connectionFile);
 
             if (comboBox1.SelectedIndex == 0)
             {
@@ -127,7 +127,7 @@ namespace OrderManager
 
         private void LoadSelected(String section)
         {
-            IniFile ini = new IniFile(connectionFile);
+            IniFile ini = new IniFile(Form1.connectionFile);
 
             Clear();
 
@@ -174,7 +174,7 @@ namespace OrderManager
         {
             comboBox1.Items.Clear();
 
-            IniFile ini = new IniFile(connectionFile);
+            IniFile ini = new IniFile(Form1.connectionFile);
 
             List<String> conections = new List<String>();
             String[] sections = ini.GetAllSections();
@@ -260,7 +260,15 @@ namespace OrderManager
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (IsServerConnected())
+            DBConnection connection = new DBConnection();
+
+            string host = textBox1.Text;
+            int port = Convert.ToInt32(textBox2.Text);
+            string database = textBox3.Text;
+            string username = textBox4.Text;
+            string password = textBox5.Text;
+
+            if (connection.IsServerConnected(host, port, database, username, password))
             {
                 IniFile ini = new IniFile(connectionFile);
 

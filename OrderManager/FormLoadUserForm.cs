@@ -7,14 +7,14 @@ namespace OrderManager
 {
     public partial class FormLoadUserForm : Form
     {
-
-        String passKey = "key";
-
         public static bool enteredPasswordSuccess = false;
 
-        public FormLoadUserForm()
+        String loadMode = "";
+
+        public FormLoadUserForm(String loadMode)
         {
             InitializeComponent();
+            this.loadMode = loadMode;   
         }
 
         private void LoadUserForm_Load(object sender, EventArgs e)
@@ -27,7 +27,8 @@ namespace OrderManager
             ValueInfoBase getMachine = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
 
-            List<String> users = userBase.GetUserList(true);
+            //List<String> users = userBase.GetUserList(true);
+            List<String> users = userBase.GetUserListForCategory(true, loadMode);
 
             int counter = 0;
 
