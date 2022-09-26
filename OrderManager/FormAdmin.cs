@@ -1410,7 +1410,6 @@ namespace OrderManager
             comboBoxBase.Size = new System.Drawing.Size(144, 21);
             comboBoxBase.TabIndex = 1;
             comboBoxBase.Items.AddRange(conections.ToArray());
-            comboBoxBase.SelectedIndex = selectedMonthLengthNorm;
             //comboBoxBase.SelectedIndexChanged += new EventHandler(comboBoxBase_SelectedIndexChanged);
 
             String currentConnection = iniBase.ReadString("selected", "general").Substring(5);

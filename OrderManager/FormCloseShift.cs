@@ -7,7 +7,7 @@ namespace OrderManager
 {
     public partial class FormCloseShift : Form
     {
-        String loadStartOfShift;
+        String loadStartOfShift = "";
 
         public FormCloseShift()
         {
@@ -18,6 +18,19 @@ namespace OrderManager
             InitializeComponent();
 
             this.loadStartOfShift = lStartOfShift;
+
+            this.Text = "Комментарий";
+
+            label1.Text = "";
+
+            //textBox1.Enabled = false;
+            textBox1.ReadOnly = true;
+
+            button1.Enabled = false;
+            button1.Text = "Сохранить";
+
+            LoadNote(loadStartOfShift);
+
         }
 
         private bool closeShiftVal;
@@ -48,16 +61,13 @@ namespace OrderManager
 
 
 
-        private void LoadNote()
+        private void LoadNote(String shiftStart)
         {
-            GetOrdersFromBase getOrder = new GetOrdersFromBase();
-            String pNote = "";
-            textBox1.Text = pNote;
-        }
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-        private void SaveNote()
-        {
-            String pNote = textBox1.Text;
+            String pNote = shiftsBase.GetNoteShift(shiftStart);
+
+            textBox1.Text = pNote;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -81,7 +91,13 @@ namespace OrderManager
 
         private void FormPrivateNote_Load(object sender, EventArgs e)
         {
-            LoadNote();
+            //LoadNote(loadStartOfShift);
+        }
+
+        private void textBox1_DoubleClick(object sender, EventArgs e)
+        {
+            textBox1.ReadOnly = false;
+            button1.Enabled = true;
         }
     }
 }

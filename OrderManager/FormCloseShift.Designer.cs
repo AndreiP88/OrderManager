@@ -110,6 +110,7 @@
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(478, 47);
             this.textBox1.TabIndex = 8;
+            this.textBox1.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
             // 
             // label1
             // 

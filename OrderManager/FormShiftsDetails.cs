@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -265,10 +266,40 @@ namespace OrderManager
             }
         }
 
+        private void UpdateNote(String timeStartShift)
+        {
+            ValueShiftsBase valueShifts = new ValueShiftsBase();
+
+            int index = listView1.Items.IndexOfKey(timeStartShift);
+
+            ListViewItem item = listView1.Items[index];
+            if (item != null)
+            {
+                item.SubItems[8].Text = valueShifts.GetNoteShift(timeStartShift);
+            }
+        }
+
         private void LoadShiftdetails(String timeStartShift)
         {
             FormOneShiftDetails form = new FormOneShiftDetails(adminMode, timeStartShift);
             form.ShowDialog();
+        }
+
+        private void LoadShiftNote(String timeStartShift)
+        {
+            FormCloseShift form = new FormCloseShift(timeStartShift);
+            form.ShowDialog();
+
+            bool result = form.ShiftVal;
+
+            if (result)
+            {
+                ValueShiftsBase getShift = new ValueShiftsBase();
+
+                getShift.SetNoteShift(timeStartShift, form.NoteVal);
+
+                UpdateNote(timeStartShift);
+            }
         }
 
         private void FormShiftsDetails_Load(object sender, EventArgs e)
@@ -308,5 +339,27 @@ namespace OrderManager
         {
             SaveParameterToBase("shiftsForm");
         }
+
+        private void detailsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count != 0)
+            {
+                LoadShiftdetails(listView1.SelectedItems[0].Name);
+            }
+        }
+
+        private void noteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count != 0)
+            {
+                LoadShiftNote(listView1.SelectedItems[0].Name);
+            }
+        }
+
+        private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = listView1.SelectedItems.Count == 0;
+        }
+
     }
 }
