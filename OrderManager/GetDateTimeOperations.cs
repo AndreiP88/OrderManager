@@ -139,26 +139,30 @@ namespace OrderManager
 
         public String DateDifferent(String firstDate, String secondDate)
         {
+            int coorection = 0;
+
             TimeSpan totalTime = TimeSpan.Zero;
 
             DateTime firstD = StringToDateTime(firstDate);
             DateTime secondD = StringToDateTime(secondDate);
 
             if (firstD > secondD)
-                totalTime = firstD.Subtract(secondD.AddMinutes(-1));
+                totalTime = firstD.Subtract(secondD.AddMinutes(coorection));
 
             return TimeToSting(totalTime);
         }
 
         public int DateDifferentToMinutes(String firstDate, String secondDate)
         {
+            int coorection = 0;
+
             TimeSpan totalTime = TimeSpan.Zero;
 
             DateTime firstD = StringToDateTime(firstDate);
             DateTime secondD = StringToDateTime(secondDate);
 
             if (firstD > secondD)
-                totalTime = firstD.Subtract(secondD.AddMinutes(-1));
+                totalTime = firstD.Subtract(secondD.AddMinutes(coorection));
 
             return TotalHoursToMinutesTS(totalTime);
         }
