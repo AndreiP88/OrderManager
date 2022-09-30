@@ -24,13 +24,15 @@ namespace OrderManager
 
             if (args.Length > 0)
             {
-                if (args[0] == "adminMode" || args[0] == "-adminMode")
+                string param = args[0].Replace("-", "");
+
+                if (param == "adminMode")
                 {
                     adminMode = true;
                 }
                 else
                 {
-                    loadMode = args[0].Replace("-", "");
+                    loadMode = param;
                 }
 
             }
