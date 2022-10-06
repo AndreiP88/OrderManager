@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 
@@ -155,6 +156,33 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+        }
+
+        private List<string> GetValueFromStampNumber(String machine, String orderStamp, String nameOfColomn)
+        {
+            List<string> result = new List<string>();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND orderStamp = @orderStamp"
+                };
+                Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@orderStamp", orderStamp);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result.Add(sqlReader[nameOfColomn].ToString());
+                }
+
+                Connect.Close();
+            }
+
+            return result;
         }
     }
 }

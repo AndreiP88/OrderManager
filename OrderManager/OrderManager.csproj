@@ -16,6 +16,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>D:\Programms\Order Manager\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -31,7 +32,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -115,6 +116,12 @@
     </Compile>
     <Compile Include="FormAddEditUser.Designer.cs">
       <DependentUpon>FormAddEditUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormAddTimeMkWork.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddTimeMkWork.Designer.cs">
+      <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
     </Compile>
     <Compile Include="FormLoadUserPasswordForm.cs">
       <SubType>Form</SubType>
@@ -250,6 +257,9 @@
     <EmbeddedResource Include="FormAllOrders.resx">
       <DependentUpon>FormAllOrders.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormAddTimeMkWork.resx">
+      <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormLoadUserPasswordForm.resx">
       <DependentUpon>FormLoadUserPasswordForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -315,6 +325,11 @@
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.7.2 %28x86 и x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 и x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

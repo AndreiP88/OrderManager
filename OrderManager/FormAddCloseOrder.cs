@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Globalization;
+using System.Linq.Expressions;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -399,6 +401,7 @@ namespace OrderManager
                 numericUpDown8.Enabled = true;
                 textBox2.Enabled = true;
                 textBox5.Enabled = true;
+                button5.Enabled = true;
             }
             else
             {
@@ -411,6 +414,7 @@ namespace OrderManager
                 numericUpDown8.Enabled = false;
                 textBox2.Enabled = false;
                 textBox5.Enabled = false;
+                button5.Enabled = false;
             }
 
             if (adminCloseOrder)
@@ -1287,6 +1291,24 @@ namespace OrderManager
 
         }
 
+        private void SetNewValue(decimal amountOrder, string stampOrder, int makereadyOrder, int workOrder)
+        {
+            numericUpDown1.Value = amountOrder;
+            textBox2.Text = stampOrder;
+
+            int makereadyH = makereadyOrder / 60;
+            int makereadyM = makereadyOrder % 60;
+
+            int workH = workOrder / 60;
+            int workM = workOrder % 60;
+
+            numericUpDown5.Value = makereadyH;
+            numericUpDown6.Value = makereadyM;
+
+            numericUpDown7.Value = workH;
+            numericUpDown8.Value = workM;
+        }
+
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (loadOrderNumber == "")
@@ -1584,6 +1606,22 @@ namespace OrderManager
 
             if (textBox4.Visible)
                 textBox4.Text = timeOperations.DateDifferent(dateTimePicker4.Text, dateTimePicker3.Text);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            ValueInfoBase valueInfoBase = new ValueInfoBase();
+
+            string machine = valueInfoBase.GetMachineFromName(comboBox3.Text);
+
+            FormAddTimeMkWork fm = new FormAddTimeMkWork(machine, numericUpDown1.Value, textBox2.Text);
+            fm.ShowDialog();
+
+            if(fm.NewValue)
+            {
+                SetNewValue(fm.ValAmount, fm.ValStamp, fm.ValMakeready, fm.ValWork);
+            }
+            
         }
     }
 
