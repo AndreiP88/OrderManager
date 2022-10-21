@@ -176,6 +176,15 @@ namespace OrderManager
             Info.active = true;
         }
 
+        private void ShowNormForm()
+        {
+            Info.active = false;
+            FormNormOrders form = new FormNormOrders();
+            form.ShowDialog();
+
+            Info.active = true;
+        }
+
         private void ShowSetUserForm()
         {
             FormUserProfile form = new FormUserProfile(Form1.Info.nameOfExecutor);
@@ -974,6 +983,11 @@ namespace OrderManager
         private void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DataBaseSelect();
+        }
+
+        private void normToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowNormForm();
         }
     }
 }

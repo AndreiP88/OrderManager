@@ -94,6 +94,7 @@ namespace OrderManager
             this.shiftsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.machinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.paramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.viewAllOrdersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,7 +110,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -825,6 +825,13 @@ namespace OrderManager
             this.paramToolStripMenuItem.Text = "Параметры";
             this.paramToolStripMenuItem.Click += new System.EventHandler(this.параметрыToolStripMenuItem_Click);
             // 
+            // базаДанныхToolStripMenuItem
+            // 
+            this.базаДанныхToolStripMenuItem.Name = "базаДанныхToolStripMenuItem";
+            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.базаДанныхToolStripMenuItem.Text = "База данных";
+            this.базаДанныхToolStripMenuItem.Click += new System.EventHandler(this.базаДанныхToolStripMenuItem_Click);
+            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -865,7 +872,7 @@ namespace OrderManager
             this.normToolStripMenuItem.Name = "normToolStripMenuItem";
             this.normToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.normToolStripMenuItem.Text = "Нормы";
-            this.normToolStripMenuItem.Visible = false;
+            this.normToolStripMenuItem.Click += new System.EventHandler(this.normToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton3
             // 
@@ -944,13 +951,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // базаДанныхToolStripMenuItem
-            // 
-            this.базаДанныхToolStripMenuItem.Name = "базаДанныхToolStripMenuItem";
-            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.базаДанныхToolStripMenuItem.Text = "База данных";
-            this.базаДанныхToolStripMenuItem.Click += new System.EventHandler(this.базаДанныхToolStripMenuItem_Click);
             // 
             // Form1
             // 

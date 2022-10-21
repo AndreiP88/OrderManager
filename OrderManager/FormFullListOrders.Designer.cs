@@ -154,7 +154,7 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 67.60564F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32.39437F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 686F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 687F));
             this.tableLayoutPanel2.Controls.Add(this.comboBox2, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.comboBox3, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.comboBox1, 0, 0);
@@ -262,7 +262,7 @@
             this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label4.Location = new System.Drawing.Point(273, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(198, 24);
+            this.label4.Size = new System.Drawing.Size(197, 24);
             this.label4.TabIndex = 7;
             this.label4.Text = "Выполнено заказов:";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -273,7 +273,7 @@
             this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label5.Location = new System.Drawing.Point(273, 24);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(198, 24);
+            this.label5.Size = new System.Drawing.Size(197, 24);
             this.label5.TabIndex = 8;
             this.label5.Text = "Сумма выполненной продукции:";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -284,7 +284,7 @@
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label6.Location = new System.Drawing.Point(273, 48);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(198, 26);
+            this.label6.Size = new System.Drawing.Size(197, 26);
             this.label6.TabIndex = 9;
             this.label6.Text = "Фильтр по номеру заказа:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -293,7 +293,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label7.Location = new System.Drawing.Point(477, 0);
+            this.label7.Location = new System.Drawing.Point(476, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(91, 24);
             this.label7.TabIndex = 10;
@@ -304,7 +304,7 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label8.Location = new System.Drawing.Point(477, 24);
+            this.label8.Location = new System.Drawing.Point(476, 24);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(91, 24);
             this.label8.TabIndex = 11;
@@ -314,7 +314,7 @@
             // textBox1
             // 
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(477, 51);
+            this.textBox1.Location = new System.Drawing.Point(476, 51);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(91, 20);
             this.textBox1.TabIndex = 12;

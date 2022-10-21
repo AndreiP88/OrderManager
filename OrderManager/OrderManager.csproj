@@ -123,6 +123,12 @@
     <Compile Include="FormAddTimeMkWork.Designer.cs">
       <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormNormOrders.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormNormOrders.Designer.cs">
+      <DependentUpon>FormNormOrders.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormLoadUserPasswordForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -259,6 +265,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormAddTimeMkWork.resx">
       <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormNormOrders.resx">
+      <DependentUpon>FormNormOrders.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormLoadUserPasswordForm.resx">
       <DependentUpon>FormLoadUserPasswordForm.cs</DependentUpon>
