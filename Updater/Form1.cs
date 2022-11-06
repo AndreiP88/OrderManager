@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Deployment.Application;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
@@ -55,8 +57,14 @@ namespace Updater
             try
             {
                 downloader.DownloadFile(link, path);
-                downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
-                downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
+                Invoke(new Action(() =>
+                {
+                    downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
+                    downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
+
+                }));
+                /*downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
+                downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;*/
             }
             catch
             {
@@ -86,9 +94,11 @@ namespace Updater
 
             string fileCL = "changlog.txt";
 
-            Download("https://drive.google.com/uc?export=download&id=1YYbr30wiiSSwETsH8GIPFulWpebS6LeM", path + "\\" + fileCL);
+            StartDownload("https://drive.google.com/uc?export=download&id=1YYbr30wiiSSwETsH8GIPFulWpebS6LeM", path + "\\" + fileCL);
 
             textBox1.Text = File.ReadAllText(path + "\\" + fileCL, Encoding.Unicode);
+
+            textBox1.DeselectAll();
         }
 
         private void CloseApp(string appName)
@@ -98,6 +108,8 @@ namespace Updater
             {
                 Target.Kill();
             }
+
+            Thread.Sleep(150);
 
             if (myProcList.Length != 0)
                 openApplication = true;
@@ -132,7 +144,8 @@ namespace Updater
 
         private void CopyFile (string source, string dest)
         {
-            File.Copy(source, dest, true);
+            if (File.Exists(source))
+                File.Copy(source, dest, true);
         }
 
         private void button2_Click(object sender, EventArgs e)

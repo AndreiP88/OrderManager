@@ -25,53 +25,63 @@ namespace OrderManager
         {
             IniFile INI = new IniFile(_settingsFile);
 
-            if (INI.KeyExists(key))
+            //if (INI.KeyExists(key))
                 INI.Write(key, value, section);
 
             //MessageBox.Show("SET: [" + section + "][" + key + "]: " + value);
         }
 
-        public String GetDBHost()
+        public bool GetAutoUpdate()
         {
-            String result = GetParameter("mysqlbase", "host");
+            bool result = false;
+            result = Convert.ToBoolean(GetParameter("update", "autoUpdate"));
 
             return result;
         }
 
-        public String GetDBPort()
+        public String GetLastDateVersion()
         {
-            String result = GetParameter("mysqlbase", "port");
+            String result = GetParameter("update", "lastDateVersion");
 
             return result;
         }
 
-        public String GetDBDatabase()
+        public String GetLastUpdateTime()
         {
-            String result = GetParameter("mysqlbase", "database");
+            String result = GetParameter("update", "lastUpdateTime");
 
             return result;
         }
 
-        public String GetDBUsername()
+        public String GetPeriodUpdate()
         {
-            String result = GetParameter("mysqlbase", "username");
+            String result = GetParameter("update", "periodUpdate");
 
             return result;
         }
 
-        public String GetDBPassword()
-        {
-            String result = GetParameter("mysqlbase", "password");
 
-            return result;
+        public void SetAutoUpdate(bool value)
+        {
+            SetParameter("update", "autoUpdate", value.ToString());
         }
 
-        public bool GetCheckDBLocalPath()
+        public void SetLastDateVersion(String value)
         {
-            bool result = Convert.ToBoolean(GetParameter("general", "LocalFile"));
-
-            return result;
+            SetParameter("update", "lastDateVersion", value);
         }
+
+        public void SetLastUpdateTime(String value)
+        {
+            SetParameter("update", "lastUpdateTime", value);
+        }
+
+        public void SetPeriodUpdate(String value)
+        {
+            SetParameter("update", "periodUpdate", value);
+        }
+
+
 
         public String GetSelectedMonthLengthNorm()
         {
@@ -192,17 +202,6 @@ namespace OrderManager
 
             return result;
         }
-
-        public void SetCheckDBLocalPath(bool value)
-        {
-            SetParameter("general", "LocalFile", value.ToString());
-        }
-
-        public void SetPath(String path)
-        {
-            SetParameter("general", "Path", path.ToString());
-        }
-
         public void SetColumnHeadersMain(String value)
         {
             SetParameter("colomns", "columnHeadersMain", value);

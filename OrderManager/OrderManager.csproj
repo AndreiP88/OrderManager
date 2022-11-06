@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="DBConnection.cs" />
     <Compile Include="DBMySQLUtils.cs" />
+    <Compile Include="FileDownloader.cs" />
     <Compile Include="FormAddEditMachine.cs">
       <SubType>Form</SubType>
     </Compile>

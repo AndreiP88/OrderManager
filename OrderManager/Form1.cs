@@ -2,11 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.LinkLabel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using File = System.IO.File;
 using ToolTip = System.Windows.Forms.ToolTip;
 
 namespace OrderManager
@@ -275,6 +281,97 @@ namespace OrderManager
             Info.startOfShift = getUser.GetCurrentShiftStart(Info.nameOfExecutor);
 
             this.Text = "Менеджер заказов - " + getUser.GetNameUser(Info.nameOfExecutor);
+        }
+
+        private void CreateFolder()
+        {
+            string path = @"TempDownload";
+            if (!Directory.Exists(path))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(path);
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden | FileAttributes.System;
+            }
+        }
+
+        private void StartCheckUpdate()
+        {
+            //MessageBox.Show("Запуск");
+
+            CreateFolder();
+
+            string pathTemp = @"TempDownload";
+
+            string fileTemp = "changlog.txt";
+
+            string link = "https://drive.google.com/uc?export=download&id=1YYbr30wiiSSwETsH8GIPFulWpebS6LeM";
+
+            //cancelTokenSource = new CancellationTokenSource();
+
+            var task = Task.Run(() => CheckUpdate(link, pathTemp + "\\" + fileTemp));
+
+            //task.Wait();
+
+            //CheckUpdate(link, pathTemp + "\\" + fileTemp);
+
+            /*CancellationToken token = cancelTokenSource.Token;
+
+            Task task = new Task(() => LoadDetailsMount(token));
+
+            task.Start();*/
+        }
+
+        private void CheckUpdate(string link, string path)
+        {
+            FileDownloader downloader = new FileDownloader();
+            INISettings ini = new INISettings();
+
+            string[] chLog = null;
+
+            DateTime lastDateV = DateTime.Now;
+            DateTime currentDateV = DateTime.Now;
+
+            string lastDateVersion = ini.GetLastDateVersion();
+            string currentDateVersion = "";
+
+            try
+            {
+                downloader.DownloadFile(link, path);
+                //downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
+                //downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
+
+                chLog = File.ReadAllLines(path, Encoding.Unicode);
+                currentDateVersion = chLog[0];
+
+                if (currentDateVersion != "")
+                    currentDateV = Convert.ToDateTime(currentDateVersion);
+
+                
+
+                if (lastDateVersion != "")
+                {
+                    lastDateV = Convert.ToDateTime(lastDateVersion);
+
+                    if (currentDateV > lastDateV)
+                    {
+                        Process.Start("Updater.exe");
+                    }
+                }
+                else
+                {
+                    Process.Start("Updater.exe");
+                }
+
+            }
+            catch
+            {
+                MessageBox.Show("Ошибка подключения", "Ошибка", MessageBoxButtons.OK);
+            }
+
+            Invoke(new Action(() =>
+            {
+                //MessageBox.Show(currentDateV.ToString() + " " + lastDateV.ToString());
+
+            }));
         }
 
         private void AddOrdersToListViewFromList()
@@ -604,6 +701,8 @@ namespace OrderManager
 
         private void Form1_Shown(object sender, EventArgs e)
         {
+            StartCheckUpdate();
+
             if (!adminMode)
             {
                 Info.active = false;
@@ -647,6 +746,8 @@ namespace OrderManager
         {
             LoadBaseConnectionParameters();
             LoadParametersFromBase("mainForm");
+
+            
 
             //LoadUser();
             //LoadParametersForTheSelectedUserFromBase(Form1.Info.mashine);

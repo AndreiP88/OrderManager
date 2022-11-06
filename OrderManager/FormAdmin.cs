@@ -366,26 +366,7 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void ShowSelectFile()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            INISettings ini = new INISettings();
-
-            String path = "";
-
-            openFileDialog.Filter = "Файл базы данных *.db|*.db";
-
-            openFileDialog.Multiselect = false;
-            openFileDialog.Title = "Открыть базу данных";
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                path = openFileDialog.FileName;
-
-                ini.SetPath(path);
-            }
-
-        }
+        
 
         private void DeleteUser(String id)
         {
@@ -2927,7 +2908,7 @@ namespace OrderManager
                 case 8:
                     break;
                 case 9:
-                    ini.SetCheckDBLocalPath(checkBox.Checked);
+                    //ini.SetCheckDBLocalPath(checkBox.Checked);
 
                     EnabledPathControls(checkBox.Checked);
                     break;
@@ -3122,7 +3103,7 @@ namespace OrderManager
                     //LoadUsersFromBase();
                     break;
                 case 9:
-                    ShowSelectFile();
+                    //ShowSelectFile();
 
                     break;
 
