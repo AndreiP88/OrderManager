@@ -421,6 +421,8 @@ namespace OrderManager
                 fullDone += ordersCurrentShift[index].done;
             }
 
+            LoadSelectedMachines();
+
             /*if (listView1.Items.Count > 0)
             {
                 if (Info.indexItem >= 0)
@@ -429,6 +431,35 @@ namespace OrderManager
                     listView1.Items[listView1.Items.Count - 1].Selected = true;
             }*/
             //listView1.Items[0].Selected = false;
+        }
+
+        private void LoadSelectedMachines()
+        {
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            List<String> machines = (List<String>)infoBase.GetMachines(Form1.Info.nameOfExecutor);
+
+            comboBox1.Items.Clear();
+
+            for (int i = 0; i < machines.Count; i++)
+            {
+                comboBox1.Items.Add(infoBase.GetMachineName(machines[i]));
+            }
+
+            if (comboBox1.Items.Count > 0)
+                comboBox1.SelectedIndex = 0;
+
+            if (comboBox1.Items.Count == 1)
+            {
+                tableLayoutPanel5.ColumnStyles[0].Width = 0;
+                comboBox1.Visible = false;
+            }
+            else
+            {
+                comboBox1.Visible = true;
+                tableLayoutPanel5.ColumnStyles[0].Width = 140;
+            }
+                
         }
 
         private void LoadDetailsMount(CancellationToken token)
@@ -513,6 +544,8 @@ namespace OrderManager
             label21.Text = "";
             label22.Text = "";
             label23.Text = "";
+
+            ClearCurrentOrderDetails();
         }
 
         private void ViewDetailsForUser()
@@ -901,17 +934,12 @@ namespace OrderManager
             CancelShift();
         }
 
-        private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
+        private string[] GetWorkingOutTime(int idx)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase valueOrders = new ValueOrdersBase();
 
-            ToolTip tooltp = new ToolTip();
-
-            int idx = e.Item.Index;
-
             String status = valueOrders.GetOrderStatus(ordersCurrentShift[idx].machineOfOrder, ordersCurrentShift[idx].numberOfOrder, ordersCurrentShift[idx].modificationOfOrder);
-
 
             String fullLastTime = "00:00";
             String fullFactTime = "00:00";
@@ -921,146 +949,260 @@ namespace OrderManager
 
             String workingOutTime = "00:00";
 
+            String[] result = new String[4];
+
+            //output
             String timeDiff = "";
             String mkTimeDiff = "";
             String woTimeDiff = "";
-
             String plannedCountDone = "0";
 
-            //MessageBox.Show(e.Item.Name);
+            fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
+            fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
 
-            if (idx != -1 && e.Item != null)
+            mkLastTime = ordersCurrentShift[idx].plannedTimeMakeready;
+            mkFactTime = ordersCurrentShift[idx].facticalTimeMakeready;
+            workingOutTime = timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[idx].workingOut);
+
+            if (timeOperations.TimeDifferent(fullLastTime, fullFactTime) == "00:00")
             {
-                String message = "";
-                String statusStr = "";
+                timeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, fullLastTime);
+            }
+            else if (timeOperations.TimeDifferent(fullFactTime, fullLastTime) == "00:00")
+            {
+                timeDiff = timeOperations.TimeDifferent(fullLastTime, fullFactTime);
+            }
+            else
+            {
+                timeDiff = "00:00";
+            }
 
-                fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
-                fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
+            if (timeOperations.TimeDifferent(mkLastTime, mkFactTime) == "00:00")
+            {
+                mkTimeDiff = "-" + timeOperations.TimeDifferent(mkFactTime, mkLastTime);
+            }
+            else if (timeOperations.TimeDifferent(mkFactTime, mkLastTime) == "00:00")
+            {
+                mkTimeDiff = timeOperations.TimeDifferent(mkLastTime, mkFactTime);
+            }
+            else
+            {
+                mkTimeDiff = "00:00";
+            }
 
-                mkLastTime = ordersCurrentShift[idx].plannedTimeMakeready;
-                mkFactTime = ordersCurrentShift[idx].facticalTimeMakeready;
-                workingOutTime = timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[idx].workingOut);
+            if (timeOperations.TimeDifferent(workingOutTime, fullFactTime) == "00:00")
+            {
+                woTimeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, workingOutTime);
+            }
+            else if (timeOperations.TimeDifferent(fullFactTime, workingOutTime) == "00:00")
+            {
+                woTimeDiff = timeOperations.TimeDifferent(workingOutTime, fullFactTime);
+            }
+            else
+            {
+                woTimeDiff = "00:00";
+            }
 
-                if (timeOperations.TimeDifferent(fullLastTime, fullFactTime) == "00:00")
+            if (timeOperations.TimeDifferent(mkLastTime, fullFactTime) == "00:00")
+            {
+                //String diff = timeOperations.TimeDifferent(fullLastTime, mkLastTime);
+                int diff = timeOperations.TimeDifferentToMinutes(fullFactTime, mkLastTime);
+
+                plannedCountDone = (diff * ordersCurrentShift[idx].norm / 60).ToString("N0");
+            }
+            else
+            {
+                plannedCountDone = "0";
+            }
+
+            result[0] = timeDiff;
+            result[1] = mkTimeDiff;
+            result[2] = woTimeDiff;
+            result[3] = plannedCountDone;
+
+            return result;
+        }
+
+        private (string, string, string[], string[]) GetWorkingOutMessage(int idx)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            ValueOrdersBase valueOrders = new ValueOrdersBase();
+
+            String newLine = Environment.NewLine;
+
+            String message = "";
+            String statusStr = "";
+
+            String[] caption = { "", "", "", "" };
+            String[] strings = { "", "", "", "" };
+
+            String[] values = GetWorkingOutTime(idx);
+
+            String timeDiff = values[0];
+            String mkTimeDiff = values[1];
+            String woTimeDiff = values[2];
+            String plannedCountDone = values[3];
+
+            String status = valueOrders.GetOrderStatus(ordersCurrentShift[idx].machineOfOrder, ordersCurrentShift[idx].numberOfOrder, ordersCurrentShift[idx].modificationOfOrder);
+
+            if (status == "1" || status == "2")
+            {
+                String plannedTimeDone = timeOperations.DateAmount(DateTime.Now.ToString(), mkTimeDiff);
+                String plannedTimeDoneOrder = timeOperations.DateAmount(DateTime.Now.ToString(), timeDiff);
+
+                statusStr = "приладка заказа";
+
+                if (mkTimeDiff.Substring(0, 1) == "-")
                 {
-                    timeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, fullLastTime);
-                }
-                else if (timeOperations.TimeDifferent(fullFactTime, fullLastTime) == "00:00")
-                {
-                    timeDiff = timeOperations.TimeDifferent(fullLastTime, fullFactTime);
+                    caption[0] = "Отставание: ";
+                    strings[0] = mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
+                    //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
                 }
                 else
                 {
-                    timeDiff = "00:00";
+                    caption[0] = "Остаток времени на приладку: ";
+                    strings[0] = mkTimeDiff;
+                    //message = "Остаток времени на приладку: " + mkTimeDiff;
                 }
 
-                if (timeOperations.TimeDifferent(mkLastTime, mkFactTime) == "00:00")
+                caption[1] = "Остаток времени для выполнение заказа: ";
+                strings[1] = timeDiff;
+
+                caption[2] = "Планирумое время завершения приладки: ";
+                strings[2] = plannedTimeDone;
+
+                caption[3] = "Планирумое время завершения заказа: ";
+                strings[3] = plannedTimeDoneOrder;
+
+                message = caption[0] + strings[0] + newLine;
+                message += caption[1] + strings[1] + newLine;
+                message += caption[2] + strings[2] + newLine;
+                message += caption[3] + strings[3];
+            }
+
+            if (status == "3")
+            {
+                String plannedTimeDone = timeOperations.DateAmount(DateTime.Now.ToString(), timeDiff);
+
+                statusStr = "заказ выполняется";
+
+                if (timeDiff.Substring(0, 1) == "-")
                 {
-                    mkTimeDiff = "-" + timeOperations.TimeDifferent(mkFactTime, mkLastTime);
-                }
-                else if (timeOperations.TimeDifferent(mkFactTime, mkLastTime) == "00:00")
-                {
-                    mkTimeDiff = timeOperations.TimeDifferent(mkLastTime, mkFactTime);
+                    caption[0] = "Отставание: ";
+                    strings[0] = timeDiff.Substring(1, timeDiff.Length - 1);
+                    //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
                 }
                 else
                 {
-                    mkTimeDiff = "00:00";
+                    caption[0] = "Остаток времени: ";
+                    strings[0] = timeDiff;
+                    //message = "Остаток времени на приладку: " + mkTimeDiff;
                 }
 
-                if (timeOperations.TimeDifferent(workingOutTime, fullFactTime) == "00:00")
+                caption[1] = "Плановая выработка: ";
+                strings[1] = plannedCountDone;
+
+                caption[2] = "Планирумое время завершения: ";
+                strings[2] = plannedTimeDone;
+
+                message = caption[0] + strings[0] + newLine;
+                message += caption[1] + strings[1] + newLine;
+                message += caption[2] + strings[2];
+            }
+
+            if (status == "4")
+            {
+                statusStr = "заказ завершен";
+
+                if (woTimeDiff.Substring(0, 1) == "-")
                 {
-                    woTimeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, workingOutTime);
-                }
-                else if (timeOperations.TimeDifferent(fullFactTime, workingOutTime) == "00:00")
-                {
-                    woTimeDiff = timeOperations.TimeDifferent(workingOutTime, fullFactTime);
+                    caption[0] = "Отставание: ";
+                    strings[0] = woTimeDiff.Substring(1, woTimeDiff.Length - 1);
                 }
                 else
                 {
-                    woTimeDiff = "00:00";
+                    caption[0] = "Опережение: ";
+                    strings[0] = woTimeDiff;
                 }
 
-                if (timeOperations.TimeDifferent(mkLastTime, fullFactTime) == "00:00")
-                {
-                    //String diff = timeOperations.TimeDifferent(fullLastTime, mkLastTime);
-                    int diff = timeOperations.TimeDifferentToMinutes(fullFactTime, mkLastTime);
+                message = caption[0] + strings[0];
+            }
 
-                    plannedCountDone = (diff * ordersCurrentShift[idx].norm / 60).ToString("N0");
-                }
-                else
-                {
-                    plannedCountDone = "0";
-                }
-
-                if (status == "1" || status == "2")
-                {
-                    String plannedTimeDone = timeOperations.DateAmount(DateTime.Now.ToString(), mkTimeDiff);
-                    String plannedTimeDoneOrder = timeOperations.DateAmount(DateTime.Now.ToString(), timeDiff);
-
-                    statusStr = " - приладка заказа";
-
-                    if (mkTimeDiff.Substring(0, 1) == "-")
-                        message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-                    else
-                        message = "Остаток времени на приладку: " + mkTimeDiff;
-
-                    message += Environment.NewLine;
-
-                    message += "Остаток времени для выполнение заказа: " + timeDiff;
-
-                    message += Environment.NewLine;
-
-                    message += "Планирумое время завершения приладки: " + plannedTimeDone;
-
-                    message += Environment.NewLine;
-
-                    message += "Планирумое время завершения заказа: " + plannedTimeDoneOrder;
-                }
-
-                if (status == "3")
-                {
-                    String plannedTimeDone = timeOperations.DateAmount(DateTime.Now.ToString(), timeDiff);
-
-                    statusStr = " - заказ выполняется";
-
-                    if (timeDiff.Substring(0, 1) == "-")
-                        message = "Отставание: " + timeDiff.Substring(1, timeDiff.Length - 1);
-                    else
-                        message = "Остаток времени: " + timeDiff;
-
-                    message += Environment.NewLine;
-
-                    message += "Плановая выработка: " + plannedCountDone;
-
-                    message += Environment.NewLine;
-
-                    message += "Планирумое время завершения: " + plannedTimeDone;
-                }
-
-                if (status == "4")
-                {
-                    statusStr = " - заказ завершен";
-
-                    if (woTimeDiff.Substring(0, 1) == "-")
-                        message = "Отставание: " + woTimeDiff.Substring(1, woTimeDiff.Length - 1);
-                    else
-                        message = "Опережение: " + woTimeDiff;
-                }
-                /*else
+            /*else
                 {
                     statusStr = "";
                     message = "Оставшееся время: " + timeDiff;
                     message += Environment.NewLine;
                     message += "Сделать подсчёт времени завершения заказа, количества, которое должно быть сделано на текущий момент по норме";
                 }*/
-                
-                /*message += Environment.NewLine;
-                message += MousePosition.X + ", " + MousePosition.Y;
-                message += Environment.NewLine;
-                message += e.Item.Position.X + ", " + e.Item.Position.Y;*/
+
+            /*message += Environment.NewLine;
+            message += MousePosition.X + ", " + MousePosition.Y;
+            message += Environment.NewLine;
+            message += e.Item.Position.X + ", " + e.Item.Position.Y;*/
+
+
+            return (statusStr, message, caption, strings);
+        }
+
+        private void LoadCurrentOrderDetails(int idx)
+        {
+            ClearCurrentOrderDetails();
+
+            if (idx != -1)
+            {
+                string statusStr = GetWorkingOutMessage(idx).Item1;
+                string[] caption = GetWorkingOutMessage(idx).Item3;
+                string[] strings = GetWorkingOutMessage(idx).Item4;
+
+                label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
+                label26.Text = statusStr;
+
+                label25.Text = caption[0];
+                label27.Text = strings[0];
+
+                label28.Text = caption[1];
+                label30.Text = strings[1];
+
+                label29.Text = caption[2];
+                label31.Text = strings[2];
+            }
+            else
+            {
+                ClearCurrentOrderDetails();
+            }
+        }
+
+        private void ClearCurrentOrderDetails()
+        {
+            label24.Text = "";
+            label26.Text = "";
+
+            label25.Text = "";
+            label27.Text = "";
+
+            label28.Text = "";
+            label30.Text = "";
+
+            label29.Text = "";
+            label31.Text = "";
+        }
+
+        private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
+        {
+            ToolTip tooltp = new ToolTip();
+
+            tooltp.AutomaticDelay = 1500;
+
+            int idx = e.Item.Index;
+
+            if (idx != -1 && e.Item != null)
+            {
+                string statusStr = GetWorkingOutMessage(idx).Item1;
+                string message = GetWorkingOutMessage(idx).Item2;
 
                 tooltp.Active = true;
-                tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder + statusStr;
+                tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder + " - " + statusStr;
                 tooltp.SetToolTip(listView1, message);
             }
             else
@@ -1089,6 +1231,21 @@ namespace OrderManager
         private void normToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowNormForm();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int idx = -1;
+
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                if (listView1.Items[i].SubItems[1].Text == comboBox1.Text)
+                {
+                    idx = i;
+                }
+            }
+
+            LoadCurrentOrderDetails(idx);
         }
     }
 }
