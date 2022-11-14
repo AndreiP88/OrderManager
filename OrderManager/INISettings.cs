@@ -41,7 +41,7 @@ namespace OrderManager
 
         public String GetLastDateVersion()
         {
-            String result = GetParameter("update", "lastDateVersion");
+            String result = GetParameter("update", "lastVersion");
 
             return result;
         }

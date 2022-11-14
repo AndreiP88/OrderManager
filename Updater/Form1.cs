@@ -26,6 +26,7 @@ namespace Updater
         }
 
         bool openApplication = false;
+        string currentVersion = "";
 
         private void CreateFolder()
         {
@@ -88,6 +89,8 @@ namespace Updater
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            INISettings ini = new INISettings();
+
             CreateFolder();
 
             string path = @"TempDownload";
@@ -96,9 +99,24 @@ namespace Updater
 
             StartDownload("https://drive.google.com/uc?export=download&id=1YYbr30wiiSSwETsH8GIPFulWpebS6LeM", path + "\\" + fileCL);
 
-            textBox1.Text = File.ReadAllText(path + "\\" + fileCL, Encoding.Unicode);
+            string[] chLog = File.ReadAllLines(path + "\\" + fileCL, Encoding.Unicode);
+
+            currentVersion = chLog[0].Substring(7);
+            //MessageBox.Show(currentVersion);
+
+            textBox1.Lines = chLog;
+            //textBox1.Text = File.ReadAllText(path + "\\" + fileCL, Encoding.Unicode);
 
             textBox1.DeselectAll();
+
+            bool autoUpdate = Convert.ToBoolean(ini.GetAutoUpdate());
+
+            if (autoUpdate)
+            {
+                DownloadAPP();
+
+                Close();
+            }
         }
 
         private void CloseApp(string appName)
@@ -128,6 +146,8 @@ namespace Updater
 
         private void DownloadAPP()
         {
+            INISettings ini = new INISettings();
+
             string path = @"TempDownload";
 
             string fileAPP = "OrderManager.exe";
@@ -137,6 +157,8 @@ namespace Updater
             CloseApp(Path.GetFileNameWithoutExtension(fileAPP));
 
             CopyFile(path + "\\" + fileAPP, fileAPP);
+
+            ini.SetLastDateVersion(currentVersion);
 
             if (openApplication)
                 OpenApp(fileAPP);

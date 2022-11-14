@@ -341,8 +341,8 @@ namespace OrderManager
 
             string[] chLog = null;
 
-            DateTime lastDateV = DateTime.Now;
-            DateTime currentDateV = DateTime.Now;
+            int lastDateV = 0;
+            int currentDateV = 0;
 
             string lastDateVersion = ini.GetLastDateVersion();
             string currentDateVersion = "";
@@ -354,16 +354,14 @@ namespace OrderManager
                 //downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
 
                 chLog = File.ReadAllLines(path, Encoding.Unicode);
-                currentDateVersion = chLog[0];
+                currentDateVersion = chLog[0].Substring(7);
 
                 if (currentDateVersion != "")
-                    currentDateV = Convert.ToDateTime(currentDateVersion);
-
-                
+                    currentDateV = Convert.ToInt32(currentDateVersion);
 
                 if (lastDateVersion != "")
                 {
-                    lastDateV = Convert.ToDateTime(lastDateVersion);
+                    lastDateV = Convert.ToInt32(lastDateVersion);
 
                     if (currentDateV > lastDateV)
                     {
