@@ -286,7 +286,7 @@ namespace OrderManager
             return TimeToSting(tTime);
         }
 
-        private int totallTimeHHMMToMinutes(String tTimeHHMM)
+        public int totallTimeHHMMToMinutes(String tTimeHHMM)
         {
             int result = 0;
 

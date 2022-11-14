@@ -49,6 +49,10 @@ namespace OrderManager
         int fullTimeWorkingOut;
         int fullDone;
 
+        int selectedIndexActive = 0;
+        int selectedIndexWOut1 = 0;
+        int selectedIndexWOut2 = 0;
+
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
         public static String connectionFile = "connections.ini";
@@ -68,6 +72,16 @@ namespace OrderManager
             public static string database = "order_manager";
             public static string username = "oxyfox";
             public static string password = "root";
+        }
+
+        public static class OrderDetails
+        {
+            public static string caption1 = "";
+            public static string caption2 = "";
+            public static string caption3 = "";
+            public static string caption4 = "";
+
+
         }
 
         public bool IsServerConnected()
@@ -422,6 +436,7 @@ namespace OrderManager
             }
 
             LoadSelectedMachines();
+            LoadSelectedMachinesForPlannedWorkinout();
 
             /*if (listView1.Items.Count > 0)
             {
@@ -446,8 +461,13 @@ namespace OrderManager
                 comboBox1.Items.Add(infoBase.GetMachineName(machines[i]));
             }
 
-            if (comboBox1.Items.Count > 0)
-                comboBox1.SelectedIndex = 0;
+            if (machines.Count > 0)
+            {
+                if (comboBox1.Items.Count > 0 && comboBox1.Items.Count >= selectedIndexActive)
+                    comboBox1.SelectedIndex = selectedIndexActive;
+                else
+                    comboBox1.SelectedIndex = 0;
+            }
 
             if (comboBox1.Items.Count == 1)
             {
@@ -456,10 +476,88 @@ namespace OrderManager
             }
             else
             {
-                comboBox1.Visible = true;
                 tableLayoutPanel5.ColumnStyles[0].Width = 140;
+                comboBox1.Visible = true;
             }
                 
+        }
+
+        private void LoadSelectedMachinesForPlannedWorkinout()
+        {
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            List<String> machines = (List<String>)infoBase.GetMachines(Form1.Info.nameOfExecutor);
+
+            comboBox2.Items.Clear();
+            comboBox2.Items.Add("Общая выработка");
+
+            comboBox3.Items.Clear();
+
+            for (int i = 0; i < machines.Count; i++)
+            {
+                comboBox2.Items.Add(infoBase.GetMachineName(machines[i]));
+                comboBox3.Items.Add(infoBase.GetMachineName(machines[i]));
+            }
+
+            if (machines.Count > 0)
+            {
+                if (comboBox2.Items.Count > 0 && comboBox2.Items.Count >= selectedIndexWOut1)
+                    comboBox2.SelectedIndex = selectedIndexWOut1;
+                else
+                    comboBox2.SelectedIndex = 1;
+
+                if (comboBox3.Items.Count > 0 && comboBox3.Items.Count >= selectedIndexWOut2)
+                    comboBox3.SelectedIndex = selectedIndexWOut2;
+                else
+                    comboBox3.SelectedIndex = 0;
+            }
+
+            if (comboBox2.Items.Count <= 2)
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 0;
+                tableLayoutPanel7.ColumnStyles[1].Width = 0;
+                //comboBox2.Visible = false;
+            }
+            else
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 140;
+                //tableLayoutPanel7.ColumnStyles[1].Width = 140;
+                //comboBox2.Visible = true;
+            }
+
+            /*if (comboBox2.Items.Count <= 2)
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 0;
+                tableLayoutPanel7.ColumnStyles[1].Width = 0;
+                //comboBox2.Visible = false;
+            }
+            else
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 140;
+                tableLayoutPanel7.ColumnStyles[1].Width = 140;
+                //comboBox2.Visible = true;
+            }*/
+
+            /*if (comboBox2.Items.Count == 1)
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 0;
+                tableLayoutPanel7.ColumnStyles[1].Width = 0;
+                //comboBox2.Visible = false;
+            }
+            else if (comboBox2.Items.Count == 2)
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 140;
+                tableLayoutPanel7.ColumnStyles[1].Width = 140;
+                //comboBox2.Visible = true;
+            }
+            else if (comboBox2.Items.Count > 2)
+            {
+                tableLayoutPanel7.ColumnStyles[0].Width = 140;
+                tableLayoutPanel7.ColumnStyles[1].Width = 0;
+            }*/
+
+
+
         }
 
         private void LoadDetailsMount(CancellationToken token)
@@ -1186,6 +1284,11 @@ namespace OrderManager
 
             label29.Text = "";
             label31.Text = "";
+
+            label34.Text = "";
+            label35.Text = "";
+            label38.Text = "";
+            label39.Text = "";
         }
 
         private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
@@ -1233,19 +1336,172 @@ namespace OrderManager
             ShowNormForm();
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private int GetIDLastOrderFromSelectedMachine(string machineName)
         {
+            ValueInfoBase infoBase = new ValueInfoBase();
+
             int idx = -1;
 
-            for (int i = 0; i < listView1.Items.Count; i++)
+            for (int i = 0; i < ordersCurrentShift.Count; i++)
             {
-                if (listView1.Items[i].SubItems[1].Text == comboBox1.Text)
+                if (infoBase.GetMachineName(ordersCurrentShift[i].machineOfOrder) == machineName)
                 {
                     idx = i;
                 }
             }
 
+            return idx;
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int idx = GetIDLastOrderFromSelectedMachine(comboBox1.Text);
+
+            /*ValueInfoBase infoBase = new ValueInfoBase();
+
+            int idx = -1;
+
+            for (int i = 0; i < ordersCurrentShift.Count; i++)
+            {
+                if (infoBase.GetMachineFromName(ordersCurrentShift[i].machineOfOrder) == comboBox1.Text)
+                {
+                    idx = i;
+                }
+            }*/
+
+            /*for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                if (listView1.Items[i].SubItems[1].Text == comboBox1.Text)
+                {
+                    idx = i;
+                }
+            }*/
+
             LoadCurrentOrderDetails(idx);
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox2.SelectedIndex == 0)
+            {
+                tableLayoutPanel7.ColumnStyles[1].Width = 140;
+
+                //comboBox3.SelectedIndex = selectedIndexWOut2;
+            }
+            else
+            {
+                tableLayoutPanel7.ColumnStyles[1].Width = 0;
+
+                selectedIndexWOut2 = comboBox2.SelectedIndex - 1;
+            }
+
+            if (comboBox3.SelectedIndex == selectedIndexWOut2)
+            {
+                UpdateWorkingOut();
+            }
+            else
+            {
+                comboBox3.SelectedIndex = selectedIndexWOut2;
+            }
+
+            selectedIndexWOut1 = comboBox2.SelectedIndex;
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            selectedIndexWOut2 = comboBox3.SelectedIndex;
+
+            UpdateWorkingOut();
+        }
+
+        private void UpdateWorkingOut()
+        {
+            /*label34.Text = comboBox2.Text;
+            label35.Text = comboBox3.Text;*/
+
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            string[] captions = { "10:30", "11:00", "11:30", "12:00" };
+            string[] values = { "", "", "", "" };
+
+            string captionNotEnough = "Тиража не достаточно для выполнения минимальной нормы";
+            string captionMakeReady = "Выполняется приладка";
+
+            int wOut;
+            int norm;
+            int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox3.Text);
+            string machine = infoBase.GetMachineFromName(comboBox3.Text);
+
+            if (idLastOrder >= 0)
+            {
+                norm = ordersCurrentShift[idLastOrder].norm;
+
+                if (comboBox2.SelectedIndex == 0)
+                {
+                    wOut = fullTimeWorkingOut;
+                }
+                else
+                {
+                    wOut = GetWOutFromMachine(machine);
+                }
+
+                for (int i = 0; i < captions.Length; i++)
+                {
+                    int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
+
+                    if (targetTime > wOut)
+                    {
+                        int targetCount = (targetTime - wOut) * norm / 60;
+
+                        if (targetCount <= ordersCurrentShift[idLastOrder].amountOfOrder * 1.1)
+                        {
+                            values[i] = targetCount.ToString("N0");
+                        }
+                        else
+                        {
+                            values[i] = "н/д";
+                        }
+                    }
+                    else
+                    {
+                        values[i] = "выполнено";
+                    }
+                }
+            }
+            
+            label32.Text = captions[0] + ":";
+            label33.Text = captions[1] + ":";
+            label36.Text = captions[2] + ":";
+            label37.Text = captions[3] + ":";
+
+            label34.Text = values[0];
+            label35.Text = values[1];
+            label38.Text = values[2];
+            label39.Text = values[3];
+        }
+
+        private int GetWOutFromMachine(string machine)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            int wOut = 0;
+
+            for (int i = 0; i < ordersCurrentShift.Count; i++)
+            {
+                if (ordersCurrentShift[i].machineOfOrder == machine)
+                {
+                    int mkTime = timeOperations.totallTimeHHMMToMinutes(ordersCurrentShift[i].plannedTimeMakeready);
+                    //int Time = timeOperations.totallTimeHHMMToMinutes(ordersCurrentShift[i].plannedTimeWork);
+
+                    int wTime = ordersCurrentShift[i].done * 60 / ordersCurrentShift[i].norm;
+
+                    wOut += mkTime + wTime;
+                }
+                    
+            }
+
+            return wOut;
         }
     }
 }
