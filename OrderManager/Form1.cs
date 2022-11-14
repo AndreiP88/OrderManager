@@ -1421,6 +1421,7 @@ namespace OrderManager
 
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase infoBase = new ValueInfoBase();
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
 
             string[] captions = { "10:30", "11:00", "11:30", "12:00" };
             string[] values = { "", "", "", "" };
@@ -1435,37 +1436,40 @@ namespace OrderManager
 
             if (idLastOrder >= 0)
             {
-                norm = ordersCurrentShift[idLastOrder].norm;
-
-                if (comboBox2.SelectedIndex == 0)
+                if (ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder) == "3")
                 {
-                    wOut = fullTimeWorkingOut;
-                }
-                else
-                {
-                    wOut = GetWOutFromMachine(machine);
-                }
+                    norm = ordersCurrentShift[idLastOrder].norm;
 
-                for (int i = 0; i < captions.Length; i++)
-                {
-                    int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
-
-                    if (targetTime > wOut)
+                    if (comboBox2.SelectedIndex == 0)
                     {
-                        int targetCount = (targetTime - wOut) * norm / 60;
-
-                        if (targetCount <= ordersCurrentShift[idLastOrder].amountOfOrder * 1.1)
-                        {
-                            values[i] = targetCount.ToString("N0");
-                        }
-                        else
-                        {
-                            values[i] = "н/д";
-                        }
+                        wOut = fullTimeWorkingOut;
                     }
                     else
                     {
-                        values[i] = "выполнено";
+                        wOut = GetWOutFromMachine(machine);
+                    }
+
+                    for (int i = 0; i < captions.Length; i++)
+                    {
+                        int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
+
+                        if (targetTime > wOut)
+                        {
+                            int targetCount = (targetTime - wOut) * norm / 60;
+
+                            if (targetCount <= ordersCurrentShift[idLastOrder].amountOfOrder * 1.1)
+                            {
+                                values[i] = targetCount.ToString("N0");
+                            }
+                            else
+                            {
+                                values[i] = "н/д";
+                            }
+                        }
+                        else
+                        {
+                            values[i] = "выполнено";
+                        }
                     }
                 }
             }
