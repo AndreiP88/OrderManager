@@ -1307,6 +1307,7 @@ namespace OrderManager
 
             numericUpDown7.Value = workH;
             numericUpDown8.Value = workM;
+
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)

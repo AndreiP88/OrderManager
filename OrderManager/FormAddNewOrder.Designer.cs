@@ -51,6 +51,7 @@ namespace OrderManager
             this.label3 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.button2 = new System.Windows.Forms.Button();
             this.numericUpDown8 = new OrderManager.FormattedNumericUpDown();
             this.numericUpDown7 = new OrderManager.FormattedNumericUpDown();
             this.numericUpDown6 = new OrderManager.FormattedNumericUpDown();
@@ -110,9 +111,9 @@ namespace OrderManager
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(292, 104);
+            this.textBox2.Location = new System.Drawing.Point(94, 104);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(144, 20);
+            this.textBox2.Size = new System.Drawing.Size(92, 20);
             this.textBox2.TabIndex = 8;
             // 
             // label1
@@ -145,7 +146,7 @@ namespace OrderManager
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(91, 91);
+            this.label5.Location = new System.Drawing.Point(243, 91);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(57, 13);
             this.label5.TabIndex = 15;
@@ -154,7 +155,7 @@ namespace OrderManager
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(191, 91);
+            this.label6.Location = new System.Drawing.Point(343, 91);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(43, 13);
             this.label6.TabIndex = 16;
@@ -163,7 +164,7 @@ namespace OrderManager
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(289, 91);
+            this.label7.Location = new System.Drawing.Point(91, 91);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(41, 13);
             this.label7.TabIndex = 17;
@@ -171,6 +172,7 @@ namespace OrderManager
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.comboBox1);
             this.groupBox1.Controls.Add(this.label9);
             this.groupBox1.Controls.Add(this.label8);
@@ -210,7 +212,7 @@ namespace OrderManager
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Nirmala UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(233, 102);
+            this.label9.Location = new System.Drawing.Point(385, 102);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(12, 17);
             this.label9.TabIndex = 21;
@@ -220,7 +222,7 @@ namespace OrderManager
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Nirmala UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(133, 103);
+            this.label8.Location = new System.Drawing.Point(285, 103);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(12, 17);
             this.label8.TabIndex = 20;
@@ -256,10 +258,20 @@ namespace OrderManager
             // 
             this.timer1.Interval = 6000;
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(192, 104);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(46, 20);
+            this.button2.TabIndex = 23;
+            this.button2.Text = ">T<";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // numericUpDown8
             // 
             this.numericUpDown8.Format = "00";
-            this.numericUpDown8.Location = new System.Drawing.Point(245, 104);
+            this.numericUpDown8.Location = new System.Drawing.Point(397, 104);
             this.numericUpDown8.Maximum = new decimal(new int[] {
             60,
             0,
@@ -274,7 +286,7 @@ namespace OrderManager
             // numericUpDown7
             // 
             this.numericUpDown7.Format = "000";
-            this.numericUpDown7.Location = new System.Drawing.Point(194, 104);
+            this.numericUpDown7.Location = new System.Drawing.Point(346, 104);
             this.numericUpDown7.Maximum = new decimal(new int[] {
             999,
             0,
@@ -291,7 +303,7 @@ namespace OrderManager
             // numericUpDown6
             // 
             this.numericUpDown6.Format = "00";
-            this.numericUpDown6.Location = new System.Drawing.Point(145, 104);
+            this.numericUpDown6.Location = new System.Drawing.Point(297, 104);
             this.numericUpDown6.Maximum = new decimal(new int[] {
             60,
             0,
@@ -306,7 +318,7 @@ namespace OrderManager
             // numericUpDown5
             // 
             this.numericUpDown5.Format = "000";
-            this.numericUpDown5.Location = new System.Drawing.Point(94, 104);
+            this.numericUpDown5.Location = new System.Drawing.Point(246, 104);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             999,
             0,
@@ -370,5 +382,6 @@ namespace OrderManager
         private FormattedNumericUpDown numericUpDown6;
         private FormattedNumericUpDown numericUpDown5;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button button2;
     }
 }

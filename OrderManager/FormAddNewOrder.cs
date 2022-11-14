@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
@@ -407,6 +408,39 @@ namespace OrderManager
                 button1.Text = "Редактировать";
             }
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ValueInfoBase valueInfoBase = new ValueInfoBase();
+
+            string machine = valueInfoBase.GetMachineFromName(orderrMachineLoad);
+
+            FormAddTimeMkWork fm = new FormAddTimeMkWork(orderrMachineLoad, numericUpDown1.Value, textBox2.Text);
+            fm.ShowDialog();
+
+            if (fm.NewValue)
+            {
+                SetNewValue(fm.ValAmount, fm.ValStamp, fm.ValMakeready, fm.ValWork);
+            }
+        }
+
+        private void SetNewValue(decimal amountOrder, string stampOrder, int makereadyOrder, int workOrder)
+        {
+            numericUpDown1.Value = amountOrder;
+            textBox2.Text = stampOrder;
+
+            int makereadyH = makereadyOrder / 60;
+            int makereadyM = makereadyOrder % 60;
+
+            int workH = workOrder / 60;
+            int workM = workOrder % 60;
+
+            numericUpDown5.Value = makereadyH;
+            numericUpDown6.Value = makereadyM;
+
+            numericUpDown7.Value = workH;
+            numericUpDown8.Value = workM;
         }
     }
 
