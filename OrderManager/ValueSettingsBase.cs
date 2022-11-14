@@ -17,6 +17,11 @@ namespace OrderManager
             return GetValue("userID", id, "checkPassword");
         }
 
+        public String GetSelectedPage(String id)
+        {
+            return GetValue("userID", id, "selectedPage");
+        }
+
         public String GetParameterLine(String id, String selectForm)
         {
             return GetValue("userID", id, selectForm);
@@ -50,6 +55,11 @@ namespace OrderManager
         public void UpdateCheckPassword(String idUser, String newValue)
         {
             UpdateValue("checkPassword", idUser, newValue);
+        }
+
+        public void UpdateSelectedPage(String idUser, String newValue)
+        {
+            UpdateValue("selectedPage", idUser, newValue);
         }
 
         public void UpdateParameterLine(String idUser, String selectForm, String newValue)

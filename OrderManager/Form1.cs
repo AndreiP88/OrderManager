@@ -378,7 +378,7 @@ namespace OrderManager
             }
             catch
             {
-                MessageBox.Show("Ошибка подключения", "Ошибка", MessageBoxButtons.OK);
+                //MessageBox.Show("Ошибка подключения", "Ошибка", MessageBoxButtons.OK);
             }
 
             Invoke(new Action(() =>
@@ -615,6 +615,16 @@ namespace OrderManager
             AddOrdersToListViewFromList();
             ViewDetailsForUser();
             LoadMachinesDetailsForUser();
+
+            ValueSettingsBase valueSettings = new ValueSettingsBase();
+
+            string load = valueSettings.GetSelectedPage(Form1.Info.nameOfExecutor);
+            int page = 0;
+
+            if (load != "")
+                page = Convert.ToInt32(load);
+
+            tabControl1.SelectTab(page);
             //LaodDetailsForCurrentMount();
         }
 
@@ -1436,7 +1446,9 @@ namespace OrderManager
 
             if (idLastOrder >= 0)
             {
-                if (ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder) == "3")
+                string status = ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder);
+
+                if (status == "3")
                 {
                     norm = ordersCurrentShift[idLastOrder].norm;
 
@@ -1506,6 +1518,21 @@ namespace OrderManager
             }
 
             return wOut;
+        }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tabControl1.SelectedIndex.ToString();
+
+            tabControl1.SelectTab(1);
+
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ValueSettingsBase valueSettings = new ValueSettingsBase();
+
+            valueSettings.UpdateSelectedPage(Form1.Info.nameOfExecutor, tabControl1.SelectedIndex.ToString());
         }
     }
 }
