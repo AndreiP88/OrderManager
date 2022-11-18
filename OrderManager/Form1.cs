@@ -1431,6 +1431,8 @@ namespace OrderManager
             ValueInfoBase infoBase = new ValueInfoBase();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
+            int percentOverAmount = 5;
+
             string[] captions = { "10:30", "11:00", "11:30", "12:00" };
             string[] values = { "", "", "", "" };
 
@@ -1438,36 +1440,70 @@ namespace OrderManager
             string captionMakeReady = "Выполняется приладка";
 
             int wOut;
-            int norm;
+            //int norm;
             int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox3.Text);
             string machine = infoBase.GetMachineFromName(comboBox3.Text);
 
             if (idLastOrder >= 0)
             {
+                if (comboBox2.SelectedIndex == 0)
+                {
+                    wOut = fullTimeWorkingOut;
+                }
+                else
+                {
+                    wOut = GetWOutFromMachine(machine);
+                }
+
                 string status = ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder);
 
-                if (status == "3")
+                int norm = ordersCurrentShift[idLastOrder].norm;
+                int done = ordersCurrentShift[idLastOrder].done;
+                int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
+                int mkTime = timeOperations.totallTimeHHMMToMinutes(ordersCurrentShift[idLastOrder].plannedTimeMakeready);
+
+                for (int i = 0; i < captions.Length; i++)
                 {
-                    norm = ordersCurrentShift[idLastOrder].norm;
+                    int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
 
-                    if (comboBox2.SelectedIndex == 0)
+                    if (status == "1")
                     {
-                        wOut = fullTimeWorkingOut;
+                        int lastTimeToWork = targetTime - wOut;
+
+                        if (lastTimeToWork > 0)
+                        {
+                            if (lastTimeToWork < mkTime)
+                            {
+                                values[i] = "часть приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
+                            }
+                            else
+                            {
+                                int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+
+                                if ((targetCount + done) <= amount * (1 + percentOverAmount / 100))
+                                {
+                                    values[i] = "вся приладка + " + targetCount.ToString("N0");
+                                }
+                                else
+                                {
+                                    values[i] = "н/д";
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            values[i] = "выполнено";
+                        }
                     }
-                    else
-                    {
-                        wOut = GetWOutFromMachine(machine);
-                    }
 
-                    for (int i = 0; i < captions.Length; i++)
+                    if (status == "3" || status == "2")
                     {
-                        int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
-
                         if (targetTime > wOut)
                         {
                             int targetCount = (targetTime - wOut) * norm / 60;
 
-                            if (targetCount <= ordersCurrentShift[idLastOrder].amountOfOrder * 1.1)
+                            if ((targetCount + done) <= amount * (1 + percentOverAmount / 100))
                             {
                                 values[i] = targetCount.ToString("N0");
                             }
@@ -1481,9 +1517,41 @@ namespace OrderManager
                             values[i] = "выполнено";
                         }
                     }
+
+                    
                 }
+
+                /*if (status == "3")
+                {
+                    norm = ordersCurrentShift[idLastOrder].norm;
+                    int done = ordersCurrentShift[idLastOrder].done;
+
+                    for (int i = 0; i < captions.Length; i++)
+                    {
+                        int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
+
+                        if (targetTime > wOut)
+                        {
+                            int targetCount = (targetTime - wOut) * norm / 60;
+
+                            if ((targetCount + done) <= ordersCurrentShift[idLastOrder].amountOfOrder * 1.05)
+                            {
+                                values[i] = targetCount.ToString("N0");
+                            }
+                            else
+                            {
+                                values[i] = "н/д";
+                            }
+                        }
+                        else
+                        {
+                            values[i] = "выполнено";
+                        }
+                    }
+                }*/
+
             }
-            
+
             label32.Text = captions[0] + ":";
             label33.Text = captions[1] + ":";
             label36.Text = captions[2] + ":";
@@ -1520,9 +1588,7 @@ namespace OrderManager
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tabControl1.SelectedIndex.ToString();
-
-            tabControl1.SelectTab(1);
+            
 
         }
 
