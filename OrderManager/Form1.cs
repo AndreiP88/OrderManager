@@ -1424,9 +1424,6 @@ namespace OrderManager
 
         private void UpdateWorkingOut()
         {
-            /*label34.Text = comboBox2.Text;
-            label35.Text = comboBox3.Text;*/
-
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase infoBase = new ValueInfoBase();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
@@ -1482,14 +1479,16 @@ namespace OrderManager
 
                                 if ((targetCount + done) <= amount * (1 + percentOverAmount / 100))
                                 {
-                                    values[i] = "вся приладка + " + targetCount.ToString("N0");
+                                    values[i] = "вся приладка";
+
+                                    if (targetCount > 0)
+                                        values[i] += " + " + targetCount.ToString("N0");
                                 }
                                 else
                                 {
                                     values[i] = "н/д";
                                 }
                             }
-
                         }
                         else
                         {
