@@ -20,9 +20,26 @@ namespace Updater
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        bool update = false;
+
+        public Form1(string[] args)
         {
             InitializeComponent();
+
+            if (args.Length > 0)
+            {
+                string param = args[0].Replace("-", "");
+
+                if (param == "update")
+                {
+                    update = true;
+                }
+                else
+                {
+                    update = false;
+                }
+
+            }
         }
 
         bool openApplication = false;
@@ -111,7 +128,7 @@ namespace Updater
 
             bool autoUpdate = Convert.ToBoolean(ini.GetAutoUpdate());
 
-            if (autoUpdate)
+            if (autoUpdate && update)
             {
                 DownloadAPP();
 

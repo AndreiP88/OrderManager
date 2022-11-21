@@ -297,6 +297,42 @@ namespace OrderManager
             this.Text = "Менеджер заказов - " + getUser.GetNameUser(Info.nameOfExecutor);
         }
 
+        private void StartDowloadUpdater()
+        {
+            //MessageBox.Show("Запуск");
+
+            //CreateFolder();
+
+            //string pathTemp = @"";
+
+            string fileTemp = "Updater.exe";
+
+            string link = "https://drive.google.com/uc?export=download&id=1-AfXKyeSzhNlCFOLj0gpY9tcZl9yHVdw";
+
+            var task = Task.Run(() => DowloadUpdater(link,fileTemp));
+
+        }
+
+        private void DowloadUpdater(string link, string path)
+        {
+            FileDownloader downloader = new FileDownloader();
+
+            try
+            {
+                downloader.DownloadFile(link, path);
+            }
+            catch
+            {
+                //MessageBox.Show("Ошибка подключения", "Ошибка", MessageBoxButtons.OK);
+            }
+
+            Invoke(new Action(() =>
+            {
+                //MessageBox.Show(currentDateV.ToString() + " " + lastDateV.ToString());
+
+            }));
+        }
+
         private void CreateFolder()
         {
             string path = @"TempDownload";
@@ -349,6 +385,10 @@ namespace OrderManager
 
             try
             {
+                var p = new Process();
+                p.StartInfo.FileName = "Updater.exe";
+                p.StartInfo.Arguments = "update";
+
                 downloader.DownloadFile(link, path);
                 //downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
                 //downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
@@ -363,14 +403,15 @@ namespace OrderManager
                 {
                     lastDateV = Convert.ToInt32(lastDateVersion);
 
+
                     if (currentDateV > lastDateV)
                     {
-                        Process.Start("Updater.exe");
+                        p.Start();
                     }
                 }
                 else
                 {
-                    Process.Start("Updater.exe");
+                    p.Start();
                 }
 
             }
@@ -1596,6 +1637,11 @@ namespace OrderManager
             ValueSettingsBase valueSettings = new ValueSettingsBase();
 
             valueSettings.UpdateSelectedPage(Form1.Info.nameOfExecutor, tabControl1.SelectedIndex.ToString());
+        }
+
+        private void downloadUpadaterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartDowloadUpdater();
         }
     }
 }

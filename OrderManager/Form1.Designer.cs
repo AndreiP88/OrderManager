@@ -135,6 +135,7 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1128,7 +1129,8 @@ namespace OrderManager
             this.machinesToolStripMenuItem,
             this.paramToolStripMenuItem,
             this.базаДанныхToolStripMenuItem,
-            this.testToolStripMenuItem});
+            this.testToolStripMenuItem,
+            this.downloadUpadaterToolStripMenuItem});
             this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
             this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton1.Name = "toolStripButton1";
@@ -1293,6 +1295,13 @@ namespace OrderManager
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
             // 
+            // downloadUpadaterToolStripMenuItem
+            // 
+            this.downloadUpadaterToolStripMenuItem.Name = "downloadUpadaterToolStripMenuItem";
+            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.downloadUpadaterToolStripMenuItem.Text = "Скачать Upadater";
+            this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1440,6 +1449,7 @@ namespace OrderManager
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.Label label39;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadUpadaterToolStripMenuItem;
     }
 }
 
