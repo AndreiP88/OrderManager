@@ -393,7 +393,7 @@ namespace OrderManager
                 //downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
                 //downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
 
-                chLog = File.ReadAllLines(path, Encoding.Unicode);
+                chLog = File.ReadAllLines(path, Encoding.UTF8);
                 currentDateVersion = chLog[0].Substring(7);
 
                 if (currentDateVersion != "")

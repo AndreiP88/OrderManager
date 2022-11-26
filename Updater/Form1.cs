@@ -116,7 +116,7 @@ namespace Updater
 
             StartDownload("https://drive.google.com/uc?export=download&id=1YYbr30wiiSSwETsH8GIPFulWpebS6LeM", path + "\\" + fileCL);
 
-            string[] chLog = File.ReadAllLines(path + "\\" + fileCL, Encoding.Unicode);
+            string[] chLog = File.ReadAllLines(path + "\\" + fileCL, Encoding.UTF8);
 
             currentVersion = chLog[0].Substring(7);
             //MessageBox.Show(currentVersion);
