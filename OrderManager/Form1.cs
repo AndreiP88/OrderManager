@@ -1496,10 +1496,11 @@ namespace OrderManager
                 string status = ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder);
 
                 int norm = ordersCurrentShift[idLastOrder].norm;
-                int done = ordersCurrentShift[idLastOrder].done;
+                int last = ordersCurrentShift[idLastOrder].lastCount;
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
+                int done = amount - last;
                 int mkTime = timeOperations.totallTimeHHMMToMinutes(ordersCurrentShift[idLastOrder].plannedTimeMakeready);
-
+                MessageBox.Show(done.ToString());
                 for (int i = 0; i < captions.Length; i++)
                 {
                     int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
