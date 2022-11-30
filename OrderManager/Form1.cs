@@ -866,7 +866,11 @@ namespace OrderManager
 
         private void button6_Click(object sender, EventArgs e)
         {
-            if (Form1.Info.startOfShift == "")
+            ValueUserBase userBase = new ValueUserBase();
+
+            string startOfShift = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
+
+            if (startOfShift == "")
             {
                 Info.active = false;
                 ClearAll();
