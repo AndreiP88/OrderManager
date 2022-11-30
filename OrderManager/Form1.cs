@@ -1500,7 +1500,7 @@ namespace OrderManager
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
                 int done = amount - last;
                 int mkTime = timeOperations.totallTimeHHMMToMinutes(ordersCurrentShift[idLastOrder].plannedTimeMakeready);
-                MessageBox.Show(done.ToString());
+                //MessageBox.Show(done.ToString());
                 for (int i = 0; i < captions.Length; i++)
                 {
                     int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);

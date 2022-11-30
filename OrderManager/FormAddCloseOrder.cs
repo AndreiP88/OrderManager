@@ -754,7 +754,12 @@ namespace OrderManager
                     DialogResult dialogResult = DialogResult.No;
 
                     if (!adminCloseOrder)
-                        dialogResult = MessageBox.Show("Приладка завершена. Начать выполнение заказа?", "Завершение приладки", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        dialogResult = MessageBox.Show("Приладка завершена. Начать выполнение заказа?", "Завершение приладки", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                    if (dialogResult == DialogResult.Cancel)
+                    {
+                        return;
+                    }
 
                     UpdateData("timeMakereadyStop", machineCurrent, shiftStart, number, modification, counterRepeat, makereadyStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
@@ -762,7 +767,7 @@ namespace OrderManager
                     if (dialogResult == DialogResult.Yes)
                     {
                         UpdateData("timeToWorkStart", machineCurrent, shiftStart, number, modification, counterRepeat, workStart);
-                        UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
+                        //UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
                         getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, number, modification, number, modification, true);
                         //убираем заказ из активных для возможности завершить смену
                         newStatus = "3";
@@ -791,6 +796,8 @@ namespace OrderManager
             }
 
             orders.SetNewStatus(machineCurrent, number, modification, newStatus);
+
+            Close();
         }
 
         private void AbortOrderInProgressToDB()
@@ -1428,7 +1435,6 @@ namespace OrderManager
                 if (result == DialogResult.Yes)
                 {
                     CloseOrderInProgressToDB();
-                    Close();
                 }
                 else if (result == DialogResult.No)
                 {
@@ -1444,11 +1450,11 @@ namespace OrderManager
             else
             {
                 CloseOrderInProgressToDB();
-                Close();
+                //Close();
             }
 
 
-            Close();
+            //Close();
         }
 
         private void button3_Click(object sender, EventArgs e)
