@@ -1415,9 +1415,6 @@ namespace OrderManager
                     MessageBox.Show("Не все данные введены.", "Проверка введенных данных", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
-
-
-
         }
         private void button2_Click(object sender, EventArgs e)
         {
@@ -1445,15 +1442,12 @@ namespace OrderManager
                 {
                     return;
                 }
-
             }
             else
             {
                 CloseOrderInProgressToDB();
                 //Close();
             }
-
-
             //Close();
         }
 
