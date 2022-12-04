@@ -1422,13 +1422,20 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
 
+            MessageBoxManager.Yes = "Завершить";
+            MessageBoxManager.No = "Подтвердить";
+            MessageBoxManager.Cancel = "Отмена";
+
             DialogResult result;
 
             String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
             if (numericUpDown4.Value < numericUpDown3.Value && status == "3")
             {
-                result = MessageBox.Show("Выработка меньше планируемой!\r\n\r\nДа - завершить заказ\r\nНет - подтвердить заказ", "Завершение заказа", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                MessageBoxManager.Register();
+                //result = MessageBox.Show("Выработка меньше планируемой!\r\n\r\nДа - завершить заказ\r\nНет - подтвердить заказ", "Завершение заказа", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                result = MessageBox.Show("Выработка меньше планируемой!", "Завершение заказа", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                MessageBoxManager.Unregister();
 
                 if (result == DialogResult.Yes)
                 {
