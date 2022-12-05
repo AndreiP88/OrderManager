@@ -129,6 +129,7 @@
             this.Text = "Выбор исполнителя";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LoadUserForm_FormClosed);
             this.Load += new System.EventHandler(this.LoadUserForm_Load);
+            this.DoubleClick += new System.EventHandler(this.FormLoadUserForm_DoubleClick);
             this.ResumeLayout(false);
 
         }

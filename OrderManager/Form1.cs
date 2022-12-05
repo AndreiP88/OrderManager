@@ -141,6 +141,18 @@ namespace OrderManager
             }
         }
 
+        private void ViewBaseConnectionParameters()
+        {
+            toolStripStatusLabel2.Text = BaseConnectionParameters.host;
+            toolStripStatusLabel5.Text = BaseConnectionParameters.database;
+        }
+
+        private void ClearBaseConnectionParameters()
+        {
+            toolStripStatusLabel2.Text = "";
+            toolStripStatusLabel5.Text = "";
+        }
+
         private void ShowUserForm()
         {
             Info.active = false;
@@ -152,6 +164,9 @@ namespace OrderManager
             LoadParametersFromBase("mainForm");
 
             LoadUser();
+
+            ViewBaseConnectionParameters();
+
 
             if (Form1.Info.startOfShift == "")
             {

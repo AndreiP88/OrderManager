@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using static OrderManager.Form1;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
@@ -30,9 +31,10 @@ namespace OrderManager
 
         private void LoadUsersList()
         {
-            ValueInfoBase getMachine = new ValueInfoBase();
+            //ValueInfoBase getMachine = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
 
+            listView1.Items.Clear();
             //List<String> users = userBase.GetUserList(true);
             //users.Clear();
 
@@ -184,6 +186,25 @@ namespace OrderManager
         private void timer1_Tick(object sender, EventArgs e)
         {
             UpdateMachineFromUsers();
+        }
+
+        private void FormLoadUserForm_DoubleClick(object sender, EventArgs e)
+        {
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL();
+            form.ShowDialog();
+
+            DBConnection connection = new DBConnection();
+
+            connection.SetDBParameter();
+
+            timer1.Enabled = false;
+
+            if (users != null)
+                users.Clear();
+
+            LoadUsersList();
+
+            timer1.Enabled = true;
         }
     }
 }
