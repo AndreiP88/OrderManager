@@ -120,6 +120,7 @@ namespace OrderManager
             this.paramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.viewAllOrdersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -135,7 +136,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1175,6 +1175,13 @@ namespace OrderManager
             this.testToolStripMenuItem.Visible = false;
             this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
             // 
+            // downloadUpadaterToolStripMenuItem
+            // 
+            this.downloadUpadaterToolStripMenuItem.Name = "downloadUpadaterToolStripMenuItem";
+            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.downloadUpadaterToolStripMenuItem.Text = "Скачать Updater";
+            this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
+            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1294,13 +1301,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // downloadUpadaterToolStripMenuItem
-            // 
-            this.downloadUpadaterToolStripMenuItem.Name = "downloadUpadaterToolStripMenuItem";
-            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.downloadUpadaterToolStripMenuItem.Text = "Скачать Upadater";
-            this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
             // 
             // Form1
             // 

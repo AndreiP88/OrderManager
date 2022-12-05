@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
 {
@@ -17,9 +20,12 @@ namespace OrderManager
             this.loadMode = loadMode;   
         }
 
+        List<String> users;
+
         private void LoadUserForm_Load(object sender, EventArgs e)
         {
             LoadUsersList();
+            timer1.Enabled = true;
         }
 
         private void LoadUsersList()
@@ -28,13 +34,15 @@ namespace OrderManager
             ValueUserBase userBase = new ValueUserBase();
 
             //List<String> users = userBase.GetUserList(true);
-            List<String> users = userBase.GetUserListForCategory(true, loadMode);
+            //users.Clear();
+
+            users = userBase.GetUserListForCategory(true, loadMode);
 
             int counter = 0;
 
             for (int i = 0; i < users.Count; i++) // считываем и вносим в комбобокс список заголовков
             {
-                String machines = getMachine.GetMachinesStr(users[i].ToString());
+                //String machines = getMachine.GetMachinesStr(users[i].ToString());
 
                 counter++;
 
@@ -42,8 +50,33 @@ namespace OrderManager
                 item.Name = users[i].ToString();
                 item.Text = counter.ToString();
                 item.SubItems.Add(userBase.GetNameUser(users[i]));
-                item.SubItems.Add(machines);
+                //item.SubItems.Add(machines);
+                item.SubItems.Add("");
                 listView1.Items.Add(item);
+            }
+
+            UpdateMachineFromUsers();
+        }
+
+        private void UpdateMachineFromUsers()
+        {
+            ValueInfoBase getMachine = new ValueInfoBase();
+            ValueUserBase userBase = new ValueUserBase();
+
+            //int index = listView1.Items.IndexOfKey(sqlReader["id"].ToString());
+
+            //users = userBase.GetUserListForCategory(true, loadMode);
+
+            for (int i = 0; i < users.Count; i++)
+            {
+                String machines = getMachine.GetMachinesStr(users[i].ToString());
+
+                ListViewItem item = listView1.Items[i];
+
+                if (item != null)
+                {
+                    item.SubItems[2].Text = machines;
+                }
             }
         }
 
@@ -146,6 +179,11 @@ namespace OrderManager
             {
                 LoadSelectedUser();
             }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            UpdateMachineFromUsers();
         }
     }
 }
