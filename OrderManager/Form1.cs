@@ -1475,7 +1475,7 @@ namespace OrderManager
 
             int percentOverAmount = 5;
 
-            string[] captions = { "10:30", "11:00", "11:30", "12:00" };
+            string[] captions = { "10:00", "10:30", "11:00", "12:00" };
             string[] values = { "", "", "", "" };
 
             string captionNotEnough = "Тиража не достаточно для выполнения минимальной нормы";
