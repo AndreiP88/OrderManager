@@ -229,12 +229,12 @@ namespace OrderManager
             // tableLayoutPanel6
             // 
             this.tableLayoutPanel6.ColumnCount = 6;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 111F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 65F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 175F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 72F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 94F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 267F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel6.Controls.Add(this.label12, 0, 0);
             this.tableLayoutPanel6.Controls.Add(this.label13, 0, 1);
             this.tableLayoutPanel6.Controls.Add(this.label14, 2, 0);
@@ -262,7 +262,7 @@ namespace OrderManager
             this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label12.Location = new System.Drawing.Point(3, 0);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(105, 31);
+            this.label12.Size = new System.Drawing.Size(162, 31);
             this.label12.TabIndex = 0;
             this.label12.Text = "Отработано смен:";
             this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -273,18 +273,18 @@ namespace OrderManager
             this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label13.Location = new System.Drawing.Point(3, 31);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(105, 31);
+            this.label13.Size = new System.Drawing.Size(162, 31);
             this.label13.TabIndex = 1;
-            this.label13.Text = "Отработано часов:";
+            this.label13.Text = "Рабочее время (фактическое):";
             this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label14
             // 
             this.label14.AutoSize = true;
             this.label14.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label14.Location = new System.Drawing.Point(179, 0);
+            this.label14.Location = new System.Drawing.Point(257, 0);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(169, 31);
+            this.label14.Size = new System.Drawing.Size(165, 31);
             this.label14.TabIndex = 2;
             this.label14.Text = "Выполнено заказов/приладок:";
             this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -293,9 +293,9 @@ namespace OrderManager
             // 
             this.label15.AutoSize = true;
             this.label15.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label15.Location = new System.Drawing.Point(179, 31);
+            this.label15.Location = new System.Drawing.Point(257, 31);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(169, 31);
+            this.label15.Size = new System.Drawing.Size(165, 31);
             this.label15.TabIndex = 3;
             this.label15.Text = "Сделано продукции:";
             this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -304,9 +304,9 @@ namespace OrderManager
             // 
             this.label16.AutoSize = true;
             this.label16.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label16.Location = new System.Drawing.Point(426, 0);
+            this.label16.Location = new System.Drawing.Point(514, 0);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(88, 31);
+            this.label16.Size = new System.Drawing.Size(80, 31);
             this.label16.TabIndex = 4;
             this.label16.Text = "Выработка, ч.:";
             this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -315,9 +315,9 @@ namespace OrderManager
             // 
             this.label17.AutoSize = true;
             this.label17.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label17.Location = new System.Drawing.Point(426, 31);
+            this.label17.Location = new System.Drawing.Point(514, 31);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(88, 31);
+            this.label17.Size = new System.Drawing.Size(80, 31);
             this.label17.TabIndex = 5;
             this.label17.Text = "Выработка, %:";
             this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -326,9 +326,9 @@ namespace OrderManager
             // 
             this.label18.AutoSize = true;
             this.label18.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label18.Location = new System.Drawing.Point(114, 0);
+            this.label18.Location = new System.Drawing.Point(171, 0);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(59, 31);
+            this.label18.Size = new System.Drawing.Size(80, 31);
             this.label18.TabIndex = 6;
             this.label18.Text = "label18";
             this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -337,9 +337,9 @@ namespace OrderManager
             // 
             this.label19.AutoSize = true;
             this.label19.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label19.Location = new System.Drawing.Point(114, 31);
+            this.label19.Location = new System.Drawing.Point(171, 31);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(59, 31);
+            this.label19.Size = new System.Drawing.Size(80, 31);
             this.label19.TabIndex = 7;
             this.label19.Text = "label19";
             this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -348,9 +348,9 @@ namespace OrderManager
             // 
             this.label20.AutoSize = true;
             this.label20.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label20.Location = new System.Drawing.Point(354, 0);
+            this.label20.Location = new System.Drawing.Point(428, 0);
             this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(66, 31);
+            this.label20.Size = new System.Drawing.Size(80, 31);
             this.label20.TabIndex = 8;
             this.label20.Text = "label20";
             this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -359,9 +359,9 @@ namespace OrderManager
             // 
             this.label21.AutoSize = true;
             this.label21.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label21.Location = new System.Drawing.Point(354, 31);
+            this.label21.Location = new System.Drawing.Point(428, 31);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(66, 31);
+            this.label21.Size = new System.Drawing.Size(80, 31);
             this.label21.TabIndex = 9;
             this.label21.Text = "label21";
             this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -371,9 +371,9 @@ namespace OrderManager
             this.label22.AutoSize = true;
             this.label22.BackColor = System.Drawing.Color.Transparent;
             this.label22.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label22.Location = new System.Drawing.Point(520, 0);
+            this.label22.Location = new System.Drawing.Point(600, 0);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(261, 31);
+            this.label22.Size = new System.Drawing.Size(166, 31);
             this.label22.TabIndex = 10;
             this.label22.Text = "label22";
             this.label22.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -382,9 +382,9 @@ namespace OrderManager
             // 
             this.label23.AutoSize = true;
             this.label23.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label23.Location = new System.Drawing.Point(520, 31);
+            this.label23.Location = new System.Drawing.Point(600, 31);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(261, 31);
+            this.label23.Size = new System.Drawing.Size(166, 31);
             this.label23.TabIndex = 11;
             this.label23.Text = "label23";
             this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;

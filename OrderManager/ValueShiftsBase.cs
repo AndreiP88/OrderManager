@@ -33,6 +33,21 @@ namespace OrderManager
 
             return result[result.Count - 1];
         }
+
+        public bool GetCheckFullShift(String startShift)
+        {
+            List<String> value = new List<String>(GetValue("startShift", startShift, "fullShift"));
+
+            string oneVal = value[value.Count - 1];
+            bool result = true;
+
+            if (oneVal != "" && oneVal != null)
+            {
+                result = Convert.ToBoolean(oneVal);
+            }
+            
+            return result;
+        }
         public List<String> GetActiveUser()
         {
             List<String> result = new List<String>(GetValue("stopShift", "", "nameUser"));
@@ -50,6 +65,23 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@startShift", startShift);
                 Command.Parameters.AddWithValue("@note", note);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public void SetCheckFullShift(String startShift, bool check)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE shifts SET fullShift = @fullShift " +
+                    "WHERE startShift = @startShift";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@fullShift", check.ToString());
 
                 Connect.Open();
                 Command.ExecuteNonQuery();

@@ -30,7 +30,7 @@ namespace OrderManager
             button1.Text = "Сохранить";
 
             LoadNote(loadStartOfShift);
-
+            LoadCheckFullShift(loadStartOfShift);
         }
 
         private bool closeShiftVal;
@@ -59,7 +59,18 @@ namespace OrderManager
             }
         }
 
-
+        private bool fullShift;
+        public bool FullShiftVal
+        {
+            get
+            {
+                return fullShift;
+            }
+            set
+            {
+                fullShift = value;
+            }
+        }
 
         private void LoadNote(String shiftStart)
         {
@@ -70,10 +81,20 @@ namespace OrderManager
             textBox1.Text = pNote;
         }
 
+        private void LoadCheckFullShift(String shiftStart)
+        {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            bool check = shiftsBase.GetCheckFullShift(shiftStart);
+
+            checkBox1.Checked = check;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             ShiftVal = false;
             NoteVal = textBox1.Text;
+            fullShift = checkBox1.Checked;
 
             this.Hide();
         }
@@ -82,6 +103,7 @@ namespace OrderManager
         {
             ShiftVal = true;
             NoteVal = textBox1.Text;
+            fullShift = checkBox1.Checked;
 
             this.Hide();
 

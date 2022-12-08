@@ -242,7 +242,7 @@ namespace OrderManager
 
                 Invoke(new Action(() =>
                 {
-                    label7.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.countShifts * 680);
+                    label7.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
                     label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
                     label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
 
@@ -297,8 +297,11 @@ namespace OrderManager
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
                 getShift.SetNoteShift(timeStartShift, form.NoteVal);
+                getShift.SetCheckFullShift(timeStartShift, form.FullShiftVal);
 
                 UpdateNote(timeStartShift);
+
+                StartLoading();
             }
         }
 

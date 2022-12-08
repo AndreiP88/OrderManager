@@ -637,7 +637,8 @@ namespace OrderManager
                 Invoke(new Action(() =>
                 {
                     label18.Text = currentShift.countShifts.ToString("N0");
-                    label19.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeShift);
+                    label19.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.shiftsWorkingTime) + " (" +
+                        dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeShift) + ")";
 
                     label20.Text = currentShift.countOrdersShift.ToString() + "/" + currentShift.countMakereadyShift.ToString();
                     label21.Text = currentShift.amountAllOrdersShift.ToString("N0");
@@ -856,6 +857,7 @@ namespace OrderManager
                 infoBase.CompleteTheShift(Info.nameOfExecutor);
                 userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "");
                 getShift.SetNoteShift(Info.startOfShift, form.NoteVal);
+                getShift.SetCheckFullShift(Info.startOfShift, form.FullShiftVal);
 
                 ClearAll();
                 EraseInfo();

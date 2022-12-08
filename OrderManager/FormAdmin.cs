@@ -2027,7 +2027,7 @@ namespace OrderManager
 
                     Invoke(new Action(() =>
                     {
-                        label1.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetailsSumm.countShifts * 680);
+                        label1.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetailsSumm.shiftsWorkingTime);
                         label2.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetailsSumm.allTimeShift);
                         label3.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetailsSumm.allTimeWorkingOutShift);
 
