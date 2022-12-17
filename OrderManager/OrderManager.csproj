@@ -147,6 +147,12 @@
     <Compile Include="FormCloseShift.Designer.cs">
       <DependentUpon>FormCloseShift.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormTypesInTheOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTypesInTheOrder.Designer.cs">
+      <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="INISettings.cs" />
     <Compile Include="StringArray.cs" />
     <Compile Include="Cryption.cs" />
@@ -228,9 +234,11 @@
     <Compile Include="GetNumberShiftFromTimeStart.cs" />
     <Compile Include="GetOrdersFromBase.cs" />
     <Compile Include="GetPercentFromWorkingOut.cs" />
+    <Compile Include="TypeInTheOrder.cs" />
     <Compile Include="ValueInfoBase.cs" />
     <Compile Include="ValueSettingsBase.cs" />
     <Compile Include="ValueShiftsBase.cs" />
+    <Compile Include="ValueTypesBase.cs" />
     <Compile Include="ValueUserBase.cs" />
     <Compile Include="ValueOrdersBase.cs" />
     <Compile Include="FormLoadUserForm.cs">
@@ -283,6 +291,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCloseShift.resx">
       <DependentUpon>FormCloseShift.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormTypesInTheOrder.resx">
+      <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSelectMachine.resx">
       <DependentUpon>FormSelectMachine.cs</DependentUpon>

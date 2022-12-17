@@ -1072,6 +1072,25 @@ namespace OrderManager
             Info.active = true;
         }
 
+        private void LoadTypes()
+        {
+            ValueInfoBase getInfo = new ValueInfoBase();
+
+            Info.active = false;
+            FormTypesInTheOrder form;
+
+            form = new FormTypesInTheOrder(Info.startOfShift,
+                ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
+                ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
+                ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat,
+                ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
+                Info.nameOfExecutor);
+
+            form.ShowDialog();
+            LoadOrdersFromBase();
+            Info.active = true;
+        }
+
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             e.Cancel = listView1.SelectedItems.Count == 0;
@@ -1663,6 +1682,11 @@ namespace OrderManager
         private void downloadUpadaterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StartDowloadUpdater();
+        }
+
+        private void typesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadTypes();
         }
     }
 }

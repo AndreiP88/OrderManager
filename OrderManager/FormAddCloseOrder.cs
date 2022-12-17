@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using static OrderManager.Form1;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OrderManager
 {
@@ -1228,11 +1230,15 @@ namespace OrderManager
             {
                 button1.Visible = true;
                 textBox6.Enabled = true;
+
+                button6.Enabled = true;
             }
             else
             {
                 button1.Visible = false;
                 textBox6.Enabled = false;
+
+                button6.Enabled = false;
             }
 
 
@@ -1270,6 +1276,8 @@ namespace OrderManager
 
         private void AddEditCloseOrder_Load(object sender, EventArgs e)
         {
+            ValueShiftsBase shiftsValue = new ValueShiftsBase();
+
             numericUpDown2.Controls[0].Enabled = false;
             numericUpDown2.Controls[0].Visible = false;
             numericUpDown2.Controls.Remove(Controls[0]);
@@ -1285,6 +1293,8 @@ namespace OrderManager
             if (loadOrderNumber != "")
             {
                 LoadOrderForEdit(startOfShift, loadOrderNumber, loadOrderModification, loadMachine, loadCounterRepeat);
+                LoadTypesFromCurrentOrder(loadOrderNumber, loadOrderModification, loadCounterRepeat, loadMachine, shiftsValue.GetNameUserFromStartShift(startOfShift));
+
                 timer1.Enabled = false;
             }
             else
@@ -1317,27 +1327,89 @@ namespace OrderManager
 
         }
 
+        private void LoadTypes()
+        {
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueOrdersBase getValue = new ValueOrdersBase();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            String number;
+            String modification;
+
+            if (loadOrderNumber != "")
+            {
+                number = loadOrderNumber;
+                modification = loadOrderModification;
+            }
+            else
+            {
+                number = ordersNumbers[comboBox1.SelectedIndex].numberOfOrder;
+                modification = ordersNumbers[comboBox1.SelectedIndex].modificationOfOrder;
+            }
+
+            String machine = getInfo.GetMachineFromName(comboBox3.Text);
+            String counterRepeat = getValue.GetCounterRepeat(machine, number, modification);
+            
+
+            FormTypesInTheOrder form;
+
+            form = new FormTypesInTheOrder(startOfShift,
+                number,
+                modification,
+                counterRepeat,
+                machine,
+                shiftsBase.GetNameUserFromStartShift(startOfShift));
+
+            form.ShowDialog();
+
+            LoadTypesFromCurrentOrder(number, modification, counterRepeat, machine, getInfo.GetIDUser(machine));
+        }
+
+        private void LoadTypesFromCurrentOrder(string number, string modification, string counterRepeat, string machine, string user)
+        {
+            ValueTypesBase typeBase = new ValueTypesBase(startOfShift, number, modification, counterRepeat, machine, user);
+            
+            List<TypeInTheOrder> typesCurrent = typeBase.GetData();
+
+            listView1.Items.Clear();
+
+            for (int i = 0; i < typesCurrent.Count; i++)
+            {
+                ListViewItem item = new ListViewItem();
+
+                item.Name = typesCurrent[i].id;
+                item.Text = (listView1.Items.Count + 1).ToString();
+                item.SubItems.Add(typesCurrent[i].type);
+                item.SubItems.Add(typesCurrent[i].done.ToString("N0"));
+
+                listView1.Items.Add(item);
+            }
+        }
+
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (loadOrderNumber == "")
             {
                 ValueInfoBase getInfo = new ValueInfoBase();
+                ValueOrdersBase getValue = new ValueOrdersBase();
 
                 String number = ordersNumbers[comboBox1.SelectedIndex].numberOfOrder;
                 String modification = ordersNumbers[comboBox1.SelectedIndex].modificationOfOrder;
-
-                ValueOrdersBase getValue = new ValueOrdersBase();
-
+                String machine = getInfo.GetMachineFromName(comboBox3.Text);
+                String counterRepeat = getValue.GetCounterRepeat(machine, number, modification);
+                
                 ClearAllValue();
 
-                LoadOrderFromDB(getInfo.GetMachineFromName(comboBox3.Text), number, modification);
-                SetVisibleElements(getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), number, modification), getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text)));
+                LoadOrderFromDB(machine, number, modification);
+                SetVisibleElements(getValue.GetOrderStatus(machine, number, modification), getInfo.GetCurrentOrderNumber(machine));
                 if (comboBox1.SelectedIndex != 0)
                 {
-                    LoadCurrentOrderInProgressFromDB(startOfShift, number, modification, getInfo.GetMachineFromName(comboBox3.Text), getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
+                    LoadCurrentOrderInProgressFromDB(startOfShift, number, modification, machine, counterRepeat);
+
+                    LoadTypesFromCurrentOrder(number, modification, counterRepeat, machine, getInfo.GetIDUser(machine));
 
                     GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase();
-                    textBox6.Text = getOrdersInProgressValue.GetNote(startOfShift, number, modification, getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), number, modification));
+                    textBox6.Text = getOrdersInProgressValue.GetNote(startOfShift, number, modification, counterRepeat);
                 }
             }
         }
@@ -1631,6 +1703,11 @@ namespace OrderManager
                 SetNewValue(fm.ValAmount, fm.ValStamp, fm.ValMakeready, fm.ValWork);
             }
             
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            LoadTypes();
         }
     }
 
