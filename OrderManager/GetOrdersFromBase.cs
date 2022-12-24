@@ -29,21 +29,26 @@ namespace OrderManager
 
         }
 
-        public String GetNote(String startShift, String numberOfOrder, String modification, String counterRepeat)
+        public String GetIndex(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
         {
-            return GetValue("note", startShift, numberOfOrder, modification, counterRepeat);
+            return GetValue("count", startShift, numberOfOrder, modification, counterRepeat, machine);
         }
 
-        public String GetPrivateNote(String startShift, String numberOfOrder, String modification, String counterRepeat)
+        public String GetNote(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
         {
-            return GetValue("privateNote", startShift, numberOfOrder, modification, counterRepeat);
-        }
-        public String GetDone(String startShift, String numberOfOrder, String modification, String counterRepeat)
-        {
-            return GetValue("done", startShift, numberOfOrder, modification, counterRepeat);
+            return GetValue("note", startShift, numberOfOrder, modification, counterRepeat, machine);
         }
 
-        private String GetValue(String nameOfColomn, String startShift, String numberOfOrder, String modification, String counterRepeat)
+        public String GetPrivateNote(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        {
+            return GetValue("privateNote", startShift, numberOfOrder, modification, counterRepeat, machine);
+        }
+        public String GetDone(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        {
+            return GetValue("done", startShift, numberOfOrder, modification, counterRepeat, machine);
+        }
+
+        private String GetValue(String nameOfColomn, String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
         {
             String result = "";
 
@@ -53,12 +58,13 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE (startOfShift = @startOfShift AND numberOfOrder = @numberOfOrder) AND (modification = @modification AND counterRepeat = @counterRepeat)"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE ((startOfShift = @startOfShift AND numberOfOrder = @numberOfOrder) AND (modification = @modification AND counterRepeat = @counterRepeat)) AND machine = @machine"
                 };
                 Command.Parameters.AddWithValue("@startOfShift", startShift);
                 Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
                 Command.Parameters.AddWithValue("@modification", modification);
                 Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
+                Command.Parameters.AddWithValue("@machine", machine);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())

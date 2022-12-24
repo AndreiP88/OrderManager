@@ -18,6 +18,7 @@ namespace OrderManager
         String orderCounterRepeat;
         String machine;
         String user;
+        String _orderInProgressID;
 
         public ValueTypesBase(String lStartOfShift, String lOrderNumber, String lOrderModification, String lOrderCounterRepeat, String lMachine, String lUser)
         {
@@ -27,6 +28,10 @@ namespace OrderManager
             this.orderCounterRepeat = lOrderCounterRepeat;
             this.machine = lMachine;
             this.user = lUser;
+
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+
+            _orderInProgressID = getOrders.GetIndex(startOfShift, orderNumber, orderModification, orderCounterRepeat, machine);
         }
 
         public List<TypeInTheOrder> GetData()
@@ -39,14 +44,10 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM typesInTheOrder WHERE (((machine = @machine AND startOfShift = @startOfShift) AND (numberOfOrder = @numberOfOrder AND modification = @modification)) AND counterRepeat = @counterRepeat)"
+                    CommandText = @"SELECT * FROM typesInTheOrder WHERE orderInProgressID = @orderInProgressID"
 
                 };
-                Command.Parameters.AddWithValue("@startOfShift", startOfShift);
-                Command.Parameters.AddWithValue("@numberOfOrder", orderNumber);
-                Command.Parameters.AddWithValue("@modification", orderModification);
-                Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@counterRepeat", orderCounterRepeat);
+                Command.Parameters.AddWithValue("@orderInProgressID", _orderInProgressID);
 
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -72,16 +73,11 @@ namespace OrderManager
                     "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
                     "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";*/
 
-                string commandText = "INSERT INTO typesInTheOrder (machine, startOfShift, numberOfOrder, modification, counterRepeat, user, type, done) " +
-                    "VALUES (@machine, @startOfShift, @numberOfOrder, @modification, @counterRepeat, @user, @type, @done)";
+                string commandText = "INSERT INTO typesInTheOrder (orderInProgressID, type, done) " +
+                    "VALUES (@orderInProgressID, @type, @done)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startOfShift", startOfShift);
-                Command.Parameters.AddWithValue("@numberOfOrder", orderNumber);
-                Command.Parameters.AddWithValue("@modification", orderModification);
-                Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@counterRepeat", orderCounterRepeat);
-                Command.Parameters.AddWithValue("@user", user);
+                Command.Parameters.AddWithValue("@orderInProgressID", _orderInProgressID);
                 Command.Parameters.AddWithValue("@type", type);
                 Command.Parameters.AddWithValue("@done", done);
 
@@ -99,11 +95,6 @@ namespace OrderManager
                     "WHERE (id = @id)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startOfShift", startOfShift);
-                Command.Parameters.AddWithValue("@numberOfOrder", orderNumber);
-                Command.Parameters.AddWithValue("@modification", orderModification);
-                Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@user", user);
                 Command.Parameters.AddWithValue("@id", value.id);
                 Command.Parameters.AddWithValue("@type", value.type);
                 Command.Parameters.AddWithValue("@done", value.done);

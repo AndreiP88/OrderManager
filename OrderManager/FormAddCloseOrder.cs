@@ -202,6 +202,8 @@ namespace OrderManager
                 button2.Visible = false;
                 button3.Visible = false;
 
+                button6.Enabled = false;
+
                 button1.Text = "Начать приладку";
 
                 dateTimePicker1.Visible = true;
@@ -222,6 +224,8 @@ namespace OrderManager
                     button2.Visible = false;
                     button3.Visible = false;
 
+                    button6.Enabled = false;
+
                     button1.Text = "Продолжить приладку";
 
                     dateTimePicker1.Visible = true;
@@ -238,6 +242,8 @@ namespace OrderManager
                     button1.Visible = true;
                     button2.Visible = true;
                     button3.Visible = true;
+
+                    button6.Enabled = true;
 
                     button1.Text = "Подтвердить приладку";
                     button2.Text = "Завершить приладку";
@@ -259,6 +265,8 @@ namespace OrderManager
                 button1.Visible = true;
                 button2.Visible = false;
                 button3.Visible = false;
+
+                button6.Enabled = false;
 
                 button1.Text = "Начать работу";
 
@@ -284,6 +292,8 @@ namespace OrderManager
                     button2.Visible = false;
                     button3.Visible = false;
 
+                    button6.Enabled = false;
+
                     button1.Text = "Продолжить работу";
 
                     dateTimePicker1.Visible = true;
@@ -307,6 +317,8 @@ namespace OrderManager
                     button1.Visible = true;
                     button2.Visible = true;
                     button3.Visible = true;
+
+                    button6.Enabled = true;
 
                     button1.Text = "Подтвердить";
                     button2.Text = "Завершить работу";
@@ -578,6 +590,8 @@ namespace OrderManager
         private void AddNewOrderInProgress(String machine, String executor, String shiftStart, String number, String modification, String makereadyStart,
             String makereadyStop, String workStart, String workStop, String done, String counterRepeat, String note)
         {
+            ValueOrdersBase valueOrders = new ValueOrdersBase();
+
             int result = 0;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -600,15 +614,18 @@ namespace OrderManager
 
             if (result == 0)
             {
+                String orderID = valueOrders.GetOrderCount(machine, number, modification);
+
                 using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
-                    string commandText = "INSERT INTO ordersInProgress (machine, executor, startOfShift, numberOfOrder, modification, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, done, counterRepeat, note) " +
-                        "VALUES(@machine, @executor, @shiftStart, @number, @modification, @makereadyStart, @makereadyStop, @workStart, @workStop, @done, @counterRepeat, @note)";
+                    string commandText = "INSERT INTO ordersInProgress (machine, executor, startOfShift, orderID, numberOfOrder, modification, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, done, counterRepeat, note) " +
+                        "VALUES(@machine, @executor, @shiftStart, @orderID, @number, @modification, @makereadyStart, @makereadyStop, @workStart, @workStop, @done, @counterRepeat, @note)";
 
                     MySqlCommand Command = new MySqlCommand(commandText, Connect);
                     Command.Parameters.AddWithValue("@machine", machine); // присваиваем переменной значение
                     Command.Parameters.AddWithValue("@executor", executor);
                     Command.Parameters.AddWithValue("@shiftStart", shiftStart);
+                    Command.Parameters.AddWithValue("@orderID", orderID);
                     Command.Parameters.AddWithValue("@number", number);
                     Command.Parameters.AddWithValue("modification", modification);
                     Command.Parameters.AddWithValue("@makereadyStart", makereadyStart);
@@ -1199,7 +1216,7 @@ namespace OrderManager
             numericUpDown4.Enabled = false;
             numericUpDown4.Value = amountDone;
 
-            textBox6.Text = getOrder.GetNote(startOfShift, orderNumber, orderModification, counterRepeat);
+            textBox6.Text = getOrder.GetNote(startOfShift, orderNumber, orderModification, counterRepeat, machine);
         }
 
         private void LoadOrderForEdit(String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
@@ -1409,7 +1426,7 @@ namespace OrderManager
                     LoadTypesFromCurrentOrder(number, modification, counterRepeat, machine, getInfo.GetIDUser(machine));
 
                     GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase();
-                    textBox6.Text = getOrdersInProgressValue.GetNote(startOfShift, number, modification, counterRepeat);
+                    textBox6.Text = getOrdersInProgressValue.GetNote(startOfShift, number, modification, counterRepeat, machine);
                 }
             }
         }
