@@ -56,6 +56,7 @@
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
+            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
@@ -72,7 +73,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(856, 541);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(978, 541);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // listView1
@@ -81,6 +82,7 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3,
+            this.columnHeader9,
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6,
@@ -93,7 +95,7 @@
             this.listView1.Location = new System.Drawing.Point(3, 83);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(850, 455);
+            this.listView1.Size = new System.Drawing.Size(972, 455);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -373,11 +375,16 @@
             this.label15.Text = "label15";
             this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "Рабочие часы";
+            this.columnHeader9.Width = 92;
+            // 
             // FormDetailsStatistic
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(856, 541);
+            this.ClientSize = new System.Drawing.Size(978, 541);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "FormDetailsStatistic";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -421,5 +428,6 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader9;
     }
 }

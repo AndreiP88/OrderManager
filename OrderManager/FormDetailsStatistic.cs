@@ -215,6 +215,7 @@ namespace OrderManager
                         item.SubItems.Add("");
                         item.SubItems.Add("");
                         item.SubItems.Add("");
+                        item.SubItems.Add("");
 
                         Invoke(new Action(() =>
                             {
@@ -263,11 +264,12 @@ namespace OrderManager
                             if (item != null)
                             {
                                 item.SubItems[2].Text = shiftsDetails.countShifts.ToString();
-                                item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
-                                item.SubItems[4].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
-                                item.SubItems[5].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
-                                item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
-                                item.SubItems[7].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+                                item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
+                                item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
+                                item.SubItems[5].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
+                                item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
+                                item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
+                                item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
                             }
                         }));
 
