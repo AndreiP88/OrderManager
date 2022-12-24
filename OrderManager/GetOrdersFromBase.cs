@@ -266,6 +266,9 @@ namespace OrderManager
                         int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
 
+                        if (lastCount < 0)
+                            lastCount = 0;
+
                         int workTime = Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         int orderNorm = 0;
                         int timeWorkingOut = 0;
