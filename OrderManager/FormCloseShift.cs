@@ -31,6 +31,7 @@ namespace OrderManager
 
             LoadNote(loadStartOfShift);
             LoadCheckFullShift(loadStartOfShift);
+            LoadCheckOvertimeShift(loadStartOfShift);
         }
 
         private bool closeShiftVal;
@@ -72,6 +73,19 @@ namespace OrderManager
             }
         }
 
+        private bool overtimeShift;
+        public bool OvertimeShiftVal
+        {
+            get
+            {
+                return overtimeShift;
+            }
+            set
+            {
+                overtimeShift = value;
+            }
+        }
+
         private void LoadNote(String shiftStart)
         {
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
@@ -90,11 +104,21 @@ namespace OrderManager
             checkBox1.Checked = check;
         }
 
+        private void LoadCheckOvertimeShift(String shiftStart)
+        {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            bool check = shiftsBase.GetCheckOvertimeShift(shiftStart);
+
+            checkBox2.Checked = check;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             ShiftVal = false;
             NoteVal = textBox1.Text;
             fullShift = checkBox1.Checked;
+            overtimeShift = checkBox2.Checked;
 
             this.Hide();
         }
@@ -104,6 +128,7 @@ namespace OrderManager
             ShiftVal = true;
             NoteVal = textBox1.Text;
             fullShift = checkBox1.Checked;
+            overtimeShift = checkBox2.Checked;
 
             this.Hide();
 
@@ -120,6 +145,38 @@ namespace OrderManager
         {
             textBox1.ReadOnly = false;
             button1.Enabled = true;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            bool value = shiftsBase.GetCheckFullShift(loadStartOfShift);
+
+            if (checkBox1.Checked != value)
+            {
+                button1.Enabled = true;
+            }
+            else
+            {
+                button1.Enabled = false;
+            }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            bool value = shiftsBase.GetCheckOvertimeShift(loadStartOfShift);
+
+            if (checkBox2.Checked != value)
+            {
+                button1.Enabled = true;
+            }
+            else
+            {
+                button1.Enabled = false;
+            }
         }
     }
 }

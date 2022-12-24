@@ -298,6 +298,7 @@ namespace OrderManager
 
                 getShift.SetNoteShift(timeStartShift, form.NoteVal);
                 getShift.SetCheckFullShift(timeStartShift, form.FullShiftVal);
+                getShift.SetCheckOvertimeShift(timeStartShift, form.OvertimeShiftVal);
 
                 UpdateNote(timeStartShift);
 

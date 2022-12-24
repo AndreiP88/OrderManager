@@ -858,6 +858,7 @@ namespace OrderManager
                 userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "");
                 getShift.SetNoteShift(Info.startOfShift, form.NoteVal);
                 getShift.SetCheckFullShift(Info.startOfShift, form.FullShiftVal);
+                getShift.SetCheckOvertimeShift(Info.startOfShift, form.OvertimeShiftVal);
 
                 ClearAll();
                 EraseInfo();
