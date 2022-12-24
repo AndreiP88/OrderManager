@@ -212,7 +212,8 @@ namespace OrderManager
                     item.SubItems.Add("");
                     item.SubItems.Add("");
                     item.SubItems.Add("");
-                    item.SubItems.Add(shiftValue.GetNoteShift(shifts[i]));
+                    if (nameOfExecutor == Form1.Info.nameOfExecutor)
+                        item.SubItems.Add(shiftValue.GetNoteShift(shifts[i]));
 
                     Invoke(new Action(() => listView1.Items.Add(item)));
                 }
@@ -362,7 +363,7 @@ namespace OrderManager
 
         private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = listView1.SelectedItems.Count == 0;
+            e.Cancel = (listView1.SelectedItems.Count == 0 || nameOfExecutor != Form1.Info.nameOfExecutor);
         }
 
     }
