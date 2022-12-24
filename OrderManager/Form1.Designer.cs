@@ -101,10 +101,10 @@ namespace OrderManager
             this.columnOrderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnCount = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -987,10 +987,10 @@ namespace OrderManager
             this.columnOrderName,
             this.columnCount,
             this.columnHeader3,
+            this.columnHeader7,
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6,
-            this.columnHeader7,
             this.columnHeader8,
             this.columnHeader9,
             this.columnHeader13});
@@ -1040,6 +1040,11 @@ namespace OrderManager
             // 
             this.columnHeader3.Text = "Остаток";
             // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "Норма, шт/ч";
+            this.columnHeader7.Width = 94;
+            // 
             // columnHeader4
             // 
             this.columnHeader4.Text = "Дано времени";
@@ -1054,11 +1059,6 @@ namespace OrderManager
             // 
             this.columnHeader6.Text = "Сделано";
             this.columnHeader6.Width = 85;
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "Норма, шт/ч";
-            this.columnHeader7.Width = 94;
             // 
             // columnHeader8
             // 

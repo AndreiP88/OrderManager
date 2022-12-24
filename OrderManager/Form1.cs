@@ -475,10 +475,10 @@ namespace OrderManager
                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
                 item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
+                item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
                 item.SubItems.Add(ordersCurrentShift[index].plannedTimeMakeready.ToString() + ", " + ordersCurrentShift[index].plannedTimeWork.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].facticalTimeMakeready.ToString() + ", " + ordersCurrentShift[index].facticalTimeWork.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
-                item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
                 item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[index].workingOut));
                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());
