@@ -17,15 +17,16 @@ namespace OrderManager
             InitializeComponent();
         }
 
+        public void Refresh(int day, string shift, string hour)
+        {
+            dayNumber.Text = day.ToString();
+            shiftNumber.Text = shift;
+            hourCurr.Text = hour.ToString();
+        }
+
         private void DayBlank_Load(object sender, EventArgs e)
         {
-            new List<Control> { dayNumber , AddAppointmentButton, ActiveAppointmentsLabel,ActiveAppointmentPanel,
-            CompletedAppointmentsLabel,CompletedAppointmentPanel, this}.ForEach(x =>
-            {
-                /*x.MouseClick += DayBlankControl_MouseClick;
-                x.MouseEnter += DayBlank_MouseEnter;
-                x.MouseLeave += DayBlank_MouseLeave;*/
-            });
+
         }
     }
 }

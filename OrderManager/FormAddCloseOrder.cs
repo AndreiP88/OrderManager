@@ -645,7 +645,7 @@ namespace OrderManager
 
         private void AcceptOrderInProgressToDB()
         {
-            ValueInfoBase getInfo = new ValueInfoBase();
+            //ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
             ValueInfoBase infoBase = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
@@ -656,13 +656,13 @@ namespace OrderManager
             String shiftStart = startOfShift;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            String status = getValue.GetOrderStatus(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            String status = getValue.GetOrderStatus(infoBase.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
             String newStatus = "0";
 
-            String machineCurrent = getInfo.GetMachineFromName(comboBox3.Text);
-            String counterRepeat = getValue.GetCounterRepeat(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
-            String currentOrderNumber = getInfo.GetCurrentOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
-            String lastOrderNumber = getInfo.GetLastOrderNumber(getInfo.GetMachineFromName(comboBox3.Text));
+            String machineCurrent = infoBase.GetMachineFromName(comboBox3.Text);
+            String counterRepeat = getValue.GetCounterRepeat(infoBase.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            String currentOrderNumber = infoBase.GetCurrentOrderNumber(infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
+            String lastOrderNumber = infoBase.GetLastOrderNumber(infoBase.GetMachineFromName(comboBox3.Text));
 
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
@@ -671,7 +671,7 @@ namespace OrderManager
             String note = textBox6.Text;
             int done = (int)numericUpDown4.Value;
 
-            userBase.UpdateLastMachine(executor, getInfo.GetMachineFromName(comboBox3.Text));
+            userBase.UpdateLastMachine(executor, infoBase.GetMachineFromName(comboBox3.Text));
 
             if (status == "0") //новая запись
             {
@@ -728,7 +728,8 @@ namespace OrderManager
                     UpdateData("timeToWorkStop", machineCurrent, shiftStart, number, modification, counterRepeat, workStop);
                     UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
                     UpdateData("done", machineCurrent, shiftStart, number, modification, counterRepeat, done.ToString());
-                    infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, false);
+                    //infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, false);
+                    infoBase.UpdateInfo(machineCurrent, "", "", "", number, modification, false);
                     //убираем заказ из активных для возможности завершить смену
                     newStatus = status;
                 }

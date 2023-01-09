@@ -205,7 +205,7 @@ namespace OrderManager
 
                 countShifts++;
 
-                token.ThrowIfCancellationRequested();
+                //token.ThrowIfCancellationRequested();
             }
 
             int countShiftForPercent;
