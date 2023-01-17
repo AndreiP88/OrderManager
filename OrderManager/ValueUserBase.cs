@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -22,11 +23,67 @@ namespace OrderManager
         /// <returns>Имя пользователя из поля nameUser базы данных</returns>
         public String GetNameUser(String id)
         {
-            return GetValue("id", id, "nameUser");
+            string fullName = "";
+
+            fullName += GetValue("id", id, "name");
+            fullName += " " + GetValue("id", id, "surname");
+
+            return fullName;
+        }
+
+        /// <summary>
+        /// Полное имя по id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public String GetFullNameUser(String id)
+        {
+            string fullName = "";
+
+            fullName += GetValue("id", id, "surname");
+            fullName += " " + GetValue("id", id, "name");
+            fullName += " " + GetValue("id", id, "patronymic");
+
+            return fullName;
+        }
+
+        /// <summary>
+        /// Имя и фамилия по id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public String GetSmalNameUser(String id)
+        {
+            string fullName = "";
+
+            fullName += GetValue("id", id, "surname");
+            fullName += " " + GetValue("id", id, "name");
+
+            return fullName;
         }
         public String GetIDUserFromName(String nameUser)
         {
-            return GetValue("nameUser", nameUser, "id");
+            String result = "";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM users WHERE concat(name, ' ', surname) = '" + nameUser + "'"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader["id"].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
         }
 
         public String GetCategoryesMachine(String id)
@@ -182,7 +239,6 @@ namespace OrderManager
                 {
                     userInfos.Add(new UserInfo(
                         Convert.ToInt32(sqlReader["id"]),
-                        sqlReader["nameUser"].ToString(),
                         sqlReader["surname"].ToString(),
                         sqlReader["name"].ToString(),
                         sqlReader["patronymic"].ToString(),
@@ -203,7 +259,7 @@ namespace OrderManager
 
         public Object GetUserInfoFromID(String userID)
         {
-            UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "", "");
+            UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "");
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -222,7 +278,6 @@ namespace OrderManager
                 {
                     userInfos = new UserInfo(
                         Convert.ToInt32(sqlReader["id"]),
-                        sqlReader["nameUser"].ToString(),
                         sqlReader["surname"].ToString(),
                         sqlReader["name"].ToString(),
                         sqlReader["patronymic"].ToString(),
@@ -244,11 +299,6 @@ namespace OrderManager
         public void UpdateLastMachine(String idUser, String newValue)
         {
             UpdateValueInfo("lastMachine", idUser, newValue);
-        }
-
-        public void UpdateName(String idUser, String newValue)
-        {
-            UpdateValue("nameUser", idUser, newValue);
         }
 
         public void UpdatePassword(String idUser, String newValue)

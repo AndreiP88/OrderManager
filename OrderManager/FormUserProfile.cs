@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace OrderManager
 {
     public partial class FormUserProfile : Form
     {
         String idUser;
-        String passKey = "key";
+
+        int _wTime = 680;
 
         public FormUserProfile(String userID)
         {
@@ -63,38 +65,31 @@ namespace OrderManager
 
         void LoadUser()
         {
-            Cryption pass = new Cryption();
             ValueUserBase userBase = new ValueUserBase();
-            ValueSettingsBase settingsBase = new ValueSettingsBase();
 
-            bool checkPass = false;
-
-            if (settingsBase.GetPasswordChecked(idUser) != "")
-                checkPass = Convert.ToBoolean(settingsBase.GetPasswordChecked(idUser));
-
-            textBox1.Text = userBase.GetNameUser(idUser);
-            textBox2.Text = pass.DeCode(userBase.GetPasswordUser(idUser), passKey);
-            checkBox1.Checked = checkPass;
+            this.Text = userBase.GetFullNameUser(idUser);
         }
 
         void SaveUser()
         {
-            Cryption pass = new Cryption();
-            ValueUserBase setUpdateUsers = new ValueUserBase();
-            ValueSettingsBase updateSettingsValue = new ValueSettingsBase();
 
-            setUpdateUsers.UpdateName(idUser, textBox1.Text);
-            setUpdateUsers.UpdatePassword(idUser, pass.Code(textBox2.Text, passKey));
-            updateSettingsValue.UpdateCheckPassword(idUser, checkBox1.Checked.ToString());
         }
 
         private void LoadCalendarShifts(DateTime date)
         {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetShiftsFromBase getShifts = new GetShiftsFromBase(idUser);
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             List<String> shifts = (List<String>)getShifts.LoadShiftsList(date);
             List<int> shiftsDays = new List<int>();
+
+            int fullWorkTime = 0;
+            int fullOverTime = 0;
+            int countFullShifts = 0;
+            int countOvertimeShifts = 0;
+            int countPartialShifts = 0;
 
             for (int i = 0; i < shifts.Count; i++)
             {
@@ -115,9 +110,81 @@ namespace OrderManager
 
             int dayCurrWeek = dayOfTheWeek;
             int weekOfMonth = 1;
+            int oldWeekOfMonth = 0;
 
             tableLayoutPanel5.Controls.Clear();
 
+            AddDaysNames();
+
+            for (int i = 1; i <= days; i++)
+            {
+                string nShift = "";
+                int workTimeShift = 0;
+                
+                int index = shiftsDays.IndexOf(i);
+
+                if (index != -1)
+                {
+                    nShift = getNumberShift.NumberShift(shifts[index]);
+
+                    if (shiftsBase.GetCheckFullShift(shifts[index]))
+                    {
+                        workTimeShift = _wTime;
+                        countFullShifts++;
+                    }
+                    else
+                    {
+                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShift(shifts[index]), shifts[index]));
+                        countPartialShifts++;
+                    }
+
+                    if (shiftsBase.GetCheckOvertimeShift(shifts[index]))
+                    {
+                        fullOverTime += workTimeShift;
+                        countOvertimeShifts++;
+                    }
+
+                    fullWorkTime += workTimeShift;
+                    
+                }
+
+                label11.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullWorkTime);
+                label13.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullOverTime);
+                label15.Text = countFullShifts.ToString();
+                label17.Text = countOvertimeShifts.ToString();
+                label19.Text = countPartialShifts.ToString();
+
+                string timeStr = timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeShift);
+
+                if (timeStr == "00:00")
+                    timeStr = "";
+
+                DayBlank currDay = new DayBlank();
+                currDay.Refresh(i, nShift, timeStr);
+
+                if (dayCurrWeek == 8)
+                {
+                    dayCurrWeek = 1;
+                    weekOfMonth++;
+                }
+
+                if (weekOfMonth != oldWeekOfMonth)
+                {
+                    oldWeekOfMonth = weekOfMonth;
+
+                    AddNumberWeekOfYear(new DateTime(now.Year, now.Month, i), weekOfMonth);
+                }
+
+                tableLayoutPanel5.Controls.Add(currDay, dayCurrWeek, weekOfMonth);
+
+                //MessageBox.Show("День недели: " + dayCurrWeek.ToString() + ". Неделя месяца: " + weekOfMonth.ToString());
+
+                dayCurrWeek++;
+            }
+        }
+
+        private void AddDaysNames()
+        {
             string[] dayNames = { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс" };
 
             for (int i = 0; i < dayNames.Length; i++)
@@ -131,32 +198,28 @@ namespace OrderManager
 
                 tableLayoutPanel5.Controls.Add(label, i + 1, 0);
             }
+        }
 
-            for (int i = 1; i <= days; i++)
-            {
-                string nShift = "";
-                int index = shiftsDays.IndexOf(i);
+        private void AddNumberWeekOfYear(DateTime startWeekDate, int numbetWeekOfMonth)
+        {
+            int weekNumber = GetWeekNumber(startWeekDate);
 
-                if (index != -1)
-                {
-                    nShift = getNumberShift.NumberShift(shifts[index]);
-                }
+            Label label = new Label();
+            label.Text = weekNumber.ToString();
+            label.TextAlign = ContentAlignment.MiddleCenter;
+            //label.Font = new Font(label.Font, label.Font.Style | FontStyle.Bold);
+            label.Font = new Font("Microsoft Sans Serif", 12, FontStyle.Regular);
+            label.Dock = DockStyle.Fill;
 
-                DayBlank currDay = new DayBlank();
-                currDay.Refresh(i, nShift, "");
+            tableLayoutPanel5.Controls.Add(label, 0, numbetWeekOfMonth);
 
-                if (dayCurrWeek == 8)
-                {
-                    dayCurrWeek = 1;
-                    weekOfMonth++;
-                }
+        }
 
-                tableLayoutPanel5.Controls.Add(currDay, dayCurrWeek, weekOfMonth);
-
-                //MessageBox.Show("День недели: " + dayCurrWeek.ToString() + ". Неделя месяца: " + weekOfMonth.ToString());
-
-                dayCurrWeek++;
-            }
+        public static int GetWeekNumber(DateTime dtPassed)
+        {
+            CultureInfo ciCurr = CultureInfo.CurrentCulture;
+            int weekNum = ciCurr.Calendar.GetWeekOfYear(dtPassed, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            return weekNum;
         }
 
         private void button2_Click(object sender, EventArgs e)

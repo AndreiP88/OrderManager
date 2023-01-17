@@ -2580,7 +2580,7 @@ namespace OrderManager
 
                         item.Name = currentUserInfo[i].userID.ToString();
                         item.Text = (i + 1).ToString();
-                        item.SubItems.Add(currentUserInfo[i].userName);
+                        //item.SubItems.Add(currentUserInfo[i].userName);
                         item.SubItems.Add(currentUserInfo[i].surname + " " + currentUserInfo[i].name + " " + currentUserInfo[i].patronymic);
                         item.SubItems.Add(catLine);
                         item.SubItems.Add(currentUserInfo[i].dateOfEmployment);

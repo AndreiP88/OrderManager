@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Forms;
+
 namespace OrderManager
 {
     partial class Form1
@@ -117,8 +119,11 @@ namespace OrderManager
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.shiftsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.machinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.paramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.machinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changePasswordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkPasswordAfterCloseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cancelAutoriToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -202,6 +207,7 @@ namespace OrderManager
             this.labelTime.Text = "00:00:00";
             this.labelTime.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             this.labelTime.Click += new System.EventHandler(this.labelTime_Click);
+            this.labelTime.DoubleClick += new System.EventHandler(this.labelTime_DoubleClick);
             // 
             // tabControl1
             // 
@@ -1135,8 +1141,11 @@ namespace OrderManager
             // 
             this.toolStripButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.shiftsToolStripMenuItem,
-            this.machinesToolStripMenuItem,
             this.paramToolStripMenuItem,
+            this.machinesToolStripMenuItem,
+            this.changePasswordToolStripMenuItem,
+            this.checkPasswordAfterCloseToolStripMenuItem,
+            this.cancelAutoriToolStripMenuItem,
             this.базаДанныхToolStripMenuItem,
             this.testToolStripMenuItem,
             this.downloadUpadaterToolStripMenuItem});
@@ -1146,32 +1155,54 @@ namespace OrderManager
             this.toolStripButton1.ShowDropDownArrow = false;
             this.toolStripButton1.Size = new System.Drawing.Size(81, 22);
             this.toolStripButton1.Text = "Оператор";
+            this.toolStripButton1.DropDownOpening += new System.EventHandler(this.toolStripButton1_DropDownOpening);
             // 
             // shiftsToolStripMenuItem
             // 
             this.shiftsToolStripMenuItem.Name = "shiftsToolStripMenuItem";
-            this.shiftsToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.shiftsToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
             this.shiftsToolStripMenuItem.Text = "Отработанные смены";
             this.shiftsToolStripMenuItem.Click += new System.EventHandler(this.отработанныеСменыToolStripMenuItem_Click);
-            // 
-            // machinesToolStripMenuItem
-            // 
-            this.machinesToolStripMenuItem.Name = "machinesToolStripMenuItem";
-            this.machinesToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.machinesToolStripMenuItem.Text = "Выбор оборудования";
-            this.machinesToolStripMenuItem.Click += new System.EventHandler(this.machinesToolStripMenuItem_Click);
             // 
             // paramToolStripMenuItem
             // 
             this.paramToolStripMenuItem.Name = "paramToolStripMenuItem";
-            this.paramToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.paramToolStripMenuItem.Text = "Параметры";
+            this.paramToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.paramToolStripMenuItem.Text = "Параметры пользователя";
             this.paramToolStripMenuItem.Click += new System.EventHandler(this.параметрыToolStripMenuItem_Click);
+            // 
+            // machinesToolStripMenuItem
+            // 
+            this.machinesToolStripMenuItem.Name = "machinesToolStripMenuItem";
+            this.machinesToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.machinesToolStripMenuItem.Text = "Выбор оборудования";
+            this.machinesToolStripMenuItem.Click += new System.EventHandler(this.machinesToolStripMenuItem_Click);
+            // 
+            // changePasswordToolStripMenuItem
+            // 
+            this.changePasswordToolStripMenuItem.Name = "changePasswordToolStripMenuItem";
+            this.changePasswordToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.changePasswordToolStripMenuItem.Text = "Изменить пароль";
+            this.changePasswordToolStripMenuItem.Click += new System.EventHandler(this.changePasswordToolStripMenuItem_Click);
+            // 
+            // checkPasswordAfterCloseToolStripMenuItem
+            // 
+            this.checkPasswordAfterCloseToolStripMenuItem.Name = "checkPasswordAfterCloseToolStripMenuItem";
+            this.checkPasswordAfterCloseToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.checkPasswordAfterCloseToolStripMenuItem.Text = "Запрашивать пароль при каждом входе";
+            this.checkPasswordAfterCloseToolStripMenuItem.Click += new System.EventHandler(this.checkPasswordAfterCloseToolStripMenuItem_Click);
+            // 
+            // cancelAutoriToolStripMenuItem
+            // 
+            this.cancelAutoriToolStripMenuItem.Name = "cancelAutoriToolStripMenuItem";
+            this.cancelAutoriToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.cancelAutoriToolStripMenuItem.Text = "Отменить авторизацию на устройстве";
+            this.cancelAutoriToolStripMenuItem.Click += new System.EventHandler(this.cancelAutoriToolStripMenuItem_Click);
             // 
             // базаДанныхToolStripMenuItem
             // 
             this.базаДанныхToolStripMenuItem.Name = "базаДанныхToolStripMenuItem";
-            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
             this.базаДанныхToolStripMenuItem.Text = "База данных";
             this.базаДанныхToolStripMenuItem.Visible = false;
             this.базаДанныхToolStripMenuItem.Click += new System.EventHandler(this.базаДанныхToolStripMenuItem_Click);
@@ -1179,7 +1210,7 @@ namespace OrderManager
             // testToolStripMenuItem
             // 
             this.testToolStripMenuItem.Name = "testToolStripMenuItem";
-            this.testToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
             this.testToolStripMenuItem.Text = "Test";
             this.testToolStripMenuItem.Visible = false;
             this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
@@ -1187,8 +1218,9 @@ namespace OrderManager
             // downloadUpadaterToolStripMenuItem
             // 
             this.downloadUpadaterToolStripMenuItem.Name = "downloadUpadaterToolStripMenuItem";
-            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
             this.downloadUpadaterToolStripMenuItem.Text = "Скачать Updater";
+            this.downloadUpadaterToolStripMenuItem.Visible = false;
             this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton1
@@ -1460,6 +1492,9 @@ namespace OrderManager
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadUpadaterToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem typesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changePasswordToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkPasswordAfterCloseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem cancelAutoriToolStripMenuItem;
     }
 }
 

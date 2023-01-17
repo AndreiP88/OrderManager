@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -14,6 +15,7 @@ using System.Windows.Forms;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.LinkLabel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using File = System.IO.File;
 using ToolTip = System.Windows.Forms.ToolTip;
 
@@ -972,6 +974,7 @@ namespace OrderManager
         {
             if (Form1.Info.nameOfExecutor == "1")
             {
+
                 FormAdmin form = new FormAdmin(adminMode);
                 form.ShowDialog();
 
@@ -1689,6 +1692,45 @@ namespace OrderManager
         private void typesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadTypes();
+        }
+
+        private void labelTime_DoubleClick(object sender, EventArgs e)
+        {
+            StartDowloadUpdater();
+        }
+
+        private void changePasswordToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormLoadUserPasswordForm form = new FormLoadUserPasswordForm(true, Info.nameOfExecutor);
+            form.ShowDialog();
+        }
+
+        private void cancelAutoriToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ValueUserBase setValueUsers = new ValueUserBase();
+
+            setValueUsers.UpdateLastUID(Info.nameOfExecutor, "");
+        }
+
+        private void checkPasswordAfterCloseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ValueSettingsBase updateSettingsValue = new ValueSettingsBase();
+
+            bool checkPass = checkPasswordAfterCloseToolStripMenuItem.Checked;
+
+            updateSettingsValue.UpdateCheckPassword(Info.nameOfExecutor, checkPass.ToString());
+        }
+
+        private void toolStripButton1_DropDownOpening(object sender, EventArgs e)
+        {
+            ValueSettingsBase settingsBase = new ValueSettingsBase();
+
+            bool checkPass = false;
+
+            if (settingsBase.GetPasswordChecked(Info.nameOfExecutor) != "")
+                checkPass = Convert.ToBoolean(settingsBase.GetPasswordChecked(Info.nameOfExecutor));
+
+            checkPasswordAfterCloseToolStripMenuItem.Checked = !checkPass;
         }
     }
 }

@@ -49,7 +49,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(58, 29);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(60, 40);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // dayNumber
@@ -57,9 +57,10 @@
             this.dayNumber.BackColor = System.Drawing.Color.Transparent;
             this.dayNumber.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dayNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.dayNumber.ForeColor = System.Drawing.SystemColors.MenuHighlight;
             this.dayNumber.Location = new System.Drawing.Point(3, 0);
             this.dayNumber.Name = "dayNumber";
-            this.dayNumber.Size = new System.Drawing.Size(25, 17);
+            this.dayNumber.Size = new System.Drawing.Size(27, 24);
             this.dayNumber.TabIndex = 1;
             this.dayNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -68,9 +69,9 @@
             this.shiftNumber.AutoSize = true;
             this.shiftNumber.Dock = System.Windows.Forms.DockStyle.Fill;
             this.shiftNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.shiftNumber.Location = new System.Drawing.Point(34, 0);
+            this.shiftNumber.Location = new System.Drawing.Point(36, 0);
             this.shiftNumber.Name = "shiftNumber";
-            this.shiftNumber.Size = new System.Drawing.Size(21, 17);
+            this.shiftNumber.Size = new System.Drawing.Size(21, 24);
             this.shiftNumber.TabIndex = 2;
             this.shiftNumber.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -79,19 +80,20 @@
             this.hourCurr.AutoSize = true;
             this.tableLayoutPanel1.SetColumnSpan(this.hourCurr, 2);
             this.hourCurr.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hourCurr.Location = new System.Drawing.Point(3, 17);
+            this.hourCurr.Location = new System.Drawing.Point(3, 24);
             this.hourCurr.Name = "hourCurr";
-            this.hourCurr.Size = new System.Drawing.Size(52, 12);
+            this.hourCurr.Size = new System.Drawing.Size(54, 16);
             this.hourCurr.TabIndex = 3;
             this.hourCurr.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // DayBlank
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.BackColor = System.Drawing.Color.NavajoWhite;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "DayBlank";
-            this.Size = new System.Drawing.Size(58, 29);
+            this.Size = new System.Drawing.Size(60, 40);
             this.Load += new System.EventHandler(this.DayBlank_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

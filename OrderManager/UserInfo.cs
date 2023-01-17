@@ -5,7 +5,6 @@ namespace OrderManager
     internal class UserInfo
     {
         public int userID;
-        public String userName;
         public String surname;
         public String name;
         public String patronymic;
@@ -22,10 +21,9 @@ namespace OrderManager
             this.v = v;
         }
 
-        public UserInfo(int userID, string userName, string surname, string name, string patronymic, string categoryesMachine, string dateOfEmployment, string dateOfBirth, string activeUser, string dateOfDismissal, string note)
+        public UserInfo(int userID, string surname, string name, string patronymic, string categoryesMachine, string dateOfEmployment, string dateOfBirth, string activeUser, string dateOfDismissal, string note)
         {
             this.userID = userID;
-            this.userName = userName;
             this.surname = surname;
             this.name = name;
             this.patronymic = patronymic;

@@ -22,6 +22,15 @@ namespace OrderManager
             dayNumber.Text = day.ToString();
             shiftNumber.Text = shift;
             hourCurr.Text = hour.ToString();
+
+            if (shift == "")
+            {
+                this.BackColor = Color.Turquoise;
+            }
+            else
+            {
+                this.BackColor = Color.NavajoWhite;
+            }
         }
 
         private void DayBlank_Load(object sender, EventArgs e)
