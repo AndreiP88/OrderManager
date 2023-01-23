@@ -1168,7 +1168,7 @@ namespace OrderManager
             // 
             this.paramToolStripMenuItem.Name = "paramToolStripMenuItem";
             this.paramToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
-            this.paramToolStripMenuItem.Text = "Параметры пользователя";
+            this.paramToolStripMenuItem.Text = "Календарь смен";
             this.paramToolStripMenuItem.Click += new System.EventHandler(this.параметрыToolStripMenuItem_Click);
             // 
             // machinesToolStripMenuItem
