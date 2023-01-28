@@ -18,8 +18,8 @@ namespace OrderManager
             DateTime timeOne = Convert.ToDateTime(dateTime.Day + "." + dateTime.Month + "." + dateTime.Year + " " + "08:00");
             DateTime timeTwo = Convert.ToDateTime(dateTime.Day + "." + dateTime.Month + "." + dateTime.Year + " " + "20:00");
 
-            dateTimePreview = dateTime.AddHours(-3);
-            dateTimeNext = dateTime.AddHours(3);
+            dateTimePreview = dateTime.AddHours(-5);
+            dateTimeNext = dateTime.AddHours(5);
 
             if (dateTimePreview <= timeOne && timeOne <= dateTimeNext)
                 result = "I";

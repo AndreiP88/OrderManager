@@ -242,6 +242,9 @@
     <Compile Include="GetPercentFromWorkingOut.cs" />
     <Compile Include="TypeInTheOrder.cs" />
     <Compile Include="ValueInfoBase.cs" />
+    <Compile Include="ValueStandardTimeBase .cs" />
+    <Compile Include="ValueSalaryPaidBase.cs" />
+    <Compile Include="ValueSalaryBase.cs" />
     <Compile Include="ValueSettingsBase.cs" />
     <Compile Include="ValueShiftsBase.cs" />
     <Compile Include="ValueTypesBase.cs" />

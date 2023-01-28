@@ -1140,8 +1140,8 @@ namespace OrderManager
             // toolStripButton1
             // 
             this.toolStripButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.shiftsToolStripMenuItem,
             this.paramToolStripMenuItem,
+            this.shiftsToolStripMenuItem,
             this.machinesToolStripMenuItem,
             this.changePasswordToolStripMenuItem,
             this.checkPasswordAfterCloseToolStripMenuItem,
@@ -1160,49 +1160,49 @@ namespace OrderManager
             // shiftsToolStripMenuItem
             // 
             this.shiftsToolStripMenuItem.Name = "shiftsToolStripMenuItem";
-            this.shiftsToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
-            this.shiftsToolStripMenuItem.Text = "Отработанные смены";
+            this.shiftsToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.shiftsToolStripMenuItem.Text = "Выработка";
             this.shiftsToolStripMenuItem.Click += new System.EventHandler(this.отработанныеСменыToolStripMenuItem_Click);
             // 
             // paramToolStripMenuItem
             // 
             this.paramToolStripMenuItem.Name = "paramToolStripMenuItem";
-            this.paramToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.paramToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.paramToolStripMenuItem.Text = "Календарь смен";
             this.paramToolStripMenuItem.Click += new System.EventHandler(this.параметрыToolStripMenuItem_Click);
             // 
             // machinesToolStripMenuItem
             // 
             this.machinesToolStripMenuItem.Name = "machinesToolStripMenuItem";
-            this.machinesToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.machinesToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.machinesToolStripMenuItem.Text = "Выбор оборудования";
             this.machinesToolStripMenuItem.Click += new System.EventHandler(this.machinesToolStripMenuItem_Click);
             // 
             // changePasswordToolStripMenuItem
             // 
             this.changePasswordToolStripMenuItem.Name = "changePasswordToolStripMenuItem";
-            this.changePasswordToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.changePasswordToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.changePasswordToolStripMenuItem.Text = "Изменить пароль";
             this.changePasswordToolStripMenuItem.Click += new System.EventHandler(this.changePasswordToolStripMenuItem_Click);
             // 
             // checkPasswordAfterCloseToolStripMenuItem
             // 
             this.checkPasswordAfterCloseToolStripMenuItem.Name = "checkPasswordAfterCloseToolStripMenuItem";
-            this.checkPasswordAfterCloseToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
-            this.checkPasswordAfterCloseToolStripMenuItem.Text = "Запрашивать пароль при каждом входе";
+            this.checkPasswordAfterCloseToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.checkPasswordAfterCloseToolStripMenuItem.Text = "Всегда запрашивать пароль";
             this.checkPasswordAfterCloseToolStripMenuItem.Click += new System.EventHandler(this.checkPasswordAfterCloseToolStripMenuItem_Click);
             // 
             // cancelAutoriToolStripMenuItem
             // 
             this.cancelAutoriToolStripMenuItem.Name = "cancelAutoriToolStripMenuItem";
-            this.cancelAutoriToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
-            this.cancelAutoriToolStripMenuItem.Text = "Отменить авторизацию на устройстве";
+            this.cancelAutoriToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.cancelAutoriToolStripMenuItem.Text = "Отменить авторизацию";
             this.cancelAutoriToolStripMenuItem.Click += new System.EventHandler(this.cancelAutoriToolStripMenuItem_Click);
             // 
             // базаДанныхToolStripMenuItem
             // 
             this.базаДанныхToolStripMenuItem.Name = "базаДанныхToolStripMenuItem";
-            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.базаДанныхToolStripMenuItem.Text = "База данных";
             this.базаДанныхToolStripMenuItem.Visible = false;
             this.базаДанныхToolStripMenuItem.Click += new System.EventHandler(this.базаДанныхToolStripMenuItem_Click);
@@ -1210,7 +1210,7 @@ namespace OrderManager
             // testToolStripMenuItem
             // 
             this.testToolStripMenuItem.Name = "testToolStripMenuItem";
-            this.testToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.testToolStripMenuItem.Text = "Test";
             this.testToolStripMenuItem.Visible = false;
             this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
@@ -1218,7 +1218,7 @@ namespace OrderManager
             // downloadUpadaterToolStripMenuItem
             // 
             this.downloadUpadaterToolStripMenuItem.Name = "downloadUpadaterToolStripMenuItem";
-            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(295, 22);
+            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.downloadUpadaterToolStripMenuItem.Text = "Скачать Updater";
             this.downloadUpadaterToolStripMenuItem.Visible = false;
             this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
