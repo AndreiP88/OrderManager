@@ -22,12 +22,16 @@ namespace OrderManager
 {
     public partial class FormAddEditTestMySQL : Form
     {
-        public FormAddEditTestMySQL()
+        bool availableDB;
+
+        public FormAddEditTestMySQL(bool availableDataBase)
         {
             InitializeComponent();
+
+            this.availableDB = availableDataBase;
         }
 
-        bool availableDB = false;
+        
         bool edit = false;
         bool edited = false;
 
@@ -276,11 +280,15 @@ namespace OrderManager
 
                 ini.Write("selected", section, "general");
 
+                availableDB = true;
+
                 Close();
             }
             else
             {
                 MessageBox.Show("Соединение не установлено!", "Ошибка", MessageBoxButtons.OK);
+
+                availableDB = false;
             }
             
         }
@@ -337,7 +345,14 @@ namespace OrderManager
 
         private void button4_Click(object sender, EventArgs e)
         {
-            Close();
+            if (availableDB)
+            {
+                Close();
+            }
+            else
+            {
+                Application.Exit();
+            }
         }
     }
 }

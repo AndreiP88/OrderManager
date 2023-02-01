@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -11,6 +12,25 @@ namespace OrderManager
         public ValueShiftsBase()
         {
 
+        }
+
+        public bool CheckShiftActivity(string startShift)
+        {
+            bool result = false;
+
+            string stopShift = GetStopShift(startShift);
+
+            if (stopShift == "")
+            {
+                result = true;
+            }
+
+            if (stopShift != "")
+            {
+                result = false;
+            }
+
+            return result;
         }
 
         public String GetStopShift(String startShift)

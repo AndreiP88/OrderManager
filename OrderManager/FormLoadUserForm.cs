@@ -190,7 +190,7 @@ namespace OrderManager
 
         private void FormLoadUserForm_DoubleClick(object sender, EventArgs e)
         {
-            FormAddEditTestMySQL form = new FormAddEditTestMySQL();
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
             form.ShowDialog();
 
             DBConnection connection = new DBConnection();

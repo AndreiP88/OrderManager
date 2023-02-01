@@ -114,6 +114,8 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
+            CheckCurrentShiftActivity();
+
             Info.active = false;
             FormAddCloseOrder form = new FormAddCloseOrder(Info.startOfShift, Info.nameOfExecutor);
             form.ShowDialog();
@@ -141,7 +143,7 @@ namespace OrderManager
             if(!connection.IsServerConnected(BaseConnectionParameters.host, BaseConnectionParameters.port, BaseConnectionParameters.database, 
                 BaseConnectionParameters.username, BaseConnectionParameters.password))
             {
-                DataBaseSelect();
+                DataBaseSelect(false);
             }
         }
 
@@ -872,6 +874,23 @@ namespace OrderManager
             Info.active = true;
         }
 
+        private void CheckCurrentShiftActivity()
+        {
+            ValueUserBase userBase = new ValueUserBase();
+            ValueShiftsBase valueShifts = new ValueShiftsBase();
+
+            string startOfShift = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
+            bool activityShift = valueShifts.CheckShiftActivity(Info.startOfShift);
+
+            if (!activityShift || startOfShift == "")
+            {
+                Info.active = false;
+                ClearAll();
+                ShowUserForm();
+                Info.active = true;
+            }
+        }
+
         private void button5_Click(object sender, EventArgs e)
         {
             Info.active = false;
@@ -930,6 +949,7 @@ namespace OrderManager
             if (DateTime.Now.ToString("ss") == "00" && Info.active == true)
             {
                 LoadOrdersFromBase();
+                CheckCurrentShiftActivity();
             }
         }
 
@@ -945,6 +965,7 @@ namespace OrderManager
 
         private void button7_Click(object sender, EventArgs e)
         {
+            CheckCurrentShiftActivity();
             SelectMachines();
         }
 
@@ -1410,9 +1431,9 @@ namespace OrderManager
 
         }
 
-        private void DataBaseSelect()
+        private void DataBaseSelect(bool available)
         {
-            FormAddEditTestMySQL form = new FormAddEditTestMySQL();
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL(available);
             form.ShowDialog();
             LoadBaseConnectionParameters();
             LoadUser();
@@ -1423,7 +1444,7 @@ namespace OrderManager
 
         private void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataBaseSelect();
+            DataBaseSelect(true);
         }
 
         private void normToolStripMenuItem_Click(object sender, EventArgs e)

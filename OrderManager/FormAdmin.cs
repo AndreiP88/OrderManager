@@ -3059,7 +3059,7 @@ namespace OrderManager
 
         private void editBaseButton_Click(object sender, EventArgs e)
         {
-            FormAddEditTestMySQL form = new FormAddEditTestMySQL();
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
             form.ShowDialog();
             LoadBaseInfo();
 
