@@ -36,7 +36,7 @@ namespace OrderManager
 
             salaryCurrent = salaryBase.GetData(loadUser);
 
-            AddTypesToListView();
+            AddSalaryToListView();
         }
 
         private void AddTypes()
@@ -81,7 +81,7 @@ namespace OrderManager
             editedSalary = false;
         }
 
-        private void AddTypesToListView()
+        private void AddSalaryToListView()
         {
             listView1.Items.Clear();
 
@@ -91,7 +91,7 @@ namespace OrderManager
 
                 item.Name = salaryCurrent[i].id;
                 item.Text = (listView1.Items.Count + 1).ToString();
-                item.SubItems.Add(salaryCurrent[i].period);
+                item.SubItems.Add(Convert.ToDateTime(salaryCurrent[i].period).ToString("MM.yyyy"));
                 item.SubItems.Add(salaryCurrent[i].basicSalary.ToString("N2"));
                 item.SubItems.Add(salaryCurrent[i].bonusSalary.ToString("N2"));
                 item.SubItems.Add(salaryCurrent[i].tax.ToString("N5"));
@@ -106,11 +106,11 @@ namespace OrderManager
 
                 item.Name = "n" + i.ToString();
                 item.Text = (listView1.Items.Count + 1).ToString();
-                item.SubItems.Add(salaryCurrent[i].period);
-                item.SubItems.Add(salaryCurrent[i].basicSalary.ToString("N2"));
-                item.SubItems.Add(salaryCurrent[i].bonusSalary.ToString("N2"));
-                item.SubItems.Add(salaryCurrent[i].tax.ToString("N5"));
-                item.SubItems.Add(salaryCurrent[i].pension.ToString("N5"));
+                item.SubItems.Add(Convert.ToDateTime(salaryForAdded[i].period).ToString("MM.yyyy"));
+                item.SubItems.Add(salaryForAdded[i].basicSalary.ToString("N2"));
+                item.SubItems.Add(salaryForAdded[i].bonusSalary.ToString("N2"));
+                item.SubItems.Add(salaryForAdded[i].tax.ToString("N5"));
+                item.SubItems.Add(salaryForAdded[i].pension.ToString("N5"));
 
                 listView1.Items.Add(item);
             }
@@ -160,7 +160,7 @@ namespace OrderManager
                 }
             }
 
-            AddTypesToListView();
+            AddSalaryToListView();
 
             Clear();
         }
@@ -230,7 +230,7 @@ namespace OrderManager
                 positionForDelete.Add(index.ToString());
             }
 
-            AddTypesToListView();
+            AddSalaryToListView();
         }
 
         private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
