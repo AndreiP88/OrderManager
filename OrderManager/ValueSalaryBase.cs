@@ -58,6 +58,87 @@ namespace OrderManager
             return result;
         }
 
+        public List<SalaryForUser> GetData(string userID)
+        {
+            List<SalaryForUser> result = new List<SalaryForUser>();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM salary WHERE userID = @userID"
+
+                };
+                Command.Parameters.AddWithValue("@userID", userID);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result.Add(new SalaryForUser(
+                        sqlReader["id"].ToString(),
+                        sqlReader["period"].ToString(),
+                        Convert.ToDecimal(sqlReader["basicSalary"]),
+                        Convert.ToDecimal(sqlReader["bonusSalary"]),
+                        Convert.ToDecimal(sqlReader["tax"]),
+                        Convert.ToDecimal(sqlReader["pension"])));
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        public void InsertData(string user, SalaryForUser value)
+        {
+            AddNewPeriod(user, value.period);
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                /*string commandText = "INSERT INTO salary (userID, period, basicSalary, bonusSalary, tax, pension) " +
+                    "VALUES (@userID, @period, @basicSalary, @bonusSalary, @tax, @pension)";*/
+
+                string commandText = "UPDATE salary SET basicSalary = @basicSalary, bonusSalary = @bonusSalary, tax = @tax, pension = @pension " +
+                    "WHERE userID = @userID AND period = @period";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@userID", user);
+                Command.Parameters.AddWithValue("@period", value.period);
+                Command.Parameters.AddWithValue("@basicSalary", value.basicSalary);
+                Command.Parameters.AddWithValue("@bonusSalary", value.bonusSalary);
+                Command.Parameters.AddWithValue("@tax", value.tax);
+                Command.Parameters.AddWithValue("@pension", value.pension);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public void UpdateData(SalaryForUser value)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE salary SET period = @period, basicSalary = @basicSalary, bonusSalary = @bonusSalary, tax = @tax, pension = @pension " +
+                    "WHERE (id = @id)";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", value.id);
+                Command.Parameters.AddWithValue("@period", value.period);
+                Command.Parameters.AddWithValue("@basicSalary", value.basicSalary);
+                Command.Parameters.AddWithValue("@bonusSalary", value.bonusSalary);
+                Command.Parameters.AddWithValue("@tax", value.tax);
+                Command.Parameters.AddWithValue("@pension", value.pension);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
         public string GetIndexFromSelectedPeriod(DateTime date, string userID)
         {
             string period = date.ToString("yyyy-MM-dd");
@@ -117,27 +198,6 @@ namespace OrderManager
             return result;
         }
 
-        private void SetValue(string userID, string period, string key, decimal value)
-        {
-            string fullPeriod = "01." + period;
-
-            AddNewPeriod(userID, fullPeriod);
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                string commandText = "UPDATE salaryPaid SET " + key + " = @value WHERE userID = @userID AND period = @period";
-
-                MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@userID", userID);
-                Command.Parameters.AddWithValue("@period", fullPeriod);
-                Command.Parameters.AddWithValue("@value", value);
-
-                Connect.Open();
-                Command.ExecuteNonQuery();
-                Connect.Close();
-            }
-        }
-
         private void AddNewPeriod(string userID, string fullPeriod)
         {
             int result = 0;
@@ -175,22 +235,18 @@ namespace OrderManager
             }
         }
 
-        private void SetValue(string id, string key, decimal value)
+        public void DeleteSalary(string id)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                string commandText = "UPDATE orders SET " + key + " = @value " +
-                    "WHERE machine = @orderMachine AND (numberOfOrder = @number AND modification = @orderModification)";
+                string commandText = "DELETE FROM salary WHERE id = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);
-                Command.Parameters.AddWithValue("@value", value);
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
         }
-
-        
     }
 }

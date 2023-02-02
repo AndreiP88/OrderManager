@@ -153,6 +153,12 @@
     <Compile Include="FormCloseShift.Designer.cs">
       <DependentUpon>FormCloseShift.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormSalaryForUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSalaryForUser.Designer.cs">
+      <DependentUpon>FormSalaryForUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTypesInTheOrder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -240,6 +246,7 @@
     <Compile Include="GetNumberShiftFromTimeStart.cs" />
     <Compile Include="GetOrdersFromBase.cs" />
     <Compile Include="GetPercentFromWorkingOut.cs" />
+    <Compile Include="SalaryForUser.cs" />
     <Compile Include="TypeInTheOrder.cs" />
     <Compile Include="ValueInfoBase.cs" />
     <Compile Include="ValueStandardTimeBase .cs" />
@@ -303,6 +310,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCloseShift.resx">
       <DependentUpon>FormCloseShift.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormSalaryForUser.resx">
+      <DependentUpon>FormSalaryForUser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormTypesInTheOrder.resx">
       <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>

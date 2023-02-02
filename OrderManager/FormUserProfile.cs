@@ -31,6 +31,20 @@ namespace OrderManager
         {
             LoadUser();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            ValueSettingsBase settingsBase = new ValueSettingsBase();
+
+            bool detailsSalary = false;
+            string getDeteils = settingsBase.GetDeteilsSalary(idUser);
+
+            if (getDeteils == "True")
+            {
+                detailsSalary = true;
+            }
+
+            if (getDeteils == "False" || getDeteils == "")
+            {
+                detailsSalary = false;
+            }
 
             String[] mounts = new String[] {
             "Январь",
@@ -51,9 +65,19 @@ namespace OrderManager
 
             SetItemsComboBox(DateTime.Now.Year, DateTime.Now.Month);
 
-            tableLayoutPanel1.ColumnStyles[0].Width = 100;
-            tableLayoutPanel1.ColumnStyles[1].Width = 0;
-            this.Width = 570;
+            if (detailsSalary)
+            {
+                //tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Percent;
+                tableLayoutPanel1.ColumnStyles[0].Width = 52;
+                tableLayoutPanel1.ColumnStyles[1].Width = 48;
+                this.Width = 1050;
+            }
+            else
+            {
+                tableLayoutPanel1.ColumnStyles[0].Width = 100;
+                tableLayoutPanel1.ColumnStyles[1].Width = 0;
+                this.Width = 570;
+            }
         }
 
         private void SetItemsComboBox(int year, int month)
@@ -391,18 +415,24 @@ namespace OrderManager
 
         private void button1_Click_1(object sender, EventArgs e)
         {
+            ValueSettingsBase settingsBase = new ValueSettingsBase();
+
             if (tableLayoutPanel1.ColumnStyles[1].Width == 0)
             {
                 //tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Percent;
                 tableLayoutPanel1.ColumnStyles[0].Width = 52;
                 tableLayoutPanel1.ColumnStyles[1].Width = 48;
                 this.Width = 1050;
+
+                settingsBase.UpdateDeteilsSalary(idUser, "True");
             }
             else
             {
                 tableLayoutPanel1.ColumnStyles[0].Width = 100;
                 tableLayoutPanel1.ColumnStyles[1].Width = 0;
                 this.Width = 570;
+
+                settingsBase.UpdateDeteilsSalary(idUser, "False");
             }
             
         }
@@ -496,6 +526,15 @@ namespace OrderManager
 
         private void numericUpDown22_ValueChanged(object sender, EventArgs e)
         {
+            RetentionFromSalary();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            FormSalaryForUser formSalary = new FormSalaryForUser(idUser);
+            formSalary.ShowDialog();
+
+            LoadSalary();
             RetentionFromSalary();
         }
     }

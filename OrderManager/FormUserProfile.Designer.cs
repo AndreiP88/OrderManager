@@ -111,6 +111,7 @@
             this.tableLayoutPanel20 = new System.Windows.Forms.TableLayoutPanel();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.tableLayoutPanel21 = new System.Windows.Forms.TableLayoutPanel();
             this.label38 = new System.Windows.Forms.Label();
             this.numericUpDown22 = new System.Windows.Forms.NumericUpDown();
@@ -1337,6 +1338,7 @@
             this.tableLayoutPanel20.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
             this.tableLayoutPanel20.Controls.Add(this.button2, 1, 0);
             this.tableLayoutPanel20.Controls.Add(this.button3, 2, 0);
+            this.tableLayoutPanel20.Controls.Add(this.button4, 0, 0);
             this.tableLayoutPanel20.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel20.Location = new System.Drawing.Point(3, 548);
             this.tableLayoutPanel20.Name = "tableLayoutPanel20";
@@ -1366,6 +1368,17 @@
             this.button3.Text = "Отмена";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
+            // button4
+            // 
+            this.button4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button4.Location = new System.Drawing.Point(3, 3);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(182, 28);
+            this.button4.TabIndex = 2;
+            this.button4.Text = "Редактировать зарплату";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // tableLayoutPanel21
             // 
@@ -1595,5 +1608,6 @@
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.NumericUpDown numericUpDown22;
         private System.Windows.Forms.NumericUpDown numericUpDown23;
+        private System.Windows.Forms.Button button4;
     }
 }

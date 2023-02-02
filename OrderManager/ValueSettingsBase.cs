@@ -22,6 +22,11 @@ namespace OrderManager
             return GetValue("userID", id, "selectedPage");
         }
 
+        public String GetDeteilsSalary(String id)
+        {
+            return GetValue("userID", id, "detailsSalary");
+        }
+
         public String GetParameterLine(String id, String selectForm)
         {
             return GetValue("userID", id, selectForm);
@@ -60,6 +65,11 @@ namespace OrderManager
         public void UpdateSelectedPage(String idUser, String newValue)
         {
             UpdateValue("selectedPage", idUser, newValue);
+        }
+
+        public void UpdateDeteilsSalary(String idUser, String newValue)
+        {
+            UpdateValue("detailsSalary", idUser, newValue);
         }
 
         public void UpdateParameterLine(String idUser, String selectForm, String newValue)
