@@ -10,6 +10,7 @@ namespace OrderManager
     public partial class FormFullListOrders : Form
     {
         bool detailsLoad;
+        string orderID;
         String orderrMachineLoad;
         String orderNumberLoad;
         String orderModificationLoad;
@@ -17,10 +18,19 @@ namespace OrderManager
         {
             InitializeComponent();
 
+            this.orderID = "";
             this.detailsLoad = details;
             this.orderrMachineLoad = orderMachine;
             this.orderNumberLoad = orderNumber;
             this.orderModificationLoad = orderModification;
+        }
+
+        public FormFullListOrders(string orderIDFromOrdersBase)
+        {
+            InitializeComponent();
+
+            this.detailsLoad = true;
+            this.orderID = orderIDFromOrdersBase;
         }
 
         String GetParametersLine()
@@ -196,7 +206,12 @@ namespace OrderManager
 
                 String commandText;
                 if (detailsLoad == true)
-                    commandText = "SELECT * FROM ordersInProgress WHERE machine = '" + orderrMachineLoad + "' AND (numberOfOrder = '" + orderNumberLoad + "' AND modification = '" + orderModificationLoad + "')";
+                {
+                    if (orderID != "")
+                        commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
+                    else
+                        commandText = "SELECT * FROM ordersInProgress WHERE machine = '" + orderrMachineLoad + "' AND (numberOfOrder = '" + orderNumberLoad + "' AND modification = '" + orderModificationLoad + "')";
+                }
                 else
                     commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
 

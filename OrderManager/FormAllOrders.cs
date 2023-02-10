@@ -4,7 +4,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Drawing;
+using System.Reflection.Emit;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Globalization;
+using System.Reflection;
 
 namespace OrderManager
 {
@@ -38,6 +45,12 @@ namespace OrderManager
         private void LoadSelectedOrder(bool detailsLoad, String orderMachine, String orderNumberm, String orderModification)
         {
             FormFullListOrders form = new FormFullListOrders(detailsLoad, orderMachine, orderNumberm, orderModification);
+            form.ShowDialog();
+        }
+
+        private void LoadSelectedOrderFromID(string id)
+        {
+            FormFullListOrders form = new FormFullListOrders(id);
             form.ShowDialog();
         }
 
@@ -159,6 +172,11 @@ namespace OrderManager
 
         private void LoadOrdersFromBase()
         {
+
+        }
+
+        private void LoadOrdersFromBase2()
+        {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
@@ -228,6 +246,161 @@ namespace OrderManager
 
         }
 
+        private List<string> LoadIndexesOrdersFromBase(string key)
+        {
+            List<string> result = new List<string>();
+
+            ValueInfoBase getInfo = new ValueInfoBase();
+
+            listView1.Items.Clear();
+
+            ordersNumbers.Clear();
+
+            int index = 0;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                String commandLine;
+                //commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') >= '";
+                commandLine += dateTimePicker1.Value.ToString("yyyy-MM-dd 00:00:00") + "'";
+
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox1.Text) + "'"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                {
+                    if (sqlReader["numberOfOrder"].ToString().Contains(key))
+                    {
+                        result.Add(sqlReader["count"].ToString());
+                        ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+
+                        String modification = "";
+                        if (sqlReader["modification"].ToString() != "")
+                            modification = " (" + sqlReader["modification"].ToString() + ")";
+
+                        ListViewItem item = new ListViewItem();
+
+                        item.Name = sqlReader["count"].ToString();
+                        item.Text = (index + 1).ToString();
+                        item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
+                        item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+                        //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
+                        item.SubItems.Add("");
+                        item.SubItems.Add("");
+
+                        listView1.Items.Add(item);
+
+                        index++;
+                    }
+
+                }
+
+                Connect.Close();
+            }
+            return result;
+        }
+
+        private void LoadOrdersFromTheKey(string key)
+        {
+            List<string> indexes = new List<string>(LoadIndexesOrdersFromBase(key));
+
+            StartLoading(indexes);
+        }
+
+        CancellationTokenSource cancelTokenSource;
+        private void StartLoading(List<string> indexes)
+        {
+            ValueInfoBase getInfo = new ValueInfoBase();
+
+            string machine = getInfo.GetMachineFromName(comboBox1.Text);
+
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+                //Thread.Sleep(100);
+            }
+
+            cancelTokenSource = new CancellationTokenSource();
+            //CancellationToken token = cancelTokenSource.Token;
+
+            //Task task = new Task(() => LoadUsersFromBase(token, date));
+            Task task = new Task(() => LoadOrdersDetailsFromBase(cancelTokenSource.Token, machine, indexes), cancelTokenSource.Token);
+            task.Start();
+        }
+
+        private void LoadOrdersDetailsFromBase(CancellationToken token, string machine, List<string> indexes)
+        {
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT * FROM orders WHERE count = '" + indexes[i] + "'"
+                    };
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                    {
+                        GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
+                        GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
+                        GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
+
+
+                        Invoke(new Action(() =>
+                        {
+                            int index = listView1.Items.IndexOfKey(indexes[i]);
+
+                            if (index >= 0)
+                            {
+                                ListViewItem item = listView1.Items[index];
+                                if (item != null)
+                                {
+                                    item.SubItems[3].Text = timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"]));
+                                    item.SubItems[4].Text = timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeToWork"]));
+                                    item.SubItems[5].Text = Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0");
+                                    item.SubItems[6].Text = leadTimeFirst.GetFirstValue("timeMakereadyStart").ToString();
+                                    item.SubItems[7].Text = leadTimeLast.GetLastValue("timeToWorkStop").ToString();
+                                    //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
+                                    item.SubItems[8].Text = orderCalc.OrderFullCalculate().ToString("N0");
+                                    item.SubItems[9].Text = ordersBase.GetOrderStatusName(getInfo.GetMachineFromName(comboBox1.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
+                                }
+                            }
+                        }));
+                    }
+
+                    Connect.Close();
+                }
+            }
+
+            Invoke(new Action(() =>
+            {
+
+            }));
+        }
+
         private void SetNewStatus(String orderMachine, String numberOfOrder, String orderModification, String newStatus)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -261,22 +434,26 @@ namespace OrderManager
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadOrdersFromBase();
+            LoadOrdersFromTheKey(textBox1.Text);
         }
 
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
             LoadOrdersFromBase();
+            LoadOrdersFromTheKey(textBox1.Text);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             LoadOrdersFromBase();
+            LoadOrdersFromTheKey(textBox1.Text);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             ShowFullOrdersForm(false);
             LoadOrdersFromBase();
+            LoadOrdersFromTheKey(textBox1.Text);
         }
 
         private void listView1_DoubleClick(object sender, EventArgs e)
@@ -284,7 +461,11 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
 
             if (listView1.SelectedItems.Count != 0)
-                LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+            {
+                LoadSelectedOrderFromID(listView1.Items[listView1.SelectedIndices[0]].Name);
+                //LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+            }
+                
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -302,13 +483,18 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
 
             if (listView1.SelectedItems.Count != 0)
-                LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+            {
+                LoadSelectedOrderFromID(listView1.Items[listView1.SelectedIndices[0]].Name);
+                //LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+            }
+                
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowFullOrdersForm(true);
             LoadOrdersFromBase();
+            LoadOrdersFromTheKey(textBox1.Text);
         }
 
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
@@ -317,6 +503,7 @@ namespace OrderManager
 
             SetNewStatus(getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder, "4");
             LoadOrdersFromBase();
+            LoadOrdersFromTheKey(textBox1.Text);
         }
     }
 }

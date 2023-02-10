@@ -134,19 +134,31 @@ namespace OrderManager
             label15.Text = "";
         }
 
+        CancellationTokenSource cancelTokenSource;
         private void StartLoading()
         {
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+                //Thread.Sleep(100);
+            }
+
             if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1)
             {
+                
+
+                cancelTokenSource = new CancellationTokenSource();
+                //CancellationToken token = cancelTokenSource.Token;
+
+                
+
                 ClearAll();
 
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1).AddMonths(comboBox2.SelectedIndex);
 
-                CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-                CancellationToken token = cancelTokenSource.Token;
-
-                Task task = new Task(() => LoadUsersFromBase(token, date));
+                //Task task = new Task(() => LoadUsersFromBase(token, date));
+                Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date), cancelTokenSource.Token);
 
                 if (thJob == true)
                 {
@@ -174,8 +186,11 @@ namespace OrderManager
                 comboBox2.Enabled = false;
             }));
 
-            while (!token.IsCancellationRequested)
+            //while (!token.IsCancellationRequested)
+            while (true)
             {
+                token.ThrowIfCancellationRequested();
+
                 thJob = true;
 
                 int fullCountShifts = 0;
@@ -260,16 +275,19 @@ namespace OrderManager
                         {
                             int index = listView1.Items.IndexOfKey(sqlReader["id"].ToString());
 
-                            ListViewItem item = listView1.Items[index];
-                            if (item != null)
+                            if (index >= 0)
                             {
-                                item.SubItems[2].Text = shiftsDetails.countShifts.ToString();
-                                item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
-                                item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
-                                item.SubItems[5].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
-                                item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
-                                item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
-                                item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+                                ListViewItem item = listView1.Items[index];
+                                if (item != null)
+                                {
+                                    item.SubItems[2].Text = shiftsDetails.countShifts.ToString();
+                                    item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
+                                    item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
+                                    item.SubItems[5].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
+                                    item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
+                                    item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
+                                    item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+                                }
                             }
                         }));
 
@@ -283,6 +301,11 @@ namespace OrderManager
                             label14.Text = fullAmountOrders.ToString("N0");
                             label15.Text = (fullPercentWorkingOut / countActiveUser).ToString("N1") + "%";
                         }));
+
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
                     }
 
                     Connect.Close();
@@ -338,5 +361,6 @@ namespace OrderManager
         {
             SaveParameterToBase("statisticForm");
         }
+
     }
 }
