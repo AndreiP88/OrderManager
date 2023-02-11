@@ -18,16 +18,19 @@ namespace OrderManager
         {
             bool result = false;
 
-            string stopShift = GetStopShift(startShift);
-
-            if (stopShift == "")
+            if (startShift != "")
             {
-                result = true;
-            }
+                string stopShift = GetStopShift(startShift);
 
-            if (stopShift != "")
-            {
-                result = false;
+                if (stopShift == "")
+                {
+                    result = true;
+                }
+
+                if (stopShift != "")
+                {
+                    result = false;
+                }
             }
 
             return result;

@@ -468,7 +468,7 @@ namespace OrderManager
 
             for (int index = 0; index < ordersCurrentShift.Count; index++)
             {
-                String modification = "";
+                string modification = "";
                 if (ordersCurrentShift[index].modificationOfOrder != "")
                     modification = " (" + ordersCurrentShift[index].modificationOfOrder + ")";
 
@@ -484,6 +484,7 @@ namespace OrderManager
                 item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
                 item.SubItems.Add(ordersCurrentShift[index].plannedTimeMakeready.ToString() + ", " + ordersCurrentShift[index].plannedTimeWork.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].facticalTimeMakeready.ToString() + ", " + ordersCurrentShift[index].facticalTimeWork.ToString());
+                item.SubItems.Add(ordersCurrentShift[index].deviation.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
                 item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[index].workingOut));
                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
@@ -1720,29 +1721,7 @@ namespace OrderManager
             StartDowloadUpdater();
         }
 
-        private void changePasswordToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FormLoadUserPasswordForm form = new FormLoadUserPasswordForm(true, Info.nameOfExecutor);
-            form.ShowDialog();
-        }
-
-        private void cancelAutoriToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ValueUserBase setValueUsers = new ValueUserBase();
-
-            setValueUsers.UpdateLastUID(Info.nameOfExecutor, "");
-        }
-
-        private void checkPasswordAfterCloseToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ValueSettingsBase updateSettingsValue = new ValueSettingsBase();
-
-            bool checkPass = checkPasswordAfterCloseToolStripMenuItem.Checked;
-
-            updateSettingsValue.UpdateCheckPassword(Info.nameOfExecutor, checkPass.ToString());
-        }
-
-        private void toolStripButton1_DropDownOpening(object sender, EventArgs e)
+        private void toolStripDropDownButton2_DropDownOpening(object sender, EventArgs e)
         {
             ValueSettingsBase settingsBase = new ValueSettingsBase();
 
@@ -1751,7 +1730,29 @@ namespace OrderManager
             if (settingsBase.GetPasswordChecked(Info.nameOfExecutor) != "")
                 checkPass = Convert.ToBoolean(settingsBase.GetPasswordChecked(Info.nameOfExecutor));
 
-            checkPasswordAfterCloseToolStripMenuItem.Checked = !checkPass;
+            alwaysCheckPasswordToolStripMenuItem.Checked = !checkPass;
+        }
+
+        private void passwordChangeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormLoadUserPasswordForm form = new FormLoadUserPasswordForm(true, Info.nameOfExecutor);
+            form.ShowDialog();
+        }
+
+        private void alwaysCheckPasswordToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ValueSettingsBase updateSettingsValue = new ValueSettingsBase();
+
+            bool checkPass = alwaysCheckPasswordToolStripMenuItem.Checked;
+
+            updateSettingsValue.UpdateCheckPassword(Info.nameOfExecutor, checkPass.ToString());
+        }
+
+        private void cancelAutorizationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ValueUserBase setValueUsers = new ValueUserBase();
+
+            setValueUsers.UpdateLastUID(Info.nameOfExecutor, "");
         }
     }
 }

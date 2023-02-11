@@ -229,6 +229,31 @@ namespace OrderManager
             return TotalMinutesToHoursAndMinutesStr(totalTime);
         }
 
+        public String TimeDifferentAndNegative(String firstTime, String secondTime)
+        {
+            int totalTime;
+            int firstD;
+            int secondD;
+
+            string sign = "";
+
+            firstD = totallTimeHHMMToMinutes(firstTime);
+            secondD = totallTimeHHMMToMinutes(secondTime);
+
+            if (firstD > secondD)
+            {
+                totalTime = firstD - secondD;
+                sign = "";
+            }
+            else
+            {
+                totalTime = secondD - firstD;
+                sign = "-";
+            }
+
+            return sign + TotalMinutesToHoursAndMinutesStr(totalTime);
+        }
+
         public int TimeDifferentToMinutes(String firstTime, String secondTime)
         {
             int totalTime = 0;

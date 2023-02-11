@@ -8,6 +8,7 @@ namespace OrderManager
 {
     internal class GetOrdersFromBase
     {
+        bool _unionDeviation = false;
         public class OrdersMonth
         {
             public String numberOrder { get; set; }
@@ -272,7 +273,7 @@ namespace OrderManager
                         int workTime = Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
                         int orderNorm = 0;
                         int timeWorkingOut = 0;
-                        String lastTimeWork = "00:00";
+                        string lastTimeWork = "00:00";
 
                         if (workTime != 0)
                         {
@@ -281,7 +282,27 @@ namespace OrderManager
                             lastTimeWork = timeOperations.TotalMinutesToHoursAndMinutesStr((lastCount * 60) / orderNorm);
                         }
 
-                        String lastTimeMakeready = LastTimeMakereadyStr(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
+                        string lastTimeMakeready = LastTimeMakereadyStr(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
+
+                        string timeMakeready = timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()).ToString();
+                        string timeWork = timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()).ToString();
+
+                        string deviation;
+
+                        if (_unionDeviation)
+                        {
+                            string timeFull = timeOperations.TimeAmount(timeMakeready, timeWork);
+                            string lastTimeFull = timeOperations.TimeAmount(lastTimeMakeready, lastTimeWork);
+
+                            deviation = timeOperations.TimeDifferentAndNegative(lastTimeFull, timeFull); 
+                        }
+                        else
+                        {
+                            string mkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeMakeready, timeMakeready);
+                            string wkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeWork, timeWork);
+
+                            deviation = mkDeviation + ", " + wkDeviation;
+                        }
 
                         timeWorkingOut += FullWorkoutTime(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString(),
                             sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
@@ -295,12 +316,12 @@ namespace OrderManager
                             lastCount,
                             lastTimeMakeready,
                             lastTimeWork,
-                            timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()).ToString(),
-                            timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()).ToString(),
+                            timeMakeready,
+                            timeWork,
                             Convert.ToInt32(sqlReader["done"]),
                             orderNorm,
                             timeWorkingOut,
-                            "<>",
+                            deviation,
                             sqlReader["counterRepeat"].ToString(),
                             sqlReader["note"].ToString(),
                             sqlReader["privateNote"].ToString()
