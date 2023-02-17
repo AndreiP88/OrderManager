@@ -240,7 +240,7 @@ namespace OrderManager
             firstD = totallTimeHHMMToMinutes(firstTime);
             secondD = totallTimeHHMMToMinutes(secondTime);
 
-            if (firstD > secondD)
+            if (firstD >= secondD)
             {
                 totalTime = firstD - secondD;
                 sign = "";

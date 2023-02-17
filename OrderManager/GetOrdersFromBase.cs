@@ -283,23 +283,32 @@ namespace OrderManager
                         }
 
                         string lastTimeMakeready = LastTimeMakereadyStr(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
-
                         string timeMakeready = timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()).ToString();
                         string timeWork = timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()).ToString();
+                        string lastTimeWorkForDeviation;
 
+                        if (timeWorkingOut > 0)
+                        {
+                            lastTimeWorkForDeviation = timeOperations.TotalMinutesToHoursAndMinutesStr(timeWorkingOut);
+                        }
+                        else
+                        {
+                            lastTimeWorkForDeviation = lastTimeWork;
+                        }
+                        
                         string deviation;
 
                         if (_unionDeviation)
                         {
                             string timeFull = timeOperations.TimeAmount(timeMakeready, timeWork);
-                            string lastTimeFull = timeOperations.TimeAmount(lastTimeMakeready, lastTimeWork);
+                            string lastTimeFull = timeOperations.TimeAmount(lastTimeMakeready, lastTimeWorkForDeviation);
 
                             deviation = timeOperations.TimeDifferentAndNegative(lastTimeFull, timeFull); 
                         }
                         else
                         {
                             string mkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeMakeready, timeMakeready);
-                            string wkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeWork, timeWork);
+                            string wkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeWorkForDeviation, timeWork);
 
                             deviation = mkDeviation + ", " + wkDeviation;
                         }
