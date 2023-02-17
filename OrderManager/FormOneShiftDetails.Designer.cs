@@ -60,13 +60,14 @@ namespace OrderManager
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.noteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -291,6 +292,7 @@ namespace OrderManager
             this.columnHeader3,
             this.columnHeader4,
             this.columnHeader5,
+            this.columnHeader11,
             this.columnHeader6,
             this.columnHeader7,
             this.columnHeader8,
@@ -350,27 +352,37 @@ namespace OrderManager
             // columnHeader5
             // 
             this.columnHeader5.Text = "Время";
-            this.columnHeader5.Width = 112;
+            this.columnHeader5.Width = 98;
             // 
             // columnHeader6
             // 
+            this.columnHeader6.DisplayIndex = 9;
             this.columnHeader6.Text = "Сделано";
             this.columnHeader6.Width = 85;
             // 
             // columnHeader7
             // 
+            this.columnHeader7.DisplayIndex = 10;
             this.columnHeader7.Text = "Норма, шт/ч";
             this.columnHeader7.Width = 94;
             // 
             // columnHeader8
             // 
+            this.columnHeader8.DisplayIndex = 11;
             this.columnHeader8.Text = "Выработка";
             this.columnHeader8.Width = 88;
             // 
             // columnHeader9
             // 
+            this.columnHeader9.DisplayIndex = 12;
             this.columnHeader9.Text = "Примечание";
             this.columnHeader9.Width = 223;
+            // 
+            // columnHeader10
+            // 
+            this.columnHeader10.DisplayIndex = 13;
+            this.columnHeader10.Text = "Заметка";
+            this.columnHeader10.Width = 95;
             // 
             // contextMenuStrip1
             // 
@@ -415,14 +427,15 @@ namespace OrderManager
             this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             // 
-            // columnHeader10
-            // 
-            this.columnHeader10.Text = "Заметка";
-            this.columnHeader10.Width = 95;
-            // 
             // toolTip1
             // 
             this.toolTip1.AutomaticDelay = 100;
+            // 
+            // columnHeader11
+            // 
+            this.columnHeader11.DisplayIndex = 8;
+            this.columnHeader11.Text = "Отклонение";
+            this.columnHeader11.Width = 92;
             // 
             // FormOneShiftDetails
             // 
@@ -484,6 +497,7 @@ namespace OrderManager
         private System.Windows.Forms.ToolStripMenuItem noteToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ColumnHeader columnHeader11;
     }
 }
 
