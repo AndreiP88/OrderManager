@@ -880,16 +880,22 @@ namespace OrderManager
             ValueUserBase userBase = new ValueUserBase();
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
-            string startOfShift = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
-            bool activityShift = valueShifts.CheckShiftActivity(Info.startOfShift);
-
-            if (!activityShift || startOfShift == "")
+            if (Info.startOfShift != "")
             {
-                Info.active = false;
-                ClearAll();
-                ShowUserForm();
-                Info.active = true;
+                string startOfShift = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
+                bool activityShift = valueShifts.CheckShiftActivity(Info.startOfShift);
+
+                //if (!activityShift || startOfShift == "")
+                if (!activityShift || startOfShift == "")
+                {
+                    Info.active = false;
+                    ClearAll();
+                    ShowUserForm();
+                    Info.active = true;
+                }
             }
+
+            
         }
 
         private void button5_Click(object sender, EventArgs e)
