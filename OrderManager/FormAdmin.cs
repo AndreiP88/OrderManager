@@ -16,8 +16,6 @@ namespace OrderManager
     {
         bool adminMode;
 
-        bool allOrderTHRead = false;
-
         public FormAdmin(bool aMode)
         {
             InitializeComponent();
@@ -2254,32 +2252,6 @@ namespace OrderManager
 
         private void StartLoadingAllOrders()
         {
-            if (allOrderTHRead)
-            {
-                StartLoadingAllOrdersthRead();
-            }
-            else
-            {
-                LoadingAllOrders();
-            }
-        }
-
-        
-
-
-
-
-
-
-
-
-
-
-
-        private void LoadingAllOrders()
-        {
-            ValueUserBase getUser = new ValueUserBase();
-
             DateTimePicker dateTime = (DateTimePicker)ControlFromKey("tableLayoutPanelControl", "dateTime");
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
             TextBox textBoxFilter = (TextBox)ControlFromKey("tableLayoutPanelControl", "textBoxFilter");
@@ -2292,168 +2264,187 @@ namespace OrderManager
                 String filterKey;
                 filterKey = textBoxFilter.Text;
 
-                CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-                CancellationToken token = cancelTokenSource.Token;
+                List<string> indexes = new List<string>(LoadIndexesOrdersFromBase(date, filterKey));
 
-                LoadAllOrdersFromBase(token, date, filterKey);
+                StartLoading(indexes);
             }
         }
 
-        private void StartLoadingAllOrdersthRead()
+        CancellationTokenSource cancelTokenSource;
+        private void StartLoading(List<string> indexes)
         {
-            ValueUserBase getUser = new ValueUserBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
 
-            DateTimePicker dateTime = (DateTimePicker)ControlFromKey("tableLayoutPanelControl", "dateTime");
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
-            TextBox textBoxFilter = (TextBox)ControlFromKey("tableLayoutPanelControl", "textBoxFilter");
 
-            if (comboBoxMachine.SelectedIndex != -1)
+            string machine = getInfo.GetMachineFromName(comboBoxMachine.Text);
+
+            if (cancelTokenSource != null)
             {
-                //ClearAll();
-
-                DateTime date;
-                date = dateTime.Value;
-
-                String filterKey;
-                filterKey = textBoxFilter.Text;
-
-                CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-                CancellationToken token = cancelTokenSource.Token;
-
-                Task task = new Task(() => LoadAllOrdersFromBase(token, date, filterKey));
-
-                if (thJob == true)
-                {
-                    cancelTokenSource.Cancel();
-                    task.Start();
-                    Text += thJob.ToString();
-                }
-                else
-                {
-                    task.Start();
-                }
+                cancelTokenSource.Cancel();
+                //Thread.Sleep(100);
             }
+
+            cancelTokenSource = new CancellationTokenSource();
+
+            Task task = new Task(() => LoadOrdersDetailsFromBase(cancelTokenSource.Token, machine, indexes), cancelTokenSource.Token);
+            task.Start();
         }
 
-        private void LoadAllOrdersFromBase(CancellationToken token, DateTime dateTime, String filter)
+        private List<string> LoadIndexesOrdersFromBase(DateTime dateTime, String filter)
+        {
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
+
+            List<string> result = new List<string>();
+
+            String machine = getInfo.GetMachineFromName(comboBoxMachine.Text);
+
+            EnabledButtons(false);
+
+            comboBoxMachine.Enabled = false;
+
+            var name = "listView";
+            if (tableLayoutPanel1.Controls.ContainsKey(name))
+            {
+                var control = tableLayoutPanel1.Controls.Find(name, false);
+                ListView listView = (ListView)control[0];
+
+                listView.Items.Clear();
+
+                ordersNumbers.Clear();
+                //ordersNumbers.Add(new Order("", ""));
+
+                int index = 0;
+
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    String commandLine;
+                    //commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
+                    commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') >= '";
+                    commandLine += dateTime.ToString("yyyy-MM-dd 00:00:00") + "'";
+
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBoxMachine.Text) + "'"
+                    };
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                    {
+                        if (sqlReader["numberOfOrder"].ToString().Contains(filter))
+                        {
+                            result.Add(sqlReader["count"].ToString());
+                            ordersNumbers.Add(new OrderNM(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+
+                            String modification = "";
+                            if (sqlReader["modification"].ToString() != "")
+                                modification = " (" + sqlReader["modification"].ToString() + ")";
+
+                            ListViewItem item = new ListViewItem();
+
+                            item.Name = sqlReader["count"].ToString();
+                            item.Text = (index + 1).ToString();
+                            item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
+                            item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+
+                            listView.Items.Add(item);
+
+                            index++;
+                        }
+
+                    }
+
+                    Connect.Close();
+                }
+
+                EnabledButtons(true);
+
+                comboBoxMachine.Enabled = true;
+            }
+
+            return result;
+        }
+
+        private void LoadOrdersDetailsFromBase(CancellationToken token, string machine, List<string> indexes)
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
-            String machine = getInfo.GetMachineFromName(comboBoxMachine.Text);
-
-            Invoke(new Action(() =>
+            var name = "listView";
+            if (tableLayoutPanel1.Controls.ContainsKey(name))
             {
-                EnabledButtons(false);
+                var control = tableLayoutPanel1.Controls.Find(name, false);
+                ListView listView = (ListView)control[0];
 
-                comboBoxMachine.Enabled = false;
-            }));
-
-            while (!token.IsCancellationRequested)
-            {
-                thJob = true;
-
-                var name = "listView";
-                if (tableLayoutPanel1.Controls.ContainsKey(name))
+                for (int i = 0; i < indexes.Count; i++)
                 {
-                    var control = tableLayoutPanel1.Controls.Find(name, false);
-                    ListView listView = (ListView)control[0];
-
-                    Invoke(new Action(() =>
+                    if (token.IsCancellationRequested)
                     {
-                        listView.Items.Clear();
-                    }));
-
-
-                    ordersNumbers.Clear();
-                    //ordersNumbers.Add(new Order("", ""));
-
-                    int index = 0;
+                        break;
+                    }
 
                     using (MySqlConnection Connect = DBConnection.GetDBConnection())
                     {
-                        String commandLine;
-                        //commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
-                        commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') >= '";
-                        commandLine += dateTime.ToString("yyyy-MM-dd 00:00:00") + "'";
-
                         Connect.Open();
                         MySqlCommand Command = new MySqlCommand
                         {
                             Connection = Connect,
-                            CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBoxMachine.Text) + "'"
+                            CommandText = @"SELECT * FROM orders WHERE count = '" + indexes[i] + "'"
                         };
                         DbDataReader sqlReader = Command.ExecuteReader();
 
-                        while (sqlReader.Read() && !token.IsCancellationRequested) // считываем и вносим в комбобокс список заголовков
+                        while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            if (token.IsCancellationRequested)
+                            GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
+                            GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
+                            GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
+
+
+                            Invoke(new Action(() =>
                             {
-                                listView.Items.Clear();
-                                Invoke(new Action(() =>
+                                int index = listView.Items.IndexOfKey(indexes[i]);
+
+                                if (index >= 0)
                                 {
-                                    listView.Items.Clear();
-                                }));
-                                break;
-                            }
-
-                            if (sqlReader["numberOfOrder"].ToString().Contains(filter))
-                            {
-                                GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
-                                GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
-                                GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
-
-                                ordersNumbers.Add(new OrderNM(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-
-                                String modification = "";
-                                if (sqlReader["modification"].ToString() != "")
-                                    modification = " (" + sqlReader["modification"].ToString() + ")";
-
-                                String orderStart = "";
-                                if (leadTimeFirst.GetFirstValue("timeMakereadyStart").ToString() != "")
-                                    orderStart = leadTimeFirst.GetFirstValue("timeMakereadyStart").ToString();
-                                else
-                                    orderStart = leadTimeFirst.GetFirstValue("timeToWorkStart").ToString();
-
-                                ListViewItem item = new ListViewItem();
-
-                                item.Name = sqlReader["numberOfOrder"].ToString();
-                                item.Text = (index + 1).ToString();
-                                item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
-                                item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
-                                item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
-                                item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeToWork"])));
-                                item.SubItems.Add(Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0"));
-                                item.SubItems.Add(orderStart);
-                                item.SubItems.Add(leadTimeLast.GetLastValue("timeToWorkStop").ToString());
-                                //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
-                                item.SubItems.Add(orderCalc.OrderFullCalculate().ToString("N0"));
-                                item.SubItems.Add(ordersBase.GetOrderStatusName(getInfo.GetMachineFromName(comboBoxMachine.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-
-                                Invoke(new Action(() => listView.Items.Add(item)));
-
-                                index++;
-                            }
-
+                                    ListViewItem item = listView.Items[index];
+                                    if (item != null)
+                                    {
+                                        item.SubItems[3].Text = timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"]));
+                                        item.SubItems[4].Text = timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeToWork"]));
+                                        item.SubItems[5].Text = Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0");
+                                        item.SubItems[6].Text = leadTimeFirst.GetFirstValue("timeMakereadyStart").ToString();
+                                        item.SubItems[7].Text = leadTimeLast.GetLastValue("timeToWorkStop").ToString();
+                                        //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
+                                        item.SubItems[8].Text = orderCalc.OrderFullCalculate().ToString("N0");
+                                        item.SubItems[9].Text = ordersBase.GetOrderStatusName(machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
+                                    }
+                                }
+                            }));
                         }
 
                         Connect.Close();
                     }
-                    Invoke(new Action(() =>
-                    {
-                        EnabledButtons(true);
-
-                        comboBoxMachine.Enabled = true;
-                    }));
                 }
-                thJob = false;
-
-                break;
             }
 
+            Invoke(new Action(() =>
+            {
+
+            }));
         }
+
         private void StartLoadNormFromBase()
         {
             TextBox textBoxFilter = (TextBox)ControlFromKey("tableLayoutPanelControl", "textBoxFilter");
@@ -2961,7 +2952,7 @@ namespace OrderManager
                 case 5:
                     if (((ListView)sender).SelectedItems.Count != 0)
                         LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectegIndex].numberOfOrder, ordersNumbers[selectegIndex].modificationOfOrder);
-                    UpdatePage(currentPage);
+                    //UpdatePage(currentPage);
                     break;
                 case 6:
 

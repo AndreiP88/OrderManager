@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -302,6 +303,70 @@ namespace OrderManager
             */
         }
 
+        private void EditControl(string machine, string user, string order, bool enabled, bool check)
+        {
+            ValueInfoBase getInfo = new ValueInfoBase();
+
+            int index = checkBoxesMachines.FindLastIndex((v) => v.Name == machine);
+
+            checkBoxesMachines[index].Enabled = enabled;
+            checkBoxesMachines[index].Checked = check;
+
+            checkBoxesMachines[index].Text = String.Format("{0,-25}{1,-25:f4}{2,-50:f4}", getInfo.GetMachineName(machine), user, order);
+        }
+
+        private void UpdateMachinesStatus()
+        {
+            ValueOrdersBase order = new ValueOrdersBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueUserBase user = new ValueUserBase();
+
+            for (int i = 0; i < checkBoxesMachines.Count; i++)
+            {
+                string machine = checkBoxesMachines[i].Name;
+
+                string orderName = getInfo.GetCurrentOrderNumber(machine);
+                if (orderName != "")
+                    orderName += ", " + order.GetOrderName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
+                else
+                    orderName = "";
+
+                if (CheckFreeMachine(machine) == false)
+                {
+                    if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == false)
+                    {
+                        EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
+                    }
+                }
+                else
+                {
+                    bool check = checkBoxesMachines[i].Checked;
+
+                    EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, check);
+                }
+
+
+
+                if (CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
+                {
+
+
+                    /*if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
+                    {
+                        EditControl(i, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, true);
+                    }
+                    else if (CheckFreeMachine(machine) == true || CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
+                    {
+                        EditControl(i, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, false);
+                    }
+                    else
+                    {
+                        EditControl(i, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
+                    }*/
+                }
+            }
+        }
+
         void checkBoxMachine_CheckedChanged(object sender, EventArgs e)
         {
             //CheckBox c1 = sender as CheckBox;
@@ -333,6 +398,11 @@ namespace OrderManager
         private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
         {
             LoadMachine();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            UpdateMachinesStatus();
         }
     }
 }
