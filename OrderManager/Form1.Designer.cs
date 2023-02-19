@@ -106,6 +106,7 @@ namespace OrderManager
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -143,7 +144,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1064,6 +1064,11 @@ namespace OrderManager
             this.columnHeader5.Text = "Время";
             this.columnHeader5.Width = 112;
             // 
+            // columnHeader14
+            // 
+            this.columnHeader14.Text = "Отклонение";
+            this.columnHeader14.Width = 90;
+            // 
             // columnHeader6
             // 
             this.columnHeader6.Text = "Сделано";
@@ -1356,11 +1361,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // columnHeader14
-            // 
-            this.columnHeader14.Text = "Отклонение";
-            this.columnHeader14.Width = 90;
             // 
             // Form1
             // 

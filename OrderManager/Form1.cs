@@ -48,6 +48,8 @@ namespace OrderManager
             }
         }
 
+        bool _wOutFromStartShift = true;
+
         List<Order> ordersCurrentShift;
 
         int fullTimeWorkingOut;
@@ -1159,6 +1161,7 @@ namespace OrderManager
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase valueOrders = new ValueOrdersBase();
+            GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
 
             String status = valueOrders.GetOrderStatus(ordersCurrentShift[idx].machineOfOrder, ordersCurrentShift[idx].numberOfOrder, ordersCurrentShift[idx].modificationOfOrder);
 
@@ -1178,12 +1181,27 @@ namespace OrderManager
             String woTimeDiff = "";
             String plannedCountDone = "0";
 
-            fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
-            fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
-
             mkLastTime = ordersCurrentShift[idx].plannedTimeMakeready;
             mkFactTime = ordersCurrentShift[idx].facticalTimeMakeready;
             workingOutTime = timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[idx].workingOut);
+
+            fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
+
+            if (_wOutFromStartShift)
+            {
+                string shiftStart = startShift.PlanedStartShift(Info.startOfShift);
+                //MessageBox.Show(shiftStart);
+                string timeAfterStartShift = timeOperations.DateDifferent(DateTime.Now.ToString(), shiftStart);
+                string wOut = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(fullTimeWorkingOut), mkLastTime);
+
+                fullFactTime = timeOperations.TimeDifferent(timeAfterStartShift, wOut);
+
+                //MessageBox.Show("Начало смены: " + shiftStart + ", Время после начала смены: " + timeAfterStartShift + ", Выработка без приладки: " + wOut + ", Полное время: " + fullFactTime);
+            }
+            else
+            {
+                fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
+            }
 
             if (timeOperations.TimeDifferent(fullLastTime, fullFactTime) == "00:00")
             {
@@ -1226,8 +1244,10 @@ namespace OrderManager
 
             if (timeOperations.TimeDifferent(mkLastTime, fullFactTime) == "00:00")
             {
-                //String diff = timeOperations.TimeDifferent(fullLastTime, mkLastTime);
                 int diff = timeOperations.TimeDifferentToMinutes(fullFactTime, mkLastTime);
+
+                //String diff = timeOperations.TimeDifferent(fullLastTime, mkLastTime);
+                //int diff = timeOperations.TimeDifferentToMinutes(fullFactTime, mkLastTime);
 
                 plannedCountDone = (diff * ordersCurrentShift[idx].norm / 60).ToString("N0");
             }

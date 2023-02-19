@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -38,9 +39,16 @@ namespace OrderManager
 
         public String GetStopShift(String startShift)
         {
-            List<String> result = new List<String>(GetValue("startShift", startShift, "stopShift"));
+            List<String> list = new List<String>(GetValue("startShift", startShift, "stopShift"));
 
-            return result[result.Count - 1];
+            string result = "";
+
+            if (list.Count > 0)
+            {
+                result = list[list.Count - 1].ToString();
+            }
+
+            return result;
         }
 
         public String GetNameUserFromStartShift(String startShift)
