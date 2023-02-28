@@ -27,6 +27,16 @@ namespace OrderManager
             return GetValue(currentMachine, orderNumber, orderModification, "statusOfOrder");
         }
 
+        /// <summary>
+        /// Получить статус заказа по индексу
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public String GetOrderStatus(int index)
+        {
+            return GetValueFromIndex(index, "statusOfOrder");
+        }
+
         public String GetOrderName(String currentMachine, String orderNumber, String orderModification)
         {
             return GetValue(currentMachine, orderNumber, orderModification, "nameOfOrder");
@@ -127,6 +137,32 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", numberOfOrder);
                 Command.Parameters.AddWithValue("@orderModification", modificationOfOrder);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader[nameOfColomn].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        private String GetValueFromIndex(int index, String nameOfColomn)
+        {
+            String result = "0";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM orders WHERE count = @count"
+                };
+                Command.Parameters.AddWithValue("@count", index);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())

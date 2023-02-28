@@ -8,14 +8,19 @@ namespace OrderManager
     public partial class FormCloseShift : Form
     {
         String loadStartOfShift = "";
+        bool _edit = false;
 
         public FormCloseShift()
         {
             InitializeComponent();
+
+            _edit = false;
         }
         public FormCloseShift(String lStartOfShift)
         {
             InitializeComponent();
+
+            _edit = true;
 
             this.loadStartOfShift = lStartOfShift;
 
@@ -149,34 +154,42 @@ namespace OrderManager
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
-
-            bool value = shiftsBase.GetCheckFullShift(loadStartOfShift);
-
-            if (checkBox1.Checked != value)
+            if (_edit)
             {
-                button1.Enabled = true;
+                ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+                bool value = shiftsBase.GetCheckFullShift(loadStartOfShift);
+
+                if (checkBox1.Checked != value)
+                {
+                    button1.Enabled = true;
+                }
+                else
+                {
+                    button1.Enabled = false;
+                }
             }
-            else
-            {
-                button1.Enabled = false;
-            }
+            
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
-
-            bool value = shiftsBase.GetCheckOvertimeShift(loadStartOfShift);
-
-            if (checkBox2.Checked != value)
+            if (_edit)
             {
-                button1.Enabled = true;
+                ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+                bool value = shiftsBase.GetCheckOvertimeShift(loadStartOfShift);
+
+                if (checkBox2.Checked != value)
+                {
+                    button1.Enabled = true;
+                }
+                else
+                {
+                    button1.Enabled = false;
+                }
             }
-            else
-            {
-                button1.Enabled = false;
-            }
+                
         }
     }
 }

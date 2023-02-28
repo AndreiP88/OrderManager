@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -14,12 +15,14 @@ namespace OrderManager
             DateTime result = DateTime.MinValue;
 
             if (firstDate > secondDate)
+            {
                 result = new DateTime((firstDate - secondDate).Ticks);
+            }
 
             return result;
         }
 
-        private DateTime StringToDateTime(String date)
+        public DateTime StringToDateTime(String date)
         {
             DateTime result = DateTime.Now;
 
@@ -137,6 +140,318 @@ namespace OrderManager
             return result;
         }
 
+        /// <summary>
+        /// Вычитает одно значение минут из другого. Можно иключить отрицательные значения.
+        /// </summary>
+        /// <param name="firstTime">Уменьшаемое</param>
+        /// <param name="secondTime">Вычитаемое</param>
+        /// <param name="positiveOnly">Использовать только положительный результат</param>
+        /// <returns>Возвращает значение в минутах</returns>
+        public int MinuteDifference(int firstTime, int secondTime, bool positiveOnly)
+        {
+            int result = firstTime - secondTime;
+
+            if (positiveOnly && result < 0)
+            {
+                result = 0;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Переводит минуты в формат часы:минуты
+        /// </summary>
+        /// <param name="totalMinutes">Целое число минут</param>
+        /// <returns>Строка в формате HH:MM</returns>
+        public string MinuteToTimeString(int totalMinutes)
+        {
+            string result = "00:00";
+
+            int absMinutes = Math.Abs(totalMinutes);
+
+            int hours = 0;
+            int minutes = absMinutes % 60;
+
+            if (absMinutes >= 60)
+            {
+                hours = absMinutes / 60;
+            }
+
+            if (totalMinutes < 0)
+            {
+                hours *= (-1);
+            }
+
+            result = hours.ToString("D2") + ":" + minutes.ToString("D2");
+
+            return result;
+        }
+
+        /// <summary>
+        /// Переводит минуты ы вормат TimeSpan
+        /// </summary>
+        /// <param name="totalMinutes"></param>
+        /// <returns>Возвращает значение TimeSpan</returns>
+        public TimeSpan MinuteToTimeSpan(int totalMinutes)
+        {
+            int absMinutes = Math.Abs(totalMinutes);
+
+            int hours = 0;
+            int minutes = absMinutes % 60;
+
+            if (absMinutes >= 60)
+            {
+                hours = absMinutes / 60;
+            }
+
+            TimeSpan tTime = TimeSpan.Zero;
+
+            tTime += TimeSpan.FromHours(hours) + TimeSpan.FromMinutes(minutes);
+
+            return tTime;
+        }
+
+        public TimeSpan DateDifference(string firstDate, string secondDate)
+        {
+            int coorection = 0;
+
+            TimeSpan totalTime = TimeSpan.Zero;
+
+            DateTime firstD = StringToDateTime(firstDate);
+            DateTime secondD = StringToDateTime(secondDate);
+
+            if (firstD > secondD)
+            {
+                totalTime = firstD.Subtract(secondD.AddMinutes(coorection));
+            }
+
+            return totalTime;
+        }
+
+        /// <summary>
+        /// Разница между датами
+        /// </summary>
+        /// <param name="firstDate"></param>
+        /// <param name="secondDate"></param>
+        /// <returns>Возвращает значение в минутах</returns>
+        public int DateDifferenceToMinutes(string firstDate, string secondDate)
+        {
+            TimeSpan result = DateDifference(firstDate, secondDate);
+
+            return TimeSpanToMinutes(result);
+        }
+
+        /// <summary>
+        /// Разница между датами
+        /// </summary>
+        /// <param name="firstDate"></param>
+        /// <param name="secondDate"></param>
+        /// <returns>Возвращает значение в формате HH:MM</returns>
+        public string DateDifferenceToString(string firstDate, string secondDate)
+        {
+            TimeSpan result = DateDifference(firstDate, secondDate);
+
+            return TimeSpanToSting(result);
+        }
+
+        /// <summary>
+        /// Переводит из формата TimeSpan в минуты
+        /// </summary>
+        /// <param name="totalHours"></param>
+        /// <returns>Целое значение минут</returns>
+        public int TimeSpanToMinutes(TimeSpan totalHours)
+        {
+            int result = 60 * 24 * totalHours.Days + 60 * totalHours.Hours + totalHours.Minutes;
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tTime"></param>
+        /// <returns></returns>
+        private String TimeSpanToSting(TimeSpan tTime)
+        {
+            String result = "";
+
+            //MessageBox.Show(tTime.ToString());
+
+            string k = "";
+
+            if (tTime.ToString().Substring(0, 1) == "-")
+            {
+                k = "-";
+            }
+
+            int H = 24 * tTime.Days + tTime.Hours;
+            int M = Math.Abs(tTime.Minutes);
+
+            if (H <= 9)
+                result += "0" + H.ToString();
+            else
+                result += H.ToString();
+
+            result += ":";
+
+            if (M <= 9)
+                result += "0" + M.ToString();
+            else
+                result += M.ToString();
+
+            return k + result.Replace("-", "");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="firstDate"></param>
+        /// <param name="secondTime"></param>
+        /// <returns></returns>
+        public string DateTimeAmountMunutes(string firstDate, int secondTime)//не правильно считает
+        {
+            DateTime totalTime;
+            DateTime firstD;
+            TimeSpan secondD = MinuteToTimeSpan(secondTime);
+
+            firstD = StringToDateTime(firstDate);
+
+
+            /*if (secondTime != "")
+            {
+                string[] time = secondTime.Split(':');
+
+                int k = 1;
+
+                if (secondTime.Substring(0, 1) == "-")
+                {
+                    k = -1;
+                }
+
+                int days = Convert.ToInt32(time[0]) / 24;
+                int hours = Convert.ToInt32(time[0]) % 24;
+
+                secondD = new TimeSpan(days, hours, Convert.ToInt32(time[1]) * k, 0);
+            }
+            else
+                secondD = TimeSpan.Zero;*/
+
+            //totalTime = firstD.AddDays(secondD.TotalDays).AddHours(secondD.TotalHours).AddMinutes(secondD.TotalMinutes);
+
+
+            //totalTime = firstD.Add(secondD);
+            totalTime = firstD.AddMinutes(secondTime);
+
+            return DateToSting(totalTime);
+        }
+
+        /// <summary>
+        /// Вичитает из даты указанное количество минут
+        /// </summary>
+        /// <param name="firstDate"></param>
+        /// <param name="secondTime"></param>
+        /// <returns></returns>
+        public string DateTimeDifferenceMunutes(string firstDate, int secondTime)//не правильно считает
+        {
+            DateTime totalTime;
+            DateTime firstD;
+            TimeSpan secondD = MinuteToTimeSpan(secondTime);
+
+            firstD = StringToDateTime(firstDate);
+
+
+            /*if (secondTime != "")
+            {
+                string[] time = secondTime.Split(':');
+
+                int k = 1;
+
+                if (secondTime.Substring(0, 1) == "-")
+                {
+                    k = -1;
+                }
+
+                int days = Convert.ToInt32(time[0]) / 24;
+                int hours = Convert.ToInt32(time[0]) % 24;
+
+                secondD = new TimeSpan(days, hours, Convert.ToInt32(time[1]) * k, 0);
+            }
+            else
+                secondD = TimeSpan.Zero;*/
+
+            //totalTime = firstD.AddDays(secondD.TotalDays).AddHours(secondD.TotalHours).AddMinutes(secondD.TotalMinutes);
+
+
+            //totalTime = firstD.Add(secondD);
+            totalTime = firstD.AddMinutes(secondTime * (-1));
+
+            return DateToSting(totalTime);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="firstDate"></param>
+        /// <param name="secondTime"></param>
+        /// <returns></returns>
+        public string DateTimeAmount(string firstDate, string secondTime)//не правильно считает// перевести время в минуты и посчитать
+        {
+            DateTime totalTime;
+            DateTime firstD;
+            TimeSpan secondD;
+
+            firstD = StringToDateTime(firstDate);
+
+            if (secondTime != "")
+            {
+                string[] time = secondTime.Split(':');
+
+                int k = 1;
+
+                if (secondTime.Substring(0, 1) == "-")
+                {
+                    k = -1;
+                }
+
+                int days = Convert.ToInt32(time[0]) / 24;
+                int hours = Convert.ToInt32(time[0]) % 24;
+
+                secondD = new TimeSpan(days, hours, Convert.ToInt32(time[1]) * k, 0);
+            }
+            else
+                secondD = TimeSpan.Zero;
+
+            //totalTime = firstD.AddDays(secondD.TotalDays).AddHours(secondD.TotalHours).AddMinutes(secondD.TotalMinutes);
+
+
+            totalTime = firstD.Add(secondD);
+
+            return DateToSting(totalTime);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public String DateDifferent(String firstDate, String secondDate)
         {
             int coorection = 0;
@@ -184,15 +499,24 @@ namespace OrderManager
             {
                 string[] time = secondTime.Split(':');
 
+                int k = 1;
+
+                if (secondTime.Substring(0, 1) == "-")
+                {
+                    k = -1;
+                }
+
                 int days = Convert.ToInt32(time[0]) / 24;
                 int hours = Convert.ToInt32(time[0]) % 24;
 
-                secondD = new TimeSpan(days, hours, Convert.ToInt32(time[1]), 0);
+                secondD = new TimeSpan(days, hours, Convert.ToInt32(time[1]) * k, 0);
             }
             else
                 secondD = TimeSpan.Zero;
 
             //totalTime = firstD.AddDays(secondD.TotalDays).AddHours(secondD.TotalHours).AddMinutes(secondD.TotalMinutes);
+            
+
             totalTime = firstD.Add(secondD);
 
             return DateToSting(totalTime);
@@ -209,7 +533,34 @@ namespace OrderManager
 
             totalTime = firstT + secondT;
 
+            //MessageBox.Show(firstT.ToString() + " + " + secondT.ToString() + " = " + totalTime.ToString());
+
             return TotalMinutesToHoursAndMinutesStr(totalTime);
+        }
+
+        public String TimeAmountN(String firstTime, String secondTime)
+        {
+            int totalTime = 0;
+            int firstT;
+            int secondT;
+
+            TimeSpan tDate;
+            string[] fDate = firstTime.Split(':');
+            string[] sDate = secondTime.Split(':');
+
+            TimeSpan f = new TimeSpan(Convert.ToInt32(fDate[0]), Convert.ToInt32(fDate[1]), 0);
+            TimeSpan s = new TimeSpan(Convert.ToInt32(sDate[0]), Convert.ToInt32(sDate[1]), 0);
+
+            firstT = totallTimeHHMMToMinutes(firstTime);
+            secondT = totallTimeHHMMToMinutes(secondTime);
+
+            tDate = f.Add(s);
+
+            return tDate.ToString();
+
+            //MessageBox.Show(firstT.ToString() + " + " + secondT.ToString() + " = " + totalTime.ToString());
+
+            //return TotalMinutesToHoursAndMinutesStr(totalTime);
         }
 
         public String TimeDifferent(String firstTime, String secondTime)
@@ -291,10 +642,13 @@ namespace OrderManager
         public (int, int) TotalMinutesToHoursAndMinutes(int totalMinutes)
         {
             int hours = 0;
-            int minutes = totalMinutes % 60;
+            int minutes = Math.Abs(totalMinutes % 60);
 
-            if (totalMinutes >= 60)
+            if (Math.Abs(totalMinutes) >= 60)
                 hours = totalMinutes / 60;
+
+            //MessageBox.Show(hours.ToString() + ":" + minutes.ToString());
+            //Console.WriteLine(hours + ":" + minutes);
 
             return (hours, minutes);
         }
@@ -302,13 +656,16 @@ namespace OrderManager
         public String TotalMinutesToHoursAndMinutesStr(int totalMinutes)
         {
             int hours = TotalMinutesToHoursAndMinutes(totalMinutes).Item1;
-            int minutes = TotalMinutesToHoursAndMinutes(totalMinutes).Item2;
+            int minutes = Math.Abs(TotalMinutesToHoursAndMinutes(totalMinutes).Item2);
 
             TimeSpan tTime = TimeSpan.Zero;
 
             tTime += TimeSpan.FromHours(hours) + TimeSpan.FromMinutes(minutes);
 
+            //MessageBox.Show(hours.ToString() + ":" + minutes.ToString() + " --- " + tTime.ToString());
+
             return TimeToSting(tTime);
+            //return tTime.ToString(@"hh\:mm");
         }
 
         public int totallTimeHHMMToMinutes(String tTimeHHMM)
@@ -319,7 +676,16 @@ namespace OrderManager
             {
                 string[] time = tTimeHHMM.Split(':');
 
-                result = 60 * Convert.ToInt32(time[0]) + Convert.ToInt32(time[1]);
+                int k = 1;
+
+                if (time[0].Substring(0, 1) == "-")
+                {
+                    k = -1;
+                }
+
+                result = (60 * Convert.ToInt32(time[0].Replace("-", "")) + Convert.ToInt32(time[1])) * k;
+
+                //MessageBox.Show(time[0] + ":" + time[1] + ", (" + Convert.ToInt32(time[0]).ToString() + ":" + Convert.ToInt32(time[1]).ToString() + ") : " + result);
             }
 
             return result;
@@ -328,8 +694,18 @@ namespace OrderManager
         private String TimeToSting(TimeSpan tTime)
         {
             String result = "";
+
+            //MessageBox.Show(tTime.ToString());
+
+            string k = "";
+
+            if (tTime.ToString().Substring(0, 1) == "-")
+            {
+                k = "-";
+            }
+
             int H = 24 * tTime.Days + tTime.Hours;
-            int M = tTime.Minutes;
+            int M = Math.Abs(tTime.Minutes);
 
             if (H <= 9)
                 result += "0" + H.ToString();
@@ -343,7 +719,7 @@ namespace OrderManager
             else
                 result += M.ToString();
 
-            return result;
+            return k + result.Replace("-", "");
         }
 
         private int TimeToTotallMinutes(TimeSpan tTime)

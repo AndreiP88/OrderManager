@@ -1574,21 +1574,23 @@ namespace OrderManager
                                                                           v.modificationOfOrder == getInfo.GetCurrentOrderModification(machines[j]) &&
                                                                           v.machineOfOrder == machines[j]);
 
-                        String fullLastTime = "00:00";
-                        String fullFactTime = "00:00";
-                        String timeDiff = "";
+                        int fullLastTime = 0;
+                        int fullFactTime = 0;
+                        int timeDiff = 0;
 
                         if (idx != -1)
                         {
-                            fullLastTime = timeOperations.TimeAmount(ordersCurrentShift[idx].plannedTimeMakeready, ordersCurrentShift[idx].plannedTimeWork);
-                            fullFactTime = timeOperations.TimeAmount(ordersCurrentShift[idx].facticalTimeMakeready, ordersCurrentShift[idx].facticalTimeWork);
+                            fullLastTime = ordersCurrentShift[idx].plannedTimeMakeready + ordersCurrentShift[idx].plannedTimeWork;
+                            fullFactTime = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
 
-                            if (timeOperations.TimeDifferent(fullLastTime, fullFactTime) == "00:00")
-                                timeDiff = "-" + timeOperations.TimeDifferent(fullFactTime, fullLastTime);
+                            timeDiff = timeOperations.MinuteDifference(fullLastTime, fullFactTime, false);
+
+                            /*if (timeOperations.MinuteDifference(fullLastTime, fullFactTime, true) == 0)
+                                timeDiff = timeOperations.MinuteDifference(fullFactTime, fullLastTime, false);
                             else if (timeOperations.TimeDifferent(fullFactTime, fullLastTime) == "00:00")
                                 timeDiff = timeOperations.TimeDifferent(fullLastTime, fullFactTime);
                             else
-                                timeDiff = "00:00";
+                                timeDiff = "00:00";*/
                         }
 
                         ListViewItem item = new ListViewItem();
@@ -1600,7 +1602,7 @@ namespace OrderManager
                         item.SubItems.Add(order);
                         item.SubItems.Add(getOrder.GetOrderStatusName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
                         item.SubItems.Add(currentTime);
-                        item.SubItems.Add(timeDiff);
+                        item.SubItems.Add(timeOperations.MinuteToTimeString(timeDiff));
 
                         listView.Items.Add(item);
                     }

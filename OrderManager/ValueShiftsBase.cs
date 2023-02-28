@@ -84,8 +84,13 @@ namespace OrderManager
         {
             List<String> value = new List<String>(GetValue("startShift", startShift, "overtimeShift"));
 
-            string oneVal = value[value.Count - 1];
+            string oneVal = null;
             bool result = false;
+
+            if (value.Count > 0)
+            {
+                oneVal = value[value.Count - 1];
+            }
 
             if (oneVal != "" && oneVal != null)
             {

@@ -146,12 +146,12 @@ namespace OrderManager
                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
                 item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
-                item.SubItems.Add(ordersCurrentShift[index].plannedTimeMakeready + ", " + ordersCurrentShift[index].plannedTimeWork);
-                item.SubItems.Add(ordersCurrentShift[index].facticalTimeMakeready + ", " + ordersCurrentShift[index].facticalTimeWork);
-                item.SubItems.Add(ordersCurrentShift[index].deviation);
+                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork));
+                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation));
                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
                 item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
-                item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(ordersCurrentShift[index].workingOut));
+                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
 
                 if (PrivateData(timeShiftStart, Form1.Info.nameOfExecutor))
