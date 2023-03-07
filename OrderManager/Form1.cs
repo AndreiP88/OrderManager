@@ -1396,7 +1396,15 @@ namespace OrderManager
 
             int workTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut), facticalTimeToWorkStop);
 
-            orderStatus.mkTimeDifferent = mkTimeDifferent;
+            if (facticalTimeMakereadyStop == "" && status == "3")
+            {
+                orderStatus.mkTimeDifferent = 0;
+            } 
+            else
+            {
+                orderStatus.mkTimeDifferent = mkTimeDifferent;
+            }
+            
             orderStatus.wkTimeDifferent = wkTimeDifferent;
 
             /*Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
