@@ -27,40 +27,70 @@ namespace OrderManager
             return GetValue("userID", id, "detailsSalary");
         }
 
-        public string GetTypeLoadOrderDetails(String id)
+        public int GetTypeLoadOrderDetails(string id)
         {
-            string result = "0";
+            int result = 0;
             string value = GetValue("userID", id, "typeLoadOrderDetails");
 
-            if (value != "" || value != null)
+            if (value != "")
             {
-                result = value;
+                try
+                {
+                    result = Convert.ToInt32(value);
+                }
+                catch { }
+                
             }
 
             return result;
         }
 
-        public string GetTypeLoadItemMouseHover(String id)
+        public int GetTypeLoadItemMouseHover(string id)
         {
-            string result = "0";
+            int result = 0;
             string value = GetValue("userID", id, "typeLoadItemMouseHover");
 
-            if (value != "" || value != null)
+            if (value != "")
             {
-                result = value;
+                try
+                {
+                    result = Convert.ToInt32(value);
+                }
+                catch { }
             }
 
             return result;
         }
 
-        public string GetTypeLoadDeviationToMainLV(String id)
+        public int GetTypeLoadDeviationToMainLV(string id)
         {
-            string result = "0";
+            int result = 0;
             string value = GetValue("userID", id, "typeLoadDeviationToMainLV");
 
-            if (value != "" || value != null)
+            if (value != "")
             {
-                result = value;
+                try
+                {
+                    result = Convert.ToInt32(value);
+                }
+                catch { }
+            }
+
+            return result;
+        }
+
+        public int GetTypeViewDeviationToMainLV(string id)
+        {
+            int result = 0;
+            string value = GetValue("userID", id, "typeViewDeviationToMainLV");
+
+            if (value != "")
+            {
+                try
+                {
+                    result = Convert.ToInt32(value);
+                }
+                catch { }
             }
 
             return result;
@@ -149,6 +179,11 @@ namespace OrderManager
         public void UpdateTypeLoadDeviationToMainLV(String idUser, String newValue)
         {
             UpdateValue("typeLoadDeviationToMainLV", idUser, newValue);
+        }
+
+        public void UpdateTypeViewDeviationToMainLV(String idUser, String newValue)
+        {
+            UpdateValue("typeViewDeviationToMainLV", idUser, newValue);
         }
 
         public void UpdateParameterLine(String idUser, String selectForm, String newValue)

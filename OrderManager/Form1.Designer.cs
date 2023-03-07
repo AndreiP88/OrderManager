@@ -144,6 +144,7 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1254,7 +1255,8 @@ namespace OrderManager
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.passwordChangeToolStripMenuItem,
             this.alwaysCheckPasswordToolStripMenuItem,
-            this.cancelAutorizationToolStripMenuItem});
+            this.cancelAutorizationToolStripMenuItem,
+            this.settingsToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
@@ -1361,6 +1363,13 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.settingsToolStripMenuItem.Text = "Параметры";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -1516,6 +1525,7 @@ namespace OrderManager
         private ToolStripMenuItem alwaysCheckPasswordToolStripMenuItem;
         private ToolStripMenuItem cancelAutorizationToolStripMenuItem;
         private ColumnHeader columnHeader14;
+        private ToolStripMenuItem settingsToolStripMenuItem;
     }
 }
 

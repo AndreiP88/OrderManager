@@ -554,6 +554,7 @@ namespace OrderManager
         private void AddOrdersToListViewFromList()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
+            ValueSettingsBase valueSettings = new ValueSettingsBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
@@ -575,6 +576,51 @@ namespace OrderManager
                 if (ordersCurrentShift[index].modificationOfOrder != "")
                     modification = " (" + ordersCurrentShift[index].modificationOfOrder + ")";
 
+                string deviation = "<>";
+
+                int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
+                int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
+
+                if (typeLoad == 0)
+                {
+                    OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
+
+                    if (typeView == 0)
+                    {
+                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                    }
+                    else
+                    {
+                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                    }
+                }
+                else if (typeLoad == 1)
+                {
+                    OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, false);
+
+                    if (typeView == 0)
+                    {
+                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                    }
+                    else
+                    {
+                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                    }
+                }
+                else if (typeLoad == 2)
+                {
+                    if (typeView == 0)
+                    {
+                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
+                    }
+                    else
+                    {
+                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+                    }
+                }
+
+
+
                 ListViewItem item = new ListViewItem();
 
                 item.Name = ordersCurrentShift[index].numberOfOrder.ToString();
@@ -587,7 +633,7 @@ namespace OrderManager
                 item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork));
-                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation));
+                item.SubItems.Add(deviation);
                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
@@ -1286,10 +1332,8 @@ namespace OrderManager
             return result;
         }
 
-        private OrderStatusValue GetWorkingOutTimeForSelectedOrder(int indexOrder)
+        private OrderStatusValue GetWorkingOutTimeForSelectedOrder(int indexOrder, bool plannedWorkingOut)
         {
-            bool _plannedWorkingOut = true;
-
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase valueOrders = new ValueOrdersBase();
             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
@@ -1304,7 +1348,7 @@ namespace OrderManager
 
             string shiftStart = Info.startOfShift; //get from Info or user base
 
-            if (_plannedWorkingOut)
+            if (plannedWorkingOut)
             {
                 shiftStart = startShift.PlanedStartShift(Info.startOfShift); //get from method
             }
@@ -1324,7 +1368,7 @@ namespace OrderManager
             int currentLead;
             string timeStartOrder;
 
-            if (_plannedWorkingOut)
+            if (plannedWorkingOut)
             {
                 currentLead = workTime - countWorkingOut; //время выполнения текущего заказа
                 timeStartOrder = timeOperations.DateTimeAmountMunutes(shiftStart, countWorkingOut);
@@ -2289,9 +2333,20 @@ namespace OrderManager
 
             if (idx != -1)
             {
-                //GetWorkingOutTimeForSelectedOrder
+                ValueSettingsBase valueSettings = new ValueSettingsBase();
 
-                OrderStatusValue statusStrings = GetWorkingOutTimeForSelectedOrder(idx);
+                bool typeLoad;
+
+                if (valueSettings.GetTypeLoadOrderDetails(Info.nameOfExecutor) == 0)
+                {
+                    typeLoad = true;
+                }
+                else
+                {
+                    typeLoad = false;
+                }
+
+                OrderStatusValue statusStrings = GetWorkingOutTimeForSelectedOrder(idx, typeLoad);
 
                 /*string statusStr = GetWorkingOutTimeForSelectedOrder(idx).Item1;
                 string[] caption = GetWorkingOutTimeForSelectedOrder(idx).Item3;
@@ -2355,7 +2410,20 @@ namespace OrderManager
                 /*string statusStr = GetWorkingOutTimeForSelectedOrder(idx).Item1;
                 string message = GetWorkingOutTimeForSelectedOrder(idx).Item2;*/
 
-                OrderStatusValue statusStrings = GetWorkingOutTimeForSelectedOrder(idx);
+                ValueSettingsBase valueSettings = new ValueSettingsBase();
+
+                bool typeLoad;
+
+                if (valueSettings.GetTypeLoadItemMouseHover(Info.nameOfExecutor) == 0)
+                {
+                    typeLoad = true;
+                }
+                else
+                {
+                    typeLoad = false;
+                }
+
+                OrderStatusValue statusStrings = GetWorkingOutTimeForSelectedOrder(idx, typeLoad);
 
                 string statusStr = statusStrings.statusStr;
                 string message = statusStrings.message;
@@ -2694,6 +2762,14 @@ namespace OrderManager
             ValueUserBase setValueUsers = new ValueUserBase();
 
             setValueUsers.UpdateLastUID(Info.nameOfExecutor, "");
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormSettings form = new FormSettings(Info.nameOfExecutor);
+            form.ShowDialog();
+
+            LoadOrdersFromBase();
         }
     }
 }
