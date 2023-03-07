@@ -51,69 +51,6 @@ namespace OrderManager
             }
         }
 
-        
-        class OrderStatusStrings
-        {
-            public string statusStr;
-            public string currentLastTimeForMakereadyCaption;
-            public string currentLastTimeForMakeready;
-            public string currentLastTimeForFullWorkCaption;
-            public string currentLastTimeForFullWork;
-            public string timeToEndMKCaption;
-            public string timeToEndMK;
-            public string timeToEndWorkCaption;
-            public string timeToEndWork;
-            public string planedCoutOrderCaption;
-            public string planedCoutOrder;
-            public string workTimeDifferentCaption;
-            public string workTimeDifferent;
-            public int mkTimeDifferent;
-            public int wkTimeDifferent;
-            public string message;
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="statusStrVal">Статус выполнения</param>
-            /// <param name="currentLastTimeForMakereadyCaptionVal">Заголовок остатка времени на приладку</param>
-            /// <param name="currentLastTimeForMakereadyVal">Значение остатка времени на приладку</param>
-            /// <param name="currentLastTimeForFullWorkCaptionVal">Заголовок остатка общего времени для выполнения заказа</param>
-            /// <param name="currentLastTimeForFullWorkVal">Значение остатка общего времени для выполнения заказа</param>
-            /// <param name="timeToEndMKCaptionVal">Заголовок времени завершения приладки</param>
-            /// <param name="timeToEndMKVal">Значение времени завершения приладки</param>
-            /// <param name="timeToEndWorkCaptionVal">Заголовок времени завершения заказа</param>
-            /// <param name="timeToEndWorkVal">Значенеи времени завершения заказа</param>
-            /// <param name="planedCoutOrderCaptionVal">Заголовок планируемой выработки</param>
-            /// <param name="planedCoutOrderVal">Значение планируемой выработки</param>
-            /// <param name="workTimeDifferentCaptionVal">Заголовок отклонекния от нормы</param>
-            /// <param name="workTimeDifferentVal">Значение отклонекния от нормы</param>
-            /// <param name="mkTimeDifferentVal">Отклонение времени приладки от нормы</param>
-            /// <param name="wkTimeDifferentVal">Отклонение времени работы от  нормы</param>
-            /// <param name="messageVal">Сообщение во всплывающей подсказке</param>
-            public OrderStatusStrings(string statusStrVal, string currentLastTimeForMakereadyCaptionVal, string currentLastTimeForMakereadyVal, string currentLastTimeForFullWorkCaptionVal,
-                string currentLastTimeForFullWorkVal, string timeToEndMKCaptionVal, string timeToEndMKVal, string timeToEndWorkCaptionVal, string timeToEndWorkVal, string planedCoutOrderCaptionVal,
-                string planedCoutOrderVal, string workTimeDifferentCaptionVal, string workTimeDifferentVal, int mkTimeDifferentVal, int wkTimeDifferentVal, string messageVal)
-            {
-                this.statusStr = statusStrVal;
-                this.currentLastTimeForMakereadyCaption = currentLastTimeForMakereadyCaptionVal;
-                this.currentLastTimeForMakeready = currentLastTimeForMakereadyVal;
-                this.currentLastTimeForFullWorkCaption = currentLastTimeForFullWorkCaptionVal;
-                this.currentLastTimeForFullWork = currentLastTimeForFullWorkVal;
-                this.timeToEndMKCaption = timeToEndMKCaptionVal;
-                this.timeToEndMK = timeToEndMKVal;
-                this.timeToEndWorkCaption = timeToEndWorkCaptionVal;
-                this.timeToEndWork = timeToEndWorkVal;
-                this.planedCoutOrderCaption = planedCoutOrderCaptionVal;
-                this.planedCoutOrder = planedCoutOrderVal;
-                this.workTimeDifferentCaption = workTimeDifferentCaptionVal;
-                this.workTimeDifferent = workTimeDifferentVal;
-                this.mkTimeDifferent = mkTimeDifferentVal;
-                this.wkTimeDifferent = wkTimeDifferentVal;
-                this.message = messageVal;
-            }
-
-        }
-
         class OrderStatusValue
         {
             public string statusStr;
@@ -149,12 +86,7 @@ namespace OrderManager
 
         }
 
-        bool _wOutFromStartShift = false;
-
         List<Order> ordersCurrentShift;
-
-        int fullTimeWorkingOut;
-        int fullDone;
 
         int selectedIndexActive = 0;
         int selectedIndexWOut1 = 0;
@@ -560,9 +492,6 @@ namespace OrderManager
 
             ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.startOfShift, "");
 
-            fullTimeWorkingOut = 0;
-            fullDone = 0;
-
             /*if (listView1.SelectedItems.Count > 0)
             {
                 Info.indexItem = listView1.SelectedIndices[0];
@@ -640,9 +569,6 @@ namespace OrderManager
                 item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());
 
                 listView1.Items.Add(item);
-
-                fullTimeWorkingOut += ordersCurrentShift[index].workingOut;
-                fullDone += ordersCurrentShift[index].done;
             }
 
             LoadSelectedMachines();
@@ -878,6 +804,9 @@ namespace OrderManager
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
             ValueInfoBase getUserMachines = new ValueInfoBase();
 
+            int fullWorkingOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
+            int fullDone = CountFullDoneOrders(ordersCurrentShift.Count, "");
+
             if (getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
                 button6.Enabled = false;
             else
@@ -890,8 +819,8 @@ namespace OrderManager
 
             label6.Text = usersBase.GetNameUser(Info.nameOfExecutor);
             label7.Text = Info.startOfShift;
-            label8.Text = dtOperations.TotalMinutesToHoursAndMinutesStr(fullTimeWorkingOut);
-            label9.Text = getPercent.PercentString(fullTimeWorkingOut);
+            label8.Text = dtOperations.TotalMinutesToHoursAndMinutesStr(fullWorkingOut);
+            label9.Text = getPercent.PercentString(fullWorkingOut);
             label10.Text = fullDone.ToString("N0");
 
             if (Info.nameOfExecutor != "")
@@ -1308,7 +1237,22 @@ namespace OrderManager
             CancelShift();
         }
 
-        private int CountWorkingOutFromPreviusOrders(int indexOrder, string machine)
+        private int CountFullDoneOrders(int indexOrder, string machine)
+        {
+            int result = 0;
+
+            for (int i = 0; i < indexOrder; i++)
+            {
+                if (ordersCurrentShift[i].machineOfOrder == machine || machine == "")
+                {
+                    result += ordersCurrentShift[i].done;
+                }
+            }
+
+            return result;
+        }
+
+        private int CountWorkingOutOrders(int indexOrder, string machine)
         {
             int result = 0;
 
@@ -1354,7 +1298,7 @@ namespace OrderManager
             }
 
             int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
-            int countPreviusWorkingOut = CountWorkingOutFromPreviusOrders(indexOrder, machine);// считать до указанного индекса
+            int countPreviusWorkingOut = CountWorkingOutOrders(indexOrder, machine);// считать до указанного индекса
             int countPreviusOutages = CountPreviusOutages(); // еще проработка требуется
             int countWorkingOut = countPreviusWorkingOut + countPreviusOutages;
 
@@ -1502,832 +1446,6 @@ namespace OrderManager
 
             return orderStatus;
         }
-
-
-
-
-
-        /*private OrderStatusStrings GetWorkingOutTimeForSelectedOrder(int indexOrder)
-        {
-            bool _plannedWorkingOut = true;
-
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
-            GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
-            GetOrdersFromBase getOrders = new GetOrdersFromBase();
-
-            OrderStatusStrings orderStatus = new OrderStatusStrings("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
-
-            string newLine = Environment.NewLine;
-
-            string machine = ordersCurrentShift[indexOrder].machineOfOrder;
-            string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
-
-            string shiftStart = Info.startOfShift; //get from Info or user base
-
-            if (_plannedWorkingOut)
-            {
-                shiftStart = startShift.PlanedStartShift(Info.startOfShift); //get from method
-            }
-
-            int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
-            int countPreviusWorkingOut = CountWorkingOutFromPreviusOrders(indexOrder, machine);// считать до указанного индекса
-            int countPreviusOutages = CountPreviusOutages(); // еще проработка требуется
-            int countWorkingOut = countPreviusWorkingOut + countPreviusOutages;
-
-            int lastTimeForMK = ordersCurrentShift[indexOrder].plannedTimeMakeready;
-            int lastTimeForWK = ordersCurrentShift[indexOrder].plannedTimeWork;
-            int fullTimeForWork = lastTimeForMK + lastTimeForWK;
-
-            string facticalTimeMakereadyStop = getOrders.GetTimeToMakereadyStop(ordersCurrentShift[indexOrder].id);
-            string facticalTimeToWorkStop = getOrders.GetTimeToWorkStop(ordersCurrentShift[indexOrder].id);
-
-            int currentLead;
-            string timeStartOrder;
-
-            if (_plannedWorkingOut)
-            {
-                currentLead = workTime - countWorkingOut; //время выполнения текущего заказа
-                timeStartOrder = timeOperations.DateTimeAmountMunutes(shiftStart, countWorkingOut);
-            }
-            else
-            {
-                currentLead = ordersCurrentShift[indexOrder].facticalTimeMakeready + ordersCurrentShift[indexOrder].facticalTimeWork;
-                timeStartOrder = timeOperations.DateTimeDifferenceMunutes(DateTime.Now.ToString(), (currentLead + 2));
-            }
-
-            int currentLastTimeForMakeready = timeOperations.MinuteDifference(lastTimeForMK, currentLead, false); //остаток времеи на приладку только положительные
-            int currentLastTimeForFullWork = timeOperations.MinuteDifference(fullTimeForWork, currentLead, false); //остаток времеи на выполнение заказа только положительные
-
-            int timeForWork = timeOperations.MinuteDifference(currentLead, lastTimeForMK, true); //время выполнения закзаза (без приладки) > 0
-
-            int planedCoutOrder = timeForWork * ordersCurrentShift[indexOrder].norm / 60;
-
-            string timeToEndMK = timeOperations.DateTimeAmountMunutes(timeStartOrder, lastTimeForMK);
-            string timeToEndWork = timeOperations.DateTimeAmountMunutes(timeStartOrder, fullTimeForWork);
-
-            int mkTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeToEndMK, facticalTimeMakereadyStop);
-            int wkTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeToEndWork, facticalTimeToWorkStop);
-
-            //int workTimeDifferent = timeOperations.MinuteDifference(ordersCurrentShift[indexOrder].workingOut, currentLead, false); //отклонение выработки от фактического времени выполнения заказа
-
-            int workTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut), facticalTimeToWorkStop);
-            
-            
-            *//*Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
-
-            Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
-            Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));
-            Console.WriteLine("Выработка предыдущих заказов: " + timeOperations.MinuteToTimeString(countPreviusWorkingOut));
-
-            Console.WriteLine("Остаток времеи на приладку: " + timeOperations.MinuteToTimeString(currentLastTimeForMakeready));
-            Console.WriteLine("Остаток времеи на выполнение заказа: " + timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
-            Console.WriteLine("Отклонение: " + timeOperations.MinuteToTimeString(workTimeDifferent));
-
-            Console.WriteLine("Время завершения приладки: " + timeToEndMK);
-            Console.WriteLine("Время завершения работы: " + timeToEndWork);
-
-            Console.WriteLine("Отклонение времени приладки от нормы: " + timeOperations.MinuteToTimeString(mkTimeDifferent));
-            Console.WriteLine("Отклонение времени работы от нормы: " + timeOperations.MinuteToTimeString(wkTimeDifferent));*/
-
-        /*string timeToEndMK = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForMakeready - lastTimeForMK);
-        string timeToEndWork = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForFullWork - fullTimeForWork);*//*
-
-        if (status == "1" || status == "2")
-        {
-            orderStatus.statusStr = "приладка заказа";
-
-            if (currentLastTimeForMakeready < 0)
-            {
-                orderStatus.currentLastTimeForMakereadyCaption = "Отставание: ";
-                orderStatus.currentLastTimeForMakeready = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
-                //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-            }
-            else
-            {
-                orderStatus.currentLastTimeForMakereadyCaption = "Остаток времени на приладку: ";
-                orderStatus.currentLastTimeForMakeready = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
-                //message = "Остаток времени на приладку: " + mkTimeDiff;
-            }
-
-            orderStatus.currentLastTimeForFullWorkCaption = "Остаток времени для выполнение заказа: ";
-            orderStatus.currentLastTimeForFullWork = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            //MessageBox.Show(timeDiff + " + " + mkLastTime + " = " + timeOperations.TimeAmount(timeDiff, mkLastTime));
-            //strings[1] = timeOperations.MinuteToTimeString(timeDiff);
-
-            orderStatus.timeToEndMKCaption = "Планирумое время завершения приладки: ";
-            orderStatus.timeToEndMK = timeToEndMK;
-
-            orderStatus.timeToEndWorkCaption = "Планирумое время завершения заказа: ";
-            orderStatus.timeToEndWork = timeToEndWork;
-
-            orderStatus.message = orderStatus.currentLastTimeForMakereadyCaption + orderStatus.currentLastTimeForMakeready + newLine +
-                orderStatus.currentLastTimeForFullWorkCaption + orderStatus.currentLastTimeForFullWork + newLine +
-                orderStatus.timeToEndMKCaption + orderStatus.timeToEndMK + newLine +
-                orderStatus.timeToEndWorkCaption + orderStatus.timeToEndWork;
-        }
-
-        if (status == "3")
-        {
-            orderStatus.statusStr = "заказ выполняется";
-
-            if (currentLastTimeForFullWork < 0)
-            {
-                //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-                orderStatus.currentLastTimeForFullWorkCaption = "Отставание: ";
-                orderStatus.currentLastTimeForFullWork = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
-            }
-            else
-            {
-                //message = "Остаток времени на приладку: " + mkTimeDiff;
-                orderStatus.currentLastTimeForFullWorkCaption = "Остаток времени: ";
-                orderStatus.currentLastTimeForFullWork = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            }
-
-            orderStatus.planedCoutOrderCaption = "Плановая выработка: ";
-            orderStatus.planedCoutOrder = planedCoutOrder.ToString("N0");
-
-            orderStatus.timeToEndWorkCaption = "Планирумое время завершения: ";
-            orderStatus.timeToEndWork = timeToEndWork;
-
-            orderStatus.message = orderStatus.currentLastTimeForFullWorkCaption + orderStatus.currentLastTimeForFullWork + newLine +
-                orderStatus.planedCoutOrderCaption + orderStatus.planedCoutOrder + newLine +
-                orderStatus.timeToEndWorkCaption + orderStatus.timeToEndWork;
-        }
-
-        if (status == "4")
-        {
-            orderStatus.statusStr = "заказ завершен";
-
-            if (workTimeDifferent < 0)
-            {
-                orderStatus.workTimeDifferentCaption = "Отставание: ";
-                orderStatus.workTimeDifferent = timeOperations.MinuteToTimeString(workTimeDifferent * (-1));
-            }
-            else
-            {
-                orderStatus.workTimeDifferentCaption = "Опережение: ";
-                orderStatus.workTimeDifferent = timeOperations.MinuteToTimeString(workTimeDifferent);
-            }
-
-            orderStatus.message = orderStatus.workTimeDifferentCaption + orderStatus.workTimeDifferent;
-        }
-
-        return orderStatus;
-    }*/
-
-
-
-
-
-
-        /*private (string, string, string[], string[]) GetWorkingOutTimeForSelectedOrder(int indexOrder)
-        {
-            bool _plannedWorkingOut = true;
-
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
-            GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
-            GetOrdersFromBase getOrders = new GetOrdersFromBase();
-
-            OrderStatusStrings orderStatus = new OrderStatusStrings("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
-
-            string newLine = Environment.NewLine;
-
-            string message = "";
-            string statusStr = "";
-
-            string[] caption = { "", "", "", "" };
-            string[] strings = { "", "", "", "" };
-
-            string machine = ordersCurrentShift[indexOrder].machineOfOrder;
-            string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
-
-            string shiftStart = Info.startOfShift; //get from Info or user base
-
-            if (_plannedWorkingOut)
-            {
-                shiftStart = startShift.PlanedStartShift(Info.startOfShift); //get from method
-            }
-
-            int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
-            int countPreviusWorkingOut = CountWorkingOutFromPreviusOrders(indexOrder, machine);// считать до указанного индекса
-            int countPreviusOutages = CountPreviusOutages(); // еще проработка требуется
-            int countWorkingOut = countPreviusWorkingOut + countPreviusOutages;
-
-            int lastTimeForMK = ordersCurrentShift[indexOrder].plannedTimeMakeready;
-            int lastTimeForWK = ordersCurrentShift[indexOrder].plannedTimeWork;
-            int fullTimeForWork = lastTimeForMK + lastTimeForWK;
-
-            string facticalTimeMakereadyStop = getOrders.GetTimeToMakereadyStop(ordersCurrentShift[indexOrder].id);
-            string facticalTimeToWorkStop = getOrders.GetTimeToWorkStop(ordersCurrentShift[indexOrder].id);
-
-            int currentLead;
-            string timeStartOrder;
-
-            if (_plannedWorkingOut)
-            {
-                currentLead = workTime - countWorkingOut; //время выполнения текущего заказа
-                timeStartOrder = timeOperations.DateTimeAmountMunutes(shiftStart, countWorkingOut);
-            }
-            else
-            {
-                currentLead = ordersCurrentShift[indexOrder].facticalTimeMakeready + ordersCurrentShift[indexOrder].facticalTimeWork;
-                timeStartOrder = timeOperations.DateTimeDifferenceMunutes(DateTime.Now.ToString(), (currentLead + 2));
-            }
-
-            int currentLastTimeForMakeready = timeOperations.MinuteDifference(lastTimeForMK, currentLead, false); //остаток времеи на приладку только положительные
-            int currentLastTimeForFullWork = timeOperations.MinuteDifference(fullTimeForWork, currentLead, false); //остаток времеи на выполнение заказа только положительные
-
-            int timeForWork = timeOperations.MinuteDifference(currentLead, lastTimeForMK, true); //время выполнения закзаза (без приладки) > 0
-
-            int planedCoutOrder = timeForWork * ordersCurrentShift[indexOrder].norm / 60;
-
-            string timeToEndMK = timeOperations.DateTimeAmountMunutes(timeStartOrder, lastTimeForMK);
-            string timeToEndWork = timeOperations.DateTimeAmountMunutes(timeStartOrder, fullTimeForWork);
-
-            int mkTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeToEndMK, facticalTimeMakereadyStop);
-            int wkTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeToEndWork, facticalTimeToWorkStop);
-
-            //int workTimeDifferent = timeOperations.MinuteDifference(ordersCurrentShift[indexOrder].workingOut, currentLead, false); //отклонение выработки от фактического времени выполнения заказа
-
-            int workTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut), facticalTimeToWorkStop);
-
-
-            Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
-
-            Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
-            Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));
-            Console.WriteLine("Выработка предыдущих заказов: " + timeOperations.MinuteToTimeString(countPreviusWorkingOut));
-
-            Console.WriteLine("Остаток времеи на приладку: " + timeOperations.MinuteToTimeString(currentLastTimeForMakeready));
-            Console.WriteLine("Остаток времеи на выполнение заказа: " + timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
-            Console.WriteLine("Отклонение: " + timeOperations.MinuteToTimeString(workTimeDifferent));
-
-            Console.WriteLine("Время завершения приладки: " + timeToEndMK);
-            Console.WriteLine("Время завершения работы: " + timeToEndWork);
-
-            Console.WriteLine("Отклонение времени приладки от нормы: " + timeOperations.MinuteToTimeString(mkTimeDifferent));
-            Console.WriteLine("Отклонение времени работы от нормы: " + timeOperations.MinuteToTimeString(wkTimeDifferent));
-
-            *//*string timeToEndMK = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForMakeready - lastTimeForMK);
-            string timeToEndWork = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForFullWork - fullTimeForWork);*/
-
-
-        /*
-        statusStr
-        currentLastTimeForMakereadyCaption
-        currentLastTimeForMakeready
-        currentLastTimeForFullWorkCaption
-        currentLastTimeForFullWork
-        timeToEndMKCaption
-        timeToEndMK
-        timeToEndWorkCaption
-        timeToEndWork
-        planedCoutOrderCaption
-        planedCoutOrder
-        workTimeDifferentCaption
-        workTimeDifferent
-        mkTimeDifferent
-        wkTimeDifferent
-        message
-        *//*
-        if (status == "1" || status == "2")
-        {
-            statusStr = "приладка заказа";
-            orderStatus.statusStr = "приладка заказа";
-
-            if (currentLastTimeForMakeready < 0)
-            {
-                caption[0] = "Отставание: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
-
-                orderStatus.currentLastTimeForMakereadyCaption = "Отставание: ";
-                orderStatus.currentLastTimeForMakeready = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
-                //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-            }
-            else
-            {
-                caption[0] = "Остаток времени на приладку: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
-
-                orderStatus.currentLastTimeForMakereadyCaption = "Остаток времени на приладку: ";
-                orderStatus.currentLastTimeForMakeready = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
-                //message = "Остаток времени на приладку: " + mkTimeDiff;
-            }
-
-            caption[1] = "Остаток времени для выполнение заказа: ";
-            strings[1] = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            orderStatus.currentLastTimeForFullWorkCaption = "Остаток времени для выполнение заказа: ";
-            orderStatus.currentLastTimeForFullWork = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            //MessageBox.Show(timeDiff + " + " + mkLastTime + " = " + timeOperations.TimeAmount(timeDiff, mkLastTime));
-            //strings[1] = timeOperations.MinuteToTimeString(timeDiff);
-
-            caption[2] = "Планирумое время завершения приладки: ";
-            strings[2] = timeToEndMK;
-            orderStatus.timeToEndMKCaption = "Планирумое время завершения приладки: ";
-            orderStatus.timeToEndMK = timeToEndMK;
-
-            caption[3] = "Планирумое время завершения заказа: ";
-            strings[3] = timeToEndWork;
-            orderStatus.timeToEndWorkCaption = "Планирумое время завершения заказа: ";
-            orderStatus.timeToEndWork = timeToEndWork;
-
-            message = caption[0] + strings[0] + newLine;
-            message += caption[1] + strings[1] + newLine;
-            message += caption[2] + strings[2] + newLine;
-            message += caption[3] + strings[3];
-
-            orderStatus.message = orderStatus.currentLastTimeForMakereadyCaption + orderStatus.currentLastTimeForMakeready + newLine +
-                orderStatus.currentLastTimeForFullWorkCaption + orderStatus.currentLastTimeForFullWork + newLine +
-                orderStatus.timeToEndMKCaption + orderStatus.timeToEndMK + newLine +
-                orderStatus.timeToEndWorkCaption + orderStatus.timeToEndWork;
-        }
-
-        if (status == "3")
-        {
-            statusStr = "заказ выполняется";
-            orderStatus.statusStr = "заказ выполняется";
-
-            if (currentLastTimeForFullWork < 0)
-            {
-                caption[0] = "Отставание: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
-                //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-                orderStatus.currentLastTimeForFullWorkCaption = "Отставание: ";
-                orderStatus.currentLastTimeForFullWork = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
-            }
-            else
-            {
-                caption[0] = "Остаток времени: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-                //message = "Остаток времени на приладку: " + mkTimeDiff;
-                orderStatus.currentLastTimeForFullWorkCaption = "Остаток времени: ";
-                orderStatus.currentLastTimeForFullWork = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            }
-
-            caption[1] = "Плановая выработка: ";
-            strings[1] = planedCoutOrder.ToString("N0");
-            orderStatus.planedCoutOrderCaption = "Плановая выработка: ";
-            orderStatus.planedCoutOrder = planedCoutOrder.ToString("N0");
-
-            caption[2] = "Планирумое время завершения: ";
-            strings[2] = timeToEndWork;
-            orderStatus.timeToEndWorkCaption = "Планирумое время завершения: ";
-            orderStatus.timeToEndWork = timeToEndWork;
-
-            message = caption[0] + strings[0] + newLine;
-            message += caption[1] + strings[1] + newLine;
-            message += caption[2] + strings[2];
-
-            orderStatus.message = orderStatus.currentLastTimeForFullWorkCaption + orderStatus.currentLastTimeForFullWork + newLine +
-                orderStatus.planedCoutOrderCaption + orderStatus.planedCoutOrder + newLine +
-                orderStatus.timeToEndWorkCaption + orderStatus.timeToEndWork;
-        }
-
-        if (status == "4")
-        {
-            statusStr = "заказ завершен";
-            orderStatus.statusStr = "заказ завершен";
-
-            if (workTimeDifferent < 0)
-            {
-                caption[0] = "Отставание: ";
-                //strings[0] = woTimeDiff.Substring(1, woTimeDiff.Length - 1);
-                strings[0] = timeOperations.MinuteToTimeString(workTimeDifferent * (-1));
-                orderStatus.workTimeDifferentCaption = "Отставание: ";
-                orderStatus.workTimeDifferent = timeOperations.MinuteToTimeString(workTimeDifferent * (-1));
-            }
-            else
-            {
-                caption[0] = "Опережение: ";
-                strings[0] = timeOperations.MinuteToTimeString(workTimeDifferent);
-                orderStatus.workTimeDifferentCaption = "Опережение: ";
-                orderStatus.workTimeDifferent = timeOperations.MinuteToTimeString(workTimeDifferent);
-            }
-
-            message = caption[0] + strings[0];
-
-            orderStatus.message = orderStatus.workTimeDifferentCaption + orderStatus.workTimeDifferent;
-        }
-
-        return (statusStr, message, caption, strings);
-    }*/
-
-        /*
-         
-         * 
-         * 
-         * private (string, string, string[], string[]) GetWorkingOutTimeForSelectedOrder(int indexOrder)
-        {
-            bool _plannedWorkingOut = true;
-
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
-            GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
-            GetOrdersFromBase getOrders = new GetOrdersFromBase();
-
-            OrderStatusStrings orderStatus = new OrderStatusStrings("", "", "", "", "", "", "", "", "", "", "", "", "");
-
-            string newLine = Environment.NewLine;
-
-            string message = "";
-            string statusStr = "";
-
-            string[] caption = { "", "", "", "" };
-            string[] strings = { "", "", "", "" };
-
-            string machine = ordersCurrentShift[indexOrder].machineOfOrder;
-            string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
-
-            string shiftStart = Info.startOfShift; //get from Info or user base
-
-            if (_plannedWorkingOut)
-            {
-                shiftStart = startShift.PlanedStartShift(Info.startOfShift); //get from method
-            }
-
-            int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
-            int countPreviusWorkingOut = CountWorkingOutFromPreviusOrders(indexOrder, machine);// считать до указанного индекса
-            int countPreviusOutages = CountPreviusOutages(); // еще проработка требуется
-            int countWorkingOut = countPreviusWorkingOut + countPreviusOutages;
-
-            int lastTimeForMK = ordersCurrentShift[indexOrder].plannedTimeMakeready;
-            int lastTimeForWK = ordersCurrentShift[indexOrder].plannedTimeWork;
-            int fullTimeForWork = lastTimeForMK + lastTimeForWK;
-
-            int currentLead;
-            string timeStartOrder;
-
-            if (_plannedWorkingOut)
-            {
-                currentLead = workTime - countWorkingOut; //время выполнения текущего заказа
-                timeStartOrder = timeOperations.DateTimeAmountMunutes(shiftStart, countWorkingOut);
-            }
-            else
-            {
-                currentLead = ordersCurrentShift[indexOrder].facticalTimeMakeready + ordersCurrentShift[indexOrder].facticalTimeWork;
-                timeStartOrder = timeOperations.DateTimeDifferenceMunutes(DateTime.Now.ToString(), (currentLead + 2));
-            }
-
-            int currentLastTimeForMakeready = timeOperations.MinuteDifference(lastTimeForMK, currentLead, false); //остаток времеи на приладку только положительные
-            int currentLastTimeForFullWork = timeOperations.MinuteDifference(fullTimeForWork, currentLead, false); //остаток времеи на выполнение заказа только положительные
-
-            int timeForWork = timeOperations.MinuteDifference(currentLead, lastTimeForMK, true); //время выполнения закзаза (без приладки) > 0
-            int workTimeDifferent = timeOperations.MinuteDifference(ordersCurrentShift[indexOrder].workingOut, currentLead, false); //отклонение выработки от фактического времени выполнения заказа
-            *//*int mkTimeDifferent = currentLead - timeForWork - lastTimeForMK;
-            int wkTimeDifferent = timeForWork - lastTimeForWK;*//*
-
-            string timeToEndMK = timeOperations.DateTimeAmountMunutes(timeStartOrder, lastTimeForMK);
-            string timeToEndWork = timeOperations.DateTimeAmountMunutes(timeStartOrder, fullTimeForWork);
-
-            *//*Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
-
-            Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
-            Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));
-            Console.WriteLine("Выработка предыдущих заказов: " + timeOperations.MinuteToTimeString(countPreviusWorkingOut));
-
-            Console.WriteLine("Остаток времеи на приладку: " + timeOperations.MinuteToTimeString(currentLastTimeForMakeready));
-            Console.WriteLine("Остаток времеи на выполнение заказа: " + timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
-            Console.WriteLine("Отклонение: " + timeOperations.MinuteToTimeString(workTimeDifferent));
-
-            Console.WriteLine("Время завершения приладки: " + timeToEndMK);
-            Console.WriteLine("Время завершения работы: " + timeToEndWork);*/
-
-        /*Console.WriteLine("Отклонение времени приладки от нормы: " + mkTimeDifferent);
-        Console.WriteLine("Отклонение времени работы от нормы: " + wkTimeDifferent);*/
-
-        /*string timeToEndMK = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForMakeready - lastTimeForMK);
-        string timeToEndWork = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForFullWork - fullTimeForWork);*//*
-
-        int planedCoutOrder = timeForWork * ordersCurrentShift[indexOrder].norm / 60;
-        *//*
-        statusStr
-        currentLastTimeForMakereadyCaption
-        currentLastTimeForMakeready
-        currentLastTimeForFullWorkCaption
-        currentLastTimeForFullWork
-        timeToEndMKCaption
-        timeToEndMK
-        timeToEndWorkCaption
-        timeToEndWork
-        planedCoutOrderCaption
-        planedCoutOrder
-        workTimeDifferentCaption
-        workTimeDifferent
-        *//*
-        if (status == "1" || status == "2")
-        {
-            statusStr = "приладка заказа";
-            orderStatus.statusStrVal = "приладка заказа";
-
-            if (currentLastTimeForMakeready < 0)
-            {
-                caption[0] = "Отставание: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
-
-                orderStatus.currentLastTimeForMakereadyCaptionVal = "Отставание: ";
-                orderStatus.currentLastTimeForMakereadyVal = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
-                //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-            }
-            else
-            {
-                caption[0] = "Остаток времени на приладку: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
-
-                orderStatus.currentLastTimeForMakereadyCaptionVal = "Остаток времени на приладку: ";
-                orderStatus.currentLastTimeForMakereadyVal = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
-                //message = "Остаток времени на приладку: " + mkTimeDiff;
-            }
-
-            caption[1] = "Остаток времени для выполнение заказа: ";
-            strings[1] = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            orderStatus.currentLastTimeForFullWorkCaptionVal = "Остаток времени для выполнение заказа: ";
-            orderStatus.currentLastTimeForFullWorkVal = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            //MessageBox.Show(timeDiff + " + " + mkLastTime + " = " + timeOperations.TimeAmount(timeDiff, mkLastTime));
-            //strings[1] = timeOperations.MinuteToTimeString(timeDiff);
-
-            caption[2] = "Планирумое время завершения приладки: ";
-            strings[2] = timeToEndMK;
-            orderStatus.timeToEndMKCaptionVal = "Планирумое время завершения приладки: ";
-            orderStatus.timeToEndMKVal = timeToEndMK;
-
-            caption[3] = "Планирумое время завершения заказа: ";
-            strings[3] = timeToEndWork;
-            orderStatus.timeToEndWorkCaptionVal = "Планирумое время завершения заказа: ";
-            orderStatus.timeToEndWorkVal = timeToEndWork;
-
-
-            message = caption[0] + strings[0] + newLine;
-            message += caption[1] + strings[1] + newLine;
-            message += caption[2] + strings[2] + newLine;
-            message += caption[3] + strings[3];
-
-
-        }
-
-        if (status == "3")
-        {
-            statusStr = "заказ выполняется";
-            orderStatus.statusStrVal = "заказ выполняется";
-
-            if (currentLastTimeForFullWork < 0)
-            {
-                caption[0] = "Отставание: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
-                //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-                orderStatus.currentLastTimeForFullWorkCaptionVal = "Отставание: ";
-                orderStatus.currentLastTimeForFullWorkVal = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
-            }
-            else
-            {
-                caption[0] = "Остаток времени: ";
-                strings[0] = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-                //message = "Остаток времени на приладку: " + mkTimeDiff;
-                orderStatus.currentLastTimeForFullWorkCaptionVal = "Остаток времени: ";
-                orderStatus.currentLastTimeForFullWorkVal = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-            }
-
-            caption[1] = "Плановая выработка: ";
-            strings[1] = planedCoutOrder.ToString("N0");
-            orderStatus.planedCoutOrderCaptionVal = "Плановая выработка: ";
-            orderStatus.planedCoutOrderVal = planedCoutOrder.ToString("N0");
-
-            caption[2] = "Планирумое время завершения: ";
-            strings[2] = timeToEndWork;
-            orderStatus.timeToEndWorkCaptionVal = "Планирумое время завершения: ";
-            orderStatus.timeToEndWorkVal = timeToEndWork;
-
-            message = caption[0] + strings[0] + newLine;
-            message += caption[1] + strings[1] + newLine;
-            message += caption[2] + strings[2];
-        }
-
-        if (status == "4")
-        {
-            statusStr = "заказ завершен";
-            orderStatus.statusStrVal = "заказ завершен";
-
-            if (workTimeDifferent < 0)
-            {
-                caption[0] = "Отставание: ";
-                //strings[0] = woTimeDiff.Substring(1, woTimeDiff.Length - 1);
-                strings[0] = timeOperations.MinuteToTimeString(workTimeDifferent * (-1));
-            }
-            else
-            {
-                caption[0] = "Опережение: ";
-                strings[0] = timeOperations.MinuteToTimeString(workTimeDifferent);
-            }
-
-            message = caption[0] + strings[0];
-        }
-
-        return (statusStr, message, caption, strings);
-    }*/
-
-        /*private int[] GetWorkingOutTime(int idx)
-        {
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
-            GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
-
-            String status = valueOrders.GetOrderStatus(ordersCurrentShift[idx].machineOfOrder, ordersCurrentShift[idx].numberOfOrder, ordersCurrentShift[idx].modificationOfOrder);
-
-            int fullLastTime = 0;
-            int fullFactTime = 0;
-
-            int mkLastTime = 0;
-            int mkFactTime = 0;
-
-            int workingOutTime = 0;
-
-            int[] result = new int[4];
-
-            //output
-            int timeDiff = 0;
-            int mkTimeDiff = 0;
-            int woTimeDiff = 0;
-            int plannedCountDone = 0;
-
-            mkLastTime = ordersCurrentShift[idx].plannedTimeMakeready;
-            mkFactTime = ordersCurrentShift[idx].facticalTimeMakeready;
-            workingOutTime = ordersCurrentShift[idx].workingOut;
-
-            fullLastTime = ordersCurrentShift[idx].plannedTimeMakeready + ordersCurrentShift[idx].plannedTimeWork;
-
-            if (_wOutFromStartShift)
-            {
-                string shiftStart = startShift.PlanedStartShift(Info.startOfShift);
-
-                int timeAfterStartShift = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart);
-                int wOut = timeOperations.MinuteDifference(fullTimeWorkingOut, mkLastTime, true);
-
-                //string wOut = timeOperations.TotalMinutesToHoursAndMinutesStr(fullTimeWorkingOut);
-
-                fullFactTime = timeOperations.MinuteDifference(timeAfterStartShift, wOut, true);
-
-                //MessageBox.Show("Начало смены: " + shiftStart + ", Время после начала смены: " + timeAfterStartShift + ", Выработка без приладки: " + wOut + ", Полное время: " + fullFactTime);
-            }
-            else
-            {
-                fullFactTime = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
-            }
-
-            timeDiff = timeOperations.MinuteDifference(fullFactTime, fullLastTime, false);
-            mkTimeDiff = timeOperations.MinuteDifference(mkFactTime, mkLastTime, false);
-            woTimeDiff = timeOperations.MinuteDifference(fullFactTime, workingOutTime, false);
-
-
-            if (mkLastTime < fullFactTime)
-            {
-                *//*string fFactTime = timeOperations.TimeAmount(fullFactTime, mkLastTime);
-
-                int diff = timeOperations.TimeDifferentToMinutes(fFactTime, mkLastTime);*//*
-
-                int diff = timeOperations.MinuteDifference(fullFactTime, mkLastTime, true);
-
-                plannedCountDone = (diff * ordersCurrentShift[idx].norm / 60);
-            }
-            else
-            {
-                plannedCountDone = 0;
-            }
-
-            result[0] = timeDiff;
-            result[1] = mkTimeDiff;
-            result[2] = woTimeDiff;
-            result[3] = plannedCountDone;
-
-            return result;
-        }
-
-        private (string, string, string[], string[]) GetWorkingOutMessage2(int idx)
-        {
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
-
-            string newLine = Environment.NewLine;
-
-            string message = "";
-            string statusStr = "";
-
-            string[] caption = { "", "", "", "" };
-            string[] strings = { "", "", "", "" };
-
-            int[] values = GetWorkingOutTime(idx);
-
-            int timeDiff = values[0];
-            int mkTimeDiff = values[1];
-            int woTimeDiff = values[2];
-            int plannedCountDone = values[3];
-
-            string status = valueOrders.GetOrderStatus(ordersCurrentShift[idx].machineOfOrder, ordersCurrentShift[idx].numberOfOrder, ordersCurrentShift[idx].modificationOfOrder);
-
-            if (status == "1" || status == "2")
-            {
-                string plannedTimeDone = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), mkTimeDiff);
-                string plannedTimeDoneOrder = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), timeDiff);
-                int mkLastTime = ordersCurrentShift[idx].plannedTimeMakeready;
-
-                statusStr = "приладка заказа";
-
-                if (mkTimeDiff < 0)
-                {
-                    caption[0] = "Отставание: ";
-                    strings[0] = timeOperations.MinuteToTimeString(mkTimeDiff * (-1));
-                    //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-                }
-                else
-                {
-                    caption[0] = "Остаток времени на приладку: ";
-                    strings[0] = timeOperations.MinuteToTimeString(mkTimeDiff);
-                    //message = "Остаток времени на приладку: " + mkTimeDiff;
-                }
-
-                caption[1] = "Остаток времени для выполнение заказа: ";
-                strings[1] = timeOperations.MinuteToTimeString(timeDiff + mkLastTime);
-                //MessageBox.Show(timeDiff + " + " + mkLastTime + " = " + timeOperations.TimeAmount(timeDiff, mkLastTime));
-                strings[1] = timeOperations.MinuteToTimeString(timeDiff);
-
-                caption[2] = "Планирумое время завершения приладки: ";
-                strings[2] = plannedTimeDone;
-
-                caption[3] = "Планирумое время завершения заказа: ";
-                strings[3] = timeOperations.DateTimeAmountMunutes(plannedTimeDoneOrder, mkLastTime);
-                strings[3] = plannedTimeDoneOrder;
-
-                message = caption[0] + strings[0] + newLine;
-                message += caption[1] + strings[1] + newLine;
-                message += caption[2] + strings[2] + newLine;
-                message += caption[3] + strings[3];
-            }
-
-            if (status == "3")
-            {
-                string plannedTimeDone = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), timeDiff);
-
-                statusStr = "заказ выполняется";
-
-                if (timeDiff < 0)
-                {
-                    caption[0] = "Отставание: ";
-                    strings[0] = timeOperations.MinuteToTimeString(timeDiff * (-1));
-                    //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
-                }
-                else
-                {
-                    caption[0] = "Остаток времени: ";
-                    strings[0] = timeOperations.MinuteToTimeString(timeDiff);
-                    //message = "Остаток времени на приладку: " + mkTimeDiff;
-                }
-
-                caption[1] = "Плановая выработка: ";
-                strings[1] = plannedCountDone.ToString("N0");
-
-                caption[2] = "Планирумое время завершения: ";
-                strings[2] = plannedTimeDone;
-
-                message = caption[0] + strings[0] + newLine;
-                message += caption[1] + strings[1] + newLine;
-                message += caption[2] + strings[2];
-            }
-
-            if (status == "4")
-            {
-                statusStr = "заказ завершен";
-
-                if (woTimeDiff < 0)
-                {
-                    caption[0] = "Отставание: ";
-                    //strings[0] = woTimeDiff.Substring(1, woTimeDiff.Length - 1);
-                    strings[0] = timeOperations.MinuteToTimeString(woTimeDiff);
-                }
-                else
-                {
-                    caption[0] = "Опережение: ";
-                    strings[0] = timeOperations.MinuteToTimeString(woTimeDiff);
-                }
-
-                message = caption[0] + strings[0];
-            }
-
-            *//*else
-                {
-                    statusStr = "";
-                    message = "Оставшееся время: " + timeDiff;
-                    message += Environment.NewLine;
-                    message += "Сделать подсчёт времени завершения заказа, количества, которое должно быть сделано на текущий момент по норме";
-                }*/
-
-        /*message += Environment.NewLine;
-        message += MousePosition.X + ", " + MousePosition.Y;
-        message += Environment.NewLine;
-        message += e.Item.Position.X + ", " + e.Item.Position.Y;*//*
-
-
-        return (statusStr, message, caption, strings);
-    }*/
 
         private void LoadCurrentOrderDetails(int idx)
         {
@@ -2565,11 +1683,11 @@ namespace OrderManager
             {
                 if (comboBox2.SelectedIndex == 0)
                 {
-                    wOut = fullTimeWorkingOut;
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
                 }
                 else
                 {
-                    wOut = GetWOutFromMachine(machine);
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
                 }
 
                 string status = ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder);
@@ -2578,7 +1696,7 @@ namespace OrderManager
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
                 int done = amount - ordersCurrentShift[idLastOrder].lastCount;// + ordersCurrentShift[idLastOrder].done;
                 int mkTime = ordersCurrentShift[idLastOrder].plannedTimeMakeready;
-                //MessageBox.Show(done.ToString());
+
                 for (int i = 0; i < captions.Length; i++)
                 {
                     int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
@@ -2682,7 +1800,7 @@ namespace OrderManager
             label39.Text = values[3];
         }
 
-        private int GetWOutFromMachine(string machine)
+        /*private int GetWOutFromMachine(string machine)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
@@ -2703,7 +1821,7 @@ namespace OrderManager
             }
 
             return wOut;
-        }
+        }*/
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
