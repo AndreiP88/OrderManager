@@ -268,6 +268,24 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText;
+
+                commandText = "INSERT INTO usersWindowState (userID) " +
+                    "SELECT * FROM (SELECT @userID) " +
+                    "AS tmp WHERE NOT EXISTS(SELECT userID FROM usersWindowState WHERE userID = @userID) LIMIT 1";
+
+                /*commandText = "INSERT INTO settings (userID) VALUES (@userID)";*/
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@userID", userID);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

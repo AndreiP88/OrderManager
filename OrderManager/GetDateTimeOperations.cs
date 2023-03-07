@@ -26,9 +26,18 @@ namespace OrderManager
         {
             DateTime result = DateTime.Now;
 
-            if (date != "")
-                result = Convert.ToDateTime(date);
-
+            try
+            {
+                if (date != "")
+                {
+                    result = Convert.ToDateTime(date);
+                }
+            }
+            catch
+            {
+                result = DateTime.Now;
+            }
+            
             return result;
         }
 
@@ -189,7 +198,7 @@ namespace OrderManager
         }
 
         /// <summary>
-        /// Переводит минуты ы вормат TimeSpan
+        /// Переводит минуты в вормат TimeSpan
         /// </summary>
         /// <param name="totalMinutes"></param>
         /// <returns>Возвращает значение TimeSpan</returns>
@@ -227,6 +236,35 @@ namespace OrderManager
             }
 
             return totalTime;
+        }
+
+        /// <summary>
+        /// Получить разницу между датами в минутах, включая отрицательные значения
+        /// </summary>
+        /// <param name="firstDate">Начальнпая дата</param>
+        /// <param name="secondDate">Конечная дата</param>
+        /// <returns></returns>
+        public int DateDifferenceToMinutesAndNegative(string firstDate, string secondDate)
+        {
+            int result;
+
+            TimeSpan totalTime;
+
+            DateTime firstD = StringToDateTime(firstDate);
+            DateTime secondD = StringToDateTime(secondDate);
+
+            if (firstD > secondD)
+            {
+                totalTime = firstD.Subtract(secondD);
+                result = (int)totalTime.TotalMinutes;
+            }
+            else
+            {
+                totalTime = secondD.Subtract(firstD);
+                result = (int)totalTime.TotalMinutes * (-1);
+            }
+
+            return result;
         }
 
         /// <summary>

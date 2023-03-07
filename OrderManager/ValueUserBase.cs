@@ -350,6 +350,17 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "DELETE FROM usersWindowWtate WHERE userID = @id";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
         }
 
         private void UpdateValue(String colomn, String id, String value)

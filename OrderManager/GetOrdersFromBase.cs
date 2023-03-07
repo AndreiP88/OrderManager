@@ -60,6 +60,16 @@ namespace OrderManager
         }
 
         /// <summary>
+        /// Получить время завершения приладки
+        /// </summary>
+        /// <param name="id">индекс строки в таблице</param>
+        /// <returns></returns>
+        public string GetTimeToMakereadyStop(int id)
+        {
+            return GetValueFromIndex(id, "timeMakereadyStop");
+        }
+
+        /// <summary>
         /// получить индекс заказа из базы данных "orders"
         /// </summary>
         /// <param name="id">Индекс операции в БД "orderInProgress"</param>
