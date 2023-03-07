@@ -51,7 +51,7 @@
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(12, 13);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(472, 158);
+            this.listView1.Size = new System.Drawing.Size(501, 211);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -64,19 +64,19 @@
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Width = 120;
+            this.columnHeader2.Width = 160;
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Width = 310;
+            this.columnHeader3.Width = 300;
             // 
             // button1
             // 
             this.button1.Enabled = false;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button1.Location = new System.Drawing.Point(490, 13);
+            this.button1.Location = new System.Drawing.Point(519, 13);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(103, 32);
+            this.button1.Size = new System.Drawing.Size(105, 32);
             this.button1.TabIndex = 2;
             this.button1.Text = "Выбрать";
             this.button1.UseVisualStyleBackColor = true;
@@ -85,9 +85,9 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button2.Location = new System.Drawing.Point(490, 51);
+            this.button2.Location = new System.Drawing.Point(519, 51);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(103, 32);
+            this.button2.Size = new System.Drawing.Size(105, 32);
             this.button2.TabIndex = 2;
             this.button2.Text = "Просмотр";
             this.button2.UseVisualStyleBackColor = true;
@@ -96,9 +96,9 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button4.Location = new System.Drawing.Point(490, 139);
+            this.button4.Location = new System.Drawing.Point(519, 192);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(103, 32);
+            this.button4.Size = new System.Drawing.Size(105, 32);
             this.button4.TabIndex = 2;
             this.button4.Text = "Выход";
             this.button4.UseVisualStyleBackColor = true;
@@ -113,7 +113,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(596, 176);
+            this.ClientSize = new System.Drawing.Size(636, 235);
             this.ControlBox = false;
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button2);
