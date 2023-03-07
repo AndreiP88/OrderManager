@@ -1434,19 +1434,15 @@ namespace OrderManager
                 {
                     orderStatus.caption_1 = "Отставание: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
-                    //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
                 }
                 else
                 {
                     orderStatus.caption_1 = "Остаток времени на приладку: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
-                    //message = "Остаток времени на приладку: " + mkTimeDiff;
                 }
 
                 orderStatus.caption_2 = "Остаток времени для выполнение заказа: ";
                 orderStatus.value_2 = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
-                //MessageBox.Show(timeDiff + " + " + mkLastTime + " = " + timeOperations.TimeAmount(timeDiff, mkLastTime));
-                //strings[1] = timeOperations.MinuteToTimeString(timeDiff);
 
                 orderStatus.caption_3 = "Планирумое время завершения приладки: ";
                 orderStatus.value_3 = timeToEndMK;
@@ -1466,13 +1462,11 @@ namespace OrderManager
 
                 if (currentLastTimeForFullWork < 0)
                 {
-                    //message = "Отставание: " + mkTimeDiff.Substring(1, mkTimeDiff.Length - 1);
                     orderStatus.caption_1 = "Отставание: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
                 }
                 else
                 {
-                    //message = "Остаток времени на приладку: " + mkTimeDiff;
                     orderStatus.caption_1 = "Остаток времени: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
                 }
