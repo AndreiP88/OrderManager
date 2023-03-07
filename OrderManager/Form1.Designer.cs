@@ -134,6 +134,7 @@ namespace OrderManager
             this.passwordChangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.alwaysCheckPasswordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelAutorizationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelShiftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -144,7 +145,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1286,6 +1286,13 @@ namespace OrderManager
             this.cancelAutorizationToolStripMenuItem.Text = "Отменить авторизацию";
             this.cancelAutorizationToolStripMenuItem.Click += new System.EventHandler(this.cancelAutorizationToolStripMenuItem_Click);
             // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.settingsToolStripMenuItem.Text = "Параметры отображения";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
             // toolStripDropDownButton3
             // 
             this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1363,13 +1370,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // settingsToolStripMenuItem
-            // 
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
-            this.settingsToolStripMenuItem.Text = "Параметры";
-            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // Form1
             // 
