@@ -65,6 +65,13 @@ namespace OrderManager
             return result[result.Count - 1];
         }
 
+        public string GetStartShiftFromID(int index)
+        {
+            List<String> result = new List<String>(GetValue("id", index.ToString(), "startShift"));
+
+            return result[result.Count - 1];
+        }
+
         public bool GetCheckFullShift(String startShift)
         {
             List<String> value = new List<String>(GetValue("startShift", startShift, "fullShift"));
