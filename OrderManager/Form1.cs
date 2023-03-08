@@ -1307,6 +1307,7 @@ namespace OrderManager
             ValueOrdersBase valueOrders = new ValueOrdersBase();
             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            ValueInfoBase infoBase = new ValueInfoBase();
 
             OrderStatusValue orderStatus = new OrderStatusValue("", "", "", "", "", "", "", "", "", 0, 0, "", Color.Black);
 
@@ -1453,6 +1454,23 @@ namespace OrderManager
                 orderStatus.message = orderStatus.caption_1 + orderStatus.value_1 + newLine +
                     orderStatus.caption_2 + orderStatus.value_2 + newLine +
                     orderStatus.caption_3 + orderStatus.value_3;
+
+                bool active = Convert.ToBoolean(infoBase.GetActiveOrder(machine));
+
+                if (!active)
+                {
+                    string timeStoFromWorkingOut = timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut);
+                    int timeWorkingOutDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeStoFromWorkingOut, facticalTimeToWorkStop);
+
+                    if (timeWorkingOutDifferent > 0)
+                    {
+                        orderStatus.color = Color.SeaGreen;
+                    }
+                    else
+                    {
+                        orderStatus.color = Color.DarkRed;
+                    }
+                }
             }
 
             if (status == "4")
