@@ -65,10 +65,11 @@ namespace OrderManager
             public int mkTimeDifferent;
             public int wkTimeDifferent;
             public string message;
+            public Color color;
 
-            public OrderStatusValue(string statusStrVal, string captionVal_1, string valueVal_1, string captionVal_2, string valueVal_2, 
+            public OrderStatusValue(string statusStrVal, string captionVal_1, string valueVal_1, string captionVal_2, string valueVal_2,
                 string captionVal_3, string valueVal_3, string captionVal_4, string valueVal_4,
-                int mkTimeDifferentVal, int wkTimeDifferentVal, string messageVal)
+                int mkTimeDifferentVal, int wkTimeDifferentVal, string messageVal, Color colorVal)
             {
                 this.statusStr = statusStrVal;
                 this.caption_1 = captionVal_1;
@@ -82,8 +83,8 @@ namespace OrderManager
                 this.mkTimeDifferent = mkTimeDifferentVal;
                 this.wkTimeDifferent = wkTimeDifferentVal;
                 this.message = messageVal;
+                this.color = colorVal;
             }
-
         }
 
         List<Order> ordersCurrentShift;
@@ -212,6 +213,15 @@ namespace OrderManager
             if (Form1.Info.startOfShift == "")
             {
                 ShowUserSelectMachineForm();
+            }
+
+            if (Info.nameOfExecutor == "1")
+            {
+                testToolStripMenuItem.Visible = true;
+            }
+            else
+            {
+                testToolStripMenuItem.Visible = false;
             }
 
             Info.active = true;
@@ -507,12 +517,16 @@ namespace OrderManager
 
                 string deviation = "<>";
 
+                Color color = Color.DarkRed;
+
                 int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
                 int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
 
                 if (typeLoad == 0)
                 {
                     OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
+
+                    color = statusValue.color;
 
                     if (typeView == 0)
                     {
@@ -527,6 +541,8 @@ namespace OrderManager
                 {
                     OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, false);
 
+                    color = statusValue.color;
+
                     if (typeView == 0)
                     {
                         deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
@@ -538,6 +554,15 @@ namespace OrderManager
                 }
                 else if (typeLoad == 2)
                 {
+                    if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
+                    {
+                        color = Color.SeaGreen;
+                    }
+                    else
+                    {
+                        color = Color.DarkRed;
+                    }
+
                     if (typeView == 0)
                     {
                         deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
@@ -567,6 +592,8 @@ namespace OrderManager
                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());
+
+                item.ForeColor = color;
 
                 listView1.Items.Add(item);
             }
@@ -1063,8 +1090,6 @@ namespace OrderManager
             LoadBaseConnectionParameters();
             LoadParametersFromBase("mainForm");
 
-            
-
             //LoadUser();
             //LoadParametersForTheSelectedUserFromBase(Form1.Info.mashine);
             //LoadOrdersFromBase();
@@ -1283,7 +1308,7 @@ namespace OrderManager
             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
-            OrderStatusValue orderStatus = new OrderStatusValue("", "", "", "", "", "", "", "", "", 0, 0, "");
+            OrderStatusValue orderStatus = new OrderStatusValue("", "", "", "", "", "", "", "", "", 0, 0, "", Color.Black);
 
             string newLine = Environment.NewLine;
 
@@ -1378,11 +1403,13 @@ namespace OrderManager
                 {
                     orderStatus.caption_1 = "Отставание: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForMakeready * (-1));
+                    orderStatus.color = Color.DarkRed;
                 }
                 else
                 {
                     orderStatus.caption_1 = "Остаток времени на приладку: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
+                    orderStatus.color = Color.Goldenrod;
                 }
 
                 orderStatus.caption_2 = "Остаток времени для выполнение заказа: ";
@@ -1408,11 +1435,13 @@ namespace OrderManager
                 {
                     orderStatus.caption_1 = "Отставание: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForFullWork * (-1));
+                    orderStatus.color = Color.DarkRed;
                 }
                 else
                 {
                     orderStatus.caption_1 = "Остаток времени: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(currentLastTimeForFullWork);
+                    orderStatus.color = Color.Goldenrod;
                 }
 
                 orderStatus.caption_2 = "Плановая выработка: ";
@@ -1434,11 +1463,13 @@ namespace OrderManager
                 {
                     orderStatus.caption_1 = "Отставание: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(workTimeDifferent * (-1));
+                    orderStatus.color = Color.DarkRed;
                 }
                 else
                 {
                     orderStatus.caption_1 = "Опережение: ";
                     orderStatus.value_1 = timeOperations.MinuteToTimeString(workTimeDifferent);
+                    orderStatus.color = Color.SeaGreen;
                 }
 
                 orderStatus.message = orderStatus.caption_1 + orderStatus.value_1;
@@ -1825,7 +1856,8 @@ namespace OrderManager
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            FormForExperience form = new FormForExperience();
+            form.ShowDialog();
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
