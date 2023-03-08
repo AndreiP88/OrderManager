@@ -1461,6 +1461,7 @@ namespace OrderManager
                 {
                     string timeStoFromWorkingOut = timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut);
                     int timeWorkingOutDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeStoFromWorkingOut, facticalTimeToWorkStop);
+                    //int timeWorkingOutDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeStoFromWorkingOut, DateTime.Now.ToString());
 
                     if (timeWorkingOutDifferent > 0)
                     {
