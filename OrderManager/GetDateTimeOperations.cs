@@ -176,6 +176,7 @@ namespace OrderManager
         public string MinuteToTimeString(int totalMinutes)
         {
             string result = "00:00";
+            string sign = "";
 
             int absMinutes = Math.Abs(totalMinutes);
 
@@ -189,10 +190,10 @@ namespace OrderManager
 
             if (totalMinutes < 0)
             {
-                hours *= (-1);
+                sign = "-";
             }
 
-            result = hours.ToString("D2") + ":" + minutes.ToString("D2");
+            result = sign + hours.ToString("D2") + ":" + minutes.ToString("D2");
 
             return result;
         }
