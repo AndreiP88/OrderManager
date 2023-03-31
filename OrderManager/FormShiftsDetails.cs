@@ -235,6 +235,15 @@ namespace OrderManager
                             item.SubItems[5].Text = currentShift.amountOrdersShift.ToString("N0");
                             item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift);
                             item.SubItems[7].Text = getPercent.PercentString(currentShift.workingOutShift);
+
+                            if (getPercent.Percent(currentShift.workingOutShift) >= 80)
+                            {
+                                item.ForeColor = Color.SeaGreen;
+                            }
+                            else
+                            {
+                                item.ForeColor = Color.DarkRed;
+                            }
                         }
                     }));
                 }
