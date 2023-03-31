@@ -308,6 +308,15 @@ namespace OrderManager
                                         item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
                                         item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
                                         item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+
+                                        if (shiftsDetails.percentWorkingOutShift >= 80)
+                                        {
+                                            item.ForeColor = Color.SeaGreen;
+                                        }
+                                        else
+                                        {
+                                            item.ForeColor = Color.DarkRed;
+                                        }
                                     }
                                 }
                             }));
