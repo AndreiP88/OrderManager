@@ -37,12 +37,12 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -135,8 +135,8 @@
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
-            "Считать исходя из планируемых значений начала смены и выработки",
-            "Считать исходя из фактического времени начала выполнения зааза"});
+            "Считать от планируемого времени начала выполнения заказа",
+            "Считать от фактического времени начала выполнения заказа"});
             this.comboBox1.Location = new System.Drawing.Point(7, 20);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(524, 21);
@@ -151,15 +151,15 @@
             this.groupBox2.Size = new System.Drawing.Size(537, 49);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Способ расчёта деталей закааз во всплывающей подсказке";
+            this.groupBox2.Text = "Способ расчёта деталей заказа во всплывающей подсказке";
             // 
             // comboBox2
             // 
             this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Items.AddRange(new object[] {
-            "Считать исходя из планируемых значений начала смены и выработки",
-            "Считать исходя из фактического времени начала выполнения зааза"});
+            "Считать от планируемого времени начала выполнения заказа",
+            "Считать от фактического времени начала выполнения заказа"});
             this.comboBox2.Location = new System.Drawing.Point(7, 20);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(524, 21);
@@ -177,20 +177,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Способ расчёта отклонения от нормы времени";
             // 
-            // comboBox3
-            // 
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Items.AddRange(new object[] {
-            "Считать исходя из планируемых значений начала выполнения и фактического завершени" +
-                "я операции",
-            "Считать исходя из фактического времени начала и завершения выполнения операции",
-            "Считать исходя из фактических значений продолжительности операций"});
-            this.comboBox3.Location = new System.Drawing.Point(7, 20);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(524, 21);
-            this.comboBox3.TabIndex = 0;
-            // 
             // comboBox4
             // 
             this.comboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -202,6 +188,19 @@
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(524, 21);
             this.comboBox4.TabIndex = 1;
+            // 
+            // comboBox3
+            // 
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Items.AddRange(new object[] {
+            "Считать от планируемого времени начала выполнения заказа",
+            "Считать от фактического времени начала выполнения заказа",
+            "Считать исходя из фактических значений продолжительности операций"});
+            this.comboBox3.Location = new System.Drawing.Point(7, 20);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(524, 21);
+            this.comboBox3.TabIndex = 0;
             // 
             // groupBox4
             // 
@@ -217,15 +216,13 @@
             this.groupBox4.Text = "Перерывы на обед";
             this.groupBox4.Visible = false;
             // 
-            // checkBox1
+            // dateTimePicker2
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(7, 20);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(293, 17);
-            this.checkBox1.TabIndex = 0;
-            this.checkBox1.Text = "Учитывать перерывы на обед в расчётах выработки";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.dateTimePicker2.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dateTimePicker2.Location = new System.Drawing.Point(7, 70);
+            this.dateTimePicker2.Name = "dateTimePicker2";
+            this.dateTimePicker2.Size = new System.Drawing.Size(74, 20);
+            this.dateTimePicker2.TabIndex = 2;
             // 
             // dateTimePicker1
             // 
@@ -235,13 +232,15 @@
             this.dateTimePicker1.Size = new System.Drawing.Size(74, 20);
             this.dateTimePicker1.TabIndex = 1;
             // 
-            // dateTimePicker2
+            // checkBox1
             // 
-            this.dateTimePicker2.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.dateTimePicker2.Location = new System.Drawing.Point(7, 70);
-            this.dateTimePicker2.Name = "dateTimePicker2";
-            this.dateTimePicker2.Size = new System.Drawing.Size(74, 20);
-            this.dateTimePicker2.TabIndex = 2;
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(7, 20);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(293, 17);
+            this.checkBox1.TabIndex = 0;
+            this.checkBox1.Text = "Учитывать перерывы на обед в расчётах выработки";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // FormSettings
             // 

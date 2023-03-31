@@ -50,6 +50,26 @@ namespace OrderManager
         }
 
         /// <summary>
+        /// Получить время начала выполнения заказа
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Фактическое время начал выполнения заказа</returns>
+        public string GetOrderStartTime(int id)
+        {
+            string startMK = GetValueFromIndex(id, "timeMakereadyStart");
+            string startWK = GetValueFromIndex(id, "timeToWorkStart");
+
+            if (startMK != "")
+            {
+                return startMK;
+            }
+            else
+            {
+                return startWK;
+            }
+        }
+
+        /// <summary>
         /// Получить время завершения заказа
         /// </summary>
         /// <param name="id"></param>

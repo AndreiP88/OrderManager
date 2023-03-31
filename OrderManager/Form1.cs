@@ -534,7 +534,8 @@ namespace OrderManager
                     }
                     else
                     {
-                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
                     }
                 }
                 else if (typeLoad == 1)
@@ -549,7 +550,8 @@ namespace OrderManager
                     }
                     else
                     {
-                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
                     }
                 }
                 else if (typeLoad == 2)
@@ -1346,7 +1348,8 @@ namespace OrderManager
             else
             {
                 currentLead = ordersCurrentShift[indexOrder].facticalTimeMakeready + ordersCurrentShift[indexOrder].facticalTimeWork;
-                timeStartOrder = timeOperations.DateTimeDifferenceMunutes(DateTime.Now.ToString(), (currentLead + 2));
+                //timeStartOrder = timeOperations.DateTimeDifferenceMunutes(DateTime.Now.ToString(), (currentLead + 2));
+                timeStartOrder = getOrders.GetOrderStartTime(ordersCurrentShift[indexOrder].id);
             }
 
             int currentLastTimeForMakeready = timeOperations.MinuteDifference(lastTimeForMK, currentLead, false); //остаток времеи на приладку только положительные
@@ -1374,24 +1377,30 @@ namespace OrderManager
             {
                 orderStatus.mkTimeDifferent = mkTimeDifferent;
             }*/
-            
+
             /*orderStatus.wkTimeDifferent = wkTimeDifferent;*/
 
-            /*Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
+            bool print = false;
 
-            Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
-            Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));
-            Console.WriteLine("Выработка предыдущих заказов: " + timeOperations.MinuteToTimeString(countPreviusWorkingOut));
+            if (print)
+            {
+                Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
 
-            Console.WriteLine("Остаток времеи на приладку: " + timeOperations.MinuteToTimeString(currentLastTimeForMakeready));
-            Console.WriteLine("Остаток времеи на выполнение заказа: " + timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
-            Console.WriteLine("Отклонение: " + timeOperations.MinuteToTimeString(workTimeDifferent));
+                Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
+                Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));
+                Console.WriteLine("Выработка предыдущих заказов: " + timeOperations.MinuteToTimeString(countPreviusWorkingOut));
 
-            Console.WriteLine("Время завершения приладки: " + timeToEndMK);
-            Console.WriteLine("Время завершения работы: " + timeToEndWork);
+                Console.WriteLine("Остаток времеи на приладку: " + timeOperations.MinuteToTimeString(currentLastTimeForMakeready));
+                Console.WriteLine("Остаток времеи на выполнение заказа: " + timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
+                Console.WriteLine("Отклонение: " + timeOperations.MinuteToTimeString(workTimeDifferent));
 
-            Console.WriteLine("Отклонение времени приладки от нормы: " + timeOperations.MinuteToTimeString(mkTimeDifferent));
-            Console.WriteLine("Отклонение времени работы от нормы: " + timeOperations.MinuteToTimeString(wkTimeDifferent));*/
+                Console.WriteLine("Время завершения приладки: " + timeToEndMK);
+                Console.WriteLine("Время завершения работы: " + timeToEndWork);
+
+                Console.WriteLine("Отклонение времени приладки от нормы: " + timeOperations.MinuteToTimeString(mkTimeDifferent));
+                Console.WriteLine("Отклонение времени работы от нормы: " + timeOperations.MinuteToTimeString(wkTimeDifferent));
+            }
+            
 
             /*string timeToEndMK = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForMakeready - lastTimeForMK);
             string timeToEndWork = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForFullWork - fullTimeForWork);*/
