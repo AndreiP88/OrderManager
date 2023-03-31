@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -1574,23 +1576,61 @@ namespace OrderManager
                                                                           v.modificationOfOrder == getInfo.GetCurrentOrderModification(machines[j]) &&
                                                                           v.machineOfOrder == machines[j]);
 
-                        int fullLastTime = 0;
-                        int fullFactTime = 0;
                         int timeDiff = 0;
+
+                        int currentLastTimeForFullWork = 0;
 
                         if (idx != -1)
                         {
-                            fullLastTime = ordersCurrentShift[idx].plannedTimeMakeready + ordersCurrentShift[idx].plannedTimeWork;
-                            fullFactTime = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
+                            int fullLastTime = ordersCurrentShift[idx].plannedTimeMakeready + ordersCurrentShift[idx].plannedTimeWork;
+                            int fullFactTime = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
 
                             timeDiff = timeOperations.MinuteDifference(fullLastTime, fullFactTime, false);
 
-                            /*if (timeOperations.MinuteDifference(fullLastTime, fullFactTime, true) == 0)
-                                timeDiff = timeOperations.MinuteDifference(fullFactTime, fullLastTime, false);
-                            else if (timeOperations.TimeDifferent(fullFactTime, fullLastTime) == "00:00")
-                                timeDiff = timeOperations.TimeDifferent(fullLastTime, fullFactTime);
+
+
+                            bool plannedWorkingOut = true;
+
+                            GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
+
+                            string shiftStart = userBase.GetCurrentShiftStart(users[i]); //get from Info or user base
+
+                            if (plannedWorkingOut)
+                            {
+                                shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
+                            }
+
+                            int countWorkingOut = 0;
+
+                            for (int k = 0; k < idx; k++)
+                            {
+                                if (ordersCurrentShift[k].machineOfOrder == ordersCurrentShift[idx].machineOfOrder)
+                                {
+                                    countWorkingOut += ordersCurrentShift[k].workingOut;
+                                }
+                            }
+
+                            int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart);
+
+                            int lastTimeForMK = ordersCurrentShift[idx].plannedTimeMakeready;
+                            int lastTimeForWK = ordersCurrentShift[idx].plannedTimeWork;
+                            int fullTimeForWork = lastTimeForMK + lastTimeForWK;
+
+                            int currentLead;
+
+                            if (plannedWorkingOut)
+                            {
+                                currentLead = workTime - countWorkingOut; //время выполнения текущего заказа
+                                //timeStartOrder = timeOperations.DateTimeAmountMunutes(shiftStart, countWorkingOut);
+                            }
                             else
-                                timeDiff = "00:00";*/
+                            {
+                                currentLead = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
+                                //timeStartOrder = timeOperations.DateTimeDifferenceMunutes(DateTime.Now.ToString(), (currentLead + 2));
+                                //timeStartOrder = getOrders.GetOrderStartTime(ordersCurrentShift[indexOrder].id);
+                            }
+
+                            currentLastTimeForFullWork = timeOperations.MinuteDifference(fullTimeForWork, currentLead, false);
                         }
 
                         ListViewItem item = new ListViewItem();
@@ -1602,7 +1642,17 @@ namespace OrderManager
                         item.SubItems.Add(order);
                         item.SubItems.Add(getOrder.GetOrderStatusName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
                         item.SubItems.Add(currentTime);
-                        item.SubItems.Add(timeOperations.MinuteToTimeString(timeDiff));
+                        //item.SubItems.Add(timeOperations.MinuteToTimeString(timeDiff));
+                        item.SubItems.Add(timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
+
+                        if (currentLastTimeForFullWork > 0)
+                        {
+                            item.ForeColor = Color.SeaGreen;
+                        }
+                        else
+                        {
+                            item.ForeColor = Color.DarkRed;
+                        }
 
                         listView.Items.Add(item);
                     }
