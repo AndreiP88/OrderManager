@@ -177,7 +177,9 @@
     <Compile Include="FormTypesInTheOrder.Designer.cs">
       <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>
     </Compile>
+    <Compile Include="GetWorkingOutTime.cs" />
     <Compile Include="INISettings.cs" />
+    <Compile Include="OrderStatusValue.cs" />
     <Compile Include="StringArray.cs" />
     <Compile Include="Cryption.cs" />
     <Compile Include="FormAddNewOrder.cs">
