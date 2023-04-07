@@ -56,6 +56,7 @@ namespace OrderManager
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -67,7 +68,6 @@ namespace OrderManager
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -354,33 +354,33 @@ namespace OrderManager
             this.columnHeader5.Text = "Время";
             this.columnHeader5.Width = 98;
             // 
+            // columnHeader11
+            // 
+            this.columnHeader11.Text = "Отклонение";
+            this.columnHeader11.Width = 92;
+            // 
             // columnHeader6
             // 
-            this.columnHeader6.DisplayIndex = 9;
             this.columnHeader6.Text = "Сделано";
             this.columnHeader6.Width = 85;
             // 
             // columnHeader7
             // 
-            this.columnHeader7.DisplayIndex = 10;
             this.columnHeader7.Text = "Норма, шт/ч";
             this.columnHeader7.Width = 94;
             // 
             // columnHeader8
             // 
-            this.columnHeader8.DisplayIndex = 11;
             this.columnHeader8.Text = "Выработка";
             this.columnHeader8.Width = 88;
             // 
             // columnHeader9
             // 
-            this.columnHeader9.DisplayIndex = 12;
             this.columnHeader9.Text = "Примечание";
             this.columnHeader9.Width = 223;
             // 
             // columnHeader10
             // 
-            this.columnHeader10.DisplayIndex = 13;
             this.columnHeader10.Text = "Заметка";
             this.columnHeader10.Width = 95;
             // 
@@ -431,12 +431,6 @@ namespace OrderManager
             // 
             this.toolTip1.AutomaticDelay = 100;
             // 
-            // columnHeader11
-            // 
-            this.columnHeader11.DisplayIndex = 8;
-            this.columnHeader11.Text = "Отклонение";
-            this.columnHeader11.Width = 92;
-            // 
             // FormOneShiftDetails
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -447,7 +441,7 @@ namespace OrderManager
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "FormOneShiftDetails";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Менеджер заказов";
+            this.Text = "Продробности смены";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormOneShiftDetails_FormClosing);
             this.Load += new System.EventHandler(this.FormOneShiftDetails_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
