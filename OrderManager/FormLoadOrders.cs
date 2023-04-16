@@ -143,7 +143,14 @@ namespace OrderManager
                     {
                         if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
                         {
-                            mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                            if (sqlReader["normtime"] != null)
+                            {
+                                mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                            }
+                            else
+                            {
+                                mkNormTime.Add(0);
+                            }
                         }
 
                         if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)

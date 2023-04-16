@@ -417,6 +417,7 @@ namespace OrderManager
                 textBox2.Enabled = true;
                 textBox5.Enabled = true;
                 button5.Enabled = true;
+                button7.Enabled = true;
             }
             else
             {
@@ -430,6 +431,7 @@ namespace OrderManager
                 textBox2.Enabled = false;
                 textBox5.Enabled = false;
                 button5.Enabled = false;
+                button7.Enabled = false;
             }
 
             if (adminCloseOrder)
