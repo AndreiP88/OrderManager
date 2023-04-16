@@ -19,6 +19,21 @@ namespace OrderManager
             return GetValue("id", id, "category");
         }
 
+        public String GetMainIDNormOperation(String id)
+        {
+            return GetValue("id", id, "mainIdNormOperation");
+        }
+
+        public String GetMKIDNormOperation(String id)
+        {
+            return GetValue("id", id, "mkIdNormOperation");
+        }
+
+        public String GetWKIDNormOperation(String id)
+        {
+            return GetValue("id", id, "wkIdNormOperation");
+        }
+
         public String GetCategoryFromName(String category)
         {
             return GetValue("category", category, "id");

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -970,6 +971,7 @@ namespace OrderManager
                 }
                 comboBox1.SelectedIndex = index;
                 comboBox1.Enabled = false;
+                button7.Enabled = false;
             }
             else if (getInfo.GetLastOrderNumber(getInfo.GetMachineFromName(comboBox3.Text)) != "")
             {
@@ -984,11 +986,13 @@ namespace OrderManager
                 }
                 comboBox1.SelectedIndex = index;
                 comboBox1.Enabled = true;
+                button7.Enabled = true;
             }
             else
             {
                 comboBox1.SelectedIndex = 0;
                 comboBox1.Enabled = true;
+                button7.Enabled = true;
             }
 
         }
@@ -1343,6 +1347,27 @@ namespace OrderManager
             numericUpDown7.Value = workH;
             numericUpDown8.Value = workM;
 
+        }
+
+        private void SetNewOrder(string number, string customer, int mkTime, int wkTime, decimal amount, string stamp)
+        {
+            textBox1.Text = number;
+            comboBox2.Text = customer;
+
+            numericUpDown1.Value = amount;
+            textBox2.Text = stamp;
+
+            int makereadyH = mkTime / 60;
+            int makereadyM = mkTime % 60;
+
+            int workH = wkTime / 60;
+            int workM = wkTime % 60;
+
+            numericUpDown5.Value = makereadyH;
+            numericUpDown6.Value = makereadyM;
+
+            numericUpDown7.Value = workH;
+            numericUpDown8.Value = workM;
         }
 
         private void LoadTypes()
@@ -1726,6 +1751,21 @@ namespace OrderManager
         private void button6_Click(object sender, EventArgs e)
         {
             LoadTypes();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            ValueInfoBase valueInfoBase = new ValueInfoBase();
+
+            string machine = valueInfoBase.GetMachineFromName(comboBox3.Text);
+
+            FormLoadOrders fm = new FormLoadOrders(machine);
+            fm.ShowDialog();
+
+            if (fm.NewValue)
+            {
+                SetNewOrder(fm.ValNumber, fm.ValCustomer, fm.ValMakeready, fm.ValWork, fm.ValAmount, fm.ValStamp);
+            }
         }
     }
 

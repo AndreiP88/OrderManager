@@ -171,6 +171,12 @@
     <Compile Include="FormSalaryForUser.Designer.cs">
       <DependentUpon>FormSalaryForUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormLoadOrders.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLoadOrders.Designer.cs">
+      <DependentUpon>FormLoadOrders.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTypesInTheOrder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -179,6 +185,7 @@
     </Compile>
     <Compile Include="GetWorkingOutTime.cs" />
     <Compile Include="INISettings.cs" />
+    <Compile Include="OrdersLoad.cs" />
     <Compile Include="OrderStatusValue.cs" />
     <Compile Include="StringArray.cs" />
     <Compile Include="Cryption.cs" />
@@ -333,6 +340,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormSalaryForUser.resx">
       <DependentUpon>FormSalaryForUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLoadOrders.resx">
+      <DependentUpon>FormLoadOrders.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormTypesInTheOrder.resx">
       <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>

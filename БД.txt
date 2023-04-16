@@ -1,0 +1,28 @@
+dbo_man_planjob_list - Нормы для заказов (id_norm_operation: 30, 31 для склейки)
+dbo_order_head - Номера заказов с описанием
+dbo_common_ul_directory - список заказчиков "id_customer"
+dbo_common_employee - сотрудники
+dbo_common_equip_directory - оборудование
+
+dbo_norm_operation - Список категорий норм
+-- Можно получить список из базы
+-- Без parent_id список, а с ним подкатегория (приладка/работа)
+
+
+
+
+
+из таблицы dbo_order_head по номеру заказа(order_num) со статусом 1 получаем индекс "id_order_head" и "id_customer"
+получаем индекс участка работы id_norm_operation (для склейки 29, берем из базы для выбранного оборудования)
+из таблицы dbo_man_order_job по id_order_head и id_norm_operation получаем индекс id_man_order_job
+из таблицы dbo_man_order_job_item по id_man_order_job получаем индекс id_man_order_job_item
+из таблицы dbo_man_planjob_list по id_man_order_job_item получаем значения id_norm_operation, plan_out_qty и normtime
+заполняем значения приладки и работы в соответстви с id_norm_operation (для склейки 30 и 31 соответственно)
+
+
+
+
+Dsn=ASystem;uid=ds;pwd=1;app=Microsoft® Visual Studio®;wsid=PR8;database=asystem
+Dsn=ASystem;uid=ds;pwd=1
+
+System.Data.Odbc.OdbcException: "ERROR [IM002] [Microsoft][Диспетчер драйверов ODBC] Источник данных не найден и не указан драйвер, используемый по умолчанию"

@@ -1,8 +1,12 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -427,6 +431,101 @@ namespace OrderManager
         private void button2_Click(object sender, EventArgs e)
         {
             AddOrdersToListViewFromList();
+        }
+
+        private void SetIDToBase(string startOfShift, int id)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE ordersInProgress SET startOfShiftID = @id " +
+                    "WHERE startOfShift = @startOfShift";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id.ToString());
+                Command.Parameters.AddWithValue("@startOfShift", startOfShift);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        private int GetID(string startOfShift)
+        {
+            int result = 0;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM shifts WHERE startShift = '" + startOfShift + "'"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = Convert.ToInt32(sqlReader["id"].ToString());
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            List<String> listStarts = new List<String>();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    listStarts.Add(sqlReader["startOfShift"].ToString());
+
+                    //SetIDToBase(sqlReader["startOfShift"].ToString(), GetID(sqlReader["startOfShift"].ToString()));
+                }
+
+                Connect.Close();
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
 }

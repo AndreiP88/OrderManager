@@ -119,30 +119,6 @@ namespace OrderManager
             return result;
         }
 
-        private int CountWorkingOutOrders(int indexOrder, string machine)
-        {
-            int result = 0;
-
-            for (int i = 0; i < indexOrder; i++)
-            {
-                if (ordersCurrentShift[i].machineOfOrder == machine || machine == "")
-                {
-                    result += ordersCurrentShift[i].workingOut;
-                }
-            }
-
-            return result;
-        }
-
-        private int CountPreviusOutages()
-        {
-            int result = 0;
-
-
-
-            return result;
-        }
-
         private void AddOrdersToListViewFromList()
         {
             ValueInfoBase getInfo = new ValueInfoBase();

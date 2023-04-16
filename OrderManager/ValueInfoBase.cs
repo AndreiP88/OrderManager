@@ -28,6 +28,11 @@ namespace OrderManager
             return GetValueMachines("id", machine, "category");
         }
 
+        public String GetIDEquipMachine(String machine)
+        {
+            return GetValueMachines("id", machine, "idEquip");
+        }
+
         public String GetMachineStartWork(String machine)
         {
             return GetValueMachines("id", machine, "dateStartWork");
