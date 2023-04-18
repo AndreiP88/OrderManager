@@ -275,6 +275,8 @@ namespace OrderManager
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
             string idMachine = valueInfo.GetIDEquipMachine(loadMachine);
 
+            string endDate = DateTime.Now.AddYears(-1).ToString();
+
             List<string> orderItemsList = new List<string>();
 
             string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
@@ -286,9 +288,10 @@ namespace OrderManager
                 {
                     Connection = connection,
                     //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
-                    CommandText = @"SELECT * FROM dbo.man_planjob WHERE (status = '0' AND id_equip = @idMachine)"
+                    CommandText = @"SELECT * FROM dbo.man_planjob WHERE ((status = '0' OR status = '3') AND (id_equip = @idMachine AND date_end > @dateEnd))"
                 };
                 Command.Parameters.AddWithValue("@idMachine", idMachine);
+                Command.Parameters.AddWithValue("@dateEnd", endDate);
 
                 DbDataReader sqlReader = Command.ExecuteReader();
 
