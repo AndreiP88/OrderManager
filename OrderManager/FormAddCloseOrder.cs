@@ -973,7 +973,7 @@ namespace OrderManager
                 }
                 comboBox1.SelectedIndex = index;
                 comboBox1.Enabled = false;
-                button7.Enabled = false;
+                //button7.Enabled = false;
             }
             else if (getInfo.GetLastOrderNumber(getInfo.GetMachineFromName(comboBox3.Text)) != "")
             {
@@ -988,13 +988,13 @@ namespace OrderManager
                 }
                 comboBox1.SelectedIndex = index;
                 comboBox1.Enabled = true;
-                button7.Enabled = true;
+                //button7.Enabled = false;
             }
             else
             {
                 comboBox1.SelectedIndex = 0;
                 comboBox1.Enabled = true;
-                button7.Enabled = true;
+                //button7.Enabled = true;
             }
 
         }

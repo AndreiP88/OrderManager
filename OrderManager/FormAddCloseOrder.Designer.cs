@@ -702,7 +702,7 @@ namespace OrderManager
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(414, 80);
+            this.button7.Location = new System.Drawing.Point(414, 79);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(31, 23);
             this.button7.TabIndex = 23;

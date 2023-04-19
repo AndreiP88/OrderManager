@@ -278,6 +278,8 @@ namespace OrderManager
             string endDate = DateTime.Now.AddYears(-1).ToString();
 
             List<string> orderItemsList = new List<string>();
+            //либо оставить так, либо сделать через класс
+            List<string> statusOrderList = new List<string>();
 
             string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
 
@@ -298,6 +300,8 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     orderItemsList.Add(sqlReader["id_man_order_job_item"].ToString());
+                    //выше описано
+                    statusOrderList.Add(sqlReader["status"].ToString());
                 }
 
                 connection.Close();
@@ -349,6 +353,7 @@ namespace OrderManager
                     List<int> wkNormTime = new List<int>();
                     List<int> amounts = new List<int>();
 
+                    //потом переделать, сделать загрузку статуса отдельно и найти где хранится номер штампа
                     string stamp = "";
 
                     DbDataReader sqlReader = Command.ExecuteReader();
