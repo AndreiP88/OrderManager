@@ -288,7 +288,7 @@ namespace OrderManager
                 {
                     Connection = connection,
                     //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
-                    CommandText = @"SELECT * FROM dbo.man_planjob WHERE ((status = '0' OR status = '3') AND (id_equip = @idMachine AND date_end > @dateEnd))"
+                    CommandText = @"SELECT * FROM dbo.man_planjob WHERE ((status <> '2') AND (id_equip = @idMachine AND date_end > @dateEnd))"
                 };
                 Command.Parameters.AddWithValue("@idMachine", idMachine);
                 Command.Parameters.AddWithValue("@dateEnd", endDate);
