@@ -1,8 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
@@ -37,8 +40,25 @@ namespace OrderManager
             _loadForEdit = true;
         }
 
+        class EquipName
+        {
+            public int id;
+            public string name;
+            public EquipName(int index, string nameEquip)
+            {
+                id = index;
+                name = nameEquip;
+            }
+        }
+
+        bool loadedFromBase = false;
+
+        List<EquipName> eNames = new List<EquipName>();
+
         private void FormAddEditUser_Load(object sender, EventArgs e)
         {
+            LoadMainNormOperation();
+
             if (_loadForEdit)
             {
                 LoadForEdit();
@@ -66,6 +86,19 @@ namespace OrderManager
             textBox4.Text = getMachine.GetMachineNote(machineIDLoad);
 
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(getMachine.GetCategoryMachine(machineIDLoad)));
+
+            SelectMainNormOperationIndex(machineIDLoad);
+        }
+
+        private void SelectMainNormOperationIndex(string machine)
+        {
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            int mainID = Convert.ToInt32(infoBase.GetIDEquipMachine(machine));
+
+            int mainIndex = eNames.FindIndex(v => v.id == mainID);
+
+            comboBox2.SelectedIndex = mainIndex;
         }
 
         private void LoadForAdd()
@@ -101,7 +134,61 @@ namespace OrderManager
                 return false;
             }
 
+            if (comboBox2.SelectedIndex == -1)
+            {
+                MessageBox.Show("Не выбрано используемое оборудование", "Ошибка", MessageBoxButtons.OK);
+                return false;
+            }
+
             return result;
+        }
+
+        private void LoadMainNormOperation()
+        {
+            eNames.Clear();
+
+            string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                        CommandText = @"SELECT * FROM dbo.common_equip_directory"
+                    };
+                    //Command.Parameters.AddWithValue("@order_num", "%" + textBox1.Text + "%");
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        eNames.Add(new EquipName(
+                            Convert.ToInt32(sqlReader["id_common_equip_directory"].ToString()),
+                            sqlReader["equip_name"].ToString()
+                            ));
+
+                        comboBox2.Items.Add(sqlReader["equip_name"].ToString());
+                    }
+
+                    connection.Close();
+                }
+
+                comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
+                //сделать выбор для редактирования
+                comboBox2.SelectedIndex = 0;
+
+                loadedFromBase = true;
+            }
+            catch
+            {
+                comboBox2.Text = "1";
+
+                loadedFromBase = false;
+            }
         }
 
         private void AddNewMachine()
@@ -117,20 +204,28 @@ namespace OrderManager
 
             String note = textBox4.Text;
 
+            string equip = comboBox2.Text;
+
+            if (loadedFromBase)
+            {
+                equip = eNames[comboBox2.SelectedIndex].id.ToString();
+            }
+
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
-                    commandText = "INSERT INTO machines (category, name, dateStartWork, note) " +
-                        "VALUES (@category, @name, @dateStartWork, @note)";
+                    commandText = "INSERT INTO machines (category, name, idEquip, dateStartWork, note) " +
+                        "VALUES (@category, @name, @idEquip, @dateStartWork, @note)";
                 else
-                    commandText = "UPDATE machines SET category = @category, name = @name, dateStartWork = @dateStartWork, note = @note " +
+                    commandText = "UPDATE machines SET category = @category, name = @name, idEquip = @idEquip, dateStartWork = @dateStartWork, note = @note " +
                     "WHERE id = @machineIDLoad";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machineIDLoad", machineIDLoad);
                 Command.Parameters.AddWithValue("@category", category);
                 Command.Parameters.AddWithValue("@name", name);
+                Command.Parameters.AddWithValue("@idEquip", equip);
                 Command.Parameters.AddWithValue("@dateStartWork", dateStartWork);
                 Command.Parameters.AddWithValue("@note", note);
 
