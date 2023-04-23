@@ -136,7 +136,6 @@ namespace OrderManager
                 numberOfOrder = number;
                 modificationOfOrder = modification;
             }
-
         }
 
         List<Order> ordersNumbers = new List<Order>();
