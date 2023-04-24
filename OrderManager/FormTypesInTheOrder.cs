@@ -1,6 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -28,7 +30,6 @@ namespace OrderManager
             this.loadOrderModification = lOrderModification;
             this.loadOrderCounterRepeat = lOrderCounterRepeat;
             this.loadMachine = lMachine;
-            this.loadMachine = lMachine;
             this.loadUser = lUser;
         }
 
@@ -40,6 +41,36 @@ namespace OrderManager
 
         bool editedType = false;
         string indexTypeEdited = "";
+
+        private void LoadItemsListForCurrentOrder()
+        {
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+
+            comboBox1.Items.Clear();
+
+            int orderID = ordersBase.GetOrderID(loadMachine, loadOrderNumber, loadOrderModification);
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM typesList WHERE orderID = @orderID"
+
+                };
+                Command.Parameters.AddWithValue("@orderID", orderID);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    comboBox1.Items.Add(sqlReader["name"].ToString());
+                }
+
+                Connect.Close();
+            }
+        }
         
         private void LoadTypes()
         {
@@ -52,7 +83,7 @@ namespace OrderManager
 
         private void AddTypes()
         {
-            typesForAdded.Add(new TypeInTheOrder(textBox1.Text, (int)numericUpDown1.Value));
+            typesForAdded.Add(new TypeInTheOrder(comboBox1.Text, (int)numericUpDown1.Value));
         }
 
         private void SaveTypes()
@@ -77,7 +108,7 @@ namespace OrderManager
 
         private void Clear()
         {
-            textBox1.Text = "";
+            comboBox1.Text = "";
             numericUpDown1.Value = 0;
 
             button1.Text = "Добавить";
@@ -139,17 +170,17 @@ namespace OrderManager
 
                 if (indexTypeEdited.Substring(0, 1) == "n")
                 {
-                    typesForAdded[index].type = textBox1.Text;
+                    typesForAdded[index].type = comboBox1.Text;
                     typesForAdded[index].done = (int)numericUpDown1.Value;
                 }
                 else
                 {
                     int i = typesCurrent.FindLastIndex((v) => v.id == index.ToString());
 
-                    typesCurrent[i].type = textBox1.Text;
+                    typesCurrent[i].type = comboBox1.Text;
                     typesCurrent[i].done = (int)numericUpDown1.Value;
 
-                    typesForEdit.Add(new TypeInTheOrder(index.ToString(), textBox1.Text, (int)numericUpDown1.Value));
+                    typesForEdit.Add(new TypeInTheOrder(index.ToString(), comboBox1.Text, (int)numericUpDown1.Value));
                 }
             }
 
@@ -169,20 +200,21 @@ namespace OrderManager
 
             if (indexTypeEdited.Substring(0, 1) == "n")
             {
-                textBox1.Text = typesForAdded[index].type;
+                comboBox1.Text = typesForAdded[index].type;
                 numericUpDown1.Value = typesForAdded[index].done;
             }
             else
             {
                 int i = typesCurrent.FindLastIndex((v) => v.id == index.ToString());
 
-                textBox1.Text = typesCurrent[i].type;
+                comboBox1.Text = typesCurrent[i].type;
                 numericUpDown1.Value = typesCurrent[i].done;
             }
         }
 
         private void FormPrivateNote_Load(object sender, EventArgs e)
         {
+            LoadItemsListForCurrentOrder();
             LoadTypes();
         }
 
@@ -245,7 +277,19 @@ namespace OrderManager
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            if (textBox1.Text.Length > 0)
+            if (comboBox1.Text.Length > 0)
+            {
+                button1.Enabled = true;
+            }
+            else
+            {
+                button1.Enabled = false;
+            }
+        }
+
+        private void comboBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.Text.Length > 0)
             {
                 button1.Enabled = true;
             }
