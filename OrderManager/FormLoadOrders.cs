@@ -68,9 +68,13 @@ namespace OrderManager
             return result;
         }
 
+
+
         private void button1_Click(object sender, EventArgs e)
         {
-            ValueCategory valueCategory = new ValueCategory();
+            LoadOrdersByNumber();
+
+            /*ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
 
             orders.Clear();
@@ -117,6 +121,35 @@ namespace OrderManager
 
             for (int i = 0; i < orderHeadList.Count; i++)
             {
+                List<string> itemOrder = new List<string>();
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+
+                        CommandText = @"SELECT detail_name FROM dbo.order_detail WHERE id_order_detail IN (
+                            SELECT itemid FROM dbo.man_order_job_item WHERE id_man_order_job IN (
+                            SELECT id_man_order_job FROM dbo.man_order_job WHERE id_order_head IN (
+                            '" + orderHeadList[i] + "') AND id_norm_operation = '" + idNormOperation + "'))"
+                    };
+                    //Command.Parameters.AddWithValue("@orderItems", orderItemsList[i]); detail_name
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        ///////
+                        itemOrder.Add(sqlReader["detail_name"].ToString());
+                    }
+                    //MessageBox.Show(itemOrder.Count.ToString());
+                    connection.Close();
+                }
+
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -167,6 +200,7 @@ namespace OrderManager
                             orders.Add(new OrdersLoad(
                                 orderNumbers[i].numberOfOrder,
                                 orderNumbers[i].nameCustomer,
+                                itemOrder[j],
                                 mkNormTime[j],
                                 wkNormTime[j],
                                 amounts[j],
@@ -184,6 +218,7 @@ namespace OrderManager
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
                                     mkNormTime[j],
                                     wkNormTime[j],
                                     amounts[j],
@@ -195,6 +230,7 @@ namespace OrderManager
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
                                     mkNormTime[j],
                                     0,
                                     0,
@@ -215,6 +251,7 @@ namespace OrderManager
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
                                     mkNormTime[j],
                                     wkNormTime[j],
                                     amounts[j],
@@ -226,6 +263,7 @@ namespace OrderManager
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
                                     0,
                                     wkNormTime[j],
                                     amounts[j],
@@ -251,6 +289,258 @@ namespace OrderManager
                 item.Text = (i + 1).ToString();
                 item.SubItems.Add(orders[i].numberOfOrder.ToString());
                 item.SubItems.Add(orders[i].nameCustomer.ToString());
+                item.SubItems.Add(orders[i].nameItem.ToString());
+                item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].makereadyTime));
+                item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].workTime));
+                item.SubItems.Add(orders[i].amountOfOrder.ToString("N0"));
+                item.SubItems.Add(orders[i].stamp.ToString());
+
+                listView1.Items.Add(item);
+            }*/
+        }
+
+        private void LoadOrdersByNumber()
+        {
+            ValueCategory valueCategory = new ValueCategory();
+            ValueInfoBase valueInfo = new ValueInfoBase();
+
+            orders.Clear();
+            orderNumbers.Clear();
+            listView1.Items.Clear();
+
+            string category = valueInfo.GetCategoryMachine(loadMachine);
+
+            string idNormOperation = valueCategory.GetMainIDNormOperation(category);
+            string idNormOperationMakeReady = valueCategory.GetMKIDNormOperation(category);
+            string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
+
+            string searchNumber = textBox1.Text;
+
+            string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
+
+            List<string> orderHeadList = new List<string>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand
+                {
+                    Connection = connection,
+                    //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                    CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+                };
+                Command.Parameters.AddWithValue("@order_num", "%" + textBox1.Text + "%");
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    orderHeadList.Add(sqlReader["id_order_head"].ToString());
+
+                    orderNumbers.Add(new OrderLoadNumber(
+                        sqlReader["order_num"].ToString(),
+                        GetCustomerNameFromID(sqlReader["id_customer"].ToString())
+                        ));
+                }
+
+                connection.Close();
+            }
+
+            for (int i = 0; i < orderHeadList.Count; i++)
+            {
+                List<string> jobItem = new List<string>();
+                List<string> itemID = new List<string>();
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+
+                        CommandText = @"SELECT id_man_order_job_item, itemid FROM dbo.man_order_job_item WHERE id_man_order_job IN (
+                            SELECT id_man_order_job FROM dbo.man_order_job WHERE id_order_head IN (
+                            '" + orderHeadList[i] + "') AND id_norm_operation = '" + idNormOperation + "')"
+                    };
+                    //Command.Parameters.AddWithValue("@orderItems", orderItemsList[i]); detail_name
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        ///////
+                        jobItem.Add(sqlReader["id_man_order_job_item"].ToString());
+                        itemID.Add(sqlReader["itemid"].ToString());
+                    }
+                    //MessageBox.Show(itemOrder.Count.ToString());
+                    connection.Close();
+                }
+
+                for(int k = 0; k < jobItem.Count; k++)
+                {
+                    List<string> itemOrder = new List<string>();
+
+                    List<int> mkNormTime = new List<int>();
+                    List<int> wkNormTime = new List<int>();
+                    List<int> amounts = new List<int>();
+
+                    string stamp = "";
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        SqlCommand Command = new SqlCommand
+                        {
+                            Connection = connection,
+                            //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                            //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+
+                            CommandText = @"SELECT detail_name FROM dbo.order_detail WHERE id_order_detail = @itemid"
+                        };
+                        Command.Parameters.AddWithValue("@itemid", itemID[k]);
+
+                        DbDataReader sqlReader = Command.ExecuteReader();
+
+                        while (sqlReader.Read())
+                        {
+                            ///////
+                            itemOrder.Add(sqlReader["detail_name"].ToString());
+                        }
+                        //MessageBox.Show(itemOrder.Count.ToString());
+                        connection.Close();
+                    }
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        SqlCommand Command = new SqlCommand
+                        {
+                            Connection = connection,
+
+                            CommandText = @"SELECT id_norm_operation, plan_out_qty, normtime FROM dbo.man_planjob_list WHERE id_man_order_job_item = @itemid"
+                        };
+                        Command.Parameters.AddWithValue("@itemid", jobItem[k]);
+
+                        DbDataReader sqlReader = Command.ExecuteReader();
+
+                        while (sqlReader.Read())
+                        {
+                            if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
+                            {
+                                if (sqlReader["normtime"] != null)
+                                {
+                                    mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                                }
+                                else
+                                {
+                                    mkNormTime.Add(0);
+                                }
+                            }
+
+                            if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
+                            {
+                                wkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                                amounts.Add(Convert.ToInt32(sqlReader["plan_out_qty"]));
+                            }
+                        }
+                        connection.Close();
+                    }
+
+                    if (mkNormTime.Count == wkNormTime.Count)
+                    {
+                        for (int j = 0; j < mkNormTime.Count; j++)
+                        {
+                            orders.Add(new OrdersLoad(
+                                orderNumbers[i].numberOfOrder,
+                                orderNumbers[i].nameCustomer,
+                                itemOrder[j],
+                                mkNormTime[j],
+                                wkNormTime[j],
+                                amounts[j],
+                                stamp
+                            ));
+                        }
+                    }
+
+                    if (mkNormTime.Count > wkNormTime.Count)
+                    {
+                        for (int j = 0; j < mkNormTime.Count; j++)
+                        {
+                            if (j < wkNormTime.Count)
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
+                                    mkNormTime[j],
+                                    wkNormTime[j],
+                                    amounts[j],
+                                    stamp
+                                ));
+                            }
+                            else
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
+                                    mkNormTime[j],
+                                    0,
+                                    0,
+                                    stamp
+                                ));
+                            }
+
+
+                        }
+                    }
+
+                    if (mkNormTime.Count < wkNormTime.Count)
+                    {
+                        for (int j = 0; j < wkNormTime.Count; j++)
+                        {
+                            if (j < mkNormTime.Count)
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
+                                    mkNormTime[j],
+                                    wkNormTime[j],
+                                    amounts[j],
+                                    stamp
+                                ));
+                            }
+                            else
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOrder[j],
+                                    0,
+                                    wkNormTime[j],
+                                    amounts[j],
+                                    stamp
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            for (int i = 0; i < orders.Count; i++)
+            {
+                ListViewItem item = new ListViewItem();
+
+                item.Name = i.ToString();
+                item.Text = (i + 1).ToString();
+                item.SubItems.Add(orders[i].numberOfOrder.ToString());
+                item.SubItems.Add(orders[i].nameCustomer.ToString());
+                item.SubItems.Add(orders[i].nameItem.ToString());
                 item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].makereadyTime));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].workTime));
                 item.SubItems.Add(orders[i].amountOfOrder.ToString("N0"));
@@ -312,6 +602,15 @@ namespace OrderManager
                 string orderNumber = "";
                 string nameCustomer = "";
 
+                string itemOrder = "";
+
+                List<int> mkNormTime = new List<int>();
+                List<int> wkNormTime = new List<int>();
+                List<int> amounts = new List<int>();
+
+                //потом переделать, сделать загрузку статуса отдельно и найти где хранится номер штампа
+                string stamp = "";
+
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -344,17 +643,35 @@ namespace OrderManager
                     SqlCommand Command = new SqlCommand
                     {
                         Connection = connection,
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+
+                        CommandText = @"SELECT detail_name FROM dbo.order_detail WHERE id_order_detail IN (
+                            SELECT itemid FROM dbo.man_order_job_item WHERE id_man_order_job_item = @orderItems)"
+                    };
+                    Command.Parameters.AddWithValue("@orderItems", orderItemsList[i]);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        ///////
+                        itemOrder = sqlReader["detail_name"].ToString();
+                    }
+
+                    connection.Close();
+                }
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
 
                         CommandText = @"SELECT id_norm_operation, plan_out_qty, normtime FROM dbo.man_planjob_list WHERE id_man_order_job_item = @orderItems"
                     };
                     Command.Parameters.AddWithValue("@orderItems", orderItemsList[i]);
-
-                    List<int> mkNormTime = new List<int>();
-                    List<int> wkNormTime = new List<int>();
-                    List<int> amounts = new List<int>();
-
-                    //потом переделать, сделать загрузку статуса отдельно и найти где хранится номер штампа
-                    string stamp = "";
 
                     DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -371,81 +688,85 @@ namespace OrderManager
                             amounts.Add(Convert.ToInt32(sqlReader["plan_out_qty"]));
                         }
                     }
+                    connection.Close();
+                }
 
-                    if (mkNormTime.Count == wkNormTime.Count)
+                if (mkNormTime.Count == wkNormTime.Count)
+                {
+                    for (int j = 0; j < mkNormTime.Count; j++)
                     {
-                        for (int j = 0; j < mkNormTime.Count; j++)
+                        orders.Add(new OrdersLoad(
+                            orderNumber,
+                            nameCustomer,
+                            itemOrder,
+                            mkNormTime[j],
+                            wkNormTime[j],
+                            amounts[j],
+                            stamp
+                        ));
+                    }
+                }
+
+                if (mkNormTime.Count > wkNormTime.Count)
+                {
+                    for (int j = 0; j < mkNormTime.Count; j++)
+                    {
+                        if (j < wkNormTime.Count)
                         {
                             orders.Add(new OrdersLoad(
                                 orderNumber,
                                 nameCustomer,
+                                itemOrder,
                                 mkNormTime[j],
                                 wkNormTime[j],
                                 amounts[j],
                                 stamp
                             ));
                         }
-                    }
-
-                    if (mkNormTime.Count > wkNormTime.Count)
-                    {
-                        for (int j = 0; j < mkNormTime.Count; j++)
+                        else
                         {
-                            if (j < wkNormTime.Count)
-                            {
-                                orders.Add(new OrdersLoad(
-                                    orderNumber,
-                                    nameCustomer,
-                                    mkNormTime[j],
-                                    wkNormTime[j],
-                                    amounts[j],
-                                    stamp
-                                ));
-                            }
-                            else
-                            {
-                                orders.Add(new OrdersLoad(
-                                    orderNumber,
-                                    nameCustomer,
-                                    mkNormTime[j],
-                                    0,
-                                    0,
-                                    stamp
-                                ));
-                            }
+                            orders.Add(new OrdersLoad(
+                                orderNumber,
+                                nameCustomer,
+                                itemOrder,
+                                mkNormTime[j],
+                                0,
+                                0,
+                                stamp
+                            ));
                         }
                     }
+                }
 
-                    if (mkNormTime.Count < wkNormTime.Count)
+                if (mkNormTime.Count < wkNormTime.Count)
+                {
+                    for (int j = 0; j < wkNormTime.Count; j++)
                     {
-                        for (int j = 0; j < wkNormTime.Count; j++)
+                        if (j < mkNormTime.Count)
                         {
-                            if (j < mkNormTime.Count)
-                            {
-                                orders.Add(new OrdersLoad(
-                                    orderNumber,
-                                    nameCustomer,
-                                    mkNormTime[j],
-                                    wkNormTime[j],
-                                    amounts[j],
-                                    stamp
-                                ));
-                            }
-                            else
-                            {
-                                orders.Add(new OrdersLoad(
-                                    orderNumber,
-                                    nameCustomer,
-                                    0,
-                                    wkNormTime[j],
-                                    amounts[j],
-                                    stamp
-                                ));
-                            }
+                            orders.Add(new OrdersLoad(
+                                orderNumber,
+                                nameCustomer,
+                                itemOrder,
+                                mkNormTime[j],
+                                wkNormTime[j],
+                                amounts[j],
+                                stamp
+                            ));
+                        }
+                        else
+                        {
+                            orders.Add(new OrdersLoad(
+                                orderNumber,
+                                nameCustomer,
+                                itemOrder,
+                                0,
+                                wkNormTime[j],
+                                amounts[j],
+                                stamp
+                            ));
                         }
                     }
-
-                    connection.Close();
                 }
             }
 
@@ -459,6 +780,7 @@ namespace OrderManager
                 item.Text = (i + 1).ToString();
                 item.SubItems.Add(orders[i].numberOfOrder.ToString());
                 item.SubItems.Add(orders[i].nameCustomer.ToString());
+                item.SubItems.Add(orders[i].nameItem.ToString());
                 item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].makereadyTime));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].workTime));
                 item.SubItems.Add(orders[i].amountOfOrder.ToString("N0"));
@@ -480,6 +802,8 @@ namespace OrderManager
         private int workNewValue;
         private decimal amountNewValue;
         private string stampOfOrderNewValue;
+        private string itemNewValue;
+        List<string> typesNewValue;
 
         public bool NewValue
         {
@@ -564,15 +888,41 @@ namespace OrderManager
             }
         }
 
+        public string ValItem
+        {
+            get
+            {
+                return itemNewValue;
+            }
+            set
+            {
+                itemNewValue = value;
+            }
+        }
+
+        public List<string> Types
+        {
+            get
+            {
+                return typesNewValue;
+            }
+            set
+            {
+                typesNewValue = value;
+            }
+        }
+
         private void SendSelectedOrder(int index)
         {
             NewValue = true;
             ValNumber = orders[index].numberOfOrder;
             ValCustomer = orders[index].nameCustomer;
+            ValItem = orders[index].nameItem;
             ValMakeready = orders[index].makereadyTime;
             ValWork = orders[index].workTime;
             ValAmount = orders[index].amountOfOrder;
             ValStamp = orders[index].stamp;
+            //сделать загрузку видов
         }
 
         private void Cancel()
@@ -580,6 +930,7 @@ namespace OrderManager
             NewValue = false;
             ValNumber = "";
             ValCustomer = "";
+            ValItem = "";
             ValMakeready = 0;
             ValWork = 0;
             ValAmount = 0;

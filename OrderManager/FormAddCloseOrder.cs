@@ -1350,10 +1350,12 @@ namespace OrderManager
 
         }
 
-        private void SetNewOrder(string number, string customer, int mkTime, int wkTime, decimal amount, string stamp)
+        private void SetNewOrder(string number, string customer, string item, int mkTime, int wkTime, decimal amount, string stamp)
         {
             textBox1.Text = number;
             comboBox2.Text = customer;
+
+            textBox5.Text = item;
 
             numericUpDown1.Value = amount;
             textBox2.Text = stamp;
@@ -1765,7 +1767,7 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                SetNewOrder(fm.ValNumber, fm.ValCustomer, fm.ValMakeready, fm.ValWork, fm.ValAmount, fm.ValStamp);
+                SetNewOrder(fm.ValNumber, fm.ValCustomer, fm.ValItem, fm.ValMakeready, fm.ValWork, fm.ValAmount, fm.ValStamp);
             }
         }
     }

@@ -10,15 +10,17 @@ namespace OrderManager
     {
         public string numberOfOrder;
         public string nameCustomer;
+        public string nameItem;
         public int makereadyTime;
         public int workTime;
         public int amountOfOrder;
         public string stamp;
 
-        public OrdersLoad(string number, string customer, int mkTime, int wkTime, int amount, string orderStamp)
+        public OrdersLoad(string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp)
         {
             this.numberOfOrder = number;
             this.nameCustomer = customer;
+            this.nameItem = item;
             this.makereadyTime = mkTime;
             this.workTime = wkTime;
             this.amountOfOrder = amount;
