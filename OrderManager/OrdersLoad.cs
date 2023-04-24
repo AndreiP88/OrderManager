@@ -15,8 +15,9 @@ namespace OrderManager
         public int workTime;
         public int amountOfOrder;
         public string stamp;
+        public string headOrder;
 
-        public OrdersLoad(string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp)
+        public OrdersLoad(string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp, string head)
         {
             this.numberOfOrder = number;
             this.nameCustomer = customer;
@@ -25,6 +26,7 @@ namespace OrderManager
             this.workTime = wkTime;
             this.amountOfOrder = amount;
             this.stamp = orderStamp;
+            this.headOrder = head;   
         }
 
     }

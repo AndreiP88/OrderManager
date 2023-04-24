@@ -459,7 +459,8 @@ namespace OrderManager
                                 mkNormTime[j],
                                 wkNormTime[j],
                                 amounts[j],
-                                stamp
+                                stamp,
+                                orderHeadList[i]
                             ));
                         }
                     }
@@ -477,7 +478,8 @@ namespace OrderManager
                                     mkNormTime[j],
                                     wkNormTime[j],
                                     amounts[j],
-                                    stamp
+                                    stamp,
+                                    orderHeadList[i]
                                 ));
                             }
                             else
@@ -489,7 +491,8 @@ namespace OrderManager
                                     mkNormTime[j],
                                     0,
                                     0,
-                                    stamp
+                                    stamp,
+                                    orderHeadList[i]
                                 ));
                             }
 
@@ -510,7 +513,8 @@ namespace OrderManager
                                     mkNormTime[j],
                                     wkNormTime[j],
                                     amounts[j],
-                                    stamp
+                                    stamp,
+                                    orderHeadList[i]
                                 ));
                             }
                             else
@@ -522,7 +526,8 @@ namespace OrderManager
                                     0,
                                     wkNormTime[j],
                                     amounts[j],
-                                    stamp
+                                    stamp,
+                                    orderHeadList[i]
                                 ));
                             }
                         }
@@ -599,6 +604,7 @@ namespace OrderManager
 
             for (int i = 0; i < orderItemsList.Count; i++)
             {
+                string orderHead = "";
                 string orderNumber = "";
                 string nameCustomer = "";
 
@@ -620,7 +626,7 @@ namespace OrderManager
                         //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
                         //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
 
-                        CommandText = @"SELECT order_num, id_customer FROM dbo.order_head WHERE id_order_head IN (
+                        CommandText = @"SELECT id_order_head, order_num, id_customer FROM dbo.order_head WHERE id_order_head IN (
                             SELECT id_order_head FROM dbo.man_order_job WHERE id_man_order_job IN (
                             SELECT id_man_order_job FROM dbo.man_order_job_item WHERE id_man_order_job_item = @orderItems))"
                     };
@@ -630,6 +636,7 @@ namespace OrderManager
 
                     while (sqlReader.Read())
                     {
+                        orderHead = sqlReader["id_order_head"].ToString();
                         orderNumber = sqlReader["order_num"].ToString();
                         nameCustomer = GetCustomerNameFromID(sqlReader["id_customer"].ToString());
                     }
@@ -702,7 +709,8 @@ namespace OrderManager
                             mkNormTime[j],
                             wkNormTime[j],
                             amounts[j],
-                            stamp
+                            stamp,
+                            orderHead
                         ));
                     }
                 }
@@ -720,7 +728,8 @@ namespace OrderManager
                                 mkNormTime[j],
                                 wkNormTime[j],
                                 amounts[j],
-                                stamp
+                                stamp,
+                                orderHead
                             ));
                         }
                         else
@@ -732,7 +741,8 @@ namespace OrderManager
                                 mkNormTime[j],
                                 0,
                                 0,
-                                stamp
+                                stamp,
+                                orderHead
                             ));
                         }
                     }
@@ -751,7 +761,8 @@ namespace OrderManager
                                 mkNormTime[j],
                                 wkNormTime[j],
                                 amounts[j],
-                                stamp
+                                stamp,
+                                orderHead
                             ));
                         }
                         else
@@ -763,7 +774,8 @@ namespace OrderManager
                                 0,
                                 wkNormTime[j],
                                 amounts[j],
-                                stamp
+                                stamp,
+                                orderHead
                             ));
                         }
                     }
@@ -793,6 +805,37 @@ namespace OrderManager
         private void button2_Click(object sender, EventArgs e)
         {
             LoadPlan();
+        }
+
+        private List<string> LoadItemsFromOrder(string headID)
+        {
+            List<string> items = new List<string>();
+
+            string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand
+                {
+                    Connection = connection,
+                    //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                    CommandText = @"SELECT * FROM dbo.order_detail WHERE (id_order_head = @headID)"
+                };
+                Command.Parameters.AddWithValue("@headID", headID);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    items.Add(sqlReader["detail_name"].ToString());
+                    items.Add(sqlReader["tir"].ToString());
+                }
+
+                connection.Close();
+            }
+
+            return items;
         }
 
         private bool newValue = false;
@@ -922,6 +965,7 @@ namespace OrderManager
             ValWork = orders[index].workTime;
             ValAmount = orders[index].amountOfOrder;
             ValStamp = orders[index].stamp;
+            Types = LoadItemsFromOrder(orders[index].headOrder);
             //сделать загрузку видов
         }
 
@@ -935,6 +979,7 @@ namespace OrderManager
             ValWork = 0;
             ValAmount = 0;
             ValStamp = "";
+            Types.Clear();
         }
 
         private void FormLoadOrders_Load(object sender, EventArgs e)

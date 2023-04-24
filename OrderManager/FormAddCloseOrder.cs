@@ -141,6 +141,8 @@ namespace OrderManager
         List<Order> ordersNumbers = new List<Order>();
         bool loadAllOrdersToCurrentMachine = true;
 
+        List<string> items = new List<string>();
+
         private void CreateTransparentPannels()
         {
             TransparentPanel panel1 = new TransparentPanel()
@@ -520,6 +522,7 @@ namespace OrderManager
 
         private void AddOrderToDB()
         {
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
 
@@ -585,6 +588,30 @@ namespace OrderManager
                     Connect.Open();
                     Command.ExecuteNonQuery();
                     Connect.Close();
+                }
+
+                int orderID = ordersBase.GetOrderID(machine, number, modification);
+
+                for (int i = 0; i < items.Count; i = i + 2)
+                {
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                    {
+                        /*string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
+                            "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
+                            "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";*/
+
+                        string commandText = "INSERT INTO typesList (orderID, name, count) " +
+                        "VALUES (@orderID, @name, @count)";
+
+                        MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                        Command.Parameters.AddWithValue("@orderID", orderID); // присваиваем переменной значение
+                        Command.Parameters.AddWithValue("@name", items[i]);
+                        Command.Parameters.AddWithValue("@count", items[i + 1]);
+
+                        Connect.Open();
+                        Command.ExecuteNonQuery();
+                        Connect.Close();
+                    }
                 }
             }
         }
@@ -1350,7 +1377,7 @@ namespace OrderManager
 
         }
 
-        private void SetNewOrder(string number, string customer, string item, int mkTime, int wkTime, decimal amount, string stamp)
+        private void SetNewOrder(string number, string customer, string item, int mkTime, int wkTime, decimal amount, string stamp, List<string> itemsOrder)
         {
             textBox1.Text = number;
             comboBox2.Text = customer;
@@ -1371,6 +1398,8 @@ namespace OrderManager
 
             numericUpDown7.Value = workH;
             numericUpDown8.Value = workM;
+
+            items = itemsOrder;
         }
 
         private void LoadTypes()
@@ -1767,7 +1796,7 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                SetNewOrder(fm.ValNumber, fm.ValCustomer, fm.ValItem, fm.ValMakeready, fm.ValWork, fm.ValAmount, fm.ValStamp);
+                SetNewOrder(fm.ValNumber, fm.ValCustomer, fm.ValItem, fm.ValMakeready, fm.ValWork, fm.ValAmount, fm.ValStamp, fm.Types);
             }
         }
     }

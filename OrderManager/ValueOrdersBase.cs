@@ -22,6 +22,11 @@ namespace OrderManager
             return GetValue(currentMachine, orderNumber, orderModification, "count");
         }
 
+        public int GetOrderID(String currentMachine, String orderNumber, String orderModification)
+        {
+            return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, "count"));
+        }
+
         public String GetOrderStatus(String currentMachine, String orderNumber, String orderModification)
         {
             return GetValue(currentMachine, orderNumber, orderModification, "statusOfOrder");
