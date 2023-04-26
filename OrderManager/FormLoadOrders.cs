@@ -979,7 +979,7 @@ namespace OrderManager
             ValWork = 0;
             ValAmount = 0;
             ValStamp = "";
-            Types.Clear();
+            //Types.Clear();
         }
 
         private void FormLoadOrders_Load(object sender, EventArgs e)
