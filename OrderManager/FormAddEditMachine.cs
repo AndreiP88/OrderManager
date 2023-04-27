@@ -107,6 +107,8 @@ namespace OrderManager
 
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedIndex = 0;
+
+            textBox1.Text = "";
         }
 
         private void LoadCategoryes()
@@ -273,6 +275,14 @@ namespace OrderManager
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (textBox1.Text == "")
+            {
+                textBox1.Text = comboBox2.Text;
+            }
         }
     }
 }
