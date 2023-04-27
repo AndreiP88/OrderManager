@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -238,12 +239,29 @@ namespace OrderManager
         public bool GetMachinesForUserActive(String userID)
         {
             List<String> orderMachines = (List<String>)GetMachines(userID);
+
             bool machinesActive = false;
+            int counter = 0;
 
             for (int i = 0; i < orderMachines.Count; i++)
             {
-                if (Convert.ToBoolean(GetActiveOrder(orderMachines[i])) == true)
-                    machinesActive = true;
+                string activeOrderValue = GetActiveOrder(orderMachines[i]);
+
+                if (activeOrderValue != "")
+                {
+                    if (Convert.ToBoolean(activeOrderValue) == true)
+                    {
+                        counter++;
+                    }
+                    //machinesActive = Convert.ToBoolean(activeOrderValue);
+                }
+                /*if (Convert.ToBoolean(GetActiveOrder(orderMachines[i])) == true)
+                    machinesActive = true;*/
+            }
+
+            if (counter > 0)
+            {
+                machinesActive = true;
             }
 
             return machinesActive;
