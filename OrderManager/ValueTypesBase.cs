@@ -34,6 +34,34 @@ namespace OrderManager
             _orderInProgressID = getOrders.GetIndex(startOfShift, orderNumber, orderModification, orderCounterRepeat, machine);
         }
 
+        public string GetNameItemFromID(string id)
+        {
+            string result = "";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM typeslist WHERE id = @id"
+
+                };
+                Command.Parameters.AddWithValue("@id", id);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader["name"].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
         public List<TypeInTheOrder> GetData()
         {
             List<TypeInTheOrder> result = new List<TypeInTheOrder>();
@@ -55,6 +83,7 @@ namespace OrderManager
                 {
                     result.Add(new TypeInTheOrder(
                         sqlReader["id"].ToString(),
+                        sqlReader["typeListID"].ToString(),
                         sqlReader["type"].ToString(),
                         Convert.ToInt32(sqlReader["done"])));
                 }

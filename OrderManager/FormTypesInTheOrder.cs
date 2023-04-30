@@ -36,6 +36,7 @@ namespace OrderManager
         List<TypeInTheOrder> typesCurrent = new List<TypeInTheOrder>();
         List<TypeInTheOrder> typesForAdded = new List<TypeInTheOrder>();
         List<TypeInTheOrder> typesForEdit = new List<TypeInTheOrder>();
+        List<int> itemsIndex = new List<int>();
 
         List<string> positionForDelete = new List<string>();
 
@@ -47,6 +48,7 @@ namespace OrderManager
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
             comboBox1.Items.Clear();
+            itemsIndex.Clear();
 
             int orderID = ordersBase.GetOrderID(loadMachine, loadOrderNumber, loadOrderModification);
 
@@ -65,7 +67,9 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    comboBox1.Items.Add(sqlReader["name"].ToString());
+                    comboBox1.Items.Add(sqlReader["name"].ToString() + " - " + (sqlReader["count"].ToString()));
+                    //comboBox1.Items.Add(typesBase.GetNameItemFromID(sqlReader["typeListID"].ToString()));
+                    itemsIndex.Add((int)sqlReader["id"]);
                 }
 
                 Connect.Close();
@@ -180,7 +184,7 @@ namespace OrderManager
                     typesCurrent[i].type = comboBox1.Text;
                     typesCurrent[i].done = (int)numericUpDown1.Value;
 
-                    typesForEdit.Add(new TypeInTheOrder(index.ToString(), comboBox1.Text, (int)numericUpDown1.Value));
+                    typesForEdit.Add(new TypeInTheOrder(index.ToString(), typesCurrent[i].indexTypeList, comboBox1.Text, (int)numericUpDown1.Value));
                 }
             }
 
