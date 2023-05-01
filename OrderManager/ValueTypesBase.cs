@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -34,6 +35,18 @@ namespace OrderManager
             _orderInProgressID = getOrders.GetIndex(startOfShift, orderNumber, orderModification, orderCounterRepeat, machine);
         }
 
+        public ValueTypesBase()
+        {
+            this.startOfShift = "";
+            this.orderNumber = "";
+            this.orderModification = "";
+            this.orderCounterRepeat = "";
+            this.machine = "";
+            this.user = "";
+
+            _orderInProgressID = "";
+        }
+
         public string GetNameItemFromID(int id)
         {
             string result = "";
@@ -54,6 +67,34 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     result = sqlReader["name"].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        public string GetTypeListIdFromIndexFromTypeListInTheOrder(string id)
+        {
+            string result = "";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM typesInTheOrder WHERE id = @id"
+
+                };
+                Command.Parameters.AddWithValue("@id", id);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader["typeListID"].ToString();
                 }
 
                 Connect.Close();
@@ -138,6 +179,70 @@ namespace OrderManager
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "DELETE FROM typesInTheOrder WHERE id = @id";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public void InsertItem(TypeInTheOrder value)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "INSERT INTO typesList (orderId, name, count) " +
+                    "VALUES (@orderId, @name, @count)";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@orderId", value.indexTypeList);
+                Command.Parameters.AddWithValue("@name", value.name);
+                Command.Parameters.AddWithValue("@count", value.count);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public void UpdateItem(TypeInTheOrder value)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE typesList SET name = @name, count = @count " +
+                    "WHERE (id = @id)";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", value.indexTypeList);
+                Command.Parameters.AddWithValue("@name", value.name);
+                Command.Parameters.AddWithValue("@count", value.count);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public void DeleteItem(string id)
+        {
+            //string indexTypeInTheOrder = GetTypeListIdFromIndexFromTypeListInTheOrder(id);
+            //MessageBox.Show(indexTypeInTheOrder);
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "DELETE FROM typesInTheOrder WHERE typeListID = @typeListID";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@typeListID", id);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "DELETE FROM typesList WHERE id = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", id);

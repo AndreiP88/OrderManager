@@ -452,10 +452,17 @@ namespace OrderManager
                     {
                         for (int j = 0; j < mkNormTime.Count; j++)
                         {
+                            string itemOr = "";
+
+                            if (itemOrder.Count > 0)
+                            {
+                                itemOr = itemOrder[j];
+                            }
+                                
                             orders.Add(new OrdersLoad(
                                 orderNumbers[i].numberOfOrder,
                                 orderNumbers[i].nameCustomer,
-                                itemOrder[j],
+                                itemOr,
                                 mkNormTime[j],
                                 wkNormTime[j],
                                 amounts[j],
@@ -469,12 +476,19 @@ namespace OrderManager
                     {
                         for (int j = 0; j < mkNormTime.Count; j++)
                         {
+                            string itemOr = "";
+
+                            if (itemOrder.Count > 0)
+                            {
+                                itemOr = itemOrder[j];
+                            }
+
                             if (j < wkNormTime.Count)
                             {
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
-                                    itemOrder[j],
+                                    itemOr,
                                     mkNormTime[j],
                                     wkNormTime[j],
                                     amounts[j],
@@ -487,7 +501,7 @@ namespace OrderManager
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
-                                    itemOrder[j],
+                                    itemOr,
                                     mkNormTime[j],
                                     0,
                                     0,
@@ -504,12 +518,19 @@ namespace OrderManager
                     {
                         for (int j = 0; j < wkNormTime.Count; j++)
                         {
+                            string itemOr = "";
+
+                            if (itemOrder.Count > 0)
+                            {
+                                itemOr = itemOrder[j];
+                            }
+
                             if (j < mkNormTime.Count)
                             {
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
-                                    itemOrder[j],
+                                    itemOr,
                                     mkNormTime[j],
                                     wkNormTime[j],
                                     amounts[j],
@@ -522,7 +543,7 @@ namespace OrderManager
                                 orders.Add(new OrdersLoad(
                                     orderNumbers[i].numberOfOrder,
                                     orderNumbers[i].nameCustomer,
-                                    itemOrder[j],
+                                    itemOr,
                                     0,
                                     wkNormTime[j],
                                     amounts[j],

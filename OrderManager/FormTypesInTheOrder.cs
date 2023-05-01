@@ -123,6 +123,7 @@ namespace OrderManager
             numericUpDown2.Value = 0;
 
             button1.Text = "Добавить";
+            button5.Enabled = true;
 
             editedType = false;
         }
@@ -155,18 +156,26 @@ namespace OrderManager
             for (int i = 0; i < typesForAdded.Count; i++)
             {
                 int index = itemsCurrentOrder.FindLastIndex((v) => v.indexTypeList == typesForAdded[i].indexTypeList);
-                //переделать добавление и тут поправить
-                ListViewItem item = new ListViewItem();
 
-                item.Name = "n" + i.ToString();
-                item.Text = (listView1.Items.Count + 1).ToString();
-                item.SubItems.Add(itemsCurrentOrder[index].name);
-                item.SubItems.Add(itemsCurrentOrder[index].count.ToString("N0"));
-                item.SubItems.Add(typesForAdded[i].done.ToString("N0"));
+                if (index != -1)
+                {
+                    ListViewItem item = new ListViewItem();
 
-                listView1.Items.Add(item);
+                    item.Name = "n" + i.ToString();
+                    item.Text = (listView1.Items.Count + 1).ToString();
+                    item.SubItems.Add(itemsCurrentOrder[index].name);
+                    item.SubItems.Add(itemsCurrentOrder[index].count.ToString("N0"));
+                    item.SubItems.Add(typesForAdded[i].done.ToString("N0"));
 
-                count += typesForAdded[i].done;
+                    listView1.Items.Add(item);
+
+                    count += typesForAdded[i].done;
+                }
+                else
+                {
+                    typesForAdded.RemoveAt(i);
+                }
+                
             }
 
             label2.Text = count.ToString("N0");
@@ -213,6 +222,7 @@ namespace OrderManager
         {
             button1.Text = "Сохранить";
             editedType = true;
+            button5.Enabled = false;
 
             indexTypeEdited = listView1.SelectedItems[0].Name;
 
@@ -221,8 +231,7 @@ namespace OrderManager
             if (indexTypeEdited.Substring(0, 1) == "n")
             {
                 int itemIndex = itemsCurrentOrder.FindLastIndex((v) => v.indexTypeList == typesForAdded[index].indexTypeList);
-                
-                comboBox1.Text = "<загрузка>";
+
                 comboBox1.SelectedIndex = itemIndex;
                 numericUpDown1.Value = typesForAdded[index].done;
             }
@@ -324,7 +333,7 @@ namespace OrderManager
         }
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedIndex > 0)
+            if (comboBox1.SelectedIndex >= 0)
             {
                 numericUpDown2.Value = itemsCurrentOrder[comboBox1.SelectedIndex].count;
             }
@@ -333,6 +342,19 @@ namespace OrderManager
                 numericUpDown2.Value = 0;
             }
             
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+
+            int orderID = ordersBase.GetOrderID(loadMachine, loadOrderNumber, loadOrderModification);
+
+            FormItemsOrder form = new FormItemsOrder(orderID.ToString());
+            form.ShowDialog();
+
+            LoadItemsListForCurrentOrder();
+            LoadTypes();
         }
     }
 }

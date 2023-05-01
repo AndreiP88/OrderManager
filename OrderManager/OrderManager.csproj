@@ -177,6 +177,12 @@
     <Compile Include="FormLoadOrders.Designer.cs">
       <DependentUpon>FormLoadOrders.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormItemsOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormItemsOrder.Designer.cs">
+      <DependentUpon>FormItemsOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTypesInTheOrder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -343,6 +349,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormLoadOrders.resx">
       <DependentUpon>FormLoadOrders.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormItemsOrder.resx">
+      <DependentUpon>FormItemsOrder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormTypesInTheOrder.resx">
       <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>
