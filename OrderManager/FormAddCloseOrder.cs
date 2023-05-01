@@ -1442,19 +1442,19 @@ namespace OrderManager
 
         private void LoadTypesFromCurrentOrder(string number, string modification, string counterRepeat, string machine, string user)
         {
+            listView1.Items.Clear();
+
             ValueTypesBase typeBase = new ValueTypesBase(startOfShift, number, modification, counterRepeat, machine, user);
             
             List<TypeInTheOrder> typesCurrent = typeBase.GetData();
-
-            listView1.Items.Clear();
 
             for (int i = 0; i < typesCurrent.Count; i++)
             {
                 ListViewItem item = new ListViewItem();
 
-                item.Name = typesCurrent[i].id;
+                item.Name = typesCurrent[i].id.ToString();
                 item.Text = (listView1.Items.Count + 1).ToString();
-                item.SubItems.Add(typesCurrent[i].type);
+                item.SubItems.Add(typeBase.GetNameItemFromID(typesCurrent[i].indexTypeList));
                 item.SubItems.Add(typesCurrent[i].done.ToString("N0"));
 
                 listView1.Items.Add(item);

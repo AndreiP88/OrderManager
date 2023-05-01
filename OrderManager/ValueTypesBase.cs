@@ -34,7 +34,7 @@ namespace OrderManager
             _orderInProgressID = getOrders.GetIndex(startOfShift, orderNumber, orderModification, orderCounterRepeat, machine);
         }
 
-        public string GetNameItemFromID(string id)
+        public string GetNameItemFromID(int id)
         {
             string result = "";
 
@@ -82,10 +82,9 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     result.Add(new TypeInTheOrder(
-                        sqlReader["id"].ToString(),
-                        sqlReader["typeListID"].ToString(),
-                        sqlReader["type"].ToString(),
-                        Convert.ToInt32(sqlReader["done"])));
+                        (int)sqlReader["id"],
+                        (int)sqlReader["typeListID"],
+                        (int)sqlReader["done"]));
                 }
 
                 Connect.Close();
@@ -94,7 +93,7 @@ namespace OrderManager
             return result;
         }
 
-        public void InsertData(string type, int done)
+        public void InsertData(TypeInTheOrder value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -102,13 +101,13 @@ namespace OrderManager
                     "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
                     "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";*/
 
-                string commandText = "INSERT INTO typesInTheOrder (orderInProgressID, type, done) " +
-                    "VALUES (@orderInProgressID, @type, @done)";
+                string commandText = "INSERT INTO typesInTheOrder (orderInProgressID, typeListID, done) " +
+                    "VALUES (@orderInProgressID, @typeListID, @done)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@orderInProgressID", _orderInProgressID);
-                Command.Parameters.AddWithValue("@type", type);
-                Command.Parameters.AddWithValue("@done", done);
+                Command.Parameters.AddWithValue("@typeListID", value.indexTypeList);
+                Command.Parameters.AddWithValue("@done", value.done);
 
                 Connect.Open();
                 Command.ExecuteNonQuery();
@@ -120,12 +119,12 @@ namespace OrderManager
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                string commandText = "UPDATE typesInTheOrder SET type = @type, done = @done " +
+                string commandText = "UPDATE typesInTheOrder SET typeListID = @typeListID, done = @done " +
                     "WHERE (id = @id)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", value.id);
-                Command.Parameters.AddWithValue("@type", value.type);
+                Command.Parameters.AddWithValue("@typeListID", value.indexTypeList);
                 Command.Parameters.AddWithValue("@done", value.done);
 
                 Connect.Open();

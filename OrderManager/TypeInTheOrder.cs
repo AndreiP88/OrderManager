@@ -8,21 +8,28 @@ namespace OrderManager
 {
     internal class TypeInTheOrder
     {
-        public string id;
-        public string indexTypeList;
-        public string type;
+        public int id;
+        public int indexTypeList;
+        public string name;
+        public int count;
         public int done;
 
-        public TypeInTheOrder(string typeOrder, int doneOrder)
+        public TypeInTheOrder(int typeOrder, int doneOrder)
         {
-            type = typeOrder;
+            indexTypeList = typeOrder;
             done = doneOrder;
         }
-        public TypeInTheOrder(string index, string idTypeList, string typeOrder, int doneOrder)
+
+        public TypeInTheOrder(int index, string nameItem, int countOrder)
+        {
+            indexTypeList = index;
+            name = nameItem;
+            count = countOrder;
+        }
+        public TypeInTheOrder(int index, int idTypeList, int doneOrder)
         {
             id = index;
             indexTypeList = idTypeList;
-            type = typeOrder;
             done = doneOrder;
         }
     }

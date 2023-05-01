@@ -36,7 +36,7 @@ namespace OrderManager
         List<TypeInTheOrder> typesCurrent = new List<TypeInTheOrder>();
         List<TypeInTheOrder> typesForAdded = new List<TypeInTheOrder>();
         List<TypeInTheOrder> typesForEdit = new List<TypeInTheOrder>();
-        List<int> itemsIndex = new List<int>();
+        List<TypeInTheOrder> itemsCurrentOrder = new List<TypeInTheOrder>();
 
         List<string> positionForDelete = new List<string>();
 
@@ -48,7 +48,7 @@ namespace OrderManager
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
             comboBox1.Items.Clear();
-            itemsIndex.Clear();
+            itemsCurrentOrder.Clear();
 
             int orderID = ordersBase.GetOrderID(loadMachine, loadOrderNumber, loadOrderModification);
 
@@ -67,9 +67,13 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    comboBox1.Items.Add(sqlReader["name"].ToString() + " - " + (sqlReader["count"].ToString()));
+                    comboBox1.Items.Add(sqlReader["name"].ToString());
                     //comboBox1.Items.Add(typesBase.GetNameItemFromID(sqlReader["typeListID"].ToString()));
-                    itemsIndex.Add((int)sqlReader["id"]);
+                    itemsCurrentOrder.Add(new TypeInTheOrder(
+                        (int)sqlReader["id"],
+                        sqlReader["name"].ToString(),
+                        (int)sqlReader["count"]
+                        ));
                 }
 
                 Connect.Close();
@@ -87,7 +91,9 @@ namespace OrderManager
 
         private void AddTypes()
         {
-            typesForAdded.Add(new TypeInTheOrder(comboBox1.Text, (int)numericUpDown1.Value));
+            int itemListIndex = itemsCurrentOrder[comboBox1.SelectedIndex].indexTypeList;
+
+            typesForAdded.Add(new TypeInTheOrder(itemListIndex, (int)numericUpDown1.Value));
         }
 
         private void SaveTypes()
@@ -96,7 +102,7 @@ namespace OrderManager
 
             for (int i = 0; i < typesForAdded.Count; i++)
             {
-                typeBase.InsertData(typesForAdded[i].type, typesForAdded[i].done);
+                typeBase.InsertData(typesForAdded[i]);
             }
 
             for (int i = 0; i < typesForEdit.Count; i++)
@@ -112,8 +118,9 @@ namespace OrderManager
 
         private void Clear()
         {
-            comboBox1.Text = "";
+            comboBox1.SelectedIndex = -1;
             numericUpDown1.Value = 0;
+            numericUpDown2.Value = 0;
 
             button1.Text = "Добавить";
 
@@ -122,17 +129,22 @@ namespace OrderManager
 
         private void AddTypesToListView()
         {
+            ValueTypesBase typesBase = new ValueTypesBase(loadStartOfShift, loadOrderNumber, loadOrderModification, loadOrderCounterRepeat, loadMachine, loadUser);
+
             int count = 0;
 
             listView1.Items.Clear();
 
             for (int i = 0; i < typesCurrent.Count; i++)
             {
+                int index = itemsCurrentOrder.FindLastIndex((v) => v.indexTypeList == typesCurrent[i].indexTypeList);
+
                 ListViewItem item = new ListViewItem();
 
-                item.Name = typesCurrent[i].id;
+                item.Name = typesCurrent[i].id.ToString();
                 item.Text = (listView1.Items.Count + 1).ToString();
-                item.SubItems.Add(typesCurrent[i].type);
+                item.SubItems.Add(itemsCurrentOrder[index].name);
+                item.SubItems.Add(itemsCurrentOrder[index].count.ToString("N0"));
                 item.SubItems.Add(typesCurrent[i].done.ToString("N0"));
 
                 listView1.Items.Add(item);
@@ -142,11 +154,14 @@ namespace OrderManager
 
             for (int i = 0; i < typesForAdded.Count; i++)
             {
+                int index = itemsCurrentOrder.FindLastIndex((v) => v.indexTypeList == typesForAdded[i].indexTypeList);
+                //переделать добавление и тут поправить
                 ListViewItem item = new ListViewItem();
 
                 item.Name = "n" + i.ToString();
                 item.Text = (listView1.Items.Count + 1).ToString();
-                item.SubItems.Add(typesForAdded[i].type);
+                item.SubItems.Add(itemsCurrentOrder[index].name);
+                item.SubItems.Add(itemsCurrentOrder[index].count.ToString("N0"));
                 item.SubItems.Add(typesForAdded[i].done.ToString("N0"));
 
                 listView1.Items.Add(item);
@@ -170,21 +185,22 @@ namespace OrderManager
             }
             else
             {
+                //сделать проверку на соответствие названия с тем, что есть в наименованиях для заказа и, если нету, то добавлять новую позицию
                 int index = Convert.ToInt32(indexTypeEdited.Replace("n", ""));
 
                 if (indexTypeEdited.Substring(0, 1) == "n")
                 {
-                    typesForAdded[index].type = comboBox1.Text;
+                    typesForAdded[index].indexTypeList = itemsCurrentOrder[comboBox1.SelectedIndex].indexTypeList;
                     typesForAdded[index].done = (int)numericUpDown1.Value;
                 }
                 else
                 {
-                    int i = typesCurrent.FindLastIndex((v) => v.id == index.ToString());
+                    int i = typesCurrent.FindLastIndex((v) => v.id == index);
 
-                    typesCurrent[i].type = comboBox1.Text;
+                    typesCurrent[i].indexTypeList = itemsCurrentOrder[comboBox1.SelectedIndex].indexTypeList;
                     typesCurrent[i].done = (int)numericUpDown1.Value;
 
-                    typesForEdit.Add(new TypeInTheOrder(index.ToString(), typesCurrent[i].indexTypeList, comboBox1.Text, (int)numericUpDown1.Value));
+                    typesForEdit.Add(new TypeInTheOrder(index, typesCurrent[i].indexTypeList, (int)numericUpDown1.Value));
                 }
             }
 
@@ -204,14 +220,18 @@ namespace OrderManager
 
             if (indexTypeEdited.Substring(0, 1) == "n")
             {
-                comboBox1.Text = typesForAdded[index].type;
+                int itemIndex = itemsCurrentOrder.FindLastIndex((v) => v.indexTypeList == typesForAdded[index].indexTypeList);
+                
+                comboBox1.Text = "<загрузка>";
+                comboBox1.SelectedIndex = itemIndex;
                 numericUpDown1.Value = typesForAdded[index].done;
             }
             else
             {
-                int i = typesCurrent.FindLastIndex((v) => v.id == index.ToString());
+                int i = typesCurrent.FindLastIndex((v) => v.id == index);
+                int itemIndex = itemsCurrentOrder.FindLastIndex((v) => v.indexTypeList == typesCurrent[i].indexTypeList);
 
-                comboBox1.Text = typesCurrent[i].type;
+                comboBox1.SelectedIndex = itemIndex;
                 numericUpDown1.Value = typesCurrent[i].done;
             }
         }
@@ -249,7 +269,7 @@ namespace OrderManager
             }
             else
             {
-                typesCurrent.RemoveAt(typesCurrent.FindLastIndex((v) => v.id == index.ToString()));
+                typesCurrent.RemoveAt(typesCurrent.FindLastIndex((v) => v.id == index));
                 positionForDelete.Add(index.ToString());
             }
 
@@ -301,6 +321,18 @@ namespace OrderManager
             {
                 button1.Enabled = false;
             }
+        }
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedIndex > 0)
+            {
+                numericUpDown2.Value = itemsCurrentOrder[comboBox1.SelectedIndex].count;
+            }
+            else
+            {
+                numericUpDown2.Value = 0;
+            }
+            
         }
     }
 }
