@@ -620,6 +620,9 @@ namespace OrderManager
             String makereadyStop, String workStart, String workStop, String done, String counterRepeat, String note)
         {
             ValueOrdersBase valueOrders = new ValueOrdersBase();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            string shiftStartID = shiftsBase.GetIDFromStartShift(shiftStart);
 
             int result = 0;
 
@@ -647,13 +650,14 @@ namespace OrderManager
 
                 using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
-                    string commandText = "INSERT INTO ordersInProgress (machine, executor, startOfShift, orderID, numberOfOrder, modification, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, done, counterRepeat, note) " +
-                        "VALUES(@machine, @executor, @shiftStart, @orderID, @number, @modification, @makereadyStart, @makereadyStop, @workStart, @workStop, @done, @counterRepeat, @note)";
+                    string commandText = "INSERT INTO ordersInProgress (machine, executor, startOfShift, startOfShiftID, orderID, numberOfOrder, modification, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, done, counterRepeat, note) " +
+                        "VALUES(@machine, @executor, @shiftStart, @shiftStartID, @orderID, @number, @modification, @makereadyStart, @makereadyStop, @workStart, @workStop, @done, @counterRepeat, @note)";
 
                     MySqlCommand Command = new MySqlCommand(commandText, Connect);
                     Command.Parameters.AddWithValue("@machine", machine); // присваиваем переменной значение
                     Command.Parameters.AddWithValue("@executor", executor);
                     Command.Parameters.AddWithValue("@shiftStart", shiftStart);
+                    Command.Parameters.AddWithValue("@shiftStartID", shiftStartID);
                     Command.Parameters.AddWithValue("@orderID", orderID);
                     Command.Parameters.AddWithValue("@number", number);
                     Command.Parameters.AddWithValue("modification", modification);

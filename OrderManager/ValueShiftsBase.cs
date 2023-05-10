@@ -51,6 +51,13 @@ namespace OrderManager
             return result;
         }
 
+        public String GetIDFromStartShift(string startShift)
+        {
+            List<string> result = new List<string>(GetValue("startShift", startShift, "id"));
+
+            return result[result.Count - 1];
+        }
+
         public String GetNameUserFromStartShift(String startShift)
         {
             List<String> result = new List<String>(GetValue("startShift", startShift, "nameUser"));
