@@ -68,7 +68,112 @@ namespace OrderManager
             return result;
         }
 
+        private string GetStampFromOrderNumber(string searchNumber)
+        {
+            string result = "";
 
+            string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
+
+            int nOrderId = 0;
+            int normOperation = 12;
+            List<string> tools = new List<string>();
+            string stamp = "";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand
+                {
+                    Connection = connection,
+                    CommandText = @"SELECT id_order_head FROM dbo.order_head WHERE order_num = @searchNumber AND status = '1'"
+                };
+                Command.Parameters.AddWithValue("@searchNumber", searchNumber);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    nOrderId = Convert.ToInt32(sqlReader["id_order_head"]);
+                }
+
+                connection.Close();
+            }
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand
+                {
+                    Connection = connection,
+                    /*CommandText = @"exec proc_rpt_order_operation_BY @nOrderId,@nSubdivisionId,@nIsCost,@nReadOnly,@nIsFlex,@nIsPaper,@nIsSubcontract,@nReportId,@nOptionSetId"*/
+                    CommandText = @"exec proc_rpt_order_tool @nOrderId, @nSubdivisionId, @nTemplateId, @nReadOnly"
+                };
+                Command.Parameters.AddWithValue("@nOrderId", nOrderId);
+                Command.Parameters.AddWithValue("@nSubdivisionId", 1);
+                Command.Parameters.AddWithValue("@nReadOnly", 1);
+                Command.Parameters.AddWithValue("@nTemplateId", 16);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    if (Convert.ToInt32(sqlReader["id_norm_operation"]) == normOperation)
+                    {
+                        tools.Add(sqlReader["tool_name"].ToString());
+                    }
+                }
+
+                /*SqlDataAdapter adapter = new SqlDataAdapter(Command);
+                // Создаем объект Dataset
+                DataSet ds = new DataSet();
+                // Заполняем Dataset
+                adapter.Fill(ds);
+
+
+                // Отображаем данные
+                dataGridView1.DataSource = ds.Tables[0];*/
+
+                connection.Close();
+            }
+
+            for (int i = 0; i < tools.Count; i++)
+            {
+                if (i < tools.Count - 1)
+                {
+                    result += GetNumberStampFromStr(tools[i]) + ", ";
+                }
+                else
+                {
+                    result += GetNumberStampFromStr(tools[i]);
+                }
+            }
+
+            return result;
+        }
+
+        private string GetNumberStampFromStr(string str)
+        {
+            string result = "";
+
+            int startIndex;
+            int endIndex;
+
+            if (str.IndexOf("(№", 0) != -1)
+            {
+                startIndex = str.IndexOf("(№", 0) + 2;
+                endIndex = str.IndexOf(")", startIndex);
+            }
+            else
+            {
+                startIndex = str.IndexOf("(", 0) + 1;
+                endIndex = str.IndexOf(")", startIndex);
+            }
+
+            result = str.Substring(startIndex, endIndex - startIndex);
+            result = result.Replace(" ", "");
+
+            return result;
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -299,6 +404,8 @@ namespace OrderManager
             }*/
         }
 
+
+
         private void LoadOrdersByNumber()
         {
             ValueCategory valueCategory = new ValueCategory();
@@ -351,14 +458,14 @@ namespace OrderManager
                 List<string> jobItem = new List<string>();
                 List<string> itemID = new List<string>();
 
+                string stamp = GetStampFromOrderNumber(orderNumbers[i].numberOfOrder);
+
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     SqlCommand Command = new SqlCommand
                     {
                         Connection = connection,
-                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
-                        //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
 
                         CommandText = @"SELECT id_man_order_job_item, itemid FROM dbo.man_order_job_item WHERE id_man_order_job IN (
                             SELECT id_man_order_job FROM dbo.man_order_job WHERE id_order_head IN (
@@ -385,8 +492,6 @@ namespace OrderManager
                     List<int> mkNormTime = new List<int>();
                     List<int> wkNormTime = new List<int>();
                     List<int> amounts = new List<int>();
-
-                    string stamp = "";
 
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
@@ -635,9 +740,6 @@ namespace OrderManager
                 List<int> wkNormTime = new List<int>();
                 List<int> amounts = new List<int>();
 
-                //потом переделать, сделать загрузку статуса отдельно и найти где хранится номер штампа
-                string stamp = "";
-
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -664,6 +766,8 @@ namespace OrderManager
 
                     connection.Close();
                 }
+
+                string stamp = GetStampFromOrderNumber(orderNumber);
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {

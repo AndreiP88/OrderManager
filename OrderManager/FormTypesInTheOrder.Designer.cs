@@ -166,7 +166,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 15F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 17F));
             this.tableLayoutPanel3.Controls.Add(this.numericUpDown2, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.button2, 5, 0);
             this.tableLayoutPanel3.Controls.Add(this.button1, 4, 0);
@@ -190,7 +190,7 @@
             0,
             0,
             0});
-            this.numericUpDown2.Location = new System.Drawing.Point(618, 3);
+            this.numericUpDown2.Location = new System.Drawing.Point(617, 3);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             1000000000,
             0,
@@ -204,10 +204,10 @@
             // button2
             // 
             this.button2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button2.Location = new System.Drawing.Point(886, 2);
+            this.button2.Location = new System.Drawing.Point(884, 2);
             this.button2.Margin = new System.Windows.Forms.Padding(2);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(73, 22);
+            this.button2.Size = new System.Drawing.Size(72, 22);
             this.button2.TabIndex = 1;
             this.button2.Text = "Отмена";
             this.button2.UseVisualStyleBackColor = true;
@@ -217,10 +217,10 @@
             // 
             this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(809, 2);
+            this.button1.Location = new System.Drawing.Point(808, 2);
             this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(73, 22);
+            this.button1.Size = new System.Drawing.Size(72, 22);
             this.button1.TabIndex = 0;
             this.button1.Text = "Добавить";
             this.button1.UseVisualStyleBackColor = true;
@@ -234,7 +234,7 @@
             0,
             0,
             0});
-            this.numericUpDown1.Location = new System.Drawing.Point(714, 3);
+            this.numericUpDown1.Location = new System.Drawing.Point(713, 3);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             1000000000,
             0,
@@ -254,7 +254,7 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(41, 3);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(571, 21);
+            this.comboBox1.Size = new System.Drawing.Size(570, 21);
             this.comboBox1.TabIndex = 10;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             this.comboBox1.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
