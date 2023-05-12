@@ -481,7 +481,7 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
-            DateTime shiftStart = timeOperations.StringToDateTime(startOfShift);
+            //DateTime shiftStart = timeOperations.StringToDateTime(startOfShift);
 
             List<Order> orders = new List<Order>();
 
@@ -520,7 +520,7 @@ namespace OrderManager
                             lastTimeWork = (lastCount * 60) / orderNorm;
                         }
 
-                        int lastTimeMakeready = LastTimeMakeready(shiftStart, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
+                        int lastTimeMakeready = LastTimeMakeready(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
                         int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
                         int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
                         int lastTimeWorkForDeviation = 0;
@@ -587,11 +587,11 @@ namespace OrderManager
             return orders;
         }
 
-        private int LastTimeMakeready(DateTime startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
+        private int LastTimeMakeready(string startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(startOfShift.ToString(), numberOrder, modificationOrder, machine, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
 
             int lastTimeMakeready = 0;
 
@@ -615,7 +615,7 @@ namespace OrderManager
             }
             else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop != "")
             {
-                lastTimeMakeready =makereadyTime;
+                lastTimeMakeready = makereadyTime;
             }
             else if (lastTimeMakereadyStop != "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop != "")
             {
@@ -623,6 +623,9 @@ namespace OrderManager
             }
             else
                 lastTimeMakeready = 0;
+
+            /*Console.WriteLine("Итог: " + lastTimeMakeready + "; Last: " + lastTimeMakereadyStop + "; Current Start: " +
+                currentTimeMakereadyStart + "; Current Stop: " + currentTimeMakereadyStop + "; Time: " + startOfShift.ToString());*/
 
             return lastTimeMakeready;
         }
