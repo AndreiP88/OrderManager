@@ -8,11 +8,13 @@ using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.Form1;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OrderManager
 {
@@ -485,7 +487,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE startOfShiftID is null or startOfShiftID = ''"
                 };
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -493,7 +495,15 @@ namespace OrderManager
                 {
                     listStarts.Add(sqlReader["startOfShift"].ToString());
 
-                    //SetIDToBase(sqlReader["startOfShift"].ToString(), GetID(sqlReader["startOfShift"].ToString()));
+                    SetIDToBase(sqlReader["startOfShift"].ToString(), GetID(sqlReader["startOfShift"].ToString()));
+
+                    ListViewItem item = new ListViewItem();
+
+                    item.Name = GetID(sqlReader["startOfShift"].ToString()).ToString();
+                    item.Text = GetID(sqlReader["startOfShift"].ToString()).ToString();
+                    item.SubItems.Add(sqlReader["startOfShift"].ToString());
+
+                    listView2.Items.Add(item);
                 }
 
                 Connect.Close();
