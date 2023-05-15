@@ -702,12 +702,14 @@ namespace OrderManager
             // 
             // button7
             // 
+            this.button7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.button7.Location = new System.Drawing.Point(414, 79);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(31, 23);
             this.button7.TabIndex = 23;
             this.button7.Text = "+";
-            this.button7.UseVisualStyleBackColor = true;
+            this.button7.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.button7.UseVisualStyleBackColor = false;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // FormAddCloseOrder
