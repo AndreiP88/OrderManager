@@ -166,10 +166,10 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            LoadOrdersByNumber();
+            LoadOrdersByNumber(textBox1.Text);
         }
 
-        private void LoadOrdersByNumber()
+        private void LoadOrdersByNumber(string searchNumber)
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -184,11 +184,9 @@ namespace OrderManager
             string idNormOperationMakeReady = valueCategory.GetMKIDNormOperation(category);
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
 
-            string searchNumber = textBox1.Text;
+            List<string> orderHeadList = new List<string>();
 
             string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
-
-            List<string> orderHeadList = new List<string>();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -934,7 +932,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                LoadOrdersByNumber();
+                LoadOrdersByNumber(textBox1.Text);
             }
         }
     }
