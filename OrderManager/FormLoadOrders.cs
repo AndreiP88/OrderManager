@@ -725,14 +725,8 @@ namespace OrderManager
         }
 
         private bool newValue = false;
-        private string numberNewValue;
-        private string customerNewValue;
-        private int makereadyNewValue;
-        private int workNewValue;
-        private decimal amountNewValue;
-        private string stampOfOrderNewValue;
-        private string itemNewValue;
-        List<string> typesNewValue;
+        OrdersLoad setNewVal;
+        private List<string> typesNewValue;
 
         public bool NewValue
         {
@@ -746,86 +740,15 @@ namespace OrderManager
             }
         }
 
-        public string ValNumber
+        public OrdersLoad SetValue
         {
             get
             {
-                return numberNewValue;
+                return setNewVal;
             }
             set
             {
-                numberNewValue = value;
-            }
-        }
-
-        public string ValCustomer
-        {
-            get
-            {
-                return customerNewValue;
-            }
-            set
-            {
-                customerNewValue = value;
-            }
-        }
-
-        public int ValMakeready
-        {
-            get
-            {
-                return makereadyNewValue;
-            }
-            set
-            {
-                makereadyNewValue = value;
-            }
-        }
-
-        public int ValWork
-        {
-            get
-            {
-                return workNewValue;
-            }
-            set
-            {
-                workNewValue = value;
-            }
-        }
-        public decimal ValAmount
-        {
-            get
-            {
-                return amountNewValue;
-            }
-            set
-            {
-                amountNewValue = value;
-            }
-        }
-
-        public string ValStamp
-        {
-            get
-            {
-                return stampOfOrderNewValue;
-            }
-            set
-            {
-                stampOfOrderNewValue = value;
-            }
-        }
-
-        public string ValItem
-        {
-            get
-            {
-                return itemNewValue;
-            }
-            set
-            {
-                itemNewValue = value;
+                setNewVal = value;
             }
         }
 
@@ -844,13 +767,8 @@ namespace OrderManager
         private void SendSelectedOrder(int index)
         {
             NewValue = true;
-            ValNumber = orders[index].numberOfOrder;
-            ValCustomer = orders[index].nameCustomer;
-            ValItem = orders[index].nameItem;
-            ValMakeready = orders[index].makereadyTime;
-            ValWork = orders[index].workTime;
-            ValAmount = orders[index].amountOfOrder;
-            ValStamp = orders[index].stamp;
+
+            SetValue = orders[index];
             Types = LoadItemsFromOrder(orders[index].headOrder);
             //сделать загрузку видов
         }
@@ -858,13 +776,6 @@ namespace OrderManager
         private void Cancel()
         {
             NewValue = false;
-            ValNumber = "";
-            ValCustomer = "";
-            ValItem = "";
-            ValMakeready = 0;
-            ValWork = 0;
-            ValAmount = 0;
-            ValStamp = "";
             //Types.Clear();
         }
 

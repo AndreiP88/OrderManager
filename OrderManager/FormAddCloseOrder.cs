@@ -1381,7 +1381,7 @@ namespace OrderManager
 
         }
 
-        private void SetNewOrder(string number, string customer, string item, int mkTime, int wkTime, decimal amount, string stamp, List<string> itemsOrder)
+        /*private void SetNewOrder(string number, string customer, string item, int mkTime, int wkTime, decimal amount, string stamp, List<string> itemsOrder)
         {
             textBox1.Text = number;
             comboBox2.Text = customer;
@@ -1390,6 +1390,34 @@ namespace OrderManager
 
             numericUpDown1.Value = amount;
             textBox2.Text = stamp;
+
+            int makereadyH = mkTime / 60;
+            int makereadyM = mkTime % 60;
+
+            int workH = wkTime / 60;
+            int workM = wkTime % 60;
+
+            numericUpDown5.Value = makereadyH;
+            numericUpDown6.Value = makereadyM;
+
+            numericUpDown7.Value = workH;
+            numericUpDown8.Value = workM;
+
+            items = itemsOrder;
+        }*/
+
+        private void SetNewOrder(OrdersLoad order, List<string> itemsOrder)
+        {
+            textBox1.Text = order.numberOfOrder;
+            comboBox2.Text = order.nameCustomer;
+
+            textBox5.Text = order.nameItem;
+
+            numericUpDown1.Value = order.amountOfOrder;
+            textBox2.Text = order.stamp;
+
+            int mkTime = order.makereadyTime;
+            int wkTime = order.workTime;
 
             int makereadyH = mkTime / 60;
             int makereadyM = mkTime % 60;
@@ -1800,7 +1828,7 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                SetNewOrder(fm.ValNumber, fm.ValCustomer, fm.ValItem, fm.ValMakeready, fm.ValWork, fm.ValAmount, fm.ValStamp, fm.Types);
+                SetNewOrder(fm.SetValue, fm.Types);
             }
         }
     }

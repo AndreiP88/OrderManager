@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OrderManager
 {
-    internal class OrdersLoad
+    public class OrdersLoad
     {
         public string numberOfOrder;
         public string nameCustomer;
