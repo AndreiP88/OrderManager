@@ -445,7 +445,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadPlan()
+        private void LoadPlanOld()
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -705,11 +705,11 @@ namespace OrderManager
 
             cancelTokenSource = new CancellationTokenSource();
 
-            Task task = new Task(() => LoadPlan2(cancelTokenSource.Token), cancelTokenSource.Token);
+            Task task = new Task(() => LoadPlan(cancelTokenSource.Token), cancelTokenSource.Token);
             task.Start();
         }
 
-        private void LoadPlan2(CancellationToken token)
+        private void LoadPlan(CancellationToken token)
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -1105,6 +1105,11 @@ namespace OrderManager
         private void Cancel()
         {
             NewValue = false;
+
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+            }
             //Types.Clear();
         }
 
