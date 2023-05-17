@@ -47,25 +47,28 @@ namespace OrderManager
 
             string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            if (id != "")
             {
-                connection.Open();
-                SqlCommand Command = new SqlCommand
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    Connection = connection,
-                    //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
-                    CommandText = @"SELECT ul_name FROM dbo.common_ul_directory WHERE id_common_ul_directory = @id_customer"
-                };
-                Command.Parameters.AddWithValue("@id_customer", id);
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                        CommandText = @"SELECT ul_name FROM dbo.common_ul_directory WHERE id_common_ul_directory = @id_customer"
+                    };
+                    Command.Parameters.AddWithValue("@id_customer", id);
 
-                DbDataReader sqlReader = Command.ExecuteReader();
+                    DbDataReader sqlReader = Command.ExecuteReader();
 
-                while (sqlReader.Read())
-                {
-                    result = sqlReader["ul_name"].ToString();
+                    while (sqlReader.Read())
+                    {
+                        result = sqlReader["ul_name"].ToString();
+                    }
+
+                    connection.Close();
                 }
-
-                connection.Close();
             }
 
             return result;
@@ -161,8 +164,11 @@ namespace OrderManager
                 endIndex = str.IndexOf(")", startIndex);
             }
 
-            result = str.Substring(startIndex, endIndex - startIndex);
-            result = result.Replace(" ", "");
+            if (startIndex >= 0 && endIndex > 0)
+            {
+                result = str.Substring(startIndex, endIndex - startIndex);
+                result = result.Replace(" ", "");
+            }
 
             return result;
         }
@@ -298,7 +304,7 @@ namespace OrderManager
                         {
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
                             {
-                                if (sqlReader["normtime"] != null)
+                                if (sqlReader["normtime"].ToString() != "")
                                 {
                                     mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
                                 }
