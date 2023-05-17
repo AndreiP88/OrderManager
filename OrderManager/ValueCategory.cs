@@ -24,6 +24,11 @@ namespace OrderManager
             return GetValue("id", id, "mainIdNormOperation");
         }
 
+        public String GetIDOptionView(String id)
+        {
+            return GetValue("id", id, "idOptionForView");
+        }
+
         public String GetMKIDNormOperation(String id)
         {
             return GetValue("id", id, "mkIdNormOperation");

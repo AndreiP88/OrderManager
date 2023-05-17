@@ -90,7 +90,13 @@ namespace OrderManager
 
             int mainIndex = mainOperation.FindIndex(v => v.id == mainID);
 
+            int optionID = Convert.ToInt32(category.GetIDOptionView(caatyegoryID));
+
+            int optionIndex = mainOperation.FindIndex(v => v.id == optionID);
+
             comboBox1.SelectedIndex = mainIndex;
+
+            comboBox4.SelectedIndex = optionIndex;
         }
 
         private void SelectSubNormOperationIndex(string caatyegoryID)
@@ -143,6 +149,7 @@ namespace OrderManager
                             ));
 
                         comboBox1.Items.Add(sqlReader["operation_name"].ToString());
+                        comboBox4.Items.Add(sqlReader["operation_name"].ToString());
                     }
 
                     connection.Close();
@@ -152,11 +159,16 @@ namespace OrderManager
                 //сделать выбор для редактирования
                 comboBox1.SelectedIndex = 0;
 
+                comboBox4.DropDownStyle = ComboBoxStyle.DropDownList;
+                //сделать выбор для редактирования
+                comboBox4.SelectedIndex = 0;
+
                 loadedFromBase = true;
             }
             catch
             {
                 comboBox1.Text = "1";
+                comboBox4.Text = "12";
 
                 loadedFromBase = false;
             }
@@ -239,7 +251,7 @@ namespace OrderManager
         {
             bool result = true;
 
-            if (textBox1.Text == "" || comboBox1.SelectedIndex == -1 || comboBox2.SelectedIndex == -1 || comboBox3.SelectedIndex == -1)
+            if (textBox1.Text == "" || comboBox1.SelectedIndex == -1 || comboBox2.SelectedIndex == -1 || comboBox3.SelectedIndex == -1 || comboBox4.SelectedIndex == -1)
             {
                 MessageBox.Show("Не все поля заполнены и выбраны", "Ошибка", MessageBoxButtons.OK);
                 return false;
@@ -255,22 +267,24 @@ namespace OrderManager
             string mainNormOp = comboBox1.Text;
             string mkNormOp = comboBox2.Text;
             string wkNormOp = comboBox3.Text;
+            string optionView = comboBox4.Text;
 
             if (loadedFromBase)
             {
                 mainNormOp = mainOperation[comboBox1.SelectedIndex].id.ToString();
                 mkNormOp = mkOperation[comboBox2.SelectedIndex].id.ToString();
                 wkNormOp = wkOperation[comboBox3.SelectedIndex].id.ToString();
+                optionView = mainOperation[comboBox4.SelectedIndex].id.ToString();
             }
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
-                    commandText = "INSERT INTO machinesCategoryes (category, mainIdNormOperation, mkIdNormOperation, wkIdNormOperation) " +
-                        "VALUES (@category, @mainNormOp, @mkNormOp, @wkNormOp)";
+                    commandText = "INSERT INTO machinesCategoryes (category, mainIdNormOperation, mkIdNormOperation, wkIdNormOperation, idOptionForView) " +
+                        "VALUES (@category, @mainNormOp, @mkNormOp, @wkNormOp, @optionView)";
                 else
-                    commandText = "UPDATE machinesCategoryes SET category = @category, mainIdNormOperation = @mainNormOp, mkIdNormOperation = @mkNormOp, wkIdNormOperation = @wkNormOp " +
+                    commandText = "UPDATE machinesCategoryes SET category = @category, mainIdNormOperation = @mainNormOp, mkIdNormOperation = @mkNormOp, wkIdNormOperation = @wkNormOp, idOptionForView = @optionView " +
                     "WHERE id = @categoryIDLoad";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -279,6 +293,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@mainNormOp", mainNormOp);
                 Command.Parameters.AddWithValue("@mkNormOp", mkNormOp);
                 Command.Parameters.AddWithValue("@wkNormOp", wkNormOp);
+                Command.Parameters.AddWithValue("@optionView", optionView);
 
                 Connect.Open();
                 Command.ExecuteNonQuery();

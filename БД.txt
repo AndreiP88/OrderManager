@@ -22,10 +22,13 @@ dbo.norm_operation - Список категорий норм
 
 
 из таблицы dbo.man_planjob по id_equip (15 для версора, 9 - диана, 38 - бобст) и status = 0 получаем id_man_order_job_item
-	из таблицы dbo.man_order_job_item по id_man_order_job_item получаем id_man_order_job
-	из таблицы dbo.man_planjob_list по id_man_order_job_item получаем значения id_norm_operation, plan_out_qty и normtime
-из таблицы dbo.man_order_job по id_man_order_job получаем id_order_head
-из таблицы dbo.order_head по id_order_head получаем order_num, id_customer
+из таблицы dbo.man_order_job_item по id_man_order_job_item получаем id_man_order_job
+	из таблицы dbo.man_order_job по id_man_order_job получаем id_order_head
+	из таблицы dbo.order_head по id_order_head получаем order_num, id_customer
+из таблицы dbo.man_planjob_list по id_man_order_job_item получаем значения id_norm_operation, plan_out_qty и normtime
+
+
+
 
 
 
