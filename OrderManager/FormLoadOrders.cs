@@ -76,10 +76,17 @@ namespace OrderManager
 
         private string GetStampFromOrderNumber(string searchNumber)
         {
+            ValueCategory valueCategory = new ValueCategory();
+            ValueInfoBase getInfo = new ValueInfoBase();
+
+            string category = getInfo.GetCategoryMachine(loadMachine);
+
+            int normOperation = Convert.ToInt32(valueCategory.GetIDOptionView(category));
+
             string result = "";
 
             int nOrderId = 0;
-            int normOperation = 12;
+            
             List<string> tools = new List<string>();
 
             string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";

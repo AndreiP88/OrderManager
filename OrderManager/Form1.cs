@@ -969,6 +969,7 @@ namespace OrderManager
                 {
                     Info.active = false;
                     ClearAll();
+                    EraseInfo();
                     ShowUserForm();
                     Info.active = true;
                 }
@@ -981,6 +982,7 @@ namespace OrderManager
         {
             Info.active = false;
             ClearAll();
+            EraseInfo();
             ShowUserForm();
             Info.active = true;
         }
