@@ -12,18 +12,34 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Linq;
 
 namespace OrderManager
 {
     public partial class FormLoadOrders : Form
     {
+        bool _loadForViewOrders;
         string loadMachine;
+        string userID;
 
         public FormLoadOrders(string lMachine)
         {
             InitializeComponent();
 
             this.loadMachine = lMachine;
+            this.userID = "0";
+
+            _loadForViewOrders = false;
+        }
+
+        public FormLoadOrders(bool loadForView, string lUser)
+        {
+            InitializeComponent();
+
+            this.loadMachine = "0";
+            this.userID = lUser;
+
+            _loadForViewOrders = loadForView;
         }
 
         class OrderLoadNumber
@@ -35,11 +51,82 @@ namespace OrderManager
                 this.numberOfOrder = number;
                 this.nameCustomer = customer;
             }
-
         }
 
         List<OrdersLoad> orders = new List<OrdersLoad>();
         List<OrderLoadNumber> orderNumbers = new List<OrderLoadNumber>();
+
+        private void LoadMachine()
+        {
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueUserBase getUser = new ValueUserBase();
+
+            comboBox1.Items.Clear();
+
+            /*using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT DISTINCT * FROM machines WHERE id IN (SELECT machine FROM machinesinfo WHERE nameOfExecutor = @userID)"
+                };
+                Command.Parameters.AddWithValue("@userID", userID);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                     comboBox1.Items.Add(sqlReader["name"].ToString());
+                }
+
+                Connect.Close();
+            }*/
+            
+
+            string categoryesCurrentUser = getUser.GetCategoryesMachine(userID);
+
+            string[] categoryes = categoryesCurrentUser.Split(';');
+
+            for (int i = 0; i < categoryes.Length; i++)
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT DISTINCT * FROM machines WHERE category = @category"
+                    };
+                    Command.Parameters.AddWithValue("@category", categoryes[i]);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        comboBox1.Items.Add(sqlReader["name"].ToString());
+                    }
+
+                    Connect.Close();
+                }
+            }
+
+            if (!_loadForViewOrders)
+            {
+                comboBox1.Enabled = false;
+                comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+                comboBox1.Items.Add(getInfo.GetMachineName(loadMachine));
+                comboBox1.SelectedIndex = 0;
+            }
+
+            if (comboBox1.Items.Count > 0 && _loadForViewOrders)
+            {
+                //SelectLastMschineToComboBox(nameOfExecutor);
+                comboBox1.Enabled = true;
+                //comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+                comboBox1.SelectedIndex = 0;
+            }
+        }
 
         private string GetCustomerNameFromID(string id)
         {
@@ -182,11 +269,359 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            LoadOrdersByNumber(textBox1.Text);
+            //LoadOrdersByNumber(textBox1.Text);
+            StartSearch(textBox1.Text);
         }
 
-        private void LoadOrdersByNumber(string searchNumber)
+        private void StartSearch(string searchNumber)
         {
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+            }
+
+            cancelTokenSource = new CancellationTokenSource();
+
+            Task task = new Task(() => LoadOrdersByNumber(cancelTokenSource.Token, searchNumber), cancelTokenSource.Token);
+            task.Start();
+        }
+
+        private void LoadOrdersByNumber(CancellationToken token, string searchNumber)
+        {
+            ValueCategory valueCategory = new ValueCategory();
+            ValueInfoBase valueInfo = new ValueInfoBase();
+
+            Invoke(new Action(() =>
+            {
+                orders.Clear();
+                orderNumbers.Clear();
+                listView1.Items.Clear();
+            }));
+
+            string category = valueInfo.GetCategoryMachine(loadMachine);
+
+            string idNormOperation = valueCategory.GetMainIDNormOperation(category);
+            string idNormOperationMakeReady = valueCategory.GetMKIDNormOperation(category);
+            string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
+
+            List<string> orderHeadList = new List<string>();
+
+            string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand
+                {
+                    Connection = connection,
+                    //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                    CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+                };
+                Command.Parameters.AddWithValue("@order_num", "%" + textBox1.Text + "%");
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    orderHeadList.Add(sqlReader["id_order_head"].ToString());
+
+                    orderNumbers.Add(new OrderLoadNumber(
+                        sqlReader["order_num"].ToString(),
+                        GetCustomerNameFromID(sqlReader["id_customer"].ToString())
+                        ));
+                }
+
+                connection.Close();
+            }
+
+            for (int i = 0; i < orderHeadList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                List<string> jobItem = new List<string>();
+                List<string> itemID = new List<string>();
+
+                string stamp = GetStampFromOrderNumber(orderNumbers[i].numberOfOrder);
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
+
+                        CommandText = @"SELECT id_man_order_job_item, itemid FROM dbo.man_order_job_item WHERE id_man_order_job IN (
+                            SELECT id_man_order_job FROM dbo.man_order_job WHERE id_order_head IN (
+                            '" + orderHeadList[i] + "') AND id_norm_operation = '" + idNormOperation + "')"
+                    };
+                    //Command.Parameters.AddWithValue("@orderItems", orderItemsList[i]); detail_name
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        ///////
+                        jobItem.Add(sqlReader["id_man_order_job_item"].ToString());
+                        itemID.Add(sqlReader["itemid"].ToString());
+                    }
+                    //MessageBox.Show(itemOrder.Count.ToString());
+                    connection.Close();
+                }
+
+                for (int k = 0; k < jobItem.Count; k++)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    List<string> itemOrder = new List<string>();
+
+                    List<int> mkNormTime = new List<int>();
+                    List<int> wkNormTime = new List<int>();
+                    List<int> amounts = new List<int>();
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        SqlCommand Command = new SqlCommand
+                        {
+                            Connection = connection,
+                            //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                            //CommandText = @"SELECT * FROM dbo.order_head WHERE (status = '1' AND order_num LIKE '%" + searchNumber + "%')"
+
+                            CommandText = @"SELECT detail_name FROM dbo.order_detail WHERE id_order_detail = @itemid"
+                        };
+                        Command.Parameters.AddWithValue("@itemid", itemID[k]);
+
+                        DbDataReader sqlReader = Command.ExecuteReader();
+
+                        while (sqlReader.Read())
+                        {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            ///////
+                            itemOrder.Add(sqlReader["detail_name"].ToString());
+                        }
+                        //MessageBox.Show(itemOrder.Count.ToString());
+                        connection.Close();
+                    }
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        SqlCommand Command = new SqlCommand
+                        {
+                            Connection = connection,
+
+                            CommandText = @"SELECT id_norm_operation, plan_out_qty, normtime FROM dbo.man_planjob_list WHERE id_man_order_job_item = @itemid"
+                        };
+                        Command.Parameters.AddWithValue("@itemid", jobItem[k]);
+
+                        DbDataReader sqlReader = Command.ExecuteReader();
+
+                        while (sqlReader.Read())
+                        {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
+                            {
+                                if (sqlReader["normtime"].ToString() != "")
+                                {
+                                    mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                                }
+                                else
+                                {
+                                    mkNormTime.Add(0);
+                                }
+                            }
+
+                            if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
+                            {
+                                wkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                                amounts.Add(Convert.ToInt32(sqlReader["plan_out_qty"]));
+                            }
+                        }
+                        connection.Close();
+                    }
+
+                    if (mkNormTime.Count == wkNormTime.Count)
+                    {
+                        for (int j = 0; j < mkNormTime.Count; j++)
+                        {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            string itemOr = "";
+
+                            if (itemOrder.Count > 0)
+                            {
+                                itemOr = itemOrder[j];
+                            }
+
+                            orders.Add(new OrdersLoad(
+                                orderNumbers[i].numberOfOrder,
+                                orderNumbers[i].nameCustomer,
+                                itemOr,
+                                mkNormTime[j],
+                                wkNormTime[j],
+                                amounts[j],
+                                stamp,
+                                orderHeadList[i]
+                            ));
+                        }
+                    }
+
+                    if (mkNormTime.Count > wkNormTime.Count)
+                    {
+                        for (int j = 0; j < mkNormTime.Count; j++)
+                        {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            string itemOr = "";
+
+                            if (itemOrder.Count > 0)
+                            {
+                                itemOr = itemOrder[j];
+                            }
+
+                            if (j < wkNormTime.Count)
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOr,
+                                    mkNormTime[j],
+                                    wkNormTime[j],
+                                    amounts[j],
+                                    stamp,
+                                    orderHeadList[i]
+                                ));
+                            }
+                            else
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOr,
+                                    mkNormTime[j],
+                                    0,
+                                    0,
+                                    stamp,
+                                    orderHeadList[i]
+                                ));
+                            }
+
+
+                        }
+                    }
+
+                    if (mkNormTime.Count < wkNormTime.Count)
+                    {
+                        for (int j = 0; j < wkNormTime.Count; j++)
+                        {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            string itemOr = "";
+
+                            if (itemOrder.Count > 0)
+                            {
+                                itemOr = itemOrder[j];
+                            }
+
+                            if (j < mkNormTime.Count)
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOr,
+                                    mkNormTime[j],
+                                    wkNormTime[j],
+                                    amounts[j],
+                                    stamp,
+                                    orderHeadList[i]
+                                ));
+                            }
+                            else
+                            {
+                                orders.Add(new OrdersLoad(
+                                    orderNumbers[i].numberOfOrder,
+                                    orderNumbers[i].nameCustomer,
+                                    itemOr,
+                                    0,
+                                    wkNormTime[j],
+                                    amounts[j],
+                                    stamp,
+                                    orderHeadList[i]
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            for (int i = 0; i < orders.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                ListViewItem item = new ListViewItem();
+
+                item.Name = i.ToString();
+                item.Text = (i + 1).ToString();
+                item.SubItems.Add(orders[i].numberOfOrder.ToString());
+                item.SubItems.Add(orders[i].nameCustomer.ToString());
+                item.SubItems.Add(orders[i].nameItem.ToString());
+                item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].makereadyTime));
+                item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].workTime));
+                item.SubItems.Add(orders[i].amountOfOrder.ToString("N0"));
+                item.SubItems.Add(orders[i].stamp.ToString());
+
+                Invoke(new Action(() =>
+                {
+                    listView1.Items.Add(item);
+                }));
+            }
+        }
+
+        /*private void LoadOrdersByNumber(string searchNumber)
+        {
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+            }
+
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
 
@@ -456,9 +891,9 @@ namespace OrderManager
 
                 listView1.Items.Add(item);
             }
-        }
+        }*/
 
-        private void LoadPlanOld()
+        /*private void LoadPlanOld()
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -703,7 +1138,7 @@ namespace OrderManager
                 listView1.Items.Add(item);
             }
         }
-
+*/
 
 
 
@@ -740,7 +1175,7 @@ namespace OrderManager
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
             string idMachine = valueInfo.GetIDEquipMachine(loadMachine);
 
-            string endDate = DateTime.Now.AddYears(-1).ToString();
+            string endDate = DateTime.Now.AddMonths(-6).ToString();
 
             List<string> orderItemsList = new List<string>();
             //либо оставить так, либо сделать через класс
@@ -1128,10 +1563,20 @@ namespace OrderManager
 
         private void FormLoadOrders_Load(object sender, EventArgs e)
         {
-            button3.Enabled = false;
-            //LoadPlan();
-            StartLoading();
+            if (_loadForViewOrders)
+            {
+                button3.Visible = false;
+                button4.Text = "Выход";
+            }
+            else
+            {
+                button3.Enabled = false;
+                button3.Visible = true;
+                button4.Text = "Отмена";
+            }
 
+            LoadMachine();
+            StartLoading();
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -1148,10 +1593,17 @@ namespace OrderManager
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            if (listView1.SelectedIndices.Count > 0)
+            if (!_loadForViewOrders)
             {
-                SendSelectedOrder(Convert.ToInt32(listView1.SelectedItems[0].Name));
-                Close();
+                if (listView1.SelectedIndices.Count > 0)
+                {
+                    SendSelectedOrder(Convert.ToInt32(listView1.SelectedItems[0].Name));
+                    Close();
+                }
+            }
+            else
+            {
+                
             }
         }
 
@@ -1191,7 +1643,24 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                LoadOrdersByNumber(textBox1.Text);
+                StartSearch(textBox1.Text);
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            if (_loadForViewOrders)
+            {
+                if (cancelTokenSource != null)
+                {
+                    cancelTokenSource.Cancel();
+                }
+
+                loadMachine = infoBase.GetMachineFromName(comboBox1.Text);
+
+                StartLoading();
             }
         }
     }

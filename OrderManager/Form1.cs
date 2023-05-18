@@ -1713,5 +1713,11 @@ namespace OrderManager
 
             LoadOrdersFromBase();
         }
+
+        private void planToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormLoadOrders fm = new FormLoadOrders(true, Info.nameOfExecutor);
+            fm.ShowDialog();
+        }
     }
 }

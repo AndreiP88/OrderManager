@@ -18,6 +18,8 @@ namespace OrderManager
         List<String> numbersOrdersInProgress;
         String numbersOrder;
 
+        List<string> items = new List<string>();
+
         public FormAddNewOrder(String orderMachine, String orderNumber, String orderModification)
         {
             InitializeComponent();
@@ -148,9 +150,9 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
-            ValueOrdersBase getOrderCount = new ValueOrdersBase();
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
 
-            String orderCount = getOrderCount.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
+            String orderCount = ordersBase.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
             String orderAddedDate = DateTime.Now.ToString();
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
@@ -212,6 +214,33 @@ namespace OrderManager
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();
+            }
+
+            if (result == 0)
+            {
+                int orderID = ordersBase.GetOrderID(machine, number, modification);
+
+                for (int i = 0; i < items.Count; i = i + 2)
+                {
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                    {
+                        /*string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
+                            "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
+                            "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";*/
+
+                        string commandText = "INSERT INTO typesList (orderID, name, count) " +
+                        "VALUES (@orderID, @name, @count)";
+
+                        MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                        Command.Parameters.AddWithValue("@orderID", orderID); // присваиваем переменной значение
+                        Command.Parameters.AddWithValue("@name", items[i]);
+                        Command.Parameters.AddWithValue("@count", items[i + 1]);
+
+                        Connect.Open();
+                        Command.ExecuteNonQuery();
+                        Connect.Close();
+                    }
+                }
             }
         }
 
@@ -441,6 +470,49 @@ namespace OrderManager
 
             numericUpDown7.Value = workH;
             numericUpDown8.Value = workM;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ValueInfoBase valueInfoBase = new ValueInfoBase();
+
+            string machine = valueInfoBase.GetMachineFromName(comboBox1.Text);
+
+            FormLoadOrders fm = new FormLoadOrders(machine);
+            fm.ShowDialog();
+
+            if (fm.NewValue)
+            {
+                SetNewOrder(fm.SetValue, fm.Types);
+            }
+        }
+
+        private void SetNewOrder(OrdersLoad order, List<string> itemsOrder)
+        {
+            textBox1.Text = order.numberOfOrder;
+            comboBox2.Text = order.nameCustomer;
+
+            textBox5.Text = order.nameItem;
+
+            numericUpDown1.Value = order.amountOfOrder;
+            textBox2.Text = order.stamp;
+
+            int mkTime = order.makereadyTime;
+            int wkTime = order.workTime;
+
+            int makereadyH = mkTime / 60;
+            int makereadyM = mkTime % 60;
+
+            int workH = wkTime / 60;
+            int workM = wkTime % 60;
+
+            numericUpDown5.Value = makereadyH;
+            numericUpDown6.Value = makereadyM;
+
+            numericUpDown7.Value = workH;
+            numericUpDown8.Value = workM;
+
+            items = itemsOrder;
         }
     }
 
