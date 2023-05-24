@@ -22,7 +22,14 @@ namespace OrderManager
             return GetValue(currentMachine, orderNumber, orderModification, "count");
         }
 
-        public int GetOrderID(String currentMachine, String orderNumber, String orderModification)
+        /// <summary>
+        /// Получить индекс заказа в базе по номеру, модификации и оборудованию
+        /// </summary>
+        /// <param name="currentMachine"></param>
+        /// <param name="orderNumber"></param>
+        /// <param name="orderModification"></param>
+        /// <returns></returns>
+        public int GetOrderID(string currentMachine, string orderNumber, string orderModification)
         {
             return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, "count"));
         }

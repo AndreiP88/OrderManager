@@ -139,6 +139,8 @@ namespace OrderManager
         }
 
         List<Order> ordersNumbers = new List<Order>();
+        List<int> ordersIndexes = new List<int>();
+
         bool loadAllOrdersToCurrentMachine = true;
 
         List<string> items = new List<string>();
@@ -967,6 +969,8 @@ namespace OrderManager
                         sqlReader["nameOfOrder"].ToString() + strModification + " - " + Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0"));
 
                     ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+
+                    ordersIndexes.Add((int)sqlReader["count"]);
                 }
 
                 Connect.Close();
@@ -1027,6 +1031,28 @@ namespace OrderManager
                 //button7.Enabled = true;
             }
 
+        }
+
+        private bool OrderSelectionIfItExists(string machine, string number, string modification)
+        {
+            bool exist = false;
+
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+
+            int orderIndex = ordersBase.GetOrderID(machine, number, modification);
+
+            int itemIndex = ordersIndexes.IndexOf(orderIndex);
+
+            if (itemIndex != -1)
+            {
+                comboBox1.SelectedIndex = itemIndex + 1;
+                exist = true;
+            }
+
+            /*int itemIndex = .FindLastIndex((v) => v.indexTypeList == typesCurrent[i].indexTypeList,
+                                             (v) => v.indexTypeList == typesCurrent[i].indexTypeList);*/
+
+            return exist;
         }
 
         private void LoadOrderFromDB(String orderMachine, String orderNumber, String orderModification)
@@ -1408,30 +1434,37 @@ namespace OrderManager
 
         private void SetNewOrder(OrdersLoad order, List<string> itemsOrder)
         {
-            textBox1.Text = order.numberOfOrder;
-            comboBox2.Text = order.nameCustomer;
+            ValueInfoBase infoBase = new ValueInfoBase();
 
-            textBox5.Text = order.nameItem;
+            string machine = infoBase.GetMachineFromName(comboBox3.Text);
 
-            numericUpDown1.Value = order.amountOfOrder;
-            textBox2.Text = order.stamp;
+            if (!OrderSelectionIfItExists(machine, order.numberOfOrder, order.nameItem))
+            {
+                textBox1.Text = order.numberOfOrder;
+                comboBox2.Text = order.nameCustomer;
 
-            int mkTime = order.makereadyTime;
-            int wkTime = order.workTime;
+                textBox5.Text = order.nameItem;
 
-            int makereadyH = mkTime / 60;
-            int makereadyM = mkTime % 60;
+                numericUpDown1.Value = order.amountOfOrder;
+                textBox2.Text = order.stamp;
 
-            int workH = wkTime / 60;
-            int workM = wkTime % 60;
+                int mkTime = order.makereadyTime;
+                int wkTime = order.workTime;
 
-            numericUpDown5.Value = makereadyH;
-            numericUpDown6.Value = makereadyM;
+                int makereadyH = mkTime / 60;
+                int makereadyM = mkTime % 60;
 
-            numericUpDown7.Value = workH;
-            numericUpDown8.Value = workM;
+                int workH = wkTime / 60;
+                int workM = wkTime % 60;
 
-            items = itemsOrder;
+                numericUpDown5.Value = makereadyH;
+                numericUpDown6.Value = makereadyM;
+
+                numericUpDown7.Value = workH;
+                numericUpDown8.Value = workM;
+
+                items = itemsOrder;
+            }
         }
 
         private void LoadTypes()
