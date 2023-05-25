@@ -5,6 +5,7 @@ namespace OrderManager
     internal class Order
     {
         public int id;
+        public int orderIndex;
         public String machineOfOrder;
         public String numberOfOrder;
         public String modificationOfOrder;
@@ -23,11 +24,12 @@ namespace OrderManager
         public String counterRepeat;
         public String note;
         public String notePrivate;
-        public Order(int indexOrderInProgress, String machine, String number, string modification, String orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
+        public Order(int indexOrderInProgress, int orderID, String machine, String number, string modification, String orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
             int plannedWork, int facticalMakeready, int facticalWork, int countDone, int cNorm,
             int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, String orderCounterRepeat, String orderNote, String orderPrivateNote)
         {
             this.id = indexOrderInProgress;
+            this.orderIndex = orderID;
             this.machineOfOrder = machine;
             this.numberOfOrder = number;
             this.modificationOfOrder = modification;

@@ -9,17 +9,13 @@ namespace OrderManager
     internal class GetLeadTime
     {
         String shiftStart;
-        String numberOfOrder;
-        String modificationOfOrder;
-        String orderMachine;
+        int orderID;
         String repeatCounter;
 
-        public GetLeadTime(String startOfShift, String orderNumber, String orderModification, String machine, String counterRepeat)
+        public GetLeadTime(string startOfShift, int orderIndex, string counterRepeat)
         {
             this.shiftStart = startOfShift;
-            this.numberOfOrder = orderNumber;
-            this.modificationOfOrder = orderModification;
-            this.orderMachine = machine;
+            this.orderID = orderIndex;
             this.repeatCounter = counterRepeat;
         }
 
@@ -65,12 +61,9 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE " +
-                        "(numberOfOrder = @number AND modification = @orderModification) AND (machine = @machine AND counterRepeat = @counterRepeat)"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND counterRepeat = @counterRepeat"
                 };
-                Command.Parameters.AddWithValue("@number", numberOfOrder);
-                Command.Parameters.AddWithValue("@orderModification", modificationOfOrder);
-                Command.Parameters.AddWithValue("@machine", orderMachine);
+                Command.Parameters.AddWithValue("@id", orderID);
                 Command.Parameters.AddWithValue("@counterRepeat", repeatCounter);
                 DbDataReader sqlReader = Command.ExecuteReader();
 

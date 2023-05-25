@@ -206,7 +206,7 @@ namespace OrderManager
 
         private void ShowFullOrdersForm()
         {
-            FormFullListOrders form = new FormFullListOrders(false, "", "", "");
+            FormFullListOrders form = new FormFullListOrders(false, -1);
             form.ShowDialog();
         }
 
@@ -872,15 +872,19 @@ namespace OrderManager
             {
                 foreach (String machine in machines)
                 {
-                    String order = "";
-                    if (getInfo.GetCurrentOrderNumber(machine) != "")
-                        order = getInfo.GetCurrentOrderNumber(machine) + ", " + getOrder.GetOrderName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
+                    int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
+
+                    string order = "";
+                    if (currentOrderID != -1)
+                    {
+                        order = getOrder.GetOrderNumber(currentOrderID) + ", " + getOrder.GetOrderName(currentOrderID);
+                    }
 
                     ListViewItem item = new ListViewItem();
 
                     item.Name = machine;
                     item.Text = getInfo.GetMachineName(machine);
-                    item.SubItems.Add(getOrder.GetOrderStatusName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine)));
+                    item.SubItems.Add(getOrder.GetOrderStatusName(currentOrderID));
                     item.SubItems.Add(order);
 
                     listView2.Items.Add(item);
@@ -1155,8 +1159,7 @@ namespace OrderManager
                 else
                 {
                     form = new FormAddCloseOrder(Info.startOfShift,
-                        ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
-                        ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
+                        ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                         ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                         ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
                 }
@@ -1175,8 +1178,7 @@ namespace OrderManager
             FormPrivateNote form;
 
             form = new FormPrivateNote(Info.startOfShift,
-                ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
-                ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
+                ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
 
@@ -1193,8 +1195,7 @@ namespace OrderManager
             FormTypesInTheOrder form;
 
             form = new FormTypesInTheOrder(Info.startOfShift,
-                ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
-                ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
+                ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 Info.nameOfExecutor);
@@ -1511,7 +1512,7 @@ namespace OrderManager
                     wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
                 }
 
-                string status = ordersBase.GetOrderStatus(machine, ordersCurrentShift[idLastOrder].numberOfOrder, ordersCurrentShift[idLastOrder].modificationOfOrder);
+                string status = ordersBase.GetOrderStatus(ordersCurrentShift[idLastOrder].orderIndex);
 
                 int norm = ordersCurrentShift[idLastOrder].norm;
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;

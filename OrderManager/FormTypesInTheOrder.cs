@@ -15,19 +15,17 @@ namespace OrderManager
     public partial class FormTypesInTheOrder : Form
     {
         String loadStartOfShift;
-        String loadOrderNumber;
-        String loadOrderModification;
+        int loadOrderID;
         String loadOrderCounterRepeat;
         String loadMachine;
         String loadUser;
 
-        public FormTypesInTheOrder(String lStartOfShift, String lOrderNumber, String lOrderModification, String lOrderCounterRepeat, String lMachine, String lUser)
+        public FormTypesInTheOrder(String lStartOfShift, int lOrderID, String lOrderCounterRepeat, String lMachine, String lUser)
         {
             InitializeComponent();
 
             this.loadStartOfShift = lStartOfShift;
-            this.loadOrderNumber = lOrderNumber;
-            this.loadOrderModification = lOrderModification;
+            this.loadOrderID = lOrderID;
             this.loadOrderCounterRepeat = lOrderCounterRepeat;
             this.loadMachine = lMachine;
             this.loadUser = lUser;
@@ -50,8 +48,6 @@ namespace OrderManager
             comboBox1.Items.Clear();
             itemsCurrentOrder.Clear();
 
-            int orderID = ordersBase.GetOrderID(loadMachine, loadOrderNumber, loadOrderModification);
-
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
@@ -61,7 +57,7 @@ namespace OrderManager
                     CommandText = @"SELECT * FROM typesList WHERE orderID = @orderID"
 
                 };
-                Command.Parameters.AddWithValue("@orderID", orderID);
+                Command.Parameters.AddWithValue("@orderID", loadOrderID);
 
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -82,7 +78,7 @@ namespace OrderManager
         
         private void LoadTypes()
         {
-            ValueTypesBase typeBase = new ValueTypesBase(loadStartOfShift, loadOrderNumber, loadOrderModification, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typeBase = new ValueTypesBase(loadStartOfShift, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
 
             typesCurrent = typeBase.GetData();
 
@@ -98,7 +94,7 @@ namespace OrderManager
 
         private void SaveTypes()
         {
-            ValueTypesBase typeBase = new ValueTypesBase(loadStartOfShift, loadOrderNumber, loadOrderModification, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typeBase = new ValueTypesBase(loadStartOfShift, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
 
             for (int i = 0; i < typesForAdded.Count; i++)
             {
@@ -130,7 +126,7 @@ namespace OrderManager
 
         private void AddTypesToListView()
         {
-            ValueTypesBase typesBase = new ValueTypesBase(loadStartOfShift, loadOrderNumber, loadOrderModification, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typesBase = new ValueTypesBase(loadStartOfShift, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
 
             int count = 0;
 
@@ -348,9 +344,7 @@ namespace OrderManager
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
-            int orderID = ordersBase.GetOrderID(loadMachine, loadOrderNumber, loadOrderModification);
-
-            FormItemsOrder form = new FormItemsOrder(orderID.ToString());
+            FormItemsOrder form = new FormItemsOrder(loadOrderID.ToString());
             form.ShowDialog();
 
             LoadItemsListForCurrentOrder();

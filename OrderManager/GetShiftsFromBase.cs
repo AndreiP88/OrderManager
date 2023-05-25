@@ -169,8 +169,7 @@ namespace OrderManager
 
                 for (int j = 0; j < ordersCurrentShift.Count; j++)
                 {
-                    GetLeadTime leadTime = new GetLeadTime(shifts[i],
-                        ordersCurrentShift[j].numberOfOrder, ordersCurrentShift[j].modificationOfOrder, ordersCurrentShift[j].machineOfOrder, getOrder.GetCounterRepeat(ordersCurrentShift[j].machineOfOrder, ordersCurrentShift[j].numberOfOrder, ordersCurrentShift[j].modificationOfOrder));
+                    GetLeadTime leadTime = new GetLeadTime(shifts[i], ordersCurrentShift[j].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[j].orderIndex));
 
                     if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")
                     {

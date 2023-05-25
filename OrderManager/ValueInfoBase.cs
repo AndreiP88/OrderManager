@@ -19,7 +19,7 @@ namespace OrderManager
             return GetValueMachines("id", machine, "name");
         }
 
-        public String GetMachineFromName(String machineName)
+        public string GetMachineFromName(string machineName)
         {
             return GetValueMachines("name", machineName, "id");
         }
@@ -54,34 +54,40 @@ namespace OrderManager
             return GetValue("machine", machine, "activeOrder");
         }
 
-        public String GetCurrentOrderNumber(String machine)
+        public string GetCurrentOrderID(string machine)
         {
-            return GetValue("machine", machine, "currentOrder");
+            string result = "-1";
+            string val = GetValue("machine", machine, "currentOrderID");
+
+            if (val != "")
+            {
+                result = val;
+            }
+
+            return result;
         }
 
-        public String GetCurrentOrderModification(String machine)
-        {
-            return GetValue("machine", machine, "currentModification");
-        }
-
-        public String GetCurrentCounterRepeat(String machine)
+        public string GetCurrentCounterRepeat(String machine)
         {
             return GetValue("machine", machine, "currentCounterRepeat");
         }
 
-        public String GetLastOrderNumber(String machine)
+        public string GetLastOrderID(string machine)
         {
-            return GetValue("machine", machine, "lastOrder");
+            string result = "-1";
+            string val = GetValue("machine", machine, "lastOrderID");
+
+            if (val != "")
+            {
+                result = val;
+            }
+
+            return result;
         }
 
-        public String GetLastOrderModification(String machine)
+        public string GetMachineFromOrderID(int orderIndex)
         {
-            return GetValue("machine", machine, "lastModification");
-        }
-
-        public String GetMachineFromOrder(String orderNumber, String orderModification)
-        {
-            return GetValueTwoParam("currentOrder", orderNumber, "currentModification", orderModification, "machine");
+            return GetValue("currentOrderID", orderIndex.ToString(), "machine");
         }
 
         /// <summary>
@@ -292,10 +298,9 @@ namespace OrderManager
             return result;
         }
 
-        public void UpdateCurrentOrder(String machine, String currentOrder, String currentModification)
+        public void UpdateCurrentOrder(String machine, int orderIndex)
         {
-            UpdateInfoParameter(machine, "currentOrder", currentOrder);
-            UpdateInfoParameter(machine, "currentModification", currentModification);
+            UpdateInfoParameter(machine, "currentOrderID", orderIndex.ToString());
         }
 
         public void CompleteTheShift(String nameOfExecutor)
@@ -316,7 +321,7 @@ namespace OrderManager
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE machinesInfo SET nameOfExecutor = '', currentCounterRepeat = '', " +
-                    "currentOrder = '', currentModification = '', activeOrder = 'False' " + // проверить актив ордер
+                    "currentOrderID = '', activeOrder = 'False' " + // проверить актив ордер
                     "WHERE (machine = @machine)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -328,20 +333,18 @@ namespace OrderManager
             }
         }
 
-        public void UpdateInfo(String machine, String currentCounterRepeat, String currentOrder, String currentModification, String lastOrder, String lastModification, bool activeOrder)
+        public void UpdateInfo(String machine, String currentCounterRepeat, string currentOrderID, string lastOrderID, bool activeOrder)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                string commandText = "UPDATE machinesInfo SET currentCounterRepeat = @currentCounterRepeat, currentOrder = @currentOrder, " +
-                    "currentModification = @currentModification, lastOrder = @lastOrder, lastModification = @lastModification, activeOrder = @activeOrder " +
+                string commandText = "UPDATE machinesInfo SET " +
+                    "currentCounterRepeat = @currentCounterRepeat, currentOrderID = @currentOrderID, lastOrderID = @lastOrderID, activeOrder = @activeOrder " +
                     "WHERE (machine = @machine)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@currentOrder", currentOrder);
-                Command.Parameters.AddWithValue("@currentModification", currentModification);
-                Command.Parameters.AddWithValue("@lastOrder", lastOrder);
-                Command.Parameters.AddWithValue("@lastModification", lastModification);
+                Command.Parameters.AddWithValue("@currentOrderID", currentOrderID);
+                Command.Parameters.AddWithValue("@lastOrderID", lastOrderID);
                 Command.Parameters.AddWithValue("@currentCounterRepeat", currentCounterRepeat);
                 Command.Parameters.AddWithValue("@activeOrder", activeOrder.ToString());
 

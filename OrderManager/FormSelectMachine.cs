@@ -106,10 +106,11 @@ namespace OrderManager
                 {
                     String machine = sqlReader["id"].ToString();
 
-                    String orderName = getInfo.GetCurrentOrderNumber(machine);
+                    int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
+                    string orderName = order.GetOrderNumber(currentOrderID);
 
-                    if (orderName != "")
-                        orderName += ", " + order.GetOrderName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
+                    if (orderName != "-1")
+                        orderName += ", " + order.GetOrderName(currentOrderID);
                     else
                         orderName = "";
 
@@ -193,7 +194,7 @@ namespace OrderManager
 
             for (int i = 0; i < checkBoxesMachines.Count; i++)
             {
-                if (getInfo.GetCurrentOrderNumber(checkBoxesMachines[i].Name) != "" &&
+                if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "" &&
                     CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
                     checkBoxesMachines[i].Checked == false)
                 {
@@ -325,9 +326,11 @@ namespace OrderManager
             {
                 string machine = checkBoxesMachines[i].Name;
 
-                string orderName = getInfo.GetCurrentOrderNumber(machine);
-                if (orderName != "")
-                    orderName += ", " + order.GetOrderName(machine, getInfo.GetCurrentOrderNumber(machine), getInfo.GetCurrentOrderModification(machine));
+                int currentOrderIndex = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
+                string orderName = order.GetOrderNumber(currentOrderIndex);
+
+                if (orderName != "-1")
+                    orderName += ", " + order.GetOrderName(currentOrderIndex);
                 else
                     orderName = "";
 

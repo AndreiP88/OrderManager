@@ -31,23 +31,23 @@ namespace OrderManager
 
         }
 
-        public String GetIndex(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        public string GetIndex(string startShift, int orderIndex, string counterRepeat, string machine)
         {
-            return GetValue("count", startShift, numberOfOrder, modification, counterRepeat, machine);
+            return GetValue("count", startShift, orderIndex, counterRepeat, machine);
         }
 
-        public String GetNote(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        public String GetNote(String startShift, int orderIndex, String counterRepeat, String machine)
         {
-            return GetValue("note", startShift, numberOfOrder, modification, counterRepeat, machine);
+            return GetValue("note", startShift, orderIndex, counterRepeat, machine);
         }
 
-        public String GetPrivateNote(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        public String GetPrivateNote(String startShift, int orderIndex, String counterRepeat, String machine)
         {
-            return GetValue("privateNote", startShift, numberOfOrder, modification, counterRepeat, machine);
+            return GetValue("privateNote", startShift, orderIndex, counterRepeat, machine);
         }
-        public String GetDone(String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        public String GetDone(String startShift, int orderIndex, String counterRepeat, String machine)
         {
-            return GetValue("done", startShift, numberOfOrder, modification, counterRepeat, machine);
+            return GetValue("done", startShift, orderIndex, counterRepeat, machine);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace OrderManager
             return Convert.ToInt32(GetValueFromIndex(id, "orderID"));
         }
 
-        private String GetValue(String nameOfColomn, String startShift, String numberOfOrder, String modification, String counterRepeat, String machine)
+        private String GetValue(String nameOfColomn, String startShift, int orderIndex, String counterRepeat, String machine)
         {
             String result = "";
 
@@ -110,11 +110,10 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE ((startOfShift = @startOfShift AND numberOfOrder = @numberOfOrder) AND (modification = @modification AND counterRepeat = @counterRepeat)) AND machine = @machine"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE ((startOfShift = @startOfShift AND machine = @machine) AND (orderID = @id AND counterRepeat = @counterRepeat))"
                 };
                 Command.Parameters.AddWithValue("@startOfShift", startShift);
-                Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
-                Command.Parameters.AddWithValue("@modification", modification);
+                Command.Parameters.AddWithValue("@id", orderIndex);
                 Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
                 Command.Parameters.AddWithValue("@machine", machine);
                 DbDataReader sqlReader = Command.ExecuteReader();
@@ -289,7 +288,7 @@ namespace OrderManager
             return ordersCountAmount;
         }
 
-        public Object GetNumbersOrders(String machine, String numberOfOrder, String modification)
+        public Object GetNumbersOrders(String machine, int orderIndex)
         {
             List<String> numbers = new List<String>();
 
@@ -299,11 +298,10 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND (numberOfOrder = @numberOfOrder AND modification = @modification)"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND orderID = @id"
                 };
                 Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@numberOfOrder", numberOfOrder);
-                Command.Parameters.AddWithValue("@modification", modification);
+                Command.Parameters.AddWithValue("@id", orderIndex);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
@@ -316,164 +314,6 @@ namespace OrderManager
 
             return numbers;
         }
-
-        /*public Object LoadAllOrdersFromBase2(String startOfShift, String category)
-        {
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueInfoBase getInfo = new ValueInfoBase();
-            ValueOrdersBase ordersBase = new ValueOrdersBase();
-
-            List<Order> orders = new List<Order>();
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE startOfShift = '" + startOfShift + "'"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read())
-                {
-                    if (category == getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
-                    {
-                        //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                        GetCountOfDone orderCount = new GetCountOfDone(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
-
-                        int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-                        int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
-
-                        if (lastCount < 0)
-                            lastCount = 0;
-
-                        int workTime = Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-                        int orderNorm = 0;
-                        int timeWorkingOut = 0;
-                        string lastTimeWork = "00:00";
-
-                        if (workTime != 0)
-                        {
-                            orderNorm = amountThisOrder * 60 / workTime;
-                            timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
-                            lastTimeWork = timeOperations.TotalMinutesToHoursAndMinutesStr((lastCount * 60) / orderNorm);
-                        }
-
-                        string lastTimeMakeready = LastTimeMakereadyStr(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
-                        string timeMakeready = timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()).ToString();
-                        string timeWork = timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()).ToString();
-                        string lastTimeWorkForDeviation;
-
-                        if (timeWorkingOut > 0)
-                        {
-                            lastTimeWorkForDeviation = timeOperations.TotalMinutesToHoursAndMinutesStr(timeWorkingOut);
-                        }
-                        else
-                        {
-                            lastTimeWorkForDeviation = lastTimeWork;
-                        }
-                        
-                        string deviation;
-
-                        if (_unionDeviation)
-                        {
-                            string timeFull = timeOperations.TimeAmount(timeMakeready, timeWork);
-                            string lastTimeFull = timeOperations.TimeAmount(lastTimeMakeready, lastTimeWorkForDeviation);
-
-                            deviation = timeOperations.TimeDifferentAndNegative(lastTimeFull, timeFull); 
-                        }
-                        else
-                        {
-                            string mkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeMakeready, timeMakeready);
-                            string wkDeviation = timeOperations.TimeDifferentAndNegative(lastTimeWorkForDeviation, timeWork);
-
-                            deviation = mkDeviation + ", " + wkDeviation;
-                        }
-
-                        timeWorkingOut += FullWorkoutTime(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString(),
-                            sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
-
-                        orders.Add(new Order(
-                            sqlReader["machine"].ToString(),
-                            sqlReader["numberOfOrder"].ToString(),
-                            sqlReader["modification"].ToString(),
-                            ordersBase.GetOrderName(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()).ToString(),
-                            amountThisOrder,
-                            lastCount,
-                            lastTimeMakeready,
-                            lastTimeWork,
-                            timeMakeready,
-                            timeWork,
-                            Convert.ToInt32(sqlReader["done"]),
-                            orderNorm,
-                            timeWorkingOut,
-                            deviation,
-                            sqlReader["counterRepeat"].ToString(),
-                            sqlReader["note"].ToString(),
-                            sqlReader["privateNote"].ToString()
-                            ));
-                    }
-                }
-
-                Connect.Close();
-            }
-
-            return orders;
-        }
-
-        private String LastTimeMakereadyStr(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
-        {
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
-
-            String lastTimeMakeready = "00:00";
-
-            String lastTimeMakereadyStop = lastTime.GetLastDateTime("timeMakereadyStop");
-            String currentTimeMakereadyStart = lastTime.GetCurrentDateTime("timeMakereadyStart");
-            String currentTimeMakereadyStop = lastTime.GetCurrentDateTime("timeMakereadyStop");
-
-            String lastTimeMake = timeOperations.DateDifferent(lastTimeMakereadyStop, lastTime.GetLastDateTime("timeMakereadyStart"));
-            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(machine, numberOrder, modificationOrder));
-
-            //разобраться с условиями не отображается остаток времени на приладку... вродебы работает)
-            //считает только одно предыдущее значение, т.е. если приладка заняла больше двух смен, тло считает только текущую смнену и предыдыдущую...
-            //вероятность того, что такие ситуации будут крайне мала, поэтому оставляю как есть)
-            if (lastTimeMakereadyStop != "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop == "")
-            {
-                lastTimeMakeready = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake);
-            }
-            else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop == "")
-            {
-                lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime);
-            }
-            else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop != "")
-            {
-                lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime);
-            }
-            else if (lastTimeMakereadyStop != "" && currentTimeMakereadyStart != "" && currentTimeMakereadyStop != "")
-            {
-                lastTimeMakeready = timeOperations.TimeDifferent(timeOperations.TotalMinutesToHoursAndMinutesStr(makereadyTime), lastTimeMake);
-            }
-            else
-                lastTimeMakeready = timeOperations.TotalMinutesToHoursAndMinutesStr(0);
-
-            return lastTimeMakeready;
-        }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public Object LoadAllOrdersFromBase(String startOfShift, String category)
         {
@@ -500,15 +340,15 @@ namespace OrderManager
                     if (category == getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
                     {
                         //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                        GetCountOfDone orderCount = new GetCountOfDone(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+                        GetCountOfDone orderCount = new GetCountOfDone(startOfShift, (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
 
-                        int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                        int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
 
                         if (lastCount < 0)
                             lastCount = 0;
 
-                        int workTime = Convert.ToInt32(ordersBase.GetTimeToWork(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                        int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
                         int orderNorm = 0;
                         int timeWorkingOut = 0;
                         int lastTimeWork = 0;
@@ -520,7 +360,7 @@ namespace OrderManager
                             lastTimeWork = (lastCount * 60) / orderNorm;
                         }
 
-                        int lastTimeMakeready = LastTimeMakeready(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString());
+                        int lastTimeMakeready = LastTimeMakeready(startOfShift, (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString());
                         int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
                         int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
                         int lastTimeWorkForDeviation = 0;
@@ -554,15 +394,16 @@ namespace OrderManager
                             deviation = mkDeviation + ", " + wkDeviation;
                         }*/
 
-                        timeWorkingOut += FullWorkoutTime(startOfShift, sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["counterRepeat"].ToString(),
+                        timeWorkingOut += FullWorkoutTime(startOfShift, (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString(),
                             sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
 
                         orders.Add(new Order(
                             Convert.ToInt32(sqlReader["count"]),
+                            (int)sqlReader["orderID"],
                             sqlReader["machine"].ToString(),
-                            sqlReader["numberOfOrder"].ToString(),
-                            sqlReader["modification"].ToString(),
-                            ordersBase.GetOrderName(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()).ToString(),
+                            ordersBase.GetOrderNumber((int)sqlReader["orderID"]),
+                            ordersBase.GetOrderModification((int)sqlReader["orderID"]),
+                            ordersBase.GetOrderName((int)sqlReader["orderID"]).ToString(),
                             amountThisOrder,
                             lastCount,
                             lastTimeMakeready,
@@ -587,11 +428,11 @@ namespace OrderManager
             return orders;
         }
 
-        private int LastTimeMakeready(string startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat)
+        private int LastTimeMakeready(string startOfShift, int orderIndex, String counterRepeat)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(startOfShift, orderIndex, counterRepeat);
 
             int lastTimeMakeready = 0;
 
@@ -600,7 +441,7 @@ namespace OrderManager
             String currentTimeMakereadyStop = lastTime.GetCurrentDateTime("timeMakereadyStop");
 
             int lastTimeMake = timeOperations.DateDifferenceToMinutes(lastTimeMakereadyStop, lastTime.GetLastDateTime("timeMakereadyStart"));
-            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(machine, numberOrder, modificationOrder));
+            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
 
             //разобраться с условиями не отображается остаток времени на приладку... вродебы работает)
             //считает только одно предыдущее значение, т.е. если приладка заняла больше двух смен, тло считает только текущую смнену и предыдыдущую...
@@ -630,13 +471,13 @@ namespace OrderManager
             return lastTimeMakeready;
         }
 
-        private int FullWorkoutTime(String startOfShift, String machine, String numberOrder, String modificationOrder, String counterRepeat, String timeMkrStop, String timeMkrStart)
+        private int FullWorkoutTime(string startOfShift, int orderIndex, string counterRepeat, string timeMkrStop, String timeMkrStart)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(startOfShift, numberOrder, modificationOrder, machine, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(startOfShift, orderIndex, counterRepeat);
 
-            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(machine, numberOrder, modificationOrder));
+            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
             int mkrStartStop = timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);
 
             int mkrWorkingOut = 0;
@@ -668,7 +509,7 @@ namespace OrderManager
             }
             else if (lastTimeMakereadyStop == "" && currentTimeMakereadyStop != "" && nextTimeMakereadyStop == "")
             {
-                if (ordersBase.GetOrderStatus(machine, numberOrder, modificationOrder) != "1" && lastTime.GetNextDateTime("timeMakereadyStart") == "")
+                if (ordersBase.GetOrderStatus(orderIndex) != "1" && lastTime.GetNextDateTime("timeMakereadyStart") == "")
                     timeWorkingOut += makereadyTime;
                 else
                     timeWorkingOut += mkrWorkingOut;

@@ -36,21 +36,22 @@ namespace OrderManager
         }
 
         List<Order> ordersNumbers = new List<Order>();
+        List<int> ordersIndexes = new List<int>();
 
         private void SetStartPeriodDTPicker()
         {
             dateTimePicker1.Value = DateTime.Now.AddMonths(-2);
         }
 
-        private void LoadSelectedOrder(bool detailsLoad, String orderMachine, String orderNumberm, String orderModification)
+        private void LoadSelectedOrder(bool detailsLoad, int orderIndex)
         {
-            FormFullListOrders form = new FormFullListOrders(detailsLoad, orderMachine, orderNumberm, orderModification);
+            FormFullListOrders form = new FormFullListOrders(detailsLoad, orderIndex);
             form.ShowDialog();
         }
 
-        private void LoadSelectedOrderFromID(string id)
+        private void LoadSelectedOrderFromID(int id)
         {
-            FormFullListOrders form = new FormFullListOrders(id);
+            FormFullListOrders form = new FormFullListOrders(true, id);
             form.ShowDialog();
         }
 
@@ -61,7 +62,7 @@ namespace OrderManager
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
+                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text), ordersIndexes[listView1.SelectedIndices[0]]);
             else
                 form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text));
 
@@ -175,13 +176,13 @@ namespace OrderManager
 
         }
 
-        private void LoadOrdersFromBase2()
+        /*private void LoadOrdersFromBase2()
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
-            String machine = getInfo.GetMachineFromName(comboBox1.Text);
+            string machine = getInfo.GetMachineFromName(comboBox1.Text);
 
             listView1.Items.Clear();
 
@@ -209,9 +210,9 @@ namespace OrderManager
                 {
                     if (sqlReader["numberOfOrder"].ToString().Contains(textBox1.Text))
                     {
-                        GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
-                        GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
-                        GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
+                        GetCountOfDone orderCalc = new GetCountOfDone("", (int)sqlReader["orderID"], "");
+                        GetLeadTime leadTimeFirst = new GetLeadTime("", (int)sqlReader["orderID"], "0");
+                        GetLeadTime leadTimeLast = new GetLeadTime("", (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString());
 
                         ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
@@ -244,7 +245,7 @@ namespace OrderManager
                 Connect.Close();
             }
 
-        }
+        }*/
 
         private List<string> LoadIndexesOrdersFromBase(string key)
         {
@@ -255,6 +256,7 @@ namespace OrderManager
             listView1.Items.Clear();
 
             ordersNumbers.Clear();
+            ordersIndexes.Clear();
 
             int index = 0;
 
@@ -279,6 +281,8 @@ namespace OrderManager
                     {
                         result.Add(sqlReader["count"].ToString());
                         ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+
+                        ordersIndexes.Add((int)sqlReader["count"]);
 
                         String modification = "";
                         if (sqlReader["modification"].ToString() != "")
@@ -364,9 +368,9 @@ namespace OrderManager
 
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {
-                        GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
-                        GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
-                        GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
+                        GetCountOfDone orderCalc = new GetCountOfDone("", (int)sqlReader["count"], "");
+                        GetLeadTime leadTimeFirst = new GetLeadTime("", (int)sqlReader["count"], "0");
+                        GetLeadTime leadTimeLast = new GetLeadTime("", (int)sqlReader["count"], sqlReader["counterRepeat"].ToString());
 
 
                         Invoke(new Action(() =>
@@ -385,7 +389,7 @@ namespace OrderManager
                                     item.SubItems[7].Text = leadTimeLast.GetLastValue("timeToWorkStop").ToString();
                                     //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
                                     item.SubItems[8].Text = orderCalc.OrderFullCalculate().ToString("N0");
-                                    item.SubItems[9].Text = ordersBase.GetOrderStatusName(getInfo.GetMachineFromName(comboBox1.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
+                                    item.SubItems[9].Text = ordersBase.GetOrderStatusName((int)sqlReader["count"]);
                                 }
                             }
                         }));
@@ -401,18 +405,17 @@ namespace OrderManager
             }));
         }
 
-        private void SetNewStatus(String orderMachine, String numberOfOrder, String orderModification, String newStatus)
+        private void SetNewStatus(int orderIndex, String newStatus)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE orders SET statusOfOrder = @status " +
-                    "WHERE machine = @orderMachine AND (numberOfOrder = @number AND modification = @orderModification)";
+                    "WHERE count = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@status", newStatus);
-                Command.Parameters.AddWithValue("@orderMachine", orderMachine);
-                Command.Parameters.AddWithValue("@number", numberOfOrder);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                Command.Parameters.AddWithValue("@id", orderIndex);
+
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();
@@ -462,7 +465,7 @@ namespace OrderManager
 
             if (listView1.SelectedItems.Count != 0)
             {
-                LoadSelectedOrderFromID(listView1.Items[listView1.SelectedIndices[0]].Name);
+                LoadSelectedOrderFromID(Convert.ToInt32(listView1.Items[listView1.SelectedIndices[0]].Name));
                 //LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
             }
                 
@@ -484,7 +487,7 @@ namespace OrderManager
 
             if (listView1.SelectedItems.Count != 0)
             {
-                LoadSelectedOrderFromID(listView1.Items[listView1.SelectedIndices[0]].Name);
+                LoadSelectedOrderFromID(Convert.ToInt32(listView1.Items[listView1.SelectedIndices[0]].Name));
                 //LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder);
             }
                 
@@ -501,7 +504,7 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            SetNewStatus(getInfo.GetMachineFromName(comboBox1.Text), ordersNumbers[listView1.SelectedIndices[0]].numberOfOrder, ordersNumbers[listView1.SelectedIndices[0]].modificationOfOrder, "4");
+            SetNewStatus(ordersIndexes[listView1.SelectedIndices[0]], "4");
             LoadOrdersFromBase();
             LoadOrdersFromTheKey(textBox1.Text);
         }

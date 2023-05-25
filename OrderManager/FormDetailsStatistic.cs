@@ -154,7 +154,7 @@ namespace OrderManager
                 //Thread.Sleep(100);
             }
 
-            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1)
+            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1)
             {
                 
 
@@ -170,6 +170,7 @@ namespace OrderManager
 
                 //Task task = new Task(() => LoadUsersFromBase(token, date));
                 Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date), cancelTokenSource.Token);
+                //LoadUsersFromBase(cancelTokenSource.Token, date);
 
                 if (thJob == true)
                 {
@@ -206,7 +207,7 @@ namespace OrderManager
             //while (!token.IsCancellationRequested)
             while (true)
             {
-                token.ThrowIfCancellationRequested();
+                //token.ThrowIfCancellationRequested();
 
                 thJob = true;
 

@@ -10,8 +10,8 @@ namespace OrderManager
     public partial class FormFullListOrders : Form
     {
         bool detailsLoad;
-        string orderID;
-        String orderrMachineLoad;
+        int orderID;
+        /*String orderrMachineLoad;
         String orderNumberLoad;
         String orderModificationLoad;
         public FormFullListOrders(bool details, String orderMachine, String orderNumber, String orderModification)
@@ -23,13 +23,13 @@ namespace OrderManager
             this.orderrMachineLoad = orderMachine;
             this.orderNumberLoad = orderNumber;
             this.orderModificationLoad = orderModification;
-        }
+        }*/
 
-        public FormFullListOrders(string orderIDFromOrdersBase)
+        public FormFullListOrders(bool details, int orderIDFromOrdersBase)
         {
             InitializeComponent();
 
-            this.detailsLoad = true;
+            this.detailsLoad = details;
             this.orderID = orderIDFromOrdersBase;
         }
 
@@ -174,6 +174,7 @@ namespace OrderManager
         private void LoadOrdersFromBase()
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
+            ValueUserBase usersBase = new ValueUserBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
@@ -192,8 +193,6 @@ namespace OrderManager
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                ValueUserBase usersBase = new ValueUserBase();
-
                 String commandLine;
                 //commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
                 commandLine = "DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
@@ -207,10 +206,10 @@ namespace OrderManager
                 String commandText;
                 if (detailsLoad == true)
                 {
-                    if (orderID != "")
+                    //if (orderID != "")
                         commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
-                    else
-                        commandText = "SELECT * FROM ordersInProgress WHERE machine = '" + orderrMachineLoad + "' AND (numberOfOrder = '" + orderNumberLoad + "' AND modification = '" + orderModificationLoad + "')";
+                    //else
+                        //commandText = "SELECT * FROM ordersInProgress WHERE machine = '" + orderrMachineLoad + "' AND (numberOfOrder = '" + orderNumberLoad + "' AND modification = '" + orderModificationLoad + "')";
                 }
                 else
                     commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
@@ -226,7 +225,9 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    if (sqlReader["numberOfOrder"].ToString().Contains(textBox1.Text))
+                    string orderNumber = ordersBase.GetOrderNumber((int)sqlReader["orderID"]);
+
+                    if (orderNumber.Contains(textBox1.Text))
                     {
                         year = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("yyyy");
                         month = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("MMMM");
@@ -249,36 +250,38 @@ namespace OrderManager
 
                         //отображение общего количества тиража не в каждой строке, а только в первой
                         String amountOrder;
-                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString())) && tmpNumberOrders == sqlReader["numberOfOrder"].ToString() + ", " + sqlReader["modification"].ToString())
+                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])) && tmpNumberOrders == sqlReader["orderID"].ToString())
                         {
                             amountOrder = "";
                         }
                         else
                         {
-                            amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString())).ToString("N0");
+                            amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])).ToString("N0");
                         }
 
-                        String modification = "";
-                        if (sqlReader["modification"].ToString() != "")
-                            modification = " (" + sqlReader["modification"].ToString() + ")";
+                        
+                        string modification = ordersBase.GetOrderModification((int)sqlReader["orderID"]);
 
-                        if (tmpNumberOrders != sqlReader["numberOfOrder"].ToString() + ", " + sqlReader["modification"].ToString())
+                        if (modification != "")
+                            modification = " (" + modification + ")";
+
+                        if (tmpNumberOrders != sqlReader["orderID"].ToString())
                             countOrders++;
 
                         tmpStartShifts = sqlReader["startOfShift"].ToString();
-                        tmpNumberOrders = sqlReader["numberOfOrder"].ToString() + ", " + sqlReader["modification"].ToString();
-                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                        tmpNumberOrders = sqlReader["orderID"].ToString();
+                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
 
                         amountAllOrders += Convert.ToInt32(sqlReader["done"]);
 
                         ListViewItem item = new ListViewItem();
 
-                        item.Name = sqlReader["numberOfOrder"].ToString();
+                        item.Name = sqlReader["orderID"].ToString();
                         item.Text = (index + 1).ToString();
                         item.SubItems.Add(date);
                         item.SubItems.Add(name);
-                        item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
-                        item.SubItems.Add(ordersBase.GetOrderName(sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                        item.SubItems.Add(ordersBase.GetOrderNumber((int)sqlReader["orderID"]) + modification);
+                        item.SubItems.Add(ordersBase.GetOrderName((int)sqlReader["orderID"]));
                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()));
                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()));
                         item.SubItems.Add(amountOrder);

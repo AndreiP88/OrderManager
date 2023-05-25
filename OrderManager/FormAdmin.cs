@@ -77,6 +77,7 @@ namespace OrderManager
 
         //List<ColumnHeader> columnHeadersMain = new List<ColumnHeader>();
         List<OrderNM> ordersNumbers = new List<OrderNM>();
+        List<int> ordersIndexes = new List<int>();
 
         int currentPage = 1;
         int selectedYear = 0;
@@ -331,9 +332,9 @@ namespace OrderManager
             return machine;
         }
 
-        private void LoadSelectedOrder(bool detailsLoad, String orderMachine, String orderNumberm, String orderModification)
+        private void LoadSelectedOrder(bool detailsLoad, int orderIndex)
         {
-            FormFullListOrders form = new FormFullListOrders(detailsLoad, orderMachine, orderNumberm, orderModification);
+            FormFullListOrders form = new FormFullListOrders(detailsLoad, orderIndex);
             form.ShowDialog();
         }
 
@@ -345,7 +346,7 @@ namespace OrderManager
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectedIndex].numberOfOrder, ordersNumbers[selectedIndex].modificationOfOrder);
+                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersIndexes[selectedIndex]);
             else
                 form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBoxMachine.Text));
 
@@ -432,17 +433,17 @@ namespace OrderManager
             }
         }
 
-        private void DeactivateOrder(String machine, String orderNumber, String orderModification)
+        private void DeactivateOrder(int orderIndex)
         {
             ValueOrdersBase orders = new ValueOrdersBase();
 
             DialogResult result;
             result = MessageBox.Show("Вы действительно хотите завершить заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
-                orders.SetNewStatus(machine, orderNumber, orderModification, "4");
+                orders.SetNewStatus(orderIndex, "4");
         }
 
-        private void AbortOrder(String machine, String orderNumber, String orderModification)
+        private void AbortOrder(String machine, int orderIndex)
         {
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -452,7 +453,7 @@ namespace OrderManager
 
             DialogResult result = DialogResult.No;
 
-            String statusOrder = orders.GetOrderStatus(machine, orderNumber, orderModification);
+            String statusOrder = orders.GetOrderStatus(orderIndex);
 
             if (statusOrder != "0" && statusOrder != "4")
             {
@@ -461,9 +462,9 @@ namespace OrderManager
 
             if (result == DialogResult.Yes)
             {
-                orders.SetNewStatus(machine, orderNumber, orderModification, "0");
-                orders.IncrementCounterRepeat(machine, orderNumber, orderModification);
-                infoBase.UpdateInfo(getInfo.GetMachineFromName(comboBoxMachine.Text), "", "", "", "", "", false);
+                orders.SetNewStatus(orderIndex, "0");
+                orders.IncrementCounterRepeat(orderIndex);
+                infoBase.UpdateInfo(getInfo.GetMachineFromName(comboBoxMachine.Text), "", "", "", false);
             }
         }
 
@@ -475,8 +476,6 @@ namespace OrderManager
                 var control = tableLayoutPanel1.Controls.Find(nameTab, true);
                 tableLayoutPanel1.Controls.Remove(control[0]);
             }
-
-
         }
 
         private void CreateListView(List<ColumnHeader> headers)
@@ -1543,7 +1542,9 @@ namespace OrderManager
 
                     for (int j = 0; j < machines.Count; j++)
                     {
-                        GetLeadTime leadTimeCurr = new GetLeadTime(userBase.GetCurrentShiftStart(users[i]), getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]), machines[j], getOrder.GetCounterRepeat(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
+                        int orderIndex = Convert.ToInt32(getInfo.GetCurrentOrderID(machines[j]));
+
+                        GetLeadTime leadTimeCurr = new GetLeadTime(userBase.GetCurrentShiftStart(users[i]), orderIndex, getOrder.GetCounterRepeat(orderIndex));
 
                         List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(userBase.GetCurrentShiftStart(users[i]), "");
 
@@ -1552,9 +1553,14 @@ namespace OrderManager
                         String currentShiftStart = "";
                         String order = "";
 
-                        if (getInfo.GetCurrentOrderNumber(machines[j]) != "")
-                            order = getInfo.GetCurrentOrderNumber(machines[j]) + ", " + getOrder.GetOrderName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j]));
+                        string orderNumCurrent = getOrder.GetOrderNumber(orderIndex);
 
+
+                        if (orderNumCurrent != "")
+                        {
+                            order = orderNumCurrent + ", " + getOrder.GetOrderName(orderIndex);
+                        }
+                            
                         if (j == 0)
                         {
                             user = users[i];
@@ -1572,9 +1578,11 @@ namespace OrderManager
                             currentTime = leadTimeCurr.GetCurrentDateTime("timeToWorkStart");
 
 
-                        int idx = ordersCurrentShift.FindLastIndex((v) => v.numberOfOrder == getInfo.GetCurrentOrderNumber(machines[j]) &&
+                        /*int idx = ordersCurrentShift.FindLastIndex((v) => v.numberOfOrder == getInfo.GetCurrentOrderNumber(machines[j]) &&
                                                                           v.modificationOfOrder == getInfo.GetCurrentOrderModification(machines[j]) &&
-                                                                          v.machineOfOrder == machines[j]);
+                                                                          v.machineOfOrder == machines[j]);*/
+
+                        int idx = ordersCurrentShift.FindLastIndex((v) => v.orderIndex == orderIndex);
 
                         int timeDiff = 0;
 
@@ -1586,8 +1594,6 @@ namespace OrderManager
                             int fullFactTime = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
 
                             timeDiff = timeOperations.MinuteDifference(fullLastTime, fullFactTime, false);
-
-
 
                             bool plannedWorkingOut = true;
 
@@ -1640,7 +1646,7 @@ namespace OrderManager
                         item.SubItems.Add(currentShiftStart);
                         item.SubItems.Add(getInfo.GetMachineName(machines[j]));
                         item.SubItems.Add(order);
-                        item.SubItems.Add(getOrder.GetOrderStatusName(machines[j], getInfo.GetCurrentOrderNumber(machines[j]), getInfo.GetCurrentOrderModification(machines[j])));
+                        item.SubItems.Add(getOrder.GetOrderStatusName(orderIndex));
                         item.SubItems.Add(currentTime);
                         //item.SubItems.Add(timeOperations.MinuteToTimeString(timeDiff));
                         item.SubItems.Add(timeOperations.MinuteToTimeString(currentLastTimeForFullWork));
@@ -2365,6 +2371,7 @@ namespace OrderManager
                 listView.Items.Clear();
 
                 ordersNumbers.Clear();
+                ordersIndexes.Clear();
                 //ordersNumbers.Add(new Order("", ""));
 
                 int index = 0;
@@ -2390,6 +2397,7 @@ namespace OrderManager
                         {
                             result.Add(sqlReader["count"].ToString());
                             ordersNumbers.Add(new OrderNM(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                            ordersIndexes.Add((int)sqlReader["count"]);
 
                             String modification = "";
                             if (sqlReader["modification"].ToString() != "")
@@ -2459,9 +2467,9 @@ namespace OrderManager
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            GetCountOfDone orderCalc = new GetCountOfDone("", machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), "");
-                            GetLeadTime leadTimeFirst = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), "0");
-                            GetLeadTime leadTimeLast = new GetLeadTime("", sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), sqlReader["machine"].ToString(), sqlReader["counterRepeat"].ToString());
+                            GetCountOfDone orderCalc = new GetCountOfDone("", (int)sqlReader["count"], "");
+                            GetLeadTime leadTimeFirst = new GetLeadTime("", (int)sqlReader["count"], "0");
+                            GetLeadTime leadTimeLast = new GetLeadTime("", (int)sqlReader["count"], sqlReader["counterRepeat"].ToString());
 
 
                             Invoke(new Action(() =>
@@ -2480,7 +2488,7 @@ namespace OrderManager
                                         item.SubItems[7].Text = leadTimeLast.GetLastValue("timeToWorkStop").ToString();
                                         //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
                                         item.SubItems[8].Text = orderCalc.OrderFullCalculate().ToString("N0");
-                                        item.SubItems[9].Text = ordersBase.GetOrderStatusName(machine, sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString());
+                                        item.SubItems[9].Text = ordersBase.GetOrderStatusName((int)sqlReader["count"]);
                                     }
                                 }
                             }));
@@ -3003,7 +3011,7 @@ namespace OrderManager
                     break;
                 case 5:
                     if (((ListView)sender).SelectedItems.Count != 0)
-                        LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[selectegIndex].numberOfOrder, ordersNumbers[selectegIndex].modificationOfOrder);
+                        LoadSelectedOrder(true, ordersIndexes[selectegIndex]);
                     //UpdatePage(currentPage);
                     break;
                 case 6:
@@ -3208,7 +3216,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    LoadSelectedOrder(true, getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[listV.SelectedIndices[0]].numberOfOrder, ordersNumbers[listV.SelectedIndices[0]].modificationOfOrder);
+                    LoadSelectedOrder(true, ordersIndexes[listV.SelectedIndices[0]]);
                     break;
 
                 default:
@@ -3375,7 +3383,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    AbortOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[listV.SelectedIndices[0]].numberOfOrder, ordersNumbers[listV.SelectedIndices[0]].modificationOfOrder);
+                    AbortOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersIndexes[listV.SelectedIndices[0]]);
                     UpdatePage(currentPage);
                     break;
 
@@ -3407,7 +3415,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    DeactivateOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersNumbers[listV.SelectedIndices[0]].numberOfOrder, ordersNumbers[listV.SelectedIndices[0]].modificationOfOrder);
+                    DeactivateOrder(ordersIndexes[listV.SelectedIndices[0]]);
                     UpdatePage(currentPage);
                     break;
 

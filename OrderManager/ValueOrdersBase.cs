@@ -17,10 +17,6 @@ namespace OrderManager
 
         }
 
-        public String GetOrderCount(String currentMachine, String orderNumber, String orderModification)
-        {
-            return GetValue(currentMachine, orderNumber, orderModification, "count");
-        }
 
         /// <summary>
         /// Получить индекс заказа в базе по номеру, модификации и оборудованию
@@ -34,69 +30,82 @@ namespace OrderManager
             return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, "count"));
         }
 
-        public String GetOrderStatus(String currentMachine, String orderNumber, String orderModification)
-        {
-            return GetValue(currentMachine, orderNumber, orderModification, "statusOfOrder");
-        }
-
         /// <summary>
         /// Получить статус заказа по индексу
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public String GetOrderStatus(int index)
+        public string GetOrderStatus(int index)
         {
-            return GetValueFromIndex(index, "statusOfOrder");
+            string result = "0";
+            string value = GetValueFromIndex(index, "statusOfOrder");
+
+            if (value != "-1")
+            {
+                result = value;
+            }
+
+            return result;
         }
 
-        public String GetOrderName(String currentMachine, String orderNumber, String orderModification)
+        public string GetOrderName(int index)
         {
-            return GetValue(currentMachine, orderNumber, orderModification, "nameOfOrder");
+            return GetValueFromIndex(index, "nameOfOrder");
         }
 
-        public String GetCounterRepeat(String currentMachine, String orderNumber, String orderModification)
+        public string GetOrderNumber(int index)
         {
-            return GetValue(currentMachine, orderNumber, orderModification, "counterRepeat");
+            return GetValueFromIndex(index, "numberOfOrder");
         }
 
-        public String GetAmountOfOrder(String currentMachine, String orderNumber, String orderModification)
+        public string GetOrderModification(int index)
         {
-            return GetValue(currentMachine, orderNumber, orderModification, "amountOfOrder");
+            return GetValueFromIndex(index, "modification");
         }
 
-        public String GetTimeMakeready(String currentMachine, String orderNumber, String orderModification)
+        public string GetCounterRepeat(int index)
         {
-            return GetValue(currentMachine, orderNumber, orderModification, "timeMakeready");
+            return GetValueFromIndex(index, "counterRepeat");
         }
 
-        public String GetTimeToWork(String currentMachine, String orderNumber, String orderModification)
+        public string GetAmountOfOrder(int index)
         {
-            return GetValue(currentMachine, orderNumber, orderModification, "timeToWork");
+            return GetValueFromIndex(index, "amountOfOrder");
         }
 
-        public void SetNewStatus(String currentMachine, String orderNumber, String orderModification, String newStatus)
+        public string GetTimeMakeready(int index)
         {
-            SetValue(currentMachine, orderNumber, orderModification, "statusOfOrder", newStatus);
+            return GetValueFromIndex(index, "timeMakeready");
         }
 
-        public void SetNewCounterRepeat(String currentMachine, String orderNumber, String orderModification, String newCounterRepaeat)
+        public string GetTimeToWork(int index)
         {
-            SetValue(currentMachine, orderNumber, orderModification, "counterRepeat", newCounterRepaeat);
+            return GetValueFromIndex(index, "timeToWork");
         }
 
-        public void IncrementCounterRepeat(String currentMachine, String orderNumber, String orderModification)
+        public void SetNewStatus(int index, string newStatus)
+        {
+            SetValue(index, "statusOfOrder", newStatus);
+        }
+
+        public void SetNewCounterRepeat(int index, string newCounterRepaeat)
+        {
+            SetValue(index, "counterRepeat", newCounterRepaeat);
+        }
+
+        public void IncrementCounterRepeat(int index)
         {
             int newCounterRep = 1;
 
-            newCounterRep += Convert.ToInt32(GetCounterRepeat(currentMachine, orderNumber, orderModification));
+            newCounterRep += Convert.ToInt32(GetCounterRepeat(index));
 
-            SetValue(currentMachine, orderNumber, orderModification, "counterRepeat", newCounterRep.ToString());
+            SetValue(index, "counterRepeat", newCounterRep.ToString());
         }
 
-        public String GetOrderStatusName(String currentMachine, String orderNumber, String orderModification)
+        public string GetOrderStatusName(int index)
         {
             String result = "";
-            String status = GetValue(currentMachine, orderNumber, orderModification, "statusOfOrder");
+            String status = GetValueFromIndex(index, "statusOfOrder");
 
             if (status == "0")
                 result = "Заказ не выполняется";
@@ -164,7 +173,7 @@ namespace OrderManager
 
         private String GetValueFromIndex(int index, String nameOfColomn)
         {
-            String result = "0";
+            String result = "-1";
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -188,17 +197,15 @@ namespace OrderManager
             return result;
         }
 
-        private void SetValue(String orderMachine, String numberOfOrder, String orderModification, String key, String value)
+        private void SetValue(int index, string key, string value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE orders SET " + key + " = @value " +
-                    "WHERE machine = @orderMachine AND (numberOfOrder = @number AND modification = @orderModification)";
+                    "WHERE count = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@orderMachine", orderMachine);
-                Command.Parameters.AddWithValue("@number", numberOfOrder);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                Command.Parameters.AddWithValue("@id", index);
                 Command.Parameters.AddWithValue("@value", value);
                 Connect.Open();
                 Command.ExecuteNonQuery();

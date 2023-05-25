@@ -8,18 +8,14 @@ namespace OrderManager
 {
     internal class GetCountOfDone
     {
-        String startShift;
-        String machine;
-        String orderNumber;
-        String orderModification;
-        String counterRepeat;
+        string startShift;
+        int orderIndex;
+        string counterRepeat;
 
-        public GetCountOfDone(String startOfShift, String machine, String orderOfNumber, String orderOfModification, String counterOfRepeat)
+        public GetCountOfDone(string startOfShift, int orderID, string counterOfRepeat)
         {
             this.startShift = startOfShift;
-            this.machine = machine;
-            this.orderNumber = orderOfNumber;
-            this.orderModification = orderOfModification;
+            this.orderIndex = orderID;
             this.counterRepeat = counterOfRepeat;
         }
 
@@ -53,11 +49,10 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id"
                 };
-                Command.Parameters.AddWithValue("@machine", machine);
-                Command.Parameters.AddWithValue("@number", orderNumber);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                //Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@id", orderIndex);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())

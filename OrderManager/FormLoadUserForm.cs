@@ -146,7 +146,7 @@ namespace OrderManager
 
         private void ShowFullOrdersForm()
         {
-            FormFullListOrders form = new FormFullListOrders(false, "", "", "");
+            FormFullListOrders form = new FormFullListOrders(false, -1);
             form.ShowDialog();
         }
 

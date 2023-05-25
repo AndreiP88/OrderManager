@@ -11,23 +11,21 @@ namespace OrderManager
     public partial class FormAddNewOrder : Form
     {
         bool editOrderLoad;
-        String orderrMachineLoad;
-        String orderNumberLoad;
-        String orderModificationLoad;
+        string orderrMachineLoad;
+        int orderIDLoad;
 
         List<String> numbersOrdersInProgress;
-        String numbersOrder;
+        int numbersOrder;
 
         List<string> items = new List<string>();
 
-        public FormAddNewOrder(String orderMachine, String orderNumber, String orderModification)
+        public FormAddNewOrder(String orderMachine, int orderIndex)
         {
             InitializeComponent();
 
             this.editOrderLoad = true;
             this.orderrMachineLoad = orderMachine;
-            this.orderNumberLoad = orderNumber;
-            this.orderModificationLoad = orderModification;
+            this.orderIDLoad = orderIndex;
 
         }
 
@@ -37,7 +35,7 @@ namespace OrderManager
 
             this.editOrderLoad = false;
             this.orderrMachineLoad = orderMachine;
-
+            this.orderIDLoad = -1;
         }
 
         private void SelectCurrentMachineToComboBox(String machine)
@@ -118,7 +116,7 @@ namespace OrderManager
             return result;
         }
 
-        private bool CheckOrderAvailable(String orderMachine, String orderNumber, String orderModification)
+        private bool CheckOrderAvailable(int orderIndex)
         {
             bool result = false;
 
@@ -128,11 +126,9 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
+                    CommandText = @"SELECT * FROM orders WHERE count = @id"
                 };
-                Command.Parameters.AddWithValue("@machine", orderMachine);
-                Command.Parameters.AddWithValue("@number", orderNumber);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                Command.Parameters.AddWithValue("@id", orderIndex);
                 DbDataReader sqlReader = Command.ExecuteReader();
                 //result = sqlReader.Read();
                 while (sqlReader.Read())
@@ -152,7 +148,7 @@ namespace OrderManager
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
-            String orderCount = ordersBase.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
+            int orderCount = orderIDLoad;
             String orderAddedDate = DateTime.Now.ToString();
             String machine = getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
@@ -248,22 +244,18 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            String machine = getInfo.GetMachineFromName(comboBox1.Text);
-            String number = textBox1.Text;
-            String modification = textBox5.Text;
+            string machine = getInfo.GetMachineFromName(comboBox1.Text);
 
             for (int i = 0; i < numbersOrdersInProgress.Count; i++)
             {
                 using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
                     string commandText;
-                    commandText = "UPDATE ordersInProgress SET machine = @machine, numberOfOrder = @number, modification = @modification " +
+                    commandText = "UPDATE ordersInProgress SET machine = @machine " +
                         "WHERE count = @count";
 
                     MySqlCommand Command = new MySqlCommand(commandText, Connect);
                     Command.Parameters.AddWithValue("@machine", machine);
-                    Command.Parameters.AddWithValue("@number", number);
-                    Command.Parameters.AddWithValue("@modification", modification);
                     Command.Parameters.AddWithValue("@count", numbersOrdersInProgress[i].ToString());
 
                     Connect.Open();
@@ -283,14 +275,14 @@ namespace OrderManager
             String number = textBox1.Text;
             String modification = textBox5.Text;
 
-            if (getInfo.GetCurrentOrderNumber(machine) == orderNumberLoad && getInfo.GetCurrentOrderModification(machine) == orderModificationLoad)
+            if (getInfo.GetCurrentOrderID(machine) == orderIDLoad.ToString())
             {
-                setInfo.UpdateCurrentOrder(machine, number, modification);
+                setInfo.UpdateCurrentOrder(machine, orderIDLoad);
             }
 
         }
 
-        private void LoadOrderFromDB(String orderMachine, String orderNumber, String orderModification)
+        private void LoadOrderFromDB(string orderMachine, int orderIndex)
         {
             //int orderStatus = 0;
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -298,8 +290,8 @@ namespace OrderManager
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
-            numbersOrdersInProgress = (List<String>)ordersFromBase.GetNumbersOrders(orderMachine, orderNumber, orderModification);
-            numbersOrder = getOrderValue.GetOrderCount(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
+            numbersOrdersInProgress = (List<String>)ordersFromBase.GetNumbersOrders(orderMachine, orderIndex);
+            numbersOrder = orderIndex;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -307,11 +299,9 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
+                    CommandText = @"SELECT * FROM orders WHERE count = @id"
                 };
-                Command.Parameters.AddWithValue("@machine", orderMachine);
-                Command.Parameters.AddWithValue("@number", orderNumber);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                Command.Parameters.AddWithValue("@id", orderIndex);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
@@ -336,14 +326,16 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
 
+            int orderIndex = getValue.GetOrderID(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text);
+
             if (CheckNotEmptyFields() == true)
             {
-                if (CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text) && numbersOrder != getValue.GetOrderCount(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text))
+                if (CheckOrderAvailable(orderIndex) && numbersOrder != orderIndex)
                 {
                     MessageBox.Show("Заказ №" + textBox1.Text + " есть в базе, проверьте введенные данные.", "Добавление заказа", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                else if (CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text) && numbersOrder == getValue.GetOrderCount(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text))
+                else if (CheckOrderAvailable(orderIndex) && numbersOrder == orderIndex)
                 {
                     AddOrderToDB();
 
@@ -353,7 +345,7 @@ namespace OrderManager
                         EditCurrentOrderInfo();
                     }
                 }
-                else if (!CheckOrderAvailable(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text))
+                else if (!CheckOrderAvailable(orderIndex))
                 {
                     AddOrderToDB();
 
@@ -433,7 +425,7 @@ namespace OrderManager
             LoadOrdersToComboBox();
             if (editOrderLoad)
             {
-                LoadOrderFromDB(orderrMachineLoad, orderNumberLoad, orderModificationLoad);
+                LoadOrderFromDB(orderrMachineLoad, orderIDLoad);
                 button1.Text = "Редактировать";
             }
 

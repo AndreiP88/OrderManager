@@ -279,8 +279,7 @@ namespace OrderManager
                 FormAddCloseOrder form;
 
                 form = new FormAddCloseOrder(adminMode, timeShiftStart,
-                ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
-                ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
+                ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
 
@@ -296,8 +295,7 @@ namespace OrderManager
             FormPrivateNote form;
 
             form = new FormPrivateNote(timeShiftStart,
-                ordersCurrentShift[listView1.SelectedIndices[0]].numberOfOrder,
-                ordersCurrentShift[listView1.SelectedIndices[0]].modificationOfOrder,
+                ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
 
