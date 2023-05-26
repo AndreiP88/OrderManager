@@ -140,12 +140,6 @@ namespace OrderManager
 
             toolStripStatusLabel2.Text = BaseConnectionParameters.host;
             toolStripStatusLabel5.Text = BaseConnectionParameters.database;
-
-            if(!connection.IsServerConnected(BaseConnectionParameters.host, BaseConnectionParameters.port, BaseConnectionParameters.database, 
-                BaseConnectionParameters.username, BaseConnectionParameters.password))
-            {
-                DataBaseSelect(false);
-            }
         }
 
         private void ViewBaseConnectionParameters()
@@ -163,6 +157,8 @@ namespace OrderManager
         private void ShowUserForm()
         {
             Info.active = false;
+
+            //ViewBaseConnectionParameters();
 
             FormLoadUserForm form = new FormLoadUserForm(loadMode);
             //this.Visible = false;
@@ -313,10 +309,13 @@ namespace OrderManager
         {
             ValueSettingsBase getSettings = new ValueSettingsBase();
 
-            if (Form1.Info.nameOfExecutor != "")
-                ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
-            else
-                ApplyParameterLine(getSettings.GetParameterLine("0", nameForm));
+            if (IsServerConnected())
+            {
+                if (Form1.Info.nameOfExecutor != "")
+                    ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
+                else
+                    ApplyParameterLine(getSettings.GetParameterLine("0", nameForm));
+            }
         }
 
         private void LoadParametersForTheSelectedUserFromBase()
@@ -771,7 +770,13 @@ namespace OrderManager
             CancellationToken token = cancelTokenSource.Token;
             token.ThrowIfCancellationRequested();
 
-            SaveParameterToBase("mainForm");
+            DBConnection connection = new DBConnection();
+
+            if (connection.IsServerConnected(BaseConnectionParameters.host, BaseConnectionParameters.port, BaseConnectionParameters.database,
+                BaseConnectionParameters.username, BaseConnectionParameters.password))
+            {
+                SaveParameterToBase("mainForm");
+            }
 
             listView1.Items.Clear();
             listView2.Items.Clear();
@@ -1020,6 +1025,13 @@ namespace OrderManager
         {
             StartCheckUpdate();
 
+            LoadBaseConnectionParameters();
+
+            if (!IsServerConnected())
+            {
+                DataBaseSelect(false);
+            }
+
             if (!adminMode)
             {
                 Info.active = false;
@@ -1064,6 +1076,12 @@ namespace OrderManager
         private void Form1_Load(object sender, EventArgs e)
         {
             LoadBaseConnectionParameters();
+
+            if (!IsServerConnected())
+            {
+                DataBaseSelect(false);
+            }
+
             LoadParametersFromBase("mainForm");
 
             //LoadUser();
@@ -1077,8 +1095,12 @@ namespace OrderManager
         {
             cancelTokenSource.Cancel();
 
-            SaveParameterToBase("mainForm");
-            
+            DBConnection connection = new DBConnection();
+
+            if (IsServerConnected())
+            {
+                SaveParameterToBase("mainForm");
+            }            
         }
 
         private void labelTime_Click(object sender, EventArgs e)
@@ -1385,10 +1407,14 @@ namespace OrderManager
         {
             FormAddEditTestMySQL form = new FormAddEditTestMySQL(available);
             form.ShowDialog();
+
             LoadBaseConnectionParameters();
+
             LoadUser();
+
             if (Form1.Info.nameOfExecutor != "")
                 LoadParametersForTheSelectedUserFromBase();
+
             LoadOrdersFromBase();
         }
 

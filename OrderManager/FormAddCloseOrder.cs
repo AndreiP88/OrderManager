@@ -709,7 +709,7 @@ namespace OrderManager
             }
             if (status == "1") // начата приладка
             {
-                if (currentOrderID == "")
+                if (currentOrderID == "-1")
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftStart, orderID, makereadyStart, "", "", "", done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID.ToString(), orderID.ToString(), true);
@@ -727,7 +727,7 @@ namespace OrderManager
             }
             if (status == "2") // приладка завершена
             {
-                if (currentOrderID == "")
+                if (currentOrderID == "-1")
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftStart, orderID, "", "", workStart, "", done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID.ToString(), orderID.ToString(), true);
@@ -743,7 +743,7 @@ namespace OrderManager
             }
             if (status == "3") // начата склейка
             {
-                if (currentOrderID == "")
+                if (currentOrderID == "-1")
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftStart, orderID, "", "", workStart, "", done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID.ToString(), orderID.ToString(), true);
