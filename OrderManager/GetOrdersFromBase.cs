@@ -208,7 +208,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    String line = sqlReader["numberOfOrder"].ToString() + "," + sqlReader["modification"].ToString();
+                    string line = sqlReader["orderID"].ToString();
 
                     //MessageBox.Show((orderList.Count - 1).ToString() + "(" + orderList.Contains(line).ToString() + "): " + orderList[orderList.Count - 1] + " = " + line);
 
@@ -264,7 +264,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    String line = sqlReader["numberOfOrder"].ToString() + "," + sqlReader["modification"].ToString();
+                    String line = sqlReader["orderID"].ToString();
 
                     //MessageBox.Show((orderList.Count - 1).ToString() + "(" + orderList.Contains(line).ToString() + "): " + orderList[orderList.Count - 1] + " = " + line);
 
