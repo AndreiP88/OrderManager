@@ -1556,7 +1556,7 @@ namespace OrderManager
                         string orderNumCurrent = getOrder.GetOrderNumber(orderIndex);
 
 
-                        if (orderNumCurrent != "")
+                        if (orderNumCurrent != "-1")
                         {
                             order = orderNumCurrent + ", " + getOrder.GetOrderName(orderIndex);
                         }

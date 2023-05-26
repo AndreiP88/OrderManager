@@ -35,8 +35,6 @@ namespace OrderManager
         bool edit = false;
         bool edited = false;
 
-        
-
         String selectedItemForEdit = "";
 
         /*public bool IsServerConnected()
