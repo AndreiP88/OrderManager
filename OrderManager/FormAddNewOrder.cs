@@ -19,7 +19,7 @@ namespace OrderManager
 
         List<string> items = new List<string>();
 
-        public FormAddNewOrder(String orderMachine, int orderIndex)
+        public FormAddNewOrder(string orderMachine, int orderIndex)
         {
             InitializeComponent();
 
@@ -29,7 +29,7 @@ namespace OrderManager
 
         }
 
-        public FormAddNewOrder(String orderMachine)
+        public FormAddNewOrder(string orderMachine)
         {
             InitializeComponent();
 
