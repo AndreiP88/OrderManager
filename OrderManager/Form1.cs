@@ -778,6 +778,8 @@ namespace OrderManager
                 SaveParameterToBase("mainForm");
             }
 
+            this.Text = "Менеджер заказов";
+
             listView1.Items.Clear();
             listView2.Items.Clear();
 
