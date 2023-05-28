@@ -27,6 +27,7 @@ namespace OrderManager
         {
             public String numberOfOrder;
             public String modificationOfOrder;
+
             public Order(String number, string modification)
             {
                 numberOfOrder = number;
@@ -323,27 +324,22 @@ namespace OrderManager
         }
 
         CancellationTokenSource cancelTokenSource;
+
         private void StartLoading(List<string> indexes)
         {
-            ValueInfoBase getInfo = new ValueInfoBase();
-
-            string machine = getInfo.GetMachineFromName(comboBox1.Text);
-
             if (cancelTokenSource != null)
             {
                 cancelTokenSource.Cancel();
-                //Thread.Sleep(100);
             }
 
             cancelTokenSource = new CancellationTokenSource();
-            //CancellationToken token = cancelTokenSource.Token;
 
             //Task task = new Task(() => LoadUsersFromBase(token, date));
-            Task task = new Task(() => LoadOrdersDetailsFromBase(cancelTokenSource.Token, machine, indexes), cancelTokenSource.Token);
+            Task task = new Task(() => LoadOrdersDetailsFromBase(cancelTokenSource.Token, indexes), cancelTokenSource.Token);
             task.Start();
         }
 
-        private void LoadOrdersDetailsFromBase(CancellationToken token, string machine, List<string> indexes)
+        private void LoadOrdersDetailsFromBase(CancellationToken token, List<string> indexes)
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -405,7 +401,7 @@ namespace OrderManager
             }));
         }
 
-        private void SetNewStatus(int orderIndex, String newStatus)
+        private void SetNewStatus(int orderIndex, string newStatus)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
