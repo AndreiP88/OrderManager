@@ -154,13 +154,11 @@ namespace OrderManager
 
             for (int i = 0; i < shifts.Count; i++)
             {
-                /*if (token.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                 {
-                    MessageBox.Show("Отмена");
+                    //MessageBox.Show("Отмена");
                     break;
-                }*/
-
-                
+                }
 
                 List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shifts[i], category);
 
@@ -169,6 +167,11 @@ namespace OrderManager
 
                 for (int j = 0; j < ordersCurrentShift.Count; j++)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     GetLeadTime leadTime = new GetLeadTime(shifts[i], ordersCurrentShift[j].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[j].orderIndex));
 
                     if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")

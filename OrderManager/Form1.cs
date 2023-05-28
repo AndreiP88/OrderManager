@@ -33,8 +33,6 @@ namespace OrderManager
         {
             InitializeComponent();
 
-            INISettings ini = new INISettings();
-
             if (args.Length > 0)
             {
                 string param = args[0].Replace("-", "");
@@ -51,16 +49,15 @@ namespace OrderManager
             }
         }
 
-        
+        CancellationTokenSource cancelTokenSource;
+
         List<Order> ordersCurrentShift;
 
         int selectedIndexActive = 0;
         int selectedIndexWOut1 = 0;
         int selectedIndexWOut2 = 0;
 
-        CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-
-        public static String connectionFile = "connections.ini";
+        public static string connectionFile = "connections.ini";
 
         public static class Info
         {
@@ -85,8 +82,6 @@ namespace OrderManager
             public static string caption2 = "";
             public static string caption3 = "";
             public static string caption4 = "";
-
-
         }
 
         public bool IsServerConnected()
@@ -709,7 +704,10 @@ namespace OrderManager
 
             while (!token.IsCancellationRequested)
             {
-                token.ThrowIfCancellationRequested();
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
 
                 ShiftsDetails currentShift = getShifts.LoadCurrentDateShiftsDetails(date, "", token);
 
@@ -736,15 +734,14 @@ namespace OrderManager
 
         private void LaodDetailsForCurrentMount()
         {
-            //cancelTokenSource = new CancellationTokenSource();
+            cancelTokenSource?.Cancel();
 
-            var task = Task.Run(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
+            cancelTokenSource = new CancellationTokenSource();
 
-            /*CancellationToken token = cancelTokenSource.Token;
+            Task task = new Task(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
+            task.Start();
 
-            Task task = new Task(() => LoadDetailsMount(token));
-
-            task.Start();*/
+            //var task = Task.Run(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
         }
 
         private void LoadOrdersFromBase()
@@ -767,8 +764,7 @@ namespace OrderManager
 
         private void ClearAll()
         {
-            CancellationToken token = cancelTokenSource.Token;
-            token.ThrowIfCancellationRequested();
+            cancelTokenSource?.Cancel();
 
             DBConnection connection = new DBConnection();
 
@@ -1095,9 +1091,7 @@ namespace OrderManager
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            cancelTokenSource.Cancel();
-
-            DBConnection connection = new DBConnection();
+            cancelTokenSource?.Cancel();
 
             if (IsServerConnected())
             {
