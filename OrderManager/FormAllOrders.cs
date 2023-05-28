@@ -36,18 +36,11 @@ namespace OrderManager
 
         }
 
-        List<Order> ordersNumbers = new List<Order>();
         List<int> ordersIndexes = new List<int>();
 
         private void SetStartPeriodDTPicker()
         {
             dateTimePicker1.Value = DateTime.Now.AddMonths(-2);
-        }
-
-        private void LoadSelectedOrder(bool detailsLoad, int orderIndex)
-        {
-            FormFullListOrders form = new FormFullListOrders(detailsLoad, orderIndex);
-            form.ShowDialog();
         }
 
         private void LoadSelectedOrderFromID(int id)
@@ -177,77 +170,6 @@ namespace OrderManager
 
         }
 
-        /*private void LoadOrdersFromBase2()
-        {
-            ValueOrdersBase ordersBase = new ValueOrdersBase();
-            ValueInfoBase getInfo = new ValueInfoBase();
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-
-            string machine = getInfo.GetMachineFromName(comboBox1.Text);
-
-            listView1.Items.Clear();
-
-            ordersNumbers.Clear();
-            //ordersNumbers.Add(new Order("", ""));
-
-            int index = 0;
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                String commandLine;
-                //commandLine = "strftime('%Y-%m-%d 00:00:00', date(substr(orderAddedDate, 7, 4) || '-' || substr(orderAddedDate, 4, 2) || '-' || substr(orderAddedDate, 1, 2))) >= '";
-                commandLine = "DATE_FORMAT(STR_TO_DATE(orderAddedDate,'%d.%m.%Y %H:%i:%S'), '%Y-%m-%d 00:00:00') >= '";
-                commandLine += dateTimePicker1.Value.ToString("yyyy-MM-dd 00:00:00") + "'";
-
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox1.Text) + "'"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
-                {
-                    if (sqlReader["numberOfOrder"].ToString().Contains(textBox1.Text))
-                    {
-                        GetCountOfDone orderCalc = new GetCountOfDone("", (int)sqlReader["orderID"], "");
-                        GetLeadTime leadTimeFirst = new GetLeadTime("", (int)sqlReader["orderID"], "0");
-                        GetLeadTime leadTimeLast = new GetLeadTime("", (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString());
-
-                        ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-
-                        String modification = "";
-                        if (sqlReader["modification"].ToString() != "")
-                            modification = " (" + sqlReader["modification"].ToString() + ")";
-
-                        ListViewItem item = new ListViewItem();
-
-                        item.Name = sqlReader["numberOfOrder"].ToString();
-                        item.Text = (index + 1).ToString();
-                        item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
-                        item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
-                        item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
-                        item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeToWork"])));
-                        item.SubItems.Add(Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0"));
-                        item.SubItems.Add(leadTimeFirst.GetFirstValue("timeMakereadyStart").ToString());
-                        item.SubItems.Add(leadTimeLast.GetLastValue("timeToWorkStop").ToString());
-                        //item.SubItems.Add(orderCalc.OrderCalculate(true, true).ToString("N0"));
-                        item.SubItems.Add(orderCalc.OrderFullCalculate().ToString("N0"));
-                        item.SubItems.Add(ordersBase.GetOrderStatusName(getInfo.GetMachineFromName(comboBox1.Text), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
-
-                        listView1.Items.Add(item);
-
-                        index++;
-                    }
-
-                }
-
-                Connect.Close();
-            }
-
-        }*/
-
         private List<string> LoadIndexesOrdersFromBase(string key)
         {
             List<string> result = new List<string>();
@@ -256,7 +178,6 @@ namespace OrderManager
 
             listView1.Items.Clear();
 
-            ordersNumbers.Clear();
             ordersIndexes.Clear();
 
             int index = 0;
@@ -281,7 +202,6 @@ namespace OrderManager
                     if (sqlReader["numberOfOrder"].ToString().Contains(key))
                     {
                         result.Add(sqlReader["count"].ToString());
-                        ordersNumbers.Add(new Order(sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
 
                         ordersIndexes.Add((int)sqlReader["count"]);
 
