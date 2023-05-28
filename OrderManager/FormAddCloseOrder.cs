@@ -80,7 +80,7 @@ namespace OrderManager
 
             this.startOfShift = lStartOfShift;
             this.nameOfExecutor = lNameOfExecutor;
-            this.loadOrderId = 1;
+            this.loadOrderId = -1;
             this.loadMachine = lMachine;
             this.loadCounterRepeat = "";
 
@@ -800,7 +800,7 @@ namespace OrderManager
 
             if (status == "1") // начата приладка
             {
-                if (currentOrderID != "")
+                if (currentOrderID != "-1")
                 {
                     DialogResult dialogResult = DialogResult.No;
 
@@ -834,7 +834,7 @@ namespace OrderManager
             }
             if (status == "3") // начата склейка
             {
-                if (currentOrderID != "")
+                if (currentOrderID != "-1")
                 {
                     GetCountOfDone orderCalc = new GetCountOfDone(shiftStart, orderID, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
@@ -884,7 +884,7 @@ namespace OrderManager
 
             if (status == "1") // начата приладка
             {
-                if (currentOrderID != "")
+                if (currentOrderID != "-1")
                 {
                     UpdateData("timeMakereadyStop", machineCurrent, shiftStart, orderID, counterRepeat, makereadyStop);
                     UpdateData("note", machineCurrent, shiftStart, orderID, counterRepeat, note);
@@ -893,7 +893,7 @@ namespace OrderManager
             }
             if (status == "3") // начата склейка
             {
-                if (currentOrderID != "")
+                if (currentOrderID != "-1")
                 {
                     GetCountOfDone orderCalc = new GetCountOfDone(shiftStart, orderID, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
@@ -1015,7 +1015,7 @@ namespace OrderManager
                 int index = 0;
                 for (int i = 0; i < ordersIndexes.Count; i++)
                 {
-                    if (ordersIndexes[i].ToString() == getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)))
+                    if (ordersIndexes[i].ToString() == getInfo.GetLastOrderID(getInfo.GetMachineFromName(comboBox3.Text)))
                     {
                         index = i;
                         break;
