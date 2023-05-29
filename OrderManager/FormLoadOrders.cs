@@ -904,6 +904,7 @@ namespace OrderManager
                 item.SubItems.Add(timeOperations.MinuteToTimeString(orders[i].workTime));
                 item.SubItems.Add(orders[i].amountOfOrder.ToString("N0"));
                 item.SubItems.Add(orders[i].stamp.ToString());
+                //item.SubItems.Add(statusOrderList[i].ToString());
 
                 Invoke(new Action(() =>
                 {
