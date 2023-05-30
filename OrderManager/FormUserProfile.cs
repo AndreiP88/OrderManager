@@ -118,7 +118,7 @@ namespace OrderManager
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            List<String> shifts = (List<String>)getShifts.LoadShiftsList(date);
+            List<int> shifts = (List<int>)getShifts.LoadShiftsList(date);
             List<int> shiftsDays = new List<int>();
 
             int fullWorkTime = 0;
@@ -129,7 +129,7 @@ namespace OrderManager
 
             for (int i = 0; i < shifts.Count; i++)
             {
-                shiftsDays.Add(Convert.ToDateTime(shifts[i]).Day);
+                shiftsDays.Add(Convert.ToDateTime(shiftsBase.GetStartShiftFromID(shifts[i])).Day);
             }
 
             var now = date;
@@ -163,7 +163,7 @@ namespace OrderManager
 
                 if (index != -1)
                 {
-                    nShift = getNumberShift.NumberShift(shifts[index]);
+                    nShift = getNumberShift.NumberShift(shiftsBase.GetStartShiftFromID(shifts[index]));
 
                     if (nShift == "II")
                     {
@@ -177,7 +177,7 @@ namespace OrderManager
                     }
                     else
                     {
-                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShift(shifts[index]), shifts[index]));
+                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShiftFromID(shifts[index]), shiftsBase.GetStartShiftFromID(shifts[index])));
                         countPartialShifts++;
                     }
 

@@ -146,6 +146,8 @@ namespace OrderManager
 
         private void LoadYears()
         {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
             List<String> years = new List<String>();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -154,14 +156,17 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT DISTINCT startOfShift FROM ordersInProgress"
+                    CommandText = @"SELECT DISTINCT shiftID FROM ordersInProgress"
                 };
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    if (years.IndexOf(Convert.ToDateTime(sqlReader["startOfShift"]).ToString("yyyy")) == -1)
-                        years.Add(Convert.ToDateTime(sqlReader["startOfShift"]).ToString("yyyy"));
+                    int orderID = (int)sqlReader["shiftID"];
+                    string year = Convert.ToDateTime(shiftsBase.GetStartShiftFromID(orderID)).ToString("yyyy");
+
+                    if (years.IndexOf(year) == -1)
+                        years.Add(year);
                 }
 
                 Connect.Close();
@@ -178,10 +183,12 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             listView1.Items.Clear();
 
-            String tmpStartShifts = "", tmpNumberOrders = "";
+            string tmpNumberOrders = "";
+            int tmpShiftsID = -1;
             int tmpAmountOrder = 0;
             int index = 0;
             int countOrders = 0;
@@ -195,21 +202,14 @@ namespace OrderManager
             {
                 String commandLine;
                 //commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
-                commandLine = "DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
-                //commandLine = "DATE_FORMAT(startOfShift, '%Y,%m') = '";
-                commandLine += comboBox1.Text + ",";
-                if (comboBox2.SelectedIndex + 1 < 10)
-                    commandLine += "0" + (comboBox2.SelectedIndex + 1).ToString() + "'";
-                else
-                    commandLine += (comboBox2.SelectedIndex + 1).ToString() + "'";
+                commandLine = "shiftID IN (SELECT id FROM shifts WHERE ";
+                commandLine += "DATE_FORMAT(STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
+                commandLine += comboBox1.Text + "," + (comboBox2.SelectedIndex + 1).ToString("D2") + "')";
 
-                String commandText;
+                string commandText;
                 if (detailsLoad == true)
                 {
-                    //if (orderID != "")
-                        commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
-                    //else
-                        //commandText = "SELECT * FROM ordersInProgress WHERE machine = '" + orderrMachineLoad + "' AND (numberOfOrder = '" + orderNumberLoad + "' AND modification = '" + orderModificationLoad + "')";
+                    commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
                 }
                 else
                     commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
@@ -229,22 +229,25 @@ namespace OrderManager
 
                     if (orderNumber.Contains(textBox1.Text))
                     {
-                        year = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("yyyy");
-                        month = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("MMMM");
+                        int shiftID = (int)sqlReader["shiftID"];
+                        string shiftStart = shiftsBase.GetStartShiftFromID(shiftID);
+
+                        year = Convert.ToDateTime(shiftStart).ToString("yyyy");
+                        month = Convert.ToDateTime(shiftStart).ToString("MMMM");
                         machine = sqlReader["machine"].ToString();
 
                         //отображение имени исполнителя не в каждой строке, а только в начале смены
                         //возможно сделать, как опцию
                         String date, name;
-                        if (tmpStartShifts == sqlReader["startOfShift"].ToString())
+                        if (tmpShiftsID == shiftID)
                         {
                             date = "";
                             name = "";
                         }
                         else
                         {
-                            date = Convert.ToDateTime(sqlReader["startOfShift"]).ToString("d");
-                            date += ", " + getNumberShift.NumberShift(sqlReader["startOfShift"].ToString());
+                            date = Convert.ToDateTime(shiftStart).ToString("d");
+                            date += ", " + getNumberShift.NumberShift(shiftStart);
                             name = usersBase.GetNameUser(sqlReader["executor"].ToString());
                         }
 
@@ -259,7 +262,6 @@ namespace OrderManager
                             amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])).ToString("N0");
                         }
 
-                        
                         string modification = ordersBase.GetOrderModification((int)sqlReader["orderID"]);
 
                         if (modification != "")
@@ -268,7 +270,7 @@ namespace OrderManager
                         if (tmpNumberOrders != sqlReader["orderID"].ToString())
                             countOrders++;
 
-                        tmpStartShifts = sqlReader["startOfShift"].ToString();
+                        tmpShiftsID = shiftID;
                         tmpNumberOrders = sqlReader["orderID"].ToString();
                         tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
 

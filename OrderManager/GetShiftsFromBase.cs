@@ -28,9 +28,9 @@ namespace OrderManager
         /// </summary>
         /// <param name="selectDate"></param>
         /// <returns></returns>
-        public List<String> LoadShiftsList(DateTime selectDate)
+        public List<int> LoadShiftsList(DateTime selectDate)
         {
-            List<String> shifts = new List<String>();
+            List<int> shifts = new List<int>();
 
             String commandLine;
 
@@ -55,7 +55,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    shifts.Add(sqlReader["startShift"].ToString());
+                    shifts.Add((int)sqlReader["id"]);
                 }
 
                 Connect.Close();
@@ -69,7 +69,7 @@ namespace OrderManager
         /// </summary>
         /// <param name="shiftStart"></param>
         /// <returns></returns>
-        public Shifts LoadCurrentShift(String shiftStart)
+        public Shifts LoadCurrentShift(int shiftStartID)
         {
             Shifts shifts = null;
 
@@ -79,7 +79,7 @@ namespace OrderManager
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase();
 
-            List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shiftStart, "");
+            List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shiftStartID, "");
 
             int fullDone = 0;
             int fullTimeWorkingOut = 0;
@@ -105,16 +105,18 @@ namespace OrderManager
                     machines += getInfo.GetMachineName(machinesList[i]) + ".";
             }
 
-            String date;
+            string startShift = getValueFromShiftsBase.GetStartShiftFromID(shiftStartID);
 
-            date = Convert.ToDateTime(shiftStart).ToString("d");
-            date += ", " + getNumberShift.NumberShift(shiftStart);
+            string date;
+
+            date = Convert.ToDateTime(startShift).ToString("d");
+            date += ", " + getNumberShift.NumberShift(startShift);
 
             shifts = new Shifts(
-                shiftStart,
+                shiftStartID,
                 date,
                 machines,
-                dateTimeOperations.DateDifferent(getValueFromShiftsBase.GetStopShift(shiftStart), shiftStart),
+                dateTimeOperations.DateDifferent(getValueFromShiftsBase.GetStopShiftFromID(shiftStartID), startShift),
                 ordersCurrentShift.Count,
                 fullDone,
                 fullTimeWorkingOut
@@ -129,7 +131,7 @@ namespace OrderManager
         /// <param name="selectDate"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        public ShiftsDetails LoadCurrentDateShiftsDetails(DateTime selectDate, String category, CancellationToken token)
+        public ShiftsDetails LoadCurrentDateShiftsDetails(DateTime selectDate, string category, CancellationToken token)
         {
             ShiftsDetails shiftsDetails = null;
 
@@ -150,7 +152,7 @@ namespace OrderManager
             float allPercentWorkingOut = 0;
             float percent = 0;
 
-            List<String> shifts = new List<String>(LoadShiftsList(selectDate));
+            List<int> shifts = new List<int>(LoadShiftsList(selectDate));
 
             for (int i = 0; i < shifts.Count; i++)
             {
@@ -184,7 +186,7 @@ namespace OrderManager
                     countOrders++;
                 }
 
-                int fullTimeWorking = dateTimeOperations.DateDifferentToMinutes(getValueFromShiftsBase.GetStopShift(shifts[i]), shifts[i]);
+                int fullTimeWorking = dateTimeOperations.DateDifferentToMinutes(getValueFromShiftsBase.GetStopShiftFromID(shifts[i]), getValueFromShiftsBase.GetStartShiftFromID(shifts[i]));
 
                 if (fullTimeWorkingOut > 0)
                 {
@@ -250,7 +252,7 @@ namespace OrderManager
         {
             List<Shifts> shifts = new List<Shifts>();
 
-            List<String> shiftsList = new List<String>(LoadShiftsList(currentDate));
+            List<int> shiftsList = new List<int>(LoadShiftsList(currentDate));
 
             for (int i = 0; i < shiftsList.Count; i++)
             {

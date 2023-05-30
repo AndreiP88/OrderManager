@@ -31,23 +31,23 @@ namespace OrderManager
 
         }
 
-        public string GetIndex(string startShift, int orderIndex, string counterRepeat, string machine)
+        public string GetIndex(int shiftID, int orderIndex, int counterRepeat, string machine)
         {
-            return GetValue("count", startShift, orderIndex, counterRepeat, machine);
+            return GetValue("count", shiftID, orderIndex, counterRepeat, machine);
         }
 
-        public String GetNote(String startShift, int orderIndex, String counterRepeat, String machine)
+        public String GetNote(int shiftID, int orderIndex, int counterRepeat, string machine)
         {
-            return GetValue("note", startShift, orderIndex, counterRepeat, machine);
+            return GetValue("note", shiftID, orderIndex, counterRepeat, machine);
         }
 
-        public String GetPrivateNote(String startShift, int orderIndex, String counterRepeat, String machine)
+        public String GetPrivateNote(int shiftID, int orderIndex, int counterRepeat, string machine)
         {
-            return GetValue("privateNote", startShift, orderIndex, counterRepeat, machine);
+            return GetValue("privateNote", shiftID, orderIndex, counterRepeat, machine);
         }
-        public String GetDone(String startShift, int orderIndex, String counterRepeat, String machine)
+        public String GetDone(int shiftID, int orderIndex, int counterRepeat, string machine)
         {
-            return GetValue("done", startShift, orderIndex, counterRepeat, machine);
+            return GetValue("done", shiftID, orderIndex, counterRepeat, machine);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace OrderManager
             return Convert.ToInt32(GetValueFromIndex(id, "orderID"));
         }
 
-        private String GetValue(String nameOfColomn, String startShift, int orderIndex, String counterRepeat, String machine)
+        private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, string machine)
         {
             String result = "";
 
@@ -110,9 +110,9 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE ((startOfShift = @startOfShift AND machine = @machine) AND (orderID = @id AND counterRepeat = @counterRepeat))"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE ((shiftID = @shiftID AND machine = @machine) AND (orderID = @id AND counterRepeat = @counterRepeat))"
                 };
-                Command.Parameters.AddWithValue("@startOfShift", startShift);
+                Command.Parameters.AddWithValue("@shiftID", shiftID);
                 Command.Parameters.AddWithValue("@id", orderIndex);
                 Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
                 Command.Parameters.AddWithValue("@machine", machine);
@@ -176,7 +176,7 @@ namespace OrderManager
             return amount;
         }
 
-        public Object GetOrdersFromMachineForTheMonth(DateTime currentDate, String machine)
+        public Object GetOrdersFromMachineForTheMonth(DateTime currentDate, string machine)
         {
             int count = 0;
             int amount = 0;
@@ -186,12 +186,14 @@ namespace OrderManager
             List<String> orderList = new List<String>();
             orderList.Add("null");
 
-            String commandLine;
+            string commandLine;
 
             //commandLine = "(strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
-            commandLine = "(DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
-            commandLine += currentDate.ToString("yyyy,MM") + "'";
-            commandLine += " AND machine = '" + machine + "')";
+            
+            commandLine = "shiftID IN (SELECT id FROM shifts WHERE ";
+            commandLine += "DATE_FORMAT(STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
+            commandLine += currentDate.ToString("yyyy,MM") + "')";
+            commandLine += " AND machine = '" + machine + "'";
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -245,9 +247,10 @@ namespace OrderManager
             String commandLine;
 
             //commandLine = "(strftime('%Y', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
-            commandLine = "(DATE_FORMAT(STR_TO_DATE(startOfShift,'%d.%m.%Y %H:%i:%S'), '%Y') = '";
-            commandLine += currentDate.ToString("yyyy") + "'";
-            commandLine += " AND machine = '" + machine + "')";
+            commandLine = "shiftID IN (SELECT id FROM shifts WHERE ";
+            commandLine += "DATE_FORMAT(STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S'), '%Y') = '";
+            commandLine += currentDate.ToString("yyyy") + "')";
+            commandLine += " AND machine = '" + machine + "'";
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -315,7 +318,7 @@ namespace OrderManager
             return numbers;
         }
 
-        public Object LoadAllOrdersFromBase(String startOfShift, String category)
+        public Object LoadAllOrdersFromBase(int shiftID, string category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -331,7 +334,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE startOfShift = '" + startOfShift + "'"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
                 };
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -340,7 +343,7 @@ namespace OrderManager
                     if (category == getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
                     {
                         //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                        GetCountOfDone orderCount = new GetCountOfDone(startOfShift, (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString()); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+                        GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
 
                         int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
@@ -360,7 +363,7 @@ namespace OrderManager
                             lastTimeWork = (lastCount * 60) / orderNorm;
                         }
 
-                        int lastTimeMakeready = LastTimeMakeready(startOfShift, (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString());
+                        int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
                         int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
                         int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
                         int lastTimeWorkForDeviation = 0;
@@ -394,7 +397,7 @@ namespace OrderManager
                             deviation = mkDeviation + ", " + wkDeviation;
                         }*/
 
-                        timeWorkingOut += FullWorkoutTime(startOfShift, (int)sqlReader["orderID"], sqlReader["counterRepeat"].ToString(),
+                        timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
                             sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
 
                         orders.Add(new Order(
@@ -415,7 +418,7 @@ namespace OrderManager
                             timeWorkingOut,
                             mkDeviation,
                             wkDeviation,
-                            sqlReader["counterRepeat"].ToString(),
+                            (int)sqlReader["counterRepeat"],
                             sqlReader["note"].ToString(),
                             sqlReader["privateNote"].ToString()
                             ));
@@ -428,11 +431,11 @@ namespace OrderManager
             return orders;
         }
 
-        private int LastTimeMakeready(string startOfShift, int orderIndex, String counterRepeat)
+        private int LastTimeMakeready(int shiftID, int orderIndex, int counterRepeat)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(startOfShift, orderIndex, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(shiftID, orderIndex, counterRepeat);
 
             int lastTimeMakeready = 0;
 
@@ -471,11 +474,11 @@ namespace OrderManager
             return lastTimeMakeready;
         }
 
-        private int FullWorkoutTime(string startOfShift, int orderIndex, string counterRepeat, string timeMkrStop, String timeMkrStart)
+        private int FullWorkoutTime(int shiftID, int orderIndex, int counterRepeat, string timeMkrStop, string timeMkrStart)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(startOfShift, orderIndex, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(shiftID, orderIndex, counterRepeat);
 
             int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
             int mkrStartStop = timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);

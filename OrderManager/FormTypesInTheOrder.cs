@@ -14,17 +14,17 @@ namespace OrderManager
 {
     public partial class FormTypesInTheOrder : Form
     {
-        String loadStartOfShift;
+        int loadShiftID;
         int loadOrderID;
-        String loadOrderCounterRepeat;
+        int loadOrderCounterRepeat;
         String loadMachine;
         String loadUser;
 
-        public FormTypesInTheOrder(String lStartOfShift, int lOrderID, String lOrderCounterRepeat, String lMachine, String lUser)
+        public FormTypesInTheOrder(int lShiftID, int lOrderID, int lOrderCounterRepeat, string lMachine, string lUser)
         {
             InitializeComponent();
 
-            this.loadStartOfShift = lStartOfShift;
+            this.loadShiftID = lShiftID;
             this.loadOrderID = lOrderID;
             this.loadOrderCounterRepeat = lOrderCounterRepeat;
             this.loadMachine = lMachine;
@@ -78,7 +78,7 @@ namespace OrderManager
         
         private void LoadTypes()
         {
-            ValueTypesBase typeBase = new ValueTypesBase(loadStartOfShift, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typeBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
 
             typesCurrent = typeBase.GetData();
 
@@ -94,7 +94,7 @@ namespace OrderManager
 
         private void SaveTypes()
         {
-            ValueTypesBase typeBase = new ValueTypesBase(loadStartOfShift, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typeBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
 
             for (int i = 0; i < typesForAdded.Count; i++)
             {
@@ -126,7 +126,7 @@ namespace OrderManager
 
         private void AddTypesToListView()
         {
-            ValueTypesBase typesBase = new ValueTypesBase(loadStartOfShift, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typesBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
 
             int count = 0;
 

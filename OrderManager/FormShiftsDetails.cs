@@ -17,7 +17,7 @@ namespace OrderManager
         int yearOfStatistic;
         int monthOfStatistic;
 
-        public FormShiftsDetails(bool aMode, String executor, int yearSt, int mouthSt)
+        public FormShiftsDetails(bool aMode, string executor, int yearSt, int mouthSt)
         {
             InitializeComponent();
 
@@ -129,7 +129,7 @@ namespace OrderManager
         {
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            List<String> years = shiftsBase.LoadYears();
+            List<string> years = shiftsBase.LoadYears();
 
             comboBox1.Items.AddRange(years.ToArray());
         }
@@ -192,18 +192,20 @@ namespace OrderManager
             {
                 thJob = true;
 
-                List<String> shifts = (List<String>)getShifts.LoadShiftsList(date);
-
+                List<int> shifts = (List<int>)getShifts.LoadShiftsList(date);
+                
                 for (int i = 0; i < shifts.Count; i++)
                 {
-                    String dateStr;
+                    string shiftStart = shiftValue.GetStartShiftFromID(shifts[i]);
 
-                    dateStr = Convert.ToDateTime(shifts[i]).ToString("d");
-                    dateStr += ", " + getNumberShift.NumberShift(shifts[i]);
+                    string dateStr;
+                    
+                    dateStr = Convert.ToDateTime(shiftStart).ToString("d");
+                    dateStr += ", " + getNumberShift.NumberShift(shiftStart);
 
                     ListViewItem item = new ListViewItem();
-
-                    item.Name = shifts[i];
+                    
+                    item.Name = shifts[i].ToString();
                     item.Text = (i + 1).ToString();
                     item.SubItems.Add(dateStr);
                     item.SubItems.Add("");
@@ -214,7 +216,7 @@ namespace OrderManager
                     item.SubItems.Add("");
                     if (nameOfExecutor == Form1.Info.nameOfExecutor)
                         item.SubItems.Add(shiftValue.GetNoteShift(shifts[i]));
-
+                    
                     Invoke(new Action(() => listView1.Items.Add(item)));
                 }
 
@@ -224,9 +226,10 @@ namespace OrderManager
 
                     Invoke(new Action(() =>
                     {
-                        int index = listView1.Items.IndexOfKey(shifts[i]);
+                        int index = listView1.Items.IndexOfKey(shifts[i].ToString());
 
                         ListViewItem item = listView1.Items[index];
+
                         if (item != null)
                         {
                             item.SubItems[2].Text = currentShift.machinesShift;
@@ -276,28 +279,28 @@ namespace OrderManager
             }
         }
 
-        private void UpdateNote(String timeStartShift)
+        private void UpdateNote(int shiftID)
         {
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
-            int index = listView1.Items.IndexOfKey(timeStartShift);
+            int index = listView1.Items.IndexOfKey(shiftID.ToString());
 
             ListViewItem item = listView1.Items[index];
             if (item != null)
             {
-                item.SubItems[8].Text = valueShifts.GetNoteShift(timeStartShift);
+                item.SubItems[8].Text = valueShifts.GetNoteShift(shiftID);
             }
         }
 
-        private void LoadShiftdetails(String timeStartShift)
+        private void LoadShiftdetails(int shiftID)
         {
-            FormOneShiftDetails form = new FormOneShiftDetails(adminMode, timeStartShift);
+            FormOneShiftDetails form = new FormOneShiftDetails(adminMode, shiftID);
             form.ShowDialog();
         }
 
-        private void LoadShiftNote(String timeStartShift)
+        private void LoadShiftNote(int shiftID)
         {
-            FormCloseShift form = new FormCloseShift(timeStartShift);
+            FormCloseShift form = new FormCloseShift(shiftID);
             form.ShowDialog();
 
             bool result = form.ShiftVal;
@@ -306,11 +309,11 @@ namespace OrderManager
             {
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
-                getShift.SetNoteShift(timeStartShift, form.NoteVal);
-                getShift.SetCheckFullShift(timeStartShift, form.FullShiftVal);
-                getShift.SetCheckOvertimeShift(timeStartShift, form.OvertimeShiftVal);
+                getShift.SetNoteShift(shiftID, form.NoteVal);
+                getShift.SetCheckFullShift(shiftID, form.FullShiftVal);
+                getShift.SetCheckOvertimeShift(shiftID, form.OvertimeShiftVal);
 
-                UpdateNote(timeStartShift);
+                UpdateNote(shiftID);
 
                 StartLoading();
             }
@@ -345,7 +348,7 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                LoadShiftdetails(listView1.SelectedItems[0].Name);
+                LoadShiftdetails(Convert.ToInt32(listView1.SelectedItems[0].Name));
             }
         }
 
@@ -358,7 +361,7 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                LoadShiftdetails(listView1.SelectedItems[0].Name);
+                LoadShiftdetails(Convert.ToInt32(listView1.SelectedItems[0].Name));
             }
         }
 
@@ -366,7 +369,7 @@ namespace OrderManager
         {
             if (listView1.SelectedItems.Count != 0)
             {
-                LoadShiftNote(listView1.SelectedItems[0].Name);
+                LoadShiftNote(Convert.ToInt32(listView1.SelectedItems[0].Name));
             }
         }
 

@@ -262,7 +262,7 @@
             this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label4.Location = new System.Drawing.Point(343, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(211, 24);
+            this.label4.Size = new System.Drawing.Size(210, 24);
             this.label4.TabIndex = 7;
             this.label4.Text = "Выполнено заказов:";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -273,7 +273,7 @@
             this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label5.Location = new System.Drawing.Point(343, 24);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(211, 24);
+            this.label5.Size = new System.Drawing.Size(210, 24);
             this.label5.TabIndex = 8;
             this.label5.Text = "Сумма выполненной продукции:";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -284,7 +284,7 @@
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label6.Location = new System.Drawing.Point(343, 48);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(211, 26);
+            this.label6.Size = new System.Drawing.Size(210, 26);
             this.label6.TabIndex = 9;
             this.label6.Text = "Фильтр по номеру заказа:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -293,9 +293,9 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label7.Location = new System.Drawing.Point(560, 0);
+            this.label7.Location = new System.Drawing.Point(559, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(88, 24);
+            this.label7.Size = new System.Drawing.Size(87, 24);
             this.label7.TabIndex = 10;
             this.label7.Text = "label7";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -304,9 +304,9 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label8.Location = new System.Drawing.Point(560, 24);
+            this.label8.Location = new System.Drawing.Point(559, 24);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(88, 24);
+            this.label8.Size = new System.Drawing.Size(87, 24);
             this.label8.TabIndex = 11;
             this.label8.Text = "label8";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -314,9 +314,9 @@
             // textBox1
             // 
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(560, 51);
+            this.textBox1.Location = new System.Drawing.Point(559, 51);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(88, 20);
+            this.textBox1.Size = new System.Drawing.Size(87, 20);
             this.textBox1.TabIndex = 12;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 

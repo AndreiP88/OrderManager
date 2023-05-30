@@ -7,31 +7,31 @@ namespace OrderManager
 {
     public partial class FormPrivateNote : Form
     {
-        String loadStartOfShift;
+        int loadShiftID;
         int loadOrderID;
-        String loadMachine;
-        String loadCounterRepeat;
+        string loadMachine;
+        int loadCounterRepeat;
 
-        public FormPrivateNote(String lStartOfShift, int lOrderIndex, String lMachine, String lCounterRepeat)
+        public FormPrivateNote(int lShiftID, int lOrderIndex, String lMachine, int lCounterRepeat)
         {
             InitializeComponent();
 
-            this.loadStartOfShift = lStartOfShift;
+            this.loadShiftID = lShiftID;
             this.loadOrderID = lOrderIndex;
             this.loadMachine = lMachine;
             this.loadCounterRepeat = lCounterRepeat;
         }
 
-        private void UpdateData(String nameOfColomn, String machineCurrent, String shiftStart, int orderIndex, String counterRepeat, String value)
+        private void UpdateData(String nameOfColomn, String machineCurrent, int shiftID, int orderIndex, int counterRepeat, String value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE ordersInProgress SET " + nameOfColomn + " = @value " +
-                    "WHERE ((machine = @machineCurrent AND startOfShift = @shiftStart) AND (orderID = @id AND counterRepeat = @counterRepeat))";
+                    "WHERE ((machine = @machineCurrent AND shiftID = @shiftID) AND (orderID = @id AND counterRepeat = @counterRepeat))";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@machineCurrent", machineCurrent); // присваиваем переменной значение
-                Command.Parameters.AddWithValue("@shiftStart", shiftStart);
+                Command.Parameters.AddWithValue("@shiftID", shiftID);
                 Command.Parameters.AddWithValue("@id", orderIndex);
                 Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
                 Command.Parameters.AddWithValue("@value", value);
@@ -45,7 +45,7 @@ namespace OrderManager
         private void LoadNote()
         {
             GetOrdersFromBase getOrder = new GetOrdersFromBase();
-            String pNote = getOrder.GetPrivateNote(loadStartOfShift, loadOrderID, loadCounterRepeat, loadMachine);
+            String pNote = getOrder.GetPrivateNote(loadShiftID, loadOrderID, loadCounterRepeat, loadMachine);
             textBox1.Text = pNote;
         }
 
@@ -53,7 +53,7 @@ namespace OrderManager
         {
             String pNote = textBox1.Text;
 
-            UpdateData("privateNote", loadMachine, loadStartOfShift, loadOrderID, loadCounterRepeat, pNote);
+            UpdateData("privateNote", loadMachine, loadShiftID, loadOrderID, loadCounterRepeat, pNote);
         }
 
         private void button2_Click(object sender, EventArgs e)

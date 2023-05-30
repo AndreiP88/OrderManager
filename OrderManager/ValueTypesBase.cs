@@ -13,16 +13,16 @@ namespace OrderManager
 {
     internal class ValueTypesBase
     {
-        String startOfShift;
+        int shiftID;
         int orderID;
-        String orderCounterRepeat;
-        String machine;
-        String user;
-        String _orderInProgressID;
+        int orderCounterRepeat;
+        string machine;
+        string user;
+        string _orderInProgressID;
 
-        public ValueTypesBase(String lStartOfShift, int lOrderID, String lOrderCounterRepeat, String lMachine, String lUser)
+        public ValueTypesBase(int lShiftID, int lOrderID, int lOrderCounterRepeat, String lMachine, String lUser)
         {
-            this.startOfShift = lStartOfShift;
+            this.shiftID = lShiftID;
             this.orderID = lOrderID;
             this.orderCounterRepeat = lOrderCounterRepeat;
             this.machine = lMachine;
@@ -30,14 +30,14 @@ namespace OrderManager
 
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
-            _orderInProgressID = getOrders.GetIndex(startOfShift, orderID, orderCounterRepeat, machine);
+            _orderInProgressID = getOrders.GetIndex(shiftID, orderID, orderCounterRepeat, machine);
         }
 
         public ValueTypesBase()
         {
-            this.startOfShift = "";
+            this.shiftID = -1;
             this.orderID = -1;
-            this.orderCounterRepeat = "";
+            this.orderCounterRepeat = 0;
             this.machine = "";
             this.user = "";
 

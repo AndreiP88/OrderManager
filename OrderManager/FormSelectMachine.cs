@@ -30,7 +30,7 @@ namespace OrderManager
 
             if (checkedCount > 0)
             {
-                if (Form1.Info.startOfShift == "")
+                if (Form1.Info.shiftIndex == -1)
                 {
                     button1.Text = "Выбрать и начать смену";
                     button1.Enabled = true;
@@ -144,14 +144,23 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            String startCurrentShift;
-
-            if (Form1.Info.startOfShift != "")
-                startCurrentShift = Form1.Info.startOfShift;
+            if (Form1.Info.shiftIndex != -1)
+            {
+                ActivateDeactivateMachines(Form1.Info.nameOfExecutor);
+            }
             else
-                startCurrentShift = DateTime.Now.ToString();
+            {
+                ShiftStart(Form1.Info.nameOfExecutor, DateTime.Now.ToString());
+                ActivateDeactivateMachines(Form1.Info.nameOfExecutor);
+            }
 
-            if (Form1.Info.startOfShift == "")
+            /*
+            if (Form1.Info.startOfShift != -1)
+                curretnShiftID = Form1.Info.startOfShift;
+            else
+                curretnShiftID = DateTime.Now.ToString();
+
+            if (Form1.Info.startOfShift == -1)
             {
                 ShiftStart(Form1.Info.nameOfExecutor, startCurrentShift);
                 ActivateDeactivateMachines(Form1.Info.nameOfExecutor);
@@ -159,14 +168,13 @@ namespace OrderManager
             else
             {
                 ActivateDeactivateMachines(Form1.Info.nameOfExecutor);
-            }
+            }*/
         }
 
-        private void ShiftStart(String currentUser, String startOfShift)
+        private void ShiftStart(string currentUser, string startOfShift)
         {
             ValueUserBase usersBase = new ValueUserBase();
-
-            usersBase.UpdateCurrentShiftStart(currentUser, startOfShift);
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -183,18 +191,20 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            Form1.Info.startOfShift = startOfShift;
+            int shiftID = shiftsBase.GetIDFromStartShift(startOfShift);
+
+            usersBase.UpdateCurrentShiftStart(currentUser, shiftID.ToString());
+
+            Form1.Info.shiftIndex = shiftID;
         }
 
         private void ActivateDeactivateMachines(String currentUser)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-
-
             for (int i = 0; i < checkBoxesMachines.Count; i++)
             {
-                if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "" &&
+                if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "-1" &&
                     CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
                     checkBoxesMachines[i].Checked == false)
                 {

@@ -115,9 +115,9 @@ namespace OrderManager
             return GetValue("id", id, "passwordUser");
         }
 
-        public String GetCurrentShiftStart(String id)
+        public int GetCurrentShiftStart(string id)
         {
-            return GetValueInfo("user", id, "currentShiftStart");
+            return Convert.ToInt32(GetValueInfo("user", id, "currentShiftStartID"));
         }
 
         public String GetLastUID(String id)
@@ -130,9 +130,9 @@ namespace OrderManager
         /// </summary>
         /// <param name="shiftStart"></param>
         /// <returns></returns>
-        public String GetCurrentUserIDFromShiftStart(String shiftStart)
+        public String GetCurrentUserIDFromShiftStart(int shiftStart)
         {
-            return GetValueInfo("currentShiftStart", shiftStart, "user");
+            return GetValueInfo("currentShiftStartID", shiftStart.ToString(), "user");
         }
 
         public List<String> GetUserList(bool activeUserOnly)
@@ -211,8 +211,9 @@ namespace OrderManager
         public bool GetUserWorking(String id)
         {
             bool result = false;
+            string val = GetValueInfo("user", id, "currentShiftStartID");
 
-            if (GetValueInfo("user", id, "currentShiftStart") != "")
+            if (val != "-1")
                 result = true;
 
             return result;
@@ -306,9 +307,9 @@ namespace OrderManager
             UpdateValue("passwordUser", idUser, newValue);
         }
 
-        public void UpdateCurrentShiftStart(String idUser, String newValue)
+        public void UpdateCurrentShiftStart(string idUser, string newValue)
         {
-            UpdateValueInfo("currentShiftStart", idUser, newValue);
+            UpdateValueInfo("currentShiftStartID", idUser, newValue);
         }
 
         public void UpdateLastUID(String idUser, String newValue)
@@ -380,7 +381,7 @@ namespace OrderManager
             }
         }
 
-        private void UpdateValueInfo(String colomn, String id, String value)
+        private void UpdateValueInfo(string colomn, string id, string value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

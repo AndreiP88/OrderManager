@@ -63,9 +63,9 @@ namespace OrderManager
             return GetValueFromIndex(index, "modification");
         }
 
-        public string GetCounterRepeat(int index)
+        public int GetCounterRepeat(int index)
         {
-            return GetValueFromIndex(index, "counterRepeat");
+            return Convert.ToInt32(GetValueFromIndex(index, "counterRepeat"));
         }
 
         public string GetAmountOfOrder(int index)

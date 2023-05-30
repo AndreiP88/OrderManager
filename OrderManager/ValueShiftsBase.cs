@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -15,13 +16,13 @@ namespace OrderManager
 
         }
 
-        public bool CheckShiftActivity(string startShift)
+        public bool CheckShiftActivity(int startShiftID)
         {
             bool result = false;
 
-            if (startShift != "")
+            if (startShiftID != -1)
             {
-                string stopShift = GetStopShift(startShift);
+                string stopShift = GetStopShiftFromID(startShiftID);
 
                 if (stopShift == "")
                 {
@@ -37,9 +38,9 @@ namespace OrderManager
             return result;
         }
 
-        public String GetStopShift(String startShift)
+        public string GetStopShiftFromID(int shiftID)
         {
-            List<String> list = new List<String>(GetValue("startShift", startShift, "stopShift"));
+            List<String> list = new List<String>(GetValue("id", shiftID.ToString(), "stopShift"));
 
             string result = "";
 
@@ -51,37 +52,53 @@ namespace OrderManager
             return result;
         }
 
-        public String GetIDFromStartShift(string startShift)
+        public int GetIDFromStartShift(string startShift)
         {
-            List<string> result = new List<string>(GetValue("startShift", startShift, "id"));
+            List<string> val = new List<string>(GetValue("startShift", startShift, "id"));
+
+            int result = -1;
+
+            if (val.Count > 0)
+            {
+                result = Convert.ToInt32(val.Last());
+            }
+
+            return result;
+        }
+
+        public string GetNameUserFromStartShift(int shiftID)
+        {
+            List<String> result = new List<String>(GetValue("id", shiftID.ToString(), "nameUser"));
 
             return result[result.Count - 1];
         }
 
-        public String GetNameUserFromStartShift(String startShift)
+        public string GetNoteShift(int shiftID)
         {
-            List<String> result = new List<String>(GetValue("startShift", startShift, "nameUser"));
-
-            return result[result.Count - 1];
-        }
-
-        public String GetNoteShift(String startShift)
-        {
-            List<String> result = new List<String>(GetValue("startShift", startShift, "note"));
+            List<String> result = new List<String>(GetValue("id", shiftID.ToString(), "note"));
 
             return result[result.Count - 1];
         }
 
         public string GetStartShiftFromID(int index)
         {
-            List<String> result = new List<String>(GetValue("id", index.ToString(), "startShift"));
+            List<string> result = new List<string>(GetValue("id", index.ToString(), "startShift"));
 
-            return result[result.Count - 1];
+            if (result.Count > 0)
+            {
+                return result[result.Count - 1];
+            }
+            else
+            {
+                return "";
+            }
+
+
         }
 
-        public bool GetCheckFullShift(String startShift)
+        public bool GetCheckFullShift(int shiftID)
         {
-            List<String> value = new List<String>(GetValue("startShift", startShift, "fullShift"));
+            List<String> value = new List<String>(GetValue("id", shiftID.ToString(), "fullShift"));
 
             string oneVal = value[value.Count - 1];
             bool result = true;
@@ -94,9 +111,9 @@ namespace OrderManager
             return result;
         }
 
-        public bool GetCheckOvertimeShift(String startShift)
+        public bool GetCheckOvertimeShift(int shiftID)
         {
-            List<String> value = new List<String>(GetValue("startShift", startShift, "overtimeShift"));
+            List<String> value = new List<String>(GetValue("id", shiftID.ToString(), "overtimeShift"));
 
             string oneVal = null;
             bool result = false;
@@ -120,15 +137,15 @@ namespace OrderManager
             return result;
         }
 
-        public void SetNoteShift(String startShift, String note)
+        public void SetNoteShift(int shiftID, string note)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE shifts SET note = @note " +
-                    "WHERE startShift = @startShift";
+                    "WHERE id = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@id", shiftID);
                 Command.Parameters.AddWithValue("@note", note);
 
                 Connect.Open();
@@ -137,15 +154,15 @@ namespace OrderManager
             }
         }
 
-        public void SetCheckFullShift(String startShift, bool check)
+        public void SetCheckFullShift(int shiftID, bool check)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE shifts SET fullShift = @fullShift " +
-                    "WHERE startShift = @startShift";
+                    "WHERE id = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@id", shiftID);
                 Command.Parameters.AddWithValue("@fullShift", check.ToString());
 
                 Connect.Open();
@@ -154,15 +171,15 @@ namespace OrderManager
             }
         }
 
-        public void SetCheckOvertimeShift(String startShift, bool check)
+        public void SetCheckOvertimeShift(int shiftID, bool check)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE shifts SET overtimeShift = @overtimeShift " +
-                    "WHERE startShift = @startShift";
+                    "WHERE id = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@id", shiftID);
                 Command.Parameters.AddWithValue("@overtimeShift", check.ToString());
 
                 Connect.Open();
@@ -171,15 +188,15 @@ namespace OrderManager
             }
         }
 
-        public void CloseShift(String startShift, String stopShift)
+        public void CloseShift(int shiftID, string stopShift)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE shifts SET stopShift = @stopShift " +
-                    "WHERE startShift = @startShift";
+                    "WHERE id = @id";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@startShift", startShift);
+                Command.Parameters.AddWithValue("@id", shiftID);
                 Command.Parameters.AddWithValue("@stopShift", stopShift);
 
                 Connect.Open();

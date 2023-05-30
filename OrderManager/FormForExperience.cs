@@ -146,6 +146,7 @@ namespace OrderManager
             ValueOrdersBase valueOrders = new ValueOrdersBase();
             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             OrderStatusValue orderStatus = new OrderStatusValue("", "", "", "", "", "", "", "", "", 0, 0, "", Color.Black);
 
@@ -154,11 +155,11 @@ namespace OrderManager
             string machine = ordersCurrentShift[indexOrder].machineOfOrder;
             string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
 
-            string shiftStart = Info.startOfShift; //get from Info or user base
+            string shiftStart = shiftsBase.GetStartShiftFromID(Info.shiftIndex); //get from Info or user base
 
             if (plannedWorkingOut)
             {
-                shiftStart = startShift.PlanedStartShift(Info.startOfShift); //get from method
+                shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
             }
 
             int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
@@ -324,7 +325,7 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
-            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.startOfShift, "");
+            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.shiftIndex, "");
 
             /*if (listView1.SelectedItems.Count > 0)
             {
@@ -439,7 +440,7 @@ namespace OrderManager
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                string commandText = "UPDATE ordersInProgress SET startOfShiftID = @id " +
+                string commandText = "UPDATE ordersInProgress SET shiftID = @id " +
                     "WHERE startOfShift = @startOfShift";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -487,7 +488,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE startOfShiftID is null or startOfShiftID = ''"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID is null or shiftID = ''"
                 };
                 DbDataReader sqlReader = Command.ExecuteReader();
 

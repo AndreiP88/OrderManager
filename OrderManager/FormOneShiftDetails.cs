@@ -9,13 +9,13 @@ namespace OrderManager
 {
     public partial class FormOneShiftDetails : Form
     {
-        String timeShiftStart;
+        int timeShiftID;
         bool adminMode;
 
-        public FormOneShiftDetails(bool aMode, String shiftStart)
+        public FormOneShiftDetails(bool aMode, int shiftID)
         {
             InitializeComponent();
-            this.timeShiftStart = shiftStart;
+            this.timeShiftID = shiftID;
             this.adminMode = aMode;
         }
 
@@ -100,13 +100,13 @@ namespace OrderManager
                 ApplyParameterLine(getSettings.GetParameterLine("0", nameForm));
         }
 
-        private bool PrivateData(String shiftStart, String userID)
+        private bool PrivateData(int shiftID, string userID)
         {
             bool result = false;
 
             ValueShiftsBase getUserShift = new ValueShiftsBase();
 
-            if (getUserShift.GetNameUserFromStartShift(shiftStart) == userID)
+            if (getUserShift.GetNameUserFromStartShift(timeShiftID) == userID)
             {
                 result = true;
             }
@@ -126,9 +126,9 @@ namespace OrderManager
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
             ValueSettingsBase valueSettings = new ValueSettingsBase();
 
-            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(timeShiftStart, "");
+            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(timeShiftID, "");
 
-            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(timeShiftStart, ordersCurrentShift);
+            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(timeShiftID, ordersCurrentShift);
 
             fullTimeWorkingOut = 0;
             fullDone = 0;
@@ -221,7 +221,7 @@ namespace OrderManager
 
                 item.ForeColor = color;
 
-                if (PrivateData(timeShiftStart, Form1.Info.nameOfExecutor))
+                if (PrivateData(timeShiftID, Form1.Info.nameOfExecutor))
                     item.SubItems.Add(ordersCurrentShift[index].notePrivate);
 
                 listView1.Items.Add(item);
@@ -239,9 +239,9 @@ namespace OrderManager
             ValueShiftsBase getShift = new ValueShiftsBase();
 
 
-            label4.Text = getUser.GetNameUser(getShift.GetNameUserFromStartShift(timeShiftStart));
-            label5.Text = timeShiftStart;
-            label6.Text = getShift.GetStopShift(timeShiftStart);
+            label4.Text = getUser.GetNameUser(getShift.GetNameUserFromStartShift(timeShiftID));
+            label5.Text = getShift.GetStartShiftFromID(timeShiftID);
+            label6.Text = getShift.GetStopShiftFromID(timeShiftID);
 
             label10.Text = dtOperations.TotalMinutesToHoursAndMinutesStr(fullTimeWorkingOut);
             label11.Text = getPercent.PercentString(fullTimeWorkingOut);
@@ -278,7 +278,7 @@ namespace OrderManager
 
                 FormAddCloseOrder form;
 
-                form = new FormAddCloseOrder(adminMode, timeShiftStart,
+                form = new FormAddCloseOrder(adminMode, timeShiftID,
                 ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
@@ -294,7 +294,7 @@ namespace OrderManager
 
             FormPrivateNote form;
 
-            form = new FormPrivateNote(timeShiftStart,
+            form = new FormPrivateNote(timeShiftID,
                 ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
@@ -323,7 +323,7 @@ namespace OrderManager
         {
             e.Cancel = listView1.SelectedItems.Count == 0;
 
-            if (!PrivateData(timeShiftStart, Form1.Info.nameOfExecutor))
+            if (!PrivateData(timeShiftID, Form1.Info.nameOfExecutor))
                 e.Cancel = true;
         }
 

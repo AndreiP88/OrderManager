@@ -464,7 +464,7 @@ namespace OrderManager
             {
                 orders.SetNewStatus(orderIndex, "0");
                 orders.IncrementCounterRepeat(orderIndex);
-                infoBase.UpdateInfo(getInfo.GetMachineFromName(comboBoxMachine.Text), "", "", "", false);
+                infoBase.UpdateInfo(getInfo.GetMachineFromName(comboBoxMachine.Text), 0, -1, -1, false);
             }
         }
 
@@ -1550,7 +1550,7 @@ namespace OrderManager
 
                         String user = "";
                         String currentTime = "";
-                        String currentShiftStart = "";
+                        int currentShiftStart = -1;
                         String order = "";
 
                         string orderNumCurrent = getOrder.GetOrderNumber(orderIndex);
@@ -1569,7 +1569,7 @@ namespace OrderManager
                         else
                         {
                             user = "";
-                            currentShiftStart = "";
+                            currentShiftStart = -1;
                         }
 
                         if (leadTimeCurr.GetCurrentDateTime("timeMakereadyStart") != "")
@@ -1599,7 +1599,7 @@ namespace OrderManager
 
                             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
 
-                            string shiftStart = userBase.GetCurrentShiftStart(users[i]); //get from Info or user base
+                            string shiftStart = getShifts.GetStartShiftFromID(userBase.GetCurrentShiftStart(users[i])); //get from Info or user base
 
                             if (plannedWorkingOut)
                             {
@@ -1641,9 +1641,9 @@ namespace OrderManager
 
                         ListViewItem item = new ListViewItem();
 
-                        item.Name = userBase.GetCurrentShiftStart(users[i]);
+                        item.Name = userBase.GetCurrentShiftStart(users[i]).ToString();
                         item.Text = userBase.GetNameUser(user);
-                        item.SubItems.Add(currentShiftStart);
+                        item.SubItems.Add(getShifts.GetStartShiftFromID(currentShiftStart));
                         item.SubItems.Add(getInfo.GetMachineName(machines[j]));
                         item.SubItems.Add(order);
                         item.SubItems.Add(getOrder.GetOrderStatusName(orderIndex));
@@ -1980,6 +1980,7 @@ namespace OrderManager
 
         private void LoadShiftsFromBase(CancellationToken token, DateTime date, String nameOfExecutor)
         {
+            ValueShiftsBase shiftValue = new ValueShiftsBase();
             GetShiftsFromBase getShifts = new GetShiftsFromBase(nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
@@ -2034,18 +2035,20 @@ namespace OrderManager
 
                     //List<Shifts> currentShift = (List<Shifts>)getShifts.LoadShiftsFromBase(date, "").Item1;
 
-                    List<String> shifts = (List<String>)getShifts.LoadShiftsList(date);
+                    List<int> shifts = (List<int>)getShifts.LoadShiftsList(date);
 
                     for (int i = 0; i < shifts.Count; i++)
                     {
-                        String dateStr;
+                        string shiftStart = shiftValue.GetStartShiftFromID(shifts[i]);
 
-                        dateStr = Convert.ToDateTime(shifts[i]).ToString("d");
-                        dateStr += ", " + getNumberShift.NumberShift(shifts[i]);
+                        string dateStr;
+
+                        dateStr = Convert.ToDateTime(shiftStart).ToString("d");
+                        dateStr += ", " + getNumberShift.NumberShift(shiftStart);
 
                         ListViewItem item = new ListViewItem();
 
-                        item.Name = shifts[i];
+                        item.Name = shifts[i].ToString();
                         item.Text = (i + 1).ToString();
                         item.SubItems.Add(dateStr);
                         item.SubItems.Add("");
@@ -2064,7 +2067,7 @@ namespace OrderManager
 
                         Invoke(new Action(() =>
                         {
-                            int index = listView.Items.IndexOfKey(shifts[i]);
+                            int index = listView.Items.IndexOfKey(shifts[i].ToString());
 
                             ListViewItem item = listView.Items[index];
                             if (item != null)
@@ -2253,6 +2256,7 @@ namespace OrderManager
                             if (getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
                             {
                                 List<int> orderCountAmountMonth = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheMonth(date, sqlReader["id"].ToString()));
+                                
                                 List<int> orderCountAmountYear = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheYear(date, sqlReader["id"].ToString()));
 
                                 countMonth = orderCountAmountMonth[0];
@@ -2467,9 +2471,9 @@ namespace OrderManager
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            GetCountOfDone orderCalc = new GetCountOfDone("", (int)sqlReader["count"], "");
-                            GetLeadTime leadTimeFirst = new GetLeadTime("", (int)sqlReader["count"], "0");
-                            GetLeadTime leadTimeLast = new GetLeadTime("", (int)sqlReader["count"], sqlReader["counterRepeat"].ToString());
+                            GetCountOfDone orderCalc = new GetCountOfDone(-1, (int)sqlReader["count"], 0);
+                            GetLeadTime leadTimeFirst = new GetLeadTime(-1, (int)sqlReader["count"], 0);
+                            GetLeadTime leadTimeLast = new GetLeadTime(-1, (int)sqlReader["count"], (int)sqlReader["counterRepeat"]);
 
 
                             Invoke(new Action(() =>
@@ -2992,19 +2996,19 @@ namespace OrderManager
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
             int selectegIndex = ((ListView)sender).SelectedIndices[0];
-            String selectedName = ((ListView)sender).SelectedItems[0].Name.ToString();
+            string selectedName = ((ListView)sender).SelectedItems[0].Name;
 
             switch (currentPage)
             {
                 case 1:
-                    LoadShiftdetails(selectedName);
+                    LoadShiftdetails(Convert.ToInt32(selectedName));
                     break;
                 case 2:
                     selectedUser = getUser.GetNameUser(selectedName);
                     LoadPage(3);
                     break;
                 case 3:
-                    LoadShiftdetails(selectedName);
+                    LoadShiftdetails(Convert.ToInt32(selectedName));
                     break;
                 case 4:
 
@@ -3199,7 +3203,7 @@ namespace OrderManager
 
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
-            String selectedName = listV.SelectedItems[0].Name.ToString();
+            int selectedName = Convert.ToInt32(listV.SelectedItems[0].Name);
 
             switch (currentPage)
             {
@@ -3232,8 +3236,8 @@ namespace OrderManager
 
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
-            String startOfShift = listV.SelectedItems[0].Name.ToString();
-            String userId = getUser.GetCurrentUserIDFromShiftStart(startOfShift);
+            int shiftID = Convert.ToInt32(listV.SelectedItems[0].Name);
+            String userId = getUser.GetCurrentUserIDFromShiftStart(shiftID);
 
             List<String> machines = (List<String>)getInfo.GetMachines(userId);
 
@@ -3241,7 +3245,7 @@ namespace OrderManager
             {
                 if (Convert.ToBoolean(getInfo.GetActiveOrder(machines[i])) == true)
                 {
-                    FormAddCloseOrder form = new FormAddCloseOrder(startOfShift, userId, machines[i]);
+                    FormAddCloseOrder form = new FormAddCloseOrder(shiftID, userId, machines[i]);
                     form.ShowDialog();
                 }
             }
@@ -3256,7 +3260,7 @@ namespace OrderManager
                 ValueInfoBase infoBase = new ValueInfoBase();
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
-                getShift.CloseShift(startOfShift, DateTime.Now.ToString());
+                getShift.CloseShift(shiftID, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(userId);
                 userBase.UpdateCurrentShiftStart(userId, "");
 
@@ -3424,9 +3428,9 @@ namespace OrderManager
             }
         }
 
-        private void LoadShiftdetails(String timeStartShift)
+        private void LoadShiftdetails(int shiftID)
         {
-            FormOneShiftDetails form = new FormOneShiftDetails(adminMode, timeStartShift);
+            FormOneShiftDetails form = new FormOneShiftDetails(adminMode, shiftID);
             form.ShowDialog();
         }
 

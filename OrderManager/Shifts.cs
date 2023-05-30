@@ -4,7 +4,7 @@ namespace OrderManager
 {
     internal class Shifts
     {
-        public String startShift;
+        public int startShiftID;
         public String dateShift;
         public String machinesShift;
         public String workingTimeShift;
@@ -13,9 +13,9 @@ namespace OrderManager
         public int workingOutShift;
 
 
-        public Shifts(String shiftStart, String shiftDate, String shiftMachines, String shiftWokingTime, int shiftCountOrders, int shiftAmountOrders, int shiftWorkingOut)
+        public Shifts(int shiftStartID, String shiftDate, String shiftMachines, String shiftWokingTime, int shiftCountOrders, int shiftAmountOrders, int shiftWorkingOut)
         {
-            this.startShift = shiftStart;
+            this.startShiftID = shiftStartID;
             this.dateShift = shiftDate;
             this.machinesShift = shiftMachines;
             this.workingTimeShift = shiftWokingTime;

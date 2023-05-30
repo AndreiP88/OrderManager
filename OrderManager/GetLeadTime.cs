@@ -8,14 +8,14 @@ namespace OrderManager
 {
     internal class GetLeadTime
     {
-        String shiftStart;
-        int orderID;
-        String repeatCounter;
+        int shiftIndex;
+        int orderIndex;
+        int repeatCounter;
 
-        public GetLeadTime(string startOfShift, int orderIndex, string counterRepeat)
+        public GetLeadTime(int shiftID, int orderID, int counterRepeat)
         {
-            this.shiftStart = startOfShift;
-            this.orderID = orderIndex;
+            this.shiftIndex = shiftID;
+            this.orderIndex = orderID;
             this.repeatCounter = counterRepeat;
         }
 
@@ -63,7 +63,7 @@ namespace OrderManager
                     Connection = Connect,
                     CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND counterRepeat = @counterRepeat"
                 };
-                Command.Parameters.AddWithValue("@id", orderID);
+                Command.Parameters.AddWithValue("@id", orderIndex);
                 Command.Parameters.AddWithValue("@counterRepeat", repeatCounter);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -71,7 +71,7 @@ namespace OrderManager
                 {
                     datetimes.Add(sqlReader[nameOfColomn].ToString());
 
-                    if (sqlReader["startOfShift"].ToString() == shiftStart)
+                    if ((int)sqlReader["shiftID"] == shiftIndex)
                     {
                         indexCurrent = datetimes.Count - 1;
                         currentTime = sqlReader[nameOfColomn].ToString();

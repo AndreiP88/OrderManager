@@ -7,7 +7,7 @@ namespace OrderManager
 {
     public partial class FormCloseShift : Form
     {
-        String loadStartOfShift = "";
+        int loadStartOfShift = -1;
         bool _edit = false;
 
         public FormCloseShift()
@@ -16,7 +16,7 @@ namespace OrderManager
 
             _edit = false;
         }
-        public FormCloseShift(String lStartOfShift)
+        public FormCloseShift(int lStartOfShift)
         {
             InitializeComponent();
 
@@ -91,29 +91,29 @@ namespace OrderManager
             }
         }
 
-        private void LoadNote(String shiftStart)
+        private void LoadNote(int shiftID)
         {
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            String pNote = shiftsBase.GetNoteShift(shiftStart);
+            String pNote = shiftsBase.GetNoteShift(shiftID);
 
             textBox1.Text = pNote;
         }
 
-        private void LoadCheckFullShift(String shiftStart)
+        private void LoadCheckFullShift(int shiftID)
         {
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            bool check = shiftsBase.GetCheckFullShift(shiftStart);
+            bool check = shiftsBase.GetCheckFullShift(shiftID);
 
             checkBox1.Checked = check;
         }
 
-        private void LoadCheckOvertimeShift(String shiftStart)
+        private void LoadCheckOvertimeShift(int shiftID)
         {
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            bool check = shiftsBase.GetCheckOvertimeShift(shiftStart);
+            bool check = shiftsBase.GetCheckOvertimeShift(shiftID);
 
             checkBox2.Checked = check;
         }

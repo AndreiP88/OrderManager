@@ -8,13 +8,13 @@ namespace OrderManager
 {
     internal class GetCountOfDone
     {
-        string startShift;
+        int shiftIndex;
         int orderIndex;
-        string counterRepeat;
+        int counterRepeat;
 
-        public GetCountOfDone(string startOfShift, int orderID, string counterOfRepeat)
+        public GetCountOfDone(int shiftID, int orderID, int counterOfRepeat)
         {
-            this.startShift = startOfShift;
+            this.shiftIndex = shiftID;
             this.orderIndex = orderID;
             this.counterRepeat = counterOfRepeat;
         }
@@ -59,7 +59,9 @@ namespace OrderManager
                 {
                     countOfShifts.Add(Convert.ToInt32(sqlReader["done"]));
 
-                    if ((sqlReader["startOfShift"].ToString() == startShift) && (sqlReader["counterRepeat"].ToString() == counterRepeat))
+                    //sqlReader["shiftID"] == DBNull.Value ? null : (int?)sqlReader["shiftID"]
+
+                    if (((int)sqlReader["shiftID"] == shiftIndex) && ((int)sqlReader["counterRepeat"] == counterRepeat))
                         indexCurrentShift = countOfShifts.Count - 1;
                 }
 

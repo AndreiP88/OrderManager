@@ -117,7 +117,7 @@ namespace OrderManager
             //form.Visible = true;
         }
 
-        private bool ChekPassword(String loadUser)
+        private bool ChekPassword(string loadUser)
         {
             bool result = false;
 

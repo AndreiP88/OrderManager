@@ -5,9 +5,9 @@ namespace OrderManager
 {
     internal class GetNumberShiftFromTimeStart
     {
-        public String NumberShift(String startTimeShift)
+        public string NumberShift(string startTimeShift)
         {
-            String result = "0";
+            string result = "0";
 
             DateTime dateTime = DateTime.Now;
 

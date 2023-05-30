@@ -333,7 +333,7 @@ namespace OrderManager
             }
         }
 
-        public void UpdateInfo(String machine, String currentCounterRepeat, string currentOrderID, string lastOrderID, bool activeOrder)
+        public void UpdateInfo(string machine, int currentCounterRepeat, int currentOrderID, int lastOrderID, bool activeOrder)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

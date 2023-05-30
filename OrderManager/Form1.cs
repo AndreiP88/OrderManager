@@ -63,8 +63,8 @@ namespace OrderManager
         {
             public static bool active = false;
             //public static int indexItem = -1;
-            public static String nameOfExecutor = "";
-            public static String startOfShift = "";
+            public static string nameOfExecutor = "";
+            public static int shiftIndex = -1;
         }
 
         public static class BaseConnectionParameters
@@ -113,7 +113,7 @@ namespace OrderManager
             CheckCurrentShiftActivity();
 
             Info.active = false;
-            FormAddCloseOrder form = new FormAddCloseOrder(Info.startOfShift, Info.nameOfExecutor);
+            FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
             form.ShowDialog();
             LoadOrdersFromBase();
             Info.active = true;
@@ -166,7 +166,7 @@ namespace OrderManager
             ViewBaseConnectionParameters();
 
 
-            if (Form1.Info.startOfShift == "")
+            if (Form1.Info.shiftIndex == -1)
             {
                 ShowUserSelectMachineForm();
             }
@@ -317,7 +317,7 @@ namespace OrderManager
         {
             ValueUserBase getUser = new ValueUserBase();
 
-            Info.startOfShift = getUser.GetCurrentShiftStart(Info.nameOfExecutor);
+            Info.shiftIndex = getUser.GetCurrentShiftStart(Info.nameOfExecutor);
 
             this.Text = "Менеджер заказов - " + getUser.GetNameUser(Info.nameOfExecutor);
         }
@@ -459,9 +459,9 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
-            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.startOfShift, "");
+            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.shiftIndex, "");
 
-            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.startOfShift, ordersCurrentShift);
+            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
             /*if (listView1.SelectedItems.Count > 0)
             {
@@ -695,10 +695,11 @@ namespace OrderManager
         {
             GetShiftsFromBase getShifts = new GetShiftsFromBase(Form1.Info.nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
             DateTime date;
-            if (Form1.Info.startOfShift != "")
-                date = Convert.ToDateTime(Form1.Info.startOfShift);
+            if (Form1.Info.shiftIndex != -1)
+                date = Convert.ToDateTime(shiftsBase.GetStartShiftFromID(Form1.Info.shiftIndex));
             else
                 date = DateTime.Now;
 
@@ -741,6 +742,7 @@ namespace OrderManager
             Task task = new Task(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
             task.Start();
 
+            //LoadDetailsMount(cancelTokenSource.Token);
             //var task = Task.Run(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
         }
 
@@ -803,6 +805,7 @@ namespace OrderManager
             ValueUserBase usersBase = new ValueUserBase();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
             ValueInfoBase getUserMachines = new ValueInfoBase();
+            ValueShiftsBase valueShifts = new ValueShiftsBase();
 
             int fullWorkingOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
             int fullDone = CountFullDoneOrders(ordersCurrentShift.Count, "");
@@ -812,13 +815,13 @@ namespace OrderManager
             else
                 button6.Enabled = true;
 
-            if (Form1.Info.startOfShift != "")
+            if (Form1.Info.shiftIndex != -1)
                 button1.Enabled = true;
             else
                 button1.Enabled = false;
 
             label6.Text = usersBase.GetNameUser(Info.nameOfExecutor);
-            label7.Text = Info.startOfShift;
+            label7.Text = valueShifts.GetStartShiftFromID(Info.shiftIndex);
             label8.Text = dtOperations.TotalMinutesToHoursAndMinutesStr(fullWorkingOut);
             label9.Text = getPercent.PercentString(fullWorkingOut);
             label10.Text = fullDone.ToString("N0");
@@ -830,7 +833,7 @@ namespace OrderManager
         private void EraseInfo()
         {
             //Form1.Info.nameOfExecutor = "";
-            Form1.Info.startOfShift = "";
+            Form1.Info.shiftIndex = -1;
 
             Form1.Info.active = false;
             this.Text = "Менеджер заказов";
@@ -946,12 +949,12 @@ namespace OrderManager
                 ValueInfoBase infoBase = new ValueInfoBase();
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
-                getShift.CloseShift(Info.startOfShift, DateTime.Now.ToString());
+                getShift.CloseShift(Info.shiftIndex, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(Info.nameOfExecutor);
-                userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "");
-                getShift.SetNoteShift(Info.startOfShift, form.NoteVal);
-                getShift.SetCheckFullShift(Info.startOfShift, form.FullShiftVal);
-                getShift.SetCheckOvertimeShift(Info.startOfShift, form.OvertimeShiftVal);
+                userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "-1");
+                getShift.SetNoteShift(Info.shiftIndex, form.NoteVal);
+                getShift.SetCheckFullShift(Info.shiftIndex, form.FullShiftVal);
+                getShift.SetCheckOvertimeShift(Info.shiftIndex, form.OvertimeShiftVal);
 
                 ClearAll();
                 EraseInfo();
@@ -966,13 +969,13 @@ namespace OrderManager
             ValueUserBase userBase = new ValueUserBase();
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
-            if (Info.startOfShift != "")
+            if (Info.shiftIndex != -1)
             {
-                string startOfShift = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
-                bool activityShift = valueShifts.CheckShiftActivity(Info.startOfShift);
+                int shiftID = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
+                bool activityShift = valueShifts.CheckShiftActivity(Info.shiftIndex);
 
                 //if (!activityShift || startOfShift == "")
-                if (!activityShift || startOfShift == "")
+                if (!activityShift || shiftID == -1)
                 {
                     Info.active = false;
                     ClearAll();
@@ -1004,9 +1007,9 @@ namespace OrderManager
         {
             ValueUserBase userBase = new ValueUserBase();
 
-            string startOfShift = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
+            int shiftID = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
 
-            if (startOfShift == "")
+            if (shiftID == -1)
             {
                 Info.active = false;
                 ClearAll();
@@ -1025,24 +1028,25 @@ namespace OrderManager
 
             LoadBaseConnectionParameters();
 
-            if (!IsServerConnected())
+            if (IsServerConnected())
             {
-                DataBaseSelect(false);
-            }
-
-            if (!adminMode)
-            {
-                Info.active = false;
-                ClearAll();
-                ShowUserForm();
+                if (!adminMode)
+                {
+                    Info.active = false;
+                    ClearAll();
+                    ShowUserForm();
+                }
+                else
+                {
+                    this.Visible = false;
+                    FormAdmin form = new FormAdmin(adminMode);
+                    form.ShowDialog();
+                }
             }
             else
             {
-                this.Visible = false;
-                FormAdmin form = new FormAdmin(adminMode);
-                form.ShowDialog();
+                DataBaseSelect(false);
             }
-
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -1172,11 +1176,11 @@ namespace OrderManager
 
                 if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && Convert.ToBoolean(getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder)))
                 {
-                    form = new FormAddCloseOrder(Info.startOfShift, Info.nameOfExecutor);
+                    form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
                 }
                 else
                 {
-                    form = new FormAddCloseOrder(Info.startOfShift,
+                    form = new FormAddCloseOrder(Info.shiftIndex,
                         ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                         ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                         ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
@@ -1195,7 +1199,7 @@ namespace OrderManager
             Info.active = false;
             FormPrivateNote form;
 
-            form = new FormPrivateNote(Info.startOfShift,
+            form = new FormPrivateNote(Info.shiftIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
@@ -1212,7 +1216,7 @@ namespace OrderManager
             Info.active = false;
             FormTypesInTheOrder form;
 
-            form = new FormTypesInTheOrder(Info.startOfShift,
+            form = new FormTypesInTheOrder(Info.shiftIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
@@ -1291,7 +1295,7 @@ namespace OrderManager
             if (idx != -1)
             {
                 ValueSettingsBase valueSettings = new ValueSettingsBase();
-                GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.startOfShift, ordersCurrentShift);
+                GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
                 bool typeLoad;
 
@@ -1354,7 +1358,7 @@ namespace OrderManager
 
         private void listView1_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
         {
-            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.startOfShift, ordersCurrentShift);
+            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
             ToolTip tooltp = new ToolTip();
 

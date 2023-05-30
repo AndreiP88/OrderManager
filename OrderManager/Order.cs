@@ -6,10 +6,10 @@ namespace OrderManager
     {
         public int id;
         public int orderIndex;
-        public String machineOfOrder;
-        public String numberOfOrder;
-        public String modificationOfOrder;
-        public String nameOfOrder;
+        public string machineOfOrder;
+        public string numberOfOrder;
+        public string modificationOfOrder;
+        public string nameOfOrder;
         public int amountOfOrder;
         public int lastCount;
         public int plannedTimeMakeready;
@@ -21,12 +21,12 @@ namespace OrderManager
         public int workingOut;
         public int mkDeviation;
         public int wkDeviation;
-        public String counterRepeat;
-        public String note;
-        public String notePrivate;
-        public Order(int indexOrderInProgress, int orderID, String machine, String number, string modification, String orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
+        public int counterRepeat;
+        public string note;
+        public string notePrivate;
+        public Order(int indexOrderInProgress, int orderID, string machine, string number, string modification, string orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
             int plannedWork, int facticalMakeready, int facticalWork, int countDone, int cNorm,
-            int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, String orderCounterRepeat, String orderNote, String orderPrivateNote)
+            int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, int orderCounterRepeat, string orderNote, string orderPrivateNote)
         {
             this.id = indexOrderInProgress;
             this.orderIndex = orderID;

@@ -11,11 +11,11 @@ namespace OrderManager
 {
     internal class GetWorkingOutTime
     {
-        string startOfShift;
+        int shiftID;
         List <Order> ordersCurrentShift;
-        public GetWorkingOutTime(string startShift, List<Order> ordersCurrent)
+        public GetWorkingOutTime(int startShiftID, List<Order> ordersCurrent)
         {
-            this.startOfShift = startShift;
+            this.shiftID = startShiftID;
             this.ordersCurrentShift = ordersCurrent;
         }
 
@@ -59,11 +59,11 @@ namespace OrderManager
             string machine = ordersCurrentShift[indexOrder].machineOfOrder;
             string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
 
-            string shiftStart = startOfShift; //get from Info or user base
+            string shiftStart = shiftsBase.GetStartShiftFromID(shiftID); //get from Info or user base
 
             if (plannedWorkingOut)
             {
-                shiftStart = startShift.PlanedStartShift(startOfShift); //get from method
+                shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
             }
 
             int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
@@ -231,7 +231,7 @@ namespace OrderManager
                 int timeWorkingOutDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeStoFromWorkingOut, facticalTimeToWorkStop);
                 //int timeWorkingOutDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeStoFromWorkingOut, DateTime.Now.ToString());
 
-                if (shiftsBase.CheckShiftActivity(startOfShift))//активна ли смена
+                if (shiftsBase.CheckShiftActivity(shiftID))//активна ли смена
                 {
                     bool active = Convert.ToBoolean(infoBase.GetActiveOrder(machine));
 
