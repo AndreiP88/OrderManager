@@ -854,7 +854,6 @@ namespace OrderManager
             {
                 int index = machines.IndexOf(userBase.GetLastMachineForUser(Form1.Info.nameOfExecutor));
 
-
                 LoadParametersForTheSelectedUserFromBase();
                 //LoadOrdersFromBase();
             }

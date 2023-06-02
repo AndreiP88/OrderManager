@@ -334,7 +334,8 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
+                    //CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
+                    CommandText = @"SELECT * FROM allOrdersInJob WHERE shiftID = '" + shiftID + "'"
                 };
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -345,13 +346,15 @@ namespace OrderManager
                         //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
                         GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
 
-                        int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
+                        //int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
+                        int amountThisOrder = (int)sqlReader["amountOfOrder"];
                         int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
 
                         if (lastCount < 0)
                             lastCount = 0;
 
-                        int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
+                        //int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
+                        int workTime = (int)sqlReader["timeToWork"];
                         int orderNorm = 0;
                         int timeWorkingOut = 0;
                         int lastTimeWork = 0;
@@ -359,7 +362,7 @@ namespace OrderManager
                         if (workTime != 0)
                         {
                             orderNorm = amountThisOrder * 60 / workTime;
-                            timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
+                            timeWorkingOut = (int)sqlReader["done"] * 60 / orderNorm;
                             lastTimeWork = (lastCount * 60) / orderNorm;
                         }
 
@@ -404,9 +407,12 @@ namespace OrderManager
                             Convert.ToInt32(sqlReader["count"]),
                             (int)sqlReader["orderID"],
                             sqlReader["machine"].ToString(),
-                            ordersBase.GetOrderNumber((int)sqlReader["orderID"]),
+                            /*ordersBase.GetOrderNumber((int)sqlReader["orderID"]),
                             ordersBase.GetOrderModification((int)sqlReader["orderID"]),
-                            ordersBase.GetOrderName((int)sqlReader["orderID"]).ToString(),
+                            ordersBase.GetOrderName((int)sqlReader["orderID"]).ToString(),*/
+                            sqlReader["numberOfOrder"].ToString(),
+                            sqlReader["modification"].ToString(),
+                            sqlReader["nameOfOrder"].ToString(),
                             amountThisOrder,
                             lastCount,
                             lastTimeMakeready,
