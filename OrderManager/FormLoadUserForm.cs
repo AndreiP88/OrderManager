@@ -188,7 +188,7 @@ namespace OrderManager
             UpdateMachineFromUsers();
         }
 
-        private void FormLoadUserForm_DoubleClick(object sender, EventArgs e)
+        private void LoadFormDataBaseSelect()
         {
             FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
             form.ShowDialog();
@@ -205,6 +205,33 @@ namespace OrderManager
             LoadUsersList();
 
             timer1.Enabled = true;
+        }
+
+        private void LoadFormCategoryesSelect()
+        {
+            FormSelectCategory form = new FormSelectCategory();
+            form.ShowDialog();
+
+            timer1.Enabled = false;
+
+            LoadUsersList();
+
+            timer1.Enabled = true;
+        }
+
+        private void FormLoadUserForm_DoubleClick(object sender, EventArgs e)
+        {
+            LoadFormDataBaseSelect();
+        }
+
+        private void selectDataBaseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadFormDataBaseSelect();
+        }
+
+        private void selectCategoryesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadFormCategoryesSelect();
         }
     }
 }

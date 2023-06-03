@@ -128,7 +128,7 @@ namespace OrderManager
             }
         }
 
-        private String GetCategoryesFromLV()
+        private string GetCategoryesFromLV()
         {
             StringArray str = new StringArray();
 

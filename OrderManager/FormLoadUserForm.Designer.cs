@@ -37,6 +37,10 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.selectCategoryesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectDataBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView1
@@ -51,7 +55,7 @@
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(12, 13);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(501, 211);
+            this.listView1.Size = new System.Drawing.Size(501, 280);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -96,7 +100,7 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button4.Location = new System.Drawing.Point(519, 192);
+            this.button4.Location = new System.Drawing.Point(519, 261);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(105, 32);
             this.button4.TabIndex = 2;
@@ -109,11 +113,34 @@
             this.timer1.Interval = 10000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectCategoryesToolStripMenuItem,
+            this.selectDataBaseToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(186, 48);
+            // 
+            // selectCategoryesToolStripMenuItem
+            // 
+            this.selectCategoryesToolStripMenuItem.Name = "selectCategoryesToolStripMenuItem";
+            this.selectCategoryesToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.selectCategoryesToolStripMenuItem.Text = "Выбор участка";
+            this.selectCategoryesToolStripMenuItem.Click += new System.EventHandler(this.selectCategoryesToolStripMenuItem_Click);
+            // 
+            // selectDataBaseToolStripMenuItem
+            // 
+            this.selectDataBaseToolStripMenuItem.Name = "selectDataBaseToolStripMenuItem";
+            this.selectDataBaseToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.selectDataBaseToolStripMenuItem.Text = "Выбор базы данных";
+            this.selectDataBaseToolStripMenuItem.Click += new System.EventHandler(this.selectDataBaseToolStripMenuItem_Click);
+            // 
             // FormLoadUserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(636, 235);
+            this.ClientSize = new System.Drawing.Size(632, 305);
+            this.ContextMenuStrip = this.contextMenuStrip1;
             this.ControlBox = false;
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button2);
@@ -130,6 +157,7 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LoadUserForm_FormClosed);
             this.Load += new System.EventHandler(this.LoadUserForm_Load);
             this.DoubleClick += new System.EventHandler(this.FormLoadUserForm_DoubleClick);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -144,5 +172,8 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem selectCategoryesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectDataBaseToolStripMenuItem;
     }
 }

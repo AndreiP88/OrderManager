@@ -97,6 +97,13 @@ namespace OrderManager
             return result;
         }
 
+        public String GetCategoryesForView()
+        {
+            String result = GetParameter("main", "selectedCategoryes");
+
+            return result;
+        }
+
         public String GetSelectedMachine()
         {
             String result = GetParameter("variables", "selectedMachine");
@@ -127,6 +134,11 @@ namespace OrderManager
         public void SetSelectedCategory(String value)
         {
             SetParameter("variables", "selectedCategory", value);
+        }
+
+        public void SetCategoryesForView(string value)
+        {
+            SetParameter("main", "selectedCategoryes", value);
         }
 
         public void SetSelectedMachine(String value)

@@ -117,7 +117,14 @@ namespace OrderManager
 
         public int GetCurrentShiftStart(string id)
         {
-            return Convert.ToInt32(GetValueInfo("user", id, "currentShiftStartID"));
+            int result = -1;
+
+            if (id != "")
+            {
+                result = Convert.ToInt32(GetValueInfo("user", id, "currentShiftStartID"));
+            }
+
+            return result;
         }
 
         public String GetLastUID(String id)
