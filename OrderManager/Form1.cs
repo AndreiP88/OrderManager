@@ -1518,9 +1518,6 @@ namespace OrderManager
             string[] captions = { "10:00", "10:30", "11:00", "12:00" };
             string[] values = { "", "", "", "" };
 
-            string captionNotEnough = "Тиража не достаточно для выполнения минимальной нормы";
-            string captionMakeReady = "Выполняется приладка";
-
             int wOut;
             //int norm;
             int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox3.Text);

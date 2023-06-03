@@ -290,6 +290,7 @@ namespace OrderManager
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
             Invoke(new Action(() =>
             {
@@ -490,6 +491,9 @@ namespace OrderManager
                                 stamp,
                                 orderHeadList[i]
                             ));
+
+                            int index = orders.Count - 1;
+                            AddOrderToListView(index, orders[index]);
                         }
                     }
 
@@ -521,6 +525,9 @@ namespace OrderManager
                                     stamp,
                                     orderHeadList[i]
                                 ));
+
+                                int index = orders.Count - 1;
+                                AddOrderToListView(index, orders[index]);
                             }
                             else
                             {
@@ -534,6 +541,9 @@ namespace OrderManager
                                     stamp,
                                     orderHeadList[i]
                                 ));
+
+                                int index = orders.Count - 1;
+                                AddOrderToListView(index, orders[index]);
                             }
 
 
@@ -568,6 +578,9 @@ namespace OrderManager
                                     stamp,
                                     orderHeadList[i]
                                 ));
+
+                                int index = orders.Count - 1;
+                                AddOrderToListView(index, orders[index]);
                             }
                             else
                             {
@@ -581,13 +594,33 @@ namespace OrderManager
                                     stamp,
                                     orderHeadList[i]
                                 ));
+
+                                int index = orders.Count - 1;
+                                AddOrderToListView(index, orders[index]);
                             }
                         }
                     }
+
+                    /*ListViewItem item = new ListViewItem();
+
+                    int index = orders.Count - 1;
+
+                    item.Name = index.ToString();
+                    item.Text = (index + 1).ToString();
+                    item.SubItems.Add(orders[index].numberOfOrder.ToString());
+                    item.SubItems.Add(orders[index].nameCustomer.ToString());
+                    item.SubItems.Add(orders[index].nameItem.ToString());
+                    item.SubItems.Add(timeOperations.MinuteToTimeString(orders[index].makereadyTime));
+                    item.SubItems.Add(timeOperations.MinuteToTimeString(orders[index].workTime));
+                    item.SubItems.Add(orders[index].amountOfOrder.ToString("N0"));
+                    item.SubItems.Add(orders[index].stamp.ToString());
+
+                    Invoke(new Action(() =>
+                    {
+                        listView1.Items.Add(item);
+                    }));*/
                 }
             }
-
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
             for (int i = 0; i < orders.Count; i++)
             {
@@ -596,7 +629,7 @@ namespace OrderManager
                     break;
                 }
 
-                ListViewItem item = new ListViewItem();
+                /*ListViewItem item = new ListViewItem();
 
                 item.Name = i.ToString();
                 item.Text = (i + 1).ToString();
@@ -611,7 +644,7 @@ namespace OrderManager
                 Invoke(new Action(() =>
                 {
                     listView1.Items.Add(item);
-                }));
+                }));*/
             }
         }
 
@@ -814,6 +847,9 @@ namespace OrderManager
                             stamp,
                             orderHead
                         ));
+
+                        int index = orders.Count - 1;
+                        AddOrderToListView(index, orders[index]);
                     }
                 }
 
@@ -833,6 +869,9 @@ namespace OrderManager
                                 stamp,
                                 orderHead
                             ));
+
+                            int index = orders.Count - 1;
+                            AddOrderToListView(index, orders[index]);
                         }
                         else
                         {
@@ -846,6 +885,9 @@ namespace OrderManager
                                 stamp,
                                 orderHead
                             ));
+
+                            int index = orders.Count - 1;
+                            AddOrderToListView(index, orders[index]);
                         }
                     }
                 }
@@ -866,6 +908,9 @@ namespace OrderManager
                                 stamp,
                                 orderHead
                             ));
+
+                            int index = orders.Count - 1;
+                            AddOrderToListView(index, orders[index]);
                         }
                         else
                         {
@@ -879,12 +924,13 @@ namespace OrderManager
                                 stamp,
                                 orderHead
                             ));
+
+                            int index = orders.Count - 1;
+                            AddOrderToListView(index, orders[index]);
                         }
                     }
                 }
             }
-
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
             for (int i = 0; i < orders.Count; i++)
             {
@@ -893,7 +939,7 @@ namespace OrderManager
                     break;
                 }
 
-                ListViewItem item = new ListViewItem();
+                /*ListViewItem item = new ListViewItem();
 
                 item.Name = i.ToString();
                 item.Text = (i + 1).ToString();
@@ -909,9 +955,8 @@ namespace OrderManager
                 Invoke(new Action(() =>
                 {
                     listView1.Items.Add(item);
-                }));
+                }));*/
 
-                
             }
 
             Invoke(new Action(() =>
@@ -920,22 +965,32 @@ namespace OrderManager
             }));
         }
 
+        private void AddOrderToListView(int index, OrdersLoad order)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
+            ListViewItem item = new ListViewItem();
 
+            item.Name = index.ToString();
+            item.Text = (index + 1).ToString();
+            item.SubItems.Add(order.numberOfOrder.ToString());
+            item.SubItems.Add(order.nameCustomer.ToString());
+            item.SubItems.Add(order.nameItem.ToString());
+            item.SubItems.Add(timeOperations.MinuteToTimeString(order.makereadyTime));
+            item.SubItems.Add(timeOperations.MinuteToTimeString(order.workTime));
+            item.SubItems.Add(order.amountOfOrder.ToString("N0"));
+            item.SubItems.Add(order.stamp.ToString());
 
+            Invoke(new Action(() =>
+            {
+                listView1.Items.Add(item);
+            }));
 
-
-
-
-
-
-
-
-
-
-
-
-
+            Invoke(new Action(() =>
+            {
+                label1.Text = $"Загружено заказов: {index + 1}";
+            }));
+        }
 
         private void button2_Click(object sender, EventArgs e)
         {
