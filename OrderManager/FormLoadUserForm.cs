@@ -13,12 +13,9 @@ namespace OrderManager
     {
         public static bool enteredPasswordSuccess = false;
 
-        String loadMode = "";
-
-        public FormLoadUserForm(String loadMode)
+        public FormLoadUserForm()
         {
             InitializeComponent();
-            this.loadMode = loadMode;   
         }
 
         List<String> users;
@@ -26,6 +23,8 @@ namespace OrderManager
         private void LoadUserForm_Load(object sender, EventArgs e)
         {
             LoadUsersList();
+            UpdateCurrentDateTime();
+
             timer1.Enabled = true;
         }
 
@@ -33,12 +32,17 @@ namespace OrderManager
         {
             //ValueInfoBase getMachine = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
+            StringArray str = new StringArray();
+            INISettings settings = new INISettings();
+
+            string selectedCategory = settings.GetCategoryesForView();
+            string[] arrayCat = str.ArrayFromTheString(selectedCategory);
 
             listView1.Items.Clear();
             //List<String> users = userBase.GetUserList(true);
             //users.Clear();
 
-            users = userBase.GetUserListForCategory(true, loadMode);
+            users = userBase.GetUserListForCategory(true, arrayCat);
 
             int counter = 0;
 
@@ -80,6 +84,13 @@ namespace OrderManager
                     item.SubItems[2].Text = machines;
                 }
             }
+        }
+
+        private void UpdateCurrentDateTime()
+        {
+            string currentTime = DateTime.Now.ToString("f");
+
+            toolStripStatusLabel1.Text = currentTime;
         }
 
         private void LoadSelectedUser()
@@ -186,6 +197,7 @@ namespace OrderManager
         private void timer1_Tick(object sender, EventArgs e)
         {
             UpdateMachineFromUsers();
+            UpdateCurrentDateTime();
         }
 
         private void LoadFormDataBaseSelect()
@@ -221,7 +233,7 @@ namespace OrderManager
 
         private void FormLoadUserForm_DoubleClick(object sender, EventArgs e)
         {
-            LoadFormDataBaseSelect();
+            //LoadFormDataBaseSelect();
         }
 
         private void selectDataBaseToolStripMenuItem_Click(object sender, EventArgs e)

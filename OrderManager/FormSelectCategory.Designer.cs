@@ -37,7 +37,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button1.Location = new System.Drawing.Point(179, 216);
+            this.button1.Location = new System.Drawing.Point(136, 216);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(130, 32);
             this.button1.TabIndex = 2;
@@ -48,7 +48,7 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button4.Location = new System.Drawing.Point(315, 216);
+            this.button4.Location = new System.Drawing.Point(272, 216);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(124, 32);
             this.button4.TabIndex = 2;
@@ -66,7 +66,7 @@
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(12, 12);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(427, 198);
+            this.listView1.Size = new System.Drawing.Size(384, 198);
             this.listView1.TabIndex = 3;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -74,13 +74,13 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "Участок";
-            this.columnHeader1.Width = 400;
+            this.columnHeader1.Width = 360;
             // 
             // FormSelectCategory
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(446, 256);
+            this.ClientSize = new System.Drawing.Size(408, 256);
             this.ControlBox = false;
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.button4);

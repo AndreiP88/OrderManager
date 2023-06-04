@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
     internal class StringArray
     {
-        char separator = ';';
+        readonly char separator = ';';
         /// <summary>
         /// С указанием разделителя
         /// </summary>
@@ -24,9 +25,9 @@ namespace OrderManager
         /// </summary>
         /// <param name="str"></param>
         /// <returns>Массив значений</returns>
-        public String[] ArrayFromTheString(String str)
+        public string[] ArrayFromTheString(string str)
         {
-            String[] result = str.Split(separator);
+            string[] result = str.Split(separator);
 
             return result;
         }
@@ -35,9 +36,9 @@ namespace OrderManager
         /// </summary>
         /// <param name="arr"></param>
         /// <returns>Строку с разделителем</returns>
-        public String StringFromTheArray(String[] arr)
+        public string StringFromTheArray(string[] arr)
         {
-            String result = "";
+            string result = "";
 
             for (int i = 0; i < arr.Length; i++)
             {

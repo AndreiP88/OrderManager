@@ -20,9 +20,6 @@ namespace OrderManager
             StringArray str = new StringArray();
             INISettings settings = new INISettings();
 
-            string selectedCategory = settings.GetCategoryesForView();
-            string[] arrayCat = str.ArrayFromTheString(selectedCategory);
-
             List<string> categoryes = new List<string>(getCategory.GetCategoryesList());
 
             for (int i = 0; i < categoryes.Count; i++)
@@ -34,6 +31,9 @@ namespace OrderManager
 
                 listView1.Items.Add(item);
             }
+
+            string selectedCategory = settings.GetCategoryesForView();
+            string[] arrayCat = str.ArrayFromTheString(selectedCategory);
 
             for (int i = 0; i < arrayCat.Length; i++)
             {

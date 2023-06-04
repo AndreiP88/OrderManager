@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
@@ -91,13 +92,19 @@ namespace OrderManager
             return GetValue("id", id, "categoryesMachine");
         }
 
-        public String[] GetMachinesArr(String id)
+        public string[] GetMachinesArr(string id)
         {
             return GetCategoryesMachine(id).Split(';');
         }
+
         public bool CategoryForUser(String id, String category)
         {
             return GetMachinesArr(id).Contains(category);
+        }
+
+        public bool CategoryForUser(string id, string[] category)
+        {
+            return GetMachinesArr(id).Any(x => category.Contains(x));
         }
 
         public String GetLastMachineForUser(String id)
@@ -167,7 +174,6 @@ namespace OrderManager
                     {
                         userList.Add(sqlReader["id"].ToString());
                     }
-
                 }
 
                 Connect.Close();
@@ -193,6 +199,22 @@ namespace OrderManager
             return result;
         }
 
+        public List<string> GetUserListForCategory(bool activeUserOnly, string[] categoryList)
+        {
+            List<string> userList = new List<string>(GetUserList(activeUserOnly));
+            List<string> result = new List<string>();
+            
+            for (int i = 0; i < userList.Count; i++)
+            {
+                if (CategoryForUser(userList[i], categoryList) || categoryList[0] == "")
+                {
+                    result.Add(userList[i].ToString());
+                }
+            }
+
+            return result;
+        }
+
         public int GetCountUsers()
         {
             int result = 0;
@@ -204,7 +226,6 @@ namespace OrderManager
                 {
                     Connection = Connect,
                     CommandText = @"SELECT COUNT(DISTINCT id) as count FROM users WHERE activeUser = 'True'"
-
                 };
 
                 result = Convert.ToInt32(Command.ExecuteScalar());
@@ -265,7 +286,7 @@ namespace OrderManager
             return userInfos;
         }
 
-        public Object GetUserInfoFromID(String userID)
+        public Object GetUserInfoFromID(string userID)
         {
             UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "");
 

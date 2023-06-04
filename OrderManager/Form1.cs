@@ -27,7 +27,6 @@ namespace OrderManager
     public partial class Form1 : Form
     {
         bool adminMode = false;
-        String loadMode = "";
 
         public Form1(string[] args)
         {
@@ -43,7 +42,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    loadMode = param;
+                    //loadMode = param;
                 }
 
             }
@@ -155,7 +154,7 @@ namespace OrderManager
 
             //ViewBaseConnectionParameters();
 
-            FormLoadUserForm form = new FormLoadUserForm(loadMode);
+            FormLoadUserForm form = new FormLoadUserForm();
             //this.Visible = false;
             form.ShowDialog();
 
