@@ -90,7 +90,7 @@ namespace OrderManager
         {
             string currentTime = DateTime.Now.ToString("f");
 
-            toolStripStatusLabel1.Text = currentTime;
+            toolStripStatusLabel1.Text = "   " + currentTime;
         }
 
         private void LoadSelectedUser()

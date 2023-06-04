@@ -128,7 +128,12 @@ namespace OrderManager
 
             if (id != "")
             {
-                result = Convert.ToInt32(GetValueInfo("user", id, "currentShiftStartID"));
+                string value = GetValueInfo("user", id, "currentShiftStartID");
+
+                if (value != "")
+                {
+                    result = Convert.ToInt32(value);
+                }
             }
 
             return result;
