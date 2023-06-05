@@ -789,7 +789,7 @@ namespace OrderManager
 
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
-            String workStart = dateTimePicker2.Value.AddMinutes(1).ToString();
+            String workStart = dateTimePicker2.Value.AddMinutes(1).ToString("HH:mm dd.MM.yyyy");
             String workStop = dateTimePicker4.Text;
             String note = textBox6.Text;
             int done = (int)numericUpDown4.Value;
