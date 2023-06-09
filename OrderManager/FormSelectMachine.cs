@@ -205,7 +205,7 @@ namespace OrderManager
             for (int i = 0; i < checkBoxesMachines.Count; i++)
             {
                 if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "-1" &&
-                    CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
+                    //CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
                     checkBoxesMachines[i].Checked == false)
                 {
                     MessageBox.Show("Прежде чем убрать какое либо оборудование из активного, завершите текущий заказ.", "Изменение активного оборудования", MessageBoxButtons.OK, MessageBoxIcon.Warning);
