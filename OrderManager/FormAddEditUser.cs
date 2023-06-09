@@ -1,8 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -38,6 +42,21 @@ namespace OrderManager
 
         }
 
+        class UserName
+        {
+            public string LastName;
+            public string FirstName;
+            public string MiddleName;
+            public UserName(string nLastName, string nFirstName, string nMiddleName)
+            {
+                this.LastName = nLastName;
+                this.FirstName = nFirstName;
+                this.MiddleName = nMiddleName;
+            }
+        }
+
+        List<UserName> userNames = new List<UserName>();
+
         private void FormAddEditUser_Load(object sender, EventArgs e)
         {
             if (_loadForEdit)
@@ -47,6 +66,7 @@ namespace OrderManager
             else
             {
                 LoadForAdd();
+                LoadMainNormOperation();
             }
         }
 
@@ -109,6 +129,62 @@ namespace OrderManager
             button3.Visible = false;
 
             LoadCategoryes();
+        }
+
+        private void LoadMainNormOperation()
+        {
+            userNames.Clear();
+
+            string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = connection,
+                        //CommandText = @"SELECT * FROM dbo.order_head WHERE status = '1' AND order_num LIKE '@order_num'"
+                        //CommandText = @"SELECT * FROM dbo.common_employee WHERE fire_date IS null"
+                        CommandText = @"SELECT
+	                            * 
+                            FROM
+	                            dbo.common_employee
+	                            INNER JOIN common_employee_speciality ON common_employee.id_common_employee_speciality = common_employee_speciality.id_common_employee_speciality 
+                            WHERE
+	                            fire_date IS NULL"
+
+                    };
+                    //Command.Parameters.AddWithValue("@order_num", "%" + textBox1.Text + "%");
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        userNames.Add(new UserName(
+                            sqlReader["employee_lastname"].ToString(),
+                            sqlReader["employee_firstname"].ToString(),
+                            sqlReader["employee_middlename"].ToString()
+                            ));
+
+                        comboBox1.Items.Add(sqlReader["employee_speciality_name"].ToString() + ": " +
+                            sqlReader["employee_lastname"].ToString() + " " +
+                            sqlReader["employee_firstname"].ToString() + " " +
+                            sqlReader["employee_middlename"].ToString());
+                    }
+
+                    connection.Close();
+                }
+
+                comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+                //сделать выбор для редактирования
+                comboBox1.SelectedIndex = -1;
+            }
+            catch
+            {
+                comboBox1.Items.Clear();
+            }
         }
 
         private void LoadCategoryes()
@@ -313,6 +389,13 @@ namespace OrderManager
             button3.Visible = false;
 
             checkBox1.Checked = false;
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = userNames[comboBox1.SelectedIndex].LastName;
+            textBox2.Text = userNames[comboBox1.SelectedIndex].FirstName;
+            textBox3.Text = userNames[comboBox1.SelectedIndex].MiddleName;
         }
     }
 }
