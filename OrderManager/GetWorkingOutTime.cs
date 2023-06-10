@@ -80,7 +80,14 @@ namespace OrderManager
 
             if (facticalTimeToWorkStop == "")
             {
-                facticalTimeToWorkStop = facticalTimeMakereadyStop;
+                if (Convert.ToInt32(infoBase.GetCurrentOrderID(machine)) == ordersCurrentShift[indexOrder].orderIndex)
+                {
+                    facticalTimeToWorkStop = DateTime.Now.ToString();
+                }
+                else
+                {
+                    facticalTimeToWorkStop = facticalTimeMakereadyStop;
+                }             
             }
 
             int currentLead;
@@ -126,7 +133,7 @@ namespace OrderManager
 
             /*orderStatus.wkTimeDifferent = wkTimeDifferent;*/
 
-            bool print = false;
+            bool print = true;
 
             if (print)
             {
