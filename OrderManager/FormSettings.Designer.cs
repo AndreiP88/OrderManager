@@ -214,7 +214,7 @@
             this.groupBox4.Size = new System.Drawing.Size(537, 48);
             this.groupBox4.TabIndex = 11;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Способ регистрации заказов в системе";
+            this.groupBox4.Text = "Способ регистрации заказов в системе (требуется тестирование работоспособности)";
             // 
             // comboBox5
             // 
@@ -237,7 +237,7 @@
             this.groupBox5.Size = new System.Drawing.Size(537, 48);
             this.groupBox5.TabIndex = 12;
             this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Способ расчёта общей выработки в статистике";
+            this.groupBox5.Text = "Способ расчёта общей выработки в статистике (пока не реализовано)";
             // 
             // comboBox6
             // 

@@ -100,6 +100,11 @@ namespace OrderManager
             return Convert.ToInt32(GetValueFromIndex(id, "orderID"));
         }
 
+        public int LastTimeForMakeready(int shiftID, int orderIndex, int counterRepeat)
+        {
+            return LastTimeMakeready(shiftID, orderIndex, counterRepeat);
+        }
+
         private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, string machine)
         {
             String result = "";

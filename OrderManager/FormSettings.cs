@@ -24,6 +24,7 @@ namespace OrderManager
             comboBox2.SelectedIndex = valueSettings.GetTypeLoadItemMouseHover(user);
             comboBox3.SelectedIndex = valueSettings.GetTypeLoadDeviationToMainLV(user);
             comboBox4.SelectedIndex = valueSettings.GetTypeViewDeviationToMainLV(user);
+            comboBox5.SelectedIndex = valueSettings.GetOrderRegistrationType(user);
         }
 
         private void SaveValue()
@@ -34,6 +35,8 @@ namespace OrderManager
             valueSettings.UpdateTypeLoadItemMouseHover(user, comboBox2.SelectedIndex.ToString());
             valueSettings.UpdateTypeLoadDeviationToMainLV(user, comboBox3.SelectedIndex.ToString());
             valueSettings.UpdateTypeViewDeviationToMainLV(user, comboBox4.SelectedIndex.ToString());
+            valueSettings.UpdateOrderRegistrationType(user, comboBox5.SelectedIndex.ToString());
+            
         }
         private void FormSettings_Load(object sender, EventArgs e)
         {

@@ -96,6 +96,24 @@ namespace OrderManager
             return result;
         }
 
+        public int GetOrderRegistrationType(string id)
+        {
+            int result = 0;
+            string value = GetValue("userID", id, "orderRegistrationType");
+
+            if (value != "")
+            {
+                try
+                {
+                    result = Convert.ToInt32(value);
+                }
+                catch { }
+            }
+
+            return result;
+        }
+        
+
         public String GetParameterLine(String id, String selectForm)
         {
             return GetValueFromWindowStateBase("userID", id, selectForm);
@@ -184,6 +202,11 @@ namespace OrderManager
         public void UpdateTypeViewDeviationToMainLV(String idUser, String newValue)
         {
             UpdateValue("typeViewDeviationToMainLV", idUser, newValue);
+        }
+
+        public void UpdateOrderRegistrationType(String idUser, String newValue)
+        {
+            UpdateValue("orderRegistrationType", idUser, newValue);
         }
 
         public void UpdateParameterLine(String idUser, String selectForm, String newValue)

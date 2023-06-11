@@ -22,6 +22,8 @@ namespace OrderManager
         string loadMachine;
         int loadCounterRepeat;
 
+        int orderRegistrationType;
+
         public class TransparentPanel : Panel
         {
             protected override CreateParams CreateParams
@@ -244,16 +246,32 @@ namespace OrderManager
 
                     button6.Enabled = true;
 
-                    button1.Text = "Подтвердить приладку";
+                    /*button1.Text = "Подтвердить приладку";
                     button2.Text = "Завершить приладку";
-                    button3.Text = "Прервать приладку";
+                    button3.Text = "Прервать приладку";*/
 
                     dateTimePicker1.Visible = true;
                     dateTimePicker2.Visible = true;
                     textBox3.Visible = true;
 
                     groupBox3.Visible = false;
-                    groupBox4.Visible = false;
+                    
+                    if (orderRegistrationType == 0)
+                    {
+                        button1.Text = "Подтвердить приладку";
+                        button2.Text = "Завершить приладку";
+                        button3.Text = "Прервать приладку";
+
+                        groupBox4.Visible = false;
+                    }
+                    else
+                    {
+                        button1.Text = "Подтвердить";
+                        button2.Text = "Завершить";
+                        button3.Text = "Прервать";
+
+                        groupBox4.Visible = true;
+                    }
 
                     textBox6.Enabled = true;
                 }
@@ -667,7 +685,7 @@ namespace OrderManager
             }
         }
 
-        private void AcceptOrderInProgressToDB()
+        /*private void AcceptOrderInProgressToDB()
         {
             //ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -763,9 +781,14 @@ namespace OrderManager
             }
 
             orders.SetNewStatus(orderID, newStatus);
-        }
 
-        private void CloseOrderInProgressToDB()
+
+
+
+
+        }*/
+
+        /*private void CloseOrderInProgressToDB()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -776,7 +799,7 @@ namespace OrderManager
             int shiftID = shiftIndex;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            
+
             String newStatus = "0";
 
             String machineCurrent = getInfo.GetMachineFromName(comboBox3.Text);
@@ -801,34 +824,53 @@ namespace OrderManager
             {
                 if (currentOrderID != "-1")
                 {
-                    DialogResult dialogResult = DialogResult.No;
-
-                    if (!adminCloseOrder)
-                        dialogResult = MessageBox.Show("Приладка завершена. Начать выполнение заказа?", "Завершение приладки", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                    if (dialogResult == DialogResult.Cancel)
+                    if (orderRegistrationType == 0)
                     {
-                        return;
+                        DialogResult dialogResult = DialogResult.No;
+
+                        if (!adminCloseOrder)
+                            dialogResult = MessageBox.Show("Приладка завершена. Начать выполнение заказа?", "Завершение приладки", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                        if (dialogResult == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+
+                        UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                        UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, workStart);
+                            //UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
+                            getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, orderID, orderID, true);
+                            //убираем заказ из активных для возможности завершить смену
+                            newStatus = "3";
+                        }
+
+                        if (dialogResult == DialogResult.No || adminCloseOrder)
+                        {
+                            getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, orderID, orderID, false);
+                            //убираем заказ из активных для возможности завершить смену
+                            newStatus = "2";
+                        }
+                    }
+                    else
+                    {
+                        *//*- при нажатии кнопок завершить
+                        -- если введено количество сделанного:
+                        --- в поле время завершения приладки вносить планируемое время завершения приладки
+                        --- в поле время начала выполнения заказа вносить планируемое время завершения приладки + 1 минута
+                        --- в поле время завершения выполнения заказа вносить текущее время
+                        --- статус менять на 4 (заказ завершен)
+                        -- если количество не введено:
+                        --- в поле время завершения приладки вносить текущее время
+                        --- статус менять на 2 (приладка завершена)*//*
+
+
                     }
 
-                    UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
-                    UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
 
-                    if (dialogResult == DialogResult.Yes)
-                    {
-                        UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, workStart);
-                        //UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
-                        getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, orderID, orderID, true);
-                        //убираем заказ из активных для возможности завершить смену
-                        newStatus = "3";
-                    }
-
-                    if (dialogResult == DialogResult.No || adminCloseOrder)
-                    {
-                        getInfo.UpdateInfo(getInfo.GetMachineFromName(comboBox3.Text), counterRepeat, orderID, orderID, false);
-                        //убираем заказ из активных для возможности завершить смену
-                        newStatus = "2";
-                    }
                 }
             }
             if (status == "3") // начата склейка
@@ -842,6 +884,254 @@ namespace OrderManager
                     UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
                     newStatus = "4";
                     getInfo.UpdateInfo(machineCurrent, 0, -1, -1, false);
+                }
+            }
+
+            orders.SetNewStatus(orderID, newStatus);
+
+            Close();
+        }*/
+
+        private void AcceptOrderInProgressToDB()
+        {
+            //ValueInfoBase getInfo = new ValueInfoBase();
+            ValueOrdersBase getValue = new ValueOrdersBase();
+            ValueInfoBase infoBase = new ValueInfoBase();
+            ValueUserBase userBase = new ValueUserBase();
+            ValueOrdersBase orders = new ValueOrdersBase();
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            //имя и время начала смены сделать через параметры
+            String executor = nameOfExecutor;
+            int shiftID = shiftIndex;
+            String number = textBox1.Text;
+            String modification = textBox5.Text;
+
+            String newStatus = "0";
+
+            String machineCurrent = infoBase.GetMachineFromName(comboBox3.Text);
+            int orderID = getValue.GetOrderID(machineCurrent, number, modification);
+
+            string status = getValue.GetOrderStatus(orderID);
+            int counterRepeat = getValue.GetCounterRepeat(orderID);
+            string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
+            string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
+
+            String makereadyStart = dateTimePicker1.Text;
+            String makereadyStop = dateTimePicker2.Text;
+            String workStart = dateTimePicker3.Text;
+            String workStop = dateTimePicker4.Text;
+            String note = textBox6.Text;
+            int done = (int)numericUpDown4.Value;
+
+            userBase.UpdateLastMachine(executor, infoBase.GetMachineFromName(comboBox3.Text));
+
+            if (status == "0") //новая запись
+            {
+                AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", done.ToString(), counterRepeat, note);
+                infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                newStatus = "1";
+            }
+            if (status == "1") // начата приладка
+            {
+                if (currentOrderID == "-1")
+                {
+                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", done.ToString(), counterRepeat, note);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    newStatus = "1";
+                }
+                else
+                {
+                    if (orderRegistrationType == 0)
+                    {
+                        UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                        newStatus = status;
+                    }
+                    else
+                    {
+                        if (done > 0)
+                        {
+                            GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
+
+                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, orderID, counterRepeat);
+                            string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
+                            string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
+
+                            done += orderCalc.OrderCalculate(false, true);
+
+                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, timeMakereadyStop);
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);
+                            UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
+                            UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
+
+                            newStatus = "3";
+                        }
+                        else
+                        {
+                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                            newStatus = status;
+                        }
+                    }
+
+                    UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, false);
+                    //убираем заказ из активных для возможности завершить смену
+                }
+
+            }
+            if (status == "2") // приладка завершена
+            {
+                if (currentOrderID == "-1")
+                {
+                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", done.ToString(), counterRepeat, note);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    newStatus = "3";
+                }
+                else
+                {
+                    UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, workStart);
+                    newStatus = "3";
+                    UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                }
+            }
+            if (status == "3") // начата склейка
+            {
+                if (currentOrderID == "-1")
+                {
+                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", done.ToString(), counterRepeat, note);
+                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    newStatus = status;
+                }
+                else
+                {
+                    GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
+                    done += orderCalc.OrderCalculate(false, true);
+                    UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
+                    UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+                    UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
+                    //infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, false);
+                    infoBase.UpdateInfo(machineCurrent, 0, -1, orderID, false);
+                    //убираем заказ из активных для возможности завершить смену
+                    newStatus = status;
+                }
+            }
+
+            orders.SetNewStatus(orderID, newStatus);
+        }
+
+        private void CloseOrderInProgressToDB()
+        {
+            ValueInfoBase infoBase = new ValueInfoBase();
+            ValueOrdersBase getValue = new ValueOrdersBase();
+            ValueUserBase userBase = new ValueUserBase();
+            ValueOrdersBase orders = new ValueOrdersBase();
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            String executor = nameOfExecutor;
+            int shiftID = shiftIndex;
+            String number = textBox1.Text;
+            String modification = textBox5.Text;
+            
+            String newStatus = "0";
+
+            String machineCurrent = infoBase.GetMachineFromName(comboBox3.Text);
+            int orderID = getValue.GetOrderID(machineCurrent, number, modification);
+
+            string status = getValue.GetOrderStatus(orderID);
+            int counterRepeat = getValue.GetCounterRepeat(orderID);
+            string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));
+            string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
+
+            String makereadyStart = dateTimePicker1.Text;
+            String makereadyStop = dateTimePicker2.Text;
+            String workStart = dateTimePicker2.Value.AddMinutes(1).ToString("HH:mm dd.MM.yyyy");
+            String workStop = dateTimePicker4.Text;
+            String note = textBox6.Text;
+            int done = (int)numericUpDown4.Value;
+
+
+            userBase.UpdateLastMachine(executor, infoBase.GetMachineFromName(comboBox3.Text));
+
+            if (status == "1") // начата приладка
+            {
+                if (currentOrderID != "-1")
+                {
+                    if (orderRegistrationType == 0)
+                    {
+                        DialogResult dialogResult = DialogResult.No;
+
+                        if (!adminCloseOrder)
+                            dialogResult = MessageBox.Show("Приладка завершена. Начать выполнение заказа?", "Завершение приладки", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                        if (dialogResult == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+
+                        UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                        UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, workStart);
+                            //UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
+                            infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                            //убираем заказ из активных для возможности завершить смену
+                            newStatus = "3";
+                        }
+
+                        if (dialogResult == DialogResult.No || adminCloseOrder)
+                        {
+                            infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, false);
+                            //убираем заказ из активных для возможности завершить смену
+                            newStatus = "2";
+                        }
+                    }
+                    else
+                    {
+                        if (done > 0)
+                        {
+                            GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
+
+                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, orderID, counterRepeat);
+                            string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
+                            string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
+
+                            done += orderCalc.OrderCalculate(false, true);
+
+                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, timeMakereadyStop);
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);
+                            UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
+                            UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
+                            infoBase.UpdateInfo(machineCurrent, 0, -1, orderID, false);
+
+                            newStatus = "4";
+                        }
+                        else
+                        {
+                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                            infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, false);
+                            newStatus = "2";
+                        }
+
+                        UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+                    }
+                }
+            }
+            if (status == "3") // начата склейка
+            {
+                if (currentOrderID != "-1")
+                {
+                    GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
+                    done += orderCalc.OrderCalculate(false, true);
+                    UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
+                    UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
+                    UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
+                    newStatus = "4";
+                    infoBase.UpdateInfo(machineCurrent, 0, -1, -1, false);
                 }
             }
 
@@ -1359,6 +1649,7 @@ namespace OrderManager
         private void AddEditCloseOrder_Load(object sender, EventArgs e)
         {
             ValueShiftsBase shiftsValue = new ValueShiftsBase();
+            ValueSettingsBase valueSettings = new ValueSettingsBase();
 
             numericUpDown2.Controls[0].Enabled = false;
             numericUpDown2.Controls[0].Visible = false;
@@ -1371,6 +1662,8 @@ namespace OrderManager
             numericUpDown3.Controls.Remove(Controls[0]);
             numericUpDown3.BackColor = Color.White;
             numericUpDown3.Enabled = false;
+
+            orderRegistrationType = valueSettings.GetOrderRegistrationType(nameOfExecutor);
 
             if (loadOrderId != -1)
             {
