@@ -214,19 +214,9 @@ namespace OrderManager
 
             for (int i = 0; i < checkBoxesMachines.Count; i++)
             {
-                /*if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "-1" &&
+                if (CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
                     CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
-                    //CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
-                    //getInfo.GetMachinesForUserActive(currentUser) == false &&
-                    checkBoxesMachines[i].Checked == false)*/
-
-
-
-                  if (CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
-                CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
-                //CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
-                //getInfo.GetMachinesForUserActive(currentUser) == false &&
-                checkBoxesMachines[i].Checked == false)
+                    checkBoxesMachines[i].Checked == false)
                 {
                     MessageBox.Show("Прежде чем убрать какое либо оборудование из активного, завершите текущий заказ.", "Изменение активного оборудования", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
