@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -52,6 +53,15 @@ namespace OrderManager
         {
             ValueInfoBase getUserID = new ValueInfoBase();
             if (getUserID.GetIDUser(machine) == user)
+                return true;
+            else
+                return false;
+        }
+
+        private bool CheckIsActyveSelectedMachine(string machine)
+        {
+            ValueInfoBase getUserID = new ValueInfoBase();
+            if (getUserID.GetActiveOrder(machine) == "True")
                 return true;
             else
                 return false;
@@ -204,9 +214,19 @@ namespace OrderManager
 
             for (int i = 0; i < checkBoxesMachines.Count; i++)
             {
-                if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "-1" &&
-                    //CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
-                    checkBoxesMachines[i].Checked == false)
+                /*if (getInfo.GetCurrentOrderID(checkBoxesMachines[i].Name) != "-1" &&
+                    CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
+                    //CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
+                    //getInfo.GetMachinesForUserActive(currentUser) == false &&
+                    checkBoxesMachines[i].Checked == false)*/
+
+
+
+                  if (CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
+                CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
+                //CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
+                //getInfo.GetMachinesForUserActive(currentUser) == false &&
+                checkBoxesMachines[i].Checked == false)
                 {
                     MessageBox.Show("Прежде чем убрать какое либо оборудование из активного, завершите текущий заказ.", "Изменение активного оборудования", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
