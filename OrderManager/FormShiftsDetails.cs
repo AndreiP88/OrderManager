@@ -234,7 +234,7 @@ namespace OrderManager
                         {
                             item.SubItems[2].Text = currentShift.machinesShift;
                             item.SubItems[3].Text = currentShift.workingTimeShift;
-                            item.SubItems[4].Text = currentShift.countOrdersShift.ToString();
+                            item.SubItems[4].Text = currentShift.countOrdersShift.ToString() + " / " + currentShift.countMakeReadyShift.ToString();
                             item.SubItems[5].Text = currentShift.amountOrdersShift.ToString("N0");
                             item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift);
                             item.SubItems[7].Text = getPercent.PercentString(currentShift.workingOutShift);

@@ -78,11 +78,13 @@ namespace OrderManager
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase();
+            ValueOrdersBase getOrder = new ValueOrdersBase();
 
             List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shiftStartID, "");
 
             int fullDone = 0;
             int fullTimeWorkingOut = 0;
+            int makeReadyCount = 0;
 
             String machines = "";
             List<String> machinesList = new List<String>();
@@ -91,6 +93,13 @@ namespace OrderManager
             {
                 if (!machinesList.Contains(ordersCurrentShift[i].machineOfOrder))
                     machinesList.Add(ordersCurrentShift[i].machineOfOrder);
+
+                GetLeadTime leadTime = new GetLeadTime(shiftStartID, ordersCurrentShift[i].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[i].orderIndex));
+
+                if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")
+                {
+                    makeReadyCount++;
+                }
 
                 fullDone += ordersCurrentShift[i].done;
                 fullTimeWorkingOut += ordersCurrentShift[i].workingOut;
@@ -118,6 +127,7 @@ namespace OrderManager
                 machines,
                 dateTimeOperations.DateDifferent(getValueFromShiftsBase.GetStopShiftFromID(shiftStartID), startShift),
                 ordersCurrentShift.Count,
+                makeReadyCount,
                 fullDone,
                 fullTimeWorkingOut
                 );
