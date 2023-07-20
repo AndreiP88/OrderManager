@@ -461,6 +461,8 @@ namespace OrderManager
 
             GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
+            int orderRegistrationType = valueSettings.GetOrderRegistrationType(Form1.Info.nameOfExecutor);
+
             /*if (listView1.SelectedItems.Count > 0)
             {
                 Info.indexItem = listView1.SelectedIndices[0];
@@ -481,61 +483,149 @@ namespace OrderManager
                 int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
                 int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
 
-                if (typeLoad == 0)
+                if (orderRegistrationType == 0)
                 {
-                    //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true);
-
-                    color = statusValue.color;
-
-                    if (typeView == 0)
+                    if (typeLoad == 0)
                     {
-                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true);
+
+                        color = statusValue.color;
+
+                        if (typeView == 0)
+                        {
+                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }
+                        else
+                        {
+                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }
                     }
-                    else
+                    else if (typeLoad == 1)
                     {
-                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
-                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false);
+
+                        color = statusValue.color;
+
+                        if (typeView == 0)
+                        {
+                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }
+                        else
+                        {
+                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }
+                    }
+                    else if (typeLoad == 2)
+                    {
+                        if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
+                        {
+                            color = Color.SeaGreen;
+                        }
+                        else
+                        {
+                            color = Color.DarkRed;
+                        }
+
+                        if (typeView == 0)
+                        {
+                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
+                        }
+                        else
+                        {
+                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+                        }
                     }
                 }
-                else if (typeLoad == 1)
+                else
                 {
-                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false);
+                    if (typeLoad == 0)
+                    {
+                        //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true);
 
-                    color = statusValue.color;
+                        if (statusValue.fullTimeDifferent > 0)
+                        {
+                            color = Color.SeaGreen;
+                        }
+                        else
+                        {
+                            color = Color.DarkRed;
+                        }
 
-                    if (typeView == 0)
-                    {
-                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                    }
-                    else
-                    {
-                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
-                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                    }
-                }
-                else if (typeLoad == 2)
-                {
-                    if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
-                    {
-                        color = Color.SeaGreen;
-                    }
-                    else
-                    {
-                        color = Color.DarkRed;
-                    }
+                        deviation = timeOperations.MinuteToTimeString(statusValue.fullTimeDifferent);
 
-                    if (typeView == 0)
-                    {
-                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
+                        /*if (typeView == 0)
+                        {
+                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }
+                        else
+                        {
+                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }*/
                     }
-                    else
+                    else if (typeLoad == 1)
                     {
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false);
+
+                        if (statusValue.fullTimeDifferent > 0)
+                        {
+                            color = Color.SeaGreen;
+                        }
+                        else
+                        {
+                            color = Color.DarkRed;
+                        }
+
+                        deviation = timeOperations.MinuteToTimeString(statusValue.fullTimeDifferent);
+
+                        /*if (typeView == 0)
+                        {
+                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }
+                        else
+                        {
+                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                        }*/
+                    }
+                    else if (typeLoad == 2)
+                    {
+                        if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
+                        {
+                            color = Color.SeaGreen;
+                        }
+                        else
+                        {
+                            color = Color.DarkRed;
+                        }
+
                         deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+
+                        /*if (typeView == 0)
+                        {
+                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
+                        }
+                        else
+                        {
+                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+                        }*/
                     }
                 }
 
+                string facticalTime = "";
 
+                if (orderRegistrationType == 0)
+                {
+                    facticalTime = timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork);
+                }
+                else
+                {
+                    facticalTime = timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready + ordersCurrentShift[index].facticalTimeWork);
+                }
 
                 ListViewItem item = new ListViewItem();
 
@@ -548,7 +638,7 @@ namespace OrderManager
                 item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
                 item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
-                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork));
+                item.SubItems.Add(facticalTime);
                 item.SubItems.Add(deviation);
                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
@@ -1294,6 +1384,8 @@ namespace OrderManager
                 ValueSettingsBase valueSettings = new ValueSettingsBase();
                 GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
+                int orderRegistrationType = valueSettings.GetOrderRegistrationType(Form1.Info.nameOfExecutor);
+
                 bool typeLoad;
 
                 if (valueSettings.GetTypeLoadOrderDetails(Info.nameOfExecutor) == 0)
@@ -1315,17 +1407,34 @@ namespace OrderManager
                 string[] caption = GetWorkingOutMessage(idx).Item3;
                 string[] strings = GetWorkingOutMessage(idx).Item4;*/
 
-                label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
-                label26.Text = statusStrings.statusStr;
+                if (orderRegistrationType == 0)
+                {
+                    label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
+                    label26.Text = statusStrings.statusStr;
 
-                label25.Text = statusStrings.caption_1;
-                label27.Text = statusStrings.value_1;
+                    label25.Text = statusStrings.caption_1;
+                    label27.Text = statusStrings.value_1;
 
-                label28.Text = statusStrings.caption_2;
-                label30.Text = statusStrings.value_2;
+                    label28.Text = statusStrings.caption_2;
+                    label30.Text = statusStrings.value_2;
 
-                label29.Text = statusStrings.caption_3;
-                label31.Text = statusStrings.value_3;
+                    label29.Text = statusStrings.caption_3;
+                    label31.Text = statusStrings.value_3;
+                }
+                else
+                {
+                    label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
+                    label26.Text = "";
+
+                    label25.Text = "";
+                    label27.Text = "";
+
+                    label28.Text = statusStrings.caption_2;
+                    label30.Text = statusStrings.value_2;
+
+                    label29.Text = statusStrings.caption_4;
+                    label31.Text = statusStrings.value_4;
+                }
             }
             else
             {
@@ -1357,6 +1466,10 @@ namespace OrderManager
         {
             GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
+            ValueSettingsBase valueSettings = new ValueSettingsBase();
+
+            int orderRegistrationType = valueSettings.GetOrderRegistrationType(Form1.Info.nameOfExecutor);
+
             ToolTip tooltp = new ToolTip();
 
             tooltp.AutomaticDelay = 2000;
@@ -1371,8 +1484,6 @@ namespace OrderManager
                 /*string statusStr = GetWorkingOutTimeForSelectedOrder(idx).Item1;
                 string message = GetWorkingOutTimeForSelectedOrder(idx).Item2;*/
 
-                ValueSettingsBase valueSettings = new ValueSettingsBase();
-
                 bool typeLoad;
 
                 if (valueSettings.GetTypeLoadItemMouseHover(Info.nameOfExecutor) == 0)
@@ -1386,12 +1497,26 @@ namespace OrderManager
 
                 OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad);
 
-                string statusStr = statusStrings.statusStr;
-                string message = statusStrings.message;
+                if (orderRegistrationType == 0)
+                {
+                    string statusStr = statusStrings.statusStr;
+                    string message = statusStrings.message;
 
-                tooltp.Active = true;
-                tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder + " - " + statusStr;
-                tooltp.SetToolTip(listView1, message);
+                    tooltp.Active = true;
+                    tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder + " - " + statusStr;
+                    tooltp.SetToolTip(listView1, message);
+                }
+                else
+                {
+                    string message = statusStrings.caption_1 + statusStrings.value_1 + Environment.NewLine + 
+                        statusStrings.caption_2 + statusStrings.value_2 + Environment.NewLine +
+                        statusStrings.caption_4 + statusStrings.value_4;
+
+                    tooltp.Active = true;
+                    tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
+                    tooltp.SetToolTip(listView1, message);
+                }
+                
             }
             else
             {

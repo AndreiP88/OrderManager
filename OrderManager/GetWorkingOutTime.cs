@@ -52,7 +52,7 @@ namespace OrderManager
             ValueInfoBase infoBase = new ValueInfoBase();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            OrderStatusValue orderStatus = new OrderStatusValue("", "", "", "", "", "", "", "", "", 0, 0, "", Color.Black);
+            OrderStatusValue orderStatus = new OrderStatusValue("", "", "", "", "", "", "", "", "", 0, 0, 0, "", Color.Black);
 
             string newLine = Environment.NewLine;
 
@@ -193,6 +193,8 @@ namespace OrderManager
                     orderStatus.caption_4 + orderStatus.value_4;
 
                 orderStatus.mkTimeDifferent = mkTimeDifferent;
+
+                orderStatus.fullTimeDifferent = currentLastTimeForFullWork;
             }
 
             if (status == "3")
@@ -217,6 +219,9 @@ namespace OrderManager
 
                 orderStatus.caption_3 = "Планирумое время завершения: ";
                 orderStatus.value_3 = timeToEndWork;
+
+                orderStatus.caption_4 = "Планирумое время завершения заказа: ";
+                orderStatus.value_4 = timeToEndWork;
 
                 orderStatus.message = orderStatus.caption_1 + orderStatus.value_1 + newLine +
                     orderStatus.caption_2 + orderStatus.value_2 + newLine +
@@ -270,8 +275,7 @@ namespace OrderManager
                     }
                 }
 
-
-                
+                orderStatus.fullTimeDifferent = currentLastTimeForFullWork;
             }
 
             if (status == "4")
@@ -304,6 +308,8 @@ namespace OrderManager
                 }*/
 
                 orderStatus.wkTimeDifferent = workTimeDifferent;
+
+                orderStatus.fullTimeDifferent = workTimeDifferent;
             }
 
             return orderStatus;

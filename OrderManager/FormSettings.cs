@@ -53,5 +53,17 @@ namespace OrderManager
             SaveValue();
             Close();
         }
+
+        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox5.SelectedIndex == 0)
+            {
+                comboBox4.Enabled = true;
+            }
+            else
+            {
+                comboBox4.Enabled = false;
+            }
+        }
     }
 }

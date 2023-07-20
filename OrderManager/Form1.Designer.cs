@@ -126,6 +126,7 @@ namespace OrderManager
             this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.planToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewAllOrdersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statisticToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -145,7 +146,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.planToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -415,11 +415,10 @@ namespace OrderManager
             // 
             this.tableLayoutPanel5.ColumnCount = 5;
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 220F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
             this.tableLayoutPanel5.Controls.Add(this.comboBox1, 0, 0);
             this.tableLayoutPanel5.Controls.Add(this.label11, 0, 1);
             this.tableLayoutPanel5.Controls.Add(this.label24, 1, 0);
@@ -464,7 +463,7 @@ namespace OrderManager
             this.label24.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label24.Location = new System.Drawing.Point(143, 0);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(194, 31);
+            this.label24.Size = new System.Drawing.Size(178, 31);
             this.label24.TabIndex = 2;
             this.label24.Text = "Номер заказа";
             this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -475,7 +474,7 @@ namespace OrderManager
             this.label25.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label25.Location = new System.Drawing.Point(143, 31);
             this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(194, 31);
+            this.label25.Size = new System.Drawing.Size(178, 31);
             this.label25.TabIndex = 3;
             this.label25.Text = "Остаток времени:";
             this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -484,9 +483,9 @@ namespace OrderManager
             // 
             this.label26.AutoSize = true;
             this.label26.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label26.Location = new System.Drawing.Point(343, 0);
+            this.label26.Location = new System.Drawing.Point(327, 0);
             this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(98, 31);
+            this.label26.Size = new System.Drawing.Size(114, 31);
             this.label26.TabIndex = 4;
             this.label26.Text = "статус заказа";
             this.label26.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -495,9 +494,9 @@ namespace OrderManager
             // 
             this.label27.AutoSize = true;
             this.label27.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label27.Location = new System.Drawing.Point(343, 31);
+            this.label27.Location = new System.Drawing.Point(327, 31);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(98, 31);
+            this.label27.Size = new System.Drawing.Size(114, 31);
             this.label27.TabIndex = 5;
             this.label27.Text = "00:00";
             this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -508,7 +507,7 @@ namespace OrderManager
             this.label28.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label28.Location = new System.Drawing.Point(447, 0);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(214, 31);
+            this.label28.Size = new System.Drawing.Size(178, 31);
             this.label28.TabIndex = 6;
             this.label28.Text = "Плановая выработка:";
             this.label28.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -519,7 +518,7 @@ namespace OrderManager
             this.label29.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label29.Location = new System.Drawing.Point(447, 31);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(214, 31);
+            this.label29.Size = new System.Drawing.Size(178, 31);
             this.label29.TabIndex = 7;
             this.label29.Text = "Планируемое время завершения:";
             this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -528,9 +527,9 @@ namespace OrderManager
             // 
             this.label30.AutoSize = true;
             this.label30.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label30.Location = new System.Drawing.Point(667, 0);
+            this.label30.Location = new System.Drawing.Point(631, 0);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(99, 31);
+            this.label30.Size = new System.Drawing.Size(135, 31);
             this.label30.TabIndex = 8;
             this.label30.Text = "0";
             this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -539,9 +538,9 @@ namespace OrderManager
             // 
             this.label31.AutoSize = true;
             this.label31.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label31.Location = new System.Drawing.Point(667, 31);
+            this.label31.Location = new System.Drawing.Point(631, 31);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(99, 31);
+            this.label31.Size = new System.Drawing.Size(135, 31);
             this.label31.TabIndex = 9;
             this.label31.Text = "00:00";
             this.label31.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1224,6 +1223,13 @@ namespace OrderManager
             this.toolStripDropDownButton1.Size = new System.Drawing.Size(66, 22);
             this.toolStripDropDownButton1.Text = "Заказы";
             // 
+            // planToolStripMenuItem
+            // 
+            this.planToolStripMenuItem.Name = "planToolStripMenuItem";
+            this.planToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.planToolStripMenuItem.Text = "Просмотр плана";
+            this.planToolStripMenuItem.Click += new System.EventHandler(this.planToolStripMenuItem_Click);
+            // 
             // viewAllOrdersToolStripMenuItem
             // 
             this.viewAllOrdersToolStripMenuItem.Name = "viewAllOrdersToolStripMenuItem";
@@ -1372,13 +1378,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // planToolStripMenuItem
-            // 
-            this.planToolStripMenuItem.Name = "planToolStripMenuItem";
-            this.planToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.planToolStripMenuItem.Text = "Просмотр плана";
-            this.planToolStripMenuItem.Click += new System.EventHandler(this.planToolStripMenuItem_Click);
             // 
             // Form1
             // 

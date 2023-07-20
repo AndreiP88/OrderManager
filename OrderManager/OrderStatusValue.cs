@@ -20,12 +20,13 @@ namespace OrderManager
         public string value_4;
         public int mkTimeDifferent;
         public int wkTimeDifferent;
+        public int fullTimeDifferent;
         public string message;
         public Color color;
 
         public OrderStatusValue(string statusStrVal, string captionVal_1, string valueVal_1, string captionVal_2, string valueVal_2,
             string captionVal_3, string valueVal_3, string captionVal_4, string valueVal_4,
-            int mkTimeDifferentVal, int wkTimeDifferentVal, string messageVal, Color colorVal)
+            int mkTimeDifferentVal, int wkTimeDifferentVal, int fullTimeDifferentVal, string messageVal, Color colorVal)
         {
             this.statusStr = statusStrVal;
             this.caption_1 = captionVal_1;
@@ -38,6 +39,7 @@ namespace OrderManager
             this.value_4 = valueVal_4;
             this.mkTimeDifferent = mkTimeDifferentVal;
             this.wkTimeDifferent = wkTimeDifferentVal;
+            this.fullTimeDifferent = fullTimeDifferentVal;
             this.message = messageVal;
             this.color = colorVal;
         }

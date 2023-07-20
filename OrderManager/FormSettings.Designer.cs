@@ -227,6 +227,7 @@
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(524, 21);
             this.comboBox5.TabIndex = 0;
+            this.comboBox5.SelectedIndexChanged += new System.EventHandler(this.comboBox5_SelectedIndexChanged);
             // 
             // groupBox5
             // 
@@ -238,6 +239,7 @@
             this.groupBox5.TabIndex = 12;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Способ расчёта общей выработки в статистике (пока не реализовано)";
+            this.groupBox5.Visible = false;
             // 
             // comboBox6
             // 
