@@ -236,8 +236,13 @@ namespace OrderManager
                             item.SubItems[3].Text = currentShift.workingTimeShift;
                             item.SubItems[4].Text = currentShift.countOrdersShift.ToString() + " / " + currentShift.countMakeReadyShift.ToString();
                             item.SubItems[5].Text = currentShift.amountOrdersShift.ToString("N0");
-                            item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift);
+                            item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift) + " (" + getPercent.GetBonusWorkingOut(currentShift.workingOutShift) + ")";
                             item.SubItems[7].Text = getPercent.PercentString(currentShift.workingOutShift);
+
+                            if (shiftValue.GetCheckOvertimeShift(currentShift.startShiftID))
+                            {
+                                item.Font = new Font(listView1.Font, FontStyle.Bold);
+                            }
 
                             if (getPercent.Percent(currentShift.workingOutShift) >= 80)
                             {
