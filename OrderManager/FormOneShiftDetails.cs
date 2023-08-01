@@ -125,10 +125,17 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
             ValueSettingsBase valueSettings = new ValueSettingsBase();
+            
+            ValueShiftsBase getShift = new ValueShiftsBase();
 
             ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(timeShiftID, "");
 
             GetWorkingOutTime workingOutTime = new GetWorkingOutTime(timeShiftID, ordersCurrentShift);
+
+            //int orderRegistrationType = valueSettings.GetOrderRegistrationType(getShift.GetNameUserFromStartShift(timeShiftID));
+            int orderRegistrationType = valueSettings.GetOrderRegistrationType(Info.nameOfExecutor);
+            int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
+            int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
 
             fullTimeWorkingOut = 0;
             fullDone = 0;
@@ -145,12 +152,9 @@ namespace OrderManager
 
                 Color color = Color.DarkRed;
 
-                int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
-                int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
-
                 if (typeLoad == 0)
                 {
-                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true);
+                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
 
                     color = statusValue.color;
 
@@ -166,7 +170,7 @@ namespace OrderManager
                 }
                 else if (typeLoad == 1)
                 {
-                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false);
+                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
 
                     color = statusValue.color;
 

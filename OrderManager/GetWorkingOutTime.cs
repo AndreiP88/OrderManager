@@ -43,7 +43,7 @@ namespace OrderManager
             return result;
         }
 
-        public OrderStatusValue GetWorkingOutTimeForSelectedOrder(int indexOrder, bool plannedWorkingOut)
+        public OrderStatusValue GetWorkingOutTimeForSelectedOrder(int indexOrder, bool plannedWorkingOut, int orderRegistrationType)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase valueOrders = new ValueOrdersBase();
@@ -58,6 +58,14 @@ namespace OrderManager
 
             string machine = ordersCurrentShift[indexOrder].machineOfOrder;
             string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
+
+            if (orderRegistrationType == 1)
+            {
+                if (status == "1" || status == "2")
+                {
+                    status = "3";
+                }
+            }
 
             string shiftStart = shiftsBase.GetStartShiftFromID(shiftID); //get from Info or user base
 
@@ -238,6 +246,7 @@ namespace OrderManager
                 }*/
 
                 orderStatus.wkTimeDifferent = wkTimeDifferent;
+                orderStatus.fullTimeDifferent = currentLastTimeForFullWork;
 
                 string timeStoFromWorkingOut = timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut);
                 int timeWorkingOutDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeStoFromWorkingOut, facticalTimeToWorkStop);
@@ -250,6 +259,7 @@ namespace OrderManager
                     if (!active)
                     {
                         orderStatus.wkTimeDifferent = timeWorkingOutDifferent;
+                        orderStatus.fullTimeDifferent = timeWorkingOutDifferent;
 
                         if (timeWorkingOutDifferent > 0)
                         {
@@ -264,6 +274,7 @@ namespace OrderManager
                 else
                 {
                     orderStatus.wkTimeDifferent = timeWorkingOutDifferent;
+                    orderStatus.fullTimeDifferent = timeWorkingOutDifferent;
 
                     if (timeWorkingOutDifferent > 0)
                     {
@@ -275,7 +286,7 @@ namespace OrderManager
                     }
                 }
 
-                orderStatus.fullTimeDifferent = currentLastTimeForFullWork;
+                //orderStatus.fullTimeDifferent = currentLastTimeForFullWork;
             }
 
             if (status == "4")

@@ -488,7 +488,7 @@ namespace OrderManager
                     if (typeLoad == 0)
                     {
                         //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
 
                         color = statusValue.color;
 
@@ -504,7 +504,7 @@ namespace OrderManager
                     }
                     else if (typeLoad == 1)
                     {
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
 
                         color = statusValue.color;
 
@@ -544,7 +544,7 @@ namespace OrderManager
                     if (typeLoad == 0)
                     {
                         //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
 
                         if (statusValue.fullTimeDifferent > 0)
                         {
@@ -569,7 +569,7 @@ namespace OrderManager
                     }
                     else if (typeLoad == 1)
                     {
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false);
+                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
 
                         if (statusValue.fullTimeDifferent > 0)
                         {
@@ -1397,7 +1397,7 @@ namespace OrderManager
                     typeLoad = false;
                 }
 
-                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad);
+                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad, orderRegistrationType);
 
                 /*string statusStr = GetWorkingOutTimeForSelectedOrder(idx).Item1;
                 string[] caption = GetWorkingOutTimeForSelectedOrder(idx).Item3;
@@ -1407,7 +1407,19 @@ namespace OrderManager
                 string[] caption = GetWorkingOutMessage(idx).Item3;
                 string[] strings = GetWorkingOutMessage(idx).Item4;*/
 
-                if (orderRegistrationType == 0)
+                label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
+                label26.Text = statusStrings.statusStr;
+
+                label25.Text = statusStrings.caption_1;
+                label27.Text = statusStrings.value_1;
+
+                label28.Text = statusStrings.caption_2;
+                label30.Text = statusStrings.value_2;
+
+                label29.Text = statusStrings.caption_3;
+                label31.Text = statusStrings.value_3;
+
+                /*if (orderRegistrationType == 0)
                 {
                     label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
                     label26.Text = statusStrings.statusStr;
@@ -1434,7 +1446,7 @@ namespace OrderManager
 
                     label29.Text = statusStrings.caption_4;
                     label31.Text = statusStrings.value_4;
-                }
+                }*/
             }
             else
             {
@@ -1495,9 +1507,16 @@ namespace OrderManager
                     typeLoad = false;
                 }
 
-                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad);
+                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad, orderRegistrationType);
 
-                if (orderRegistrationType == 0)
+                string statusStr = statusStrings.statusStr;
+                string message = statusStrings.message;
+
+                tooltp.Active = true;
+                tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder + " - " + statusStr;
+                tooltp.SetToolTip(listView1, message);
+
+                /*if (orderRegistrationType == 0)
                 {
                     string statusStr = statusStrings.statusStr;
                     string message = statusStrings.message;
@@ -1515,7 +1534,7 @@ namespace OrderManager
                     tooltp.Active = true;
                     tooltp.ToolTipTitle = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
                     tooltp.SetToolTip(listView1, message);
-                }
+                }*/
                 
             }
             else
