@@ -1359,7 +1359,7 @@ namespace OrderManager
             return result;
         }
 
-        private int CountWorkingOutOrders(int indexOrder, string machine)
+        private int CountWorkingOutOrders(int indexOrder, string machine, bool loadAllOrder = true)
         {
             int result = 0;
 
@@ -1367,7 +1367,17 @@ namespace OrderManager
             {
                 if (ordersCurrentShift[i].machineOfOrder == machine || machine == "")
                 {
-                    result += ordersCurrentShift[i].workingOut;  
+                    if (loadAllOrder)
+                    {
+                        result += ordersCurrentShift[i].workingOut;
+                    }
+                    else
+                    {
+                        if (i < indexOrder - 1)
+                        {
+                            result += ordersCurrentShift[i].workingOut;
+                        }
+                    }
                 }
             }
 
@@ -1660,7 +1670,7 @@ namespace OrderManager
             string[] captions = { "10:00", "10:30", "11:00", "12:00" };
             string[] values = { "", "", "", "" };
 
-            int wOut;
+            int wOut, wOutAllOrders;
             //int norm;
             int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox3.Text);
             string machine = infoBase.GetMachineFromName(comboBox3.Text);
@@ -1669,18 +1679,21 @@ namespace OrderManager
             {
                 if (comboBox2.SelectedIndex == 0)
                 {
-                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, "", false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, "");
                 }
                 else
                 {
-                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine, false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
                 }
 
                 string status = ordersBase.GetOrderStatus(ordersCurrentShift[idLastOrder].orderIndex);
 
                 int norm = ordersCurrentShift[idLastOrder].norm;
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
-                int done = amount - ordersCurrentShift[idLastOrder].lastCount;// + ordersCurrentShift[idLastOrder].done;
+                int lastCount = ordersCurrentShift[idLastOrder].lastCount;
+                int done = amount - lastCount;// + ordersCurrentShift[idLastOrder].done;
                 int mkTime = ordersCurrentShift[idLastOrder].plannedTimeMakeready;
 
                 for (int i = 0; i < captions.Length; i++)
@@ -1695,28 +1708,30 @@ namespace OrderManager
                         {
                             if (lastTimeToWork < mkTime)
                             {
-                                values[i] = "часть приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
+                                values[i] = "Необходима часть приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
                             }
                             else
                             {
                                 int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+                                int targetAmount = done + targetCount;
+                                int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
 
-                                if ((targetCount + done) <= amount * (1 + percentOverAmount / 100))
+                                if (targetAmount <= amount * (1 + percentOverAmount / 100))
                                 {
-                                    values[i] = "вся приладка";
+                                    values[i] = "Необходима вся приладка";
 
                                     if (targetCount > 0)
-                                        values[i] += " + " + targetCount.ToString("N0");
+                                        values[i] += " и сделать: " + targetCount.ToString("N0") + " шт.";
                                 }
                                 else
                                 {
-                                    values[i] = "н/д";
+                                    values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
                                 }
                             }
                         }
                         else
                         {
-                            values[i] = "выполнено";
+                            values[i] = "Выполнено";
                         }
                     }
 
@@ -1725,23 +1740,35 @@ namespace OrderManager
                         if (targetTime > wOut)
                         {
                             int targetCount = (targetTime - wOut) * norm / 60;
+                            int targetAmount = done + targetCount;
+                            int lackOfTime = targetTime - (60 * lastCount / norm + mkTime);
 
-                            if ((targetCount + done) <= amount * (1 + percentOverAmount / 100))
+                            if (targetAmount <= amount * (1 + percentOverAmount / 100))
                             {
-                                values[i] = targetCount.ToString("N0");
+                                values[i] = "Необходимо сделать: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
                             }
                             else
                             {
-                                values[i] = "н/д";
+                                values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
                             }
                         }
                         else
                         {
-                            values[i] = "выполнено";
+                            values[i] = "Выполнено";
                         }
                     }
 
-                    
+                    if (status == "4")
+                    {
+                        if (targetTime > wOutAllOrders)
+                        {
+                            values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(targetTime - wOutAllOrders) + "";
+                        }
+                        else
+                        {
+                            values[i] = "Выполнено";
+                        }
+                    }
                 }
 
                 /*if (status == "3")
