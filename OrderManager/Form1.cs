@@ -1,24 +1,14 @@
 ﻿using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Common;
-using System.Data.Entity;
-using System.Data.Odbc;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.WebRequestMethods;
-using static System.Windows.Forms.LinkLabel;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using File = System.IO.File;
 using ToolTip = System.Windows.Forms.ToolTip;
 
@@ -720,12 +710,12 @@ namespace OrderManager
 
             if (machines.Count > 0)
             {
-                if (comboBox2.Items.Count > 0 && comboBox2.Items.Count >= selectedIndexWOut1)
+                if (comboBox2.Items.Count > 0 && comboBox2.Items.Count > selectedIndexWOut1)
                     comboBox2.SelectedIndex = selectedIndexWOut1;
                 else
                     comboBox2.SelectedIndex = 1;
 
-                if (comboBox3.Items.Count > 0 && comboBox3.Items.Count >= selectedIndexWOut2)
+                if (comboBox3.Items.Count > 0 && comboBox3.Items.Count > selectedIndexWOut2)
                     comboBox3.SelectedIndex = selectedIndexWOut2;
                 else
                     comboBox3.SelectedIndex = 0;
@@ -1646,7 +1636,10 @@ namespace OrderManager
             }
             else
             {
-                comboBox3.SelectedIndex = selectedIndexWOut2;
+                if (comboBox3.Items.Count > selectedIndexWOut2)
+                    comboBox3.SelectedIndex = selectedIndexWOut2;
+                else
+                    comboBox3.SelectedIndex = 0;
             }
 
             selectedIndexWOut1 = comboBox2.SelectedIndex;
