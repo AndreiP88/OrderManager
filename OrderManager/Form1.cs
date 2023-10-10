@@ -1154,11 +1154,18 @@ namespace OrderManager
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            labelTime.Text = DateTime.Now.ToString("HH:mm:ss");
-            if (DateTime.Now.ToString("ss") == "00" && Info.active == true)
+            DateTime currentTime = DateTime.Now;
+
+            labelTime.Text = currentTime.ToString("HH:mm:ss");
+
+            if (currentTime.Second == 0)
             {
-                LoadOrdersFromBase();
-                CheckCurrentShiftActivity();
+                if (Info.active == true)
+                {
+                    LoadOrdersFromBase();
+                    CheckCurrentShiftActivity();
+                }
+                
                 StartTaskUpdateApplication();
             }
         }
