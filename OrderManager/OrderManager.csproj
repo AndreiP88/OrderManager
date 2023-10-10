@@ -197,6 +197,7 @@
     </Compile>
     <Compile Include="GetWorkingOutTime.cs" />
     <Compile Include="INISettings.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="OrdersLoad.cs" />
     <Compile Include="OrderStatusValue.cs" />
     <Compile Include="StringArray.cs" />

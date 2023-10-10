@@ -356,7 +356,7 @@ namespace OrderManager
             }
         }
 
-        private void StartCheckUpdate()
+        /*private void StartCheckUpdate()
         {
             //MessageBox.Show("Запуск");
 
@@ -376,11 +376,11 @@ namespace OrderManager
 
             //CheckUpdate(link, pathTemp + "\\" + fileTemp);
 
-            /*CancellationToken token = cancelTokenSource.Token;
+            *//*CancellationToken token = cancelTokenSource.Token;
 
             Task task = new Task(() => LoadDetailsMount(token));
 
-            task.Start();*/
+            task.Start();*//*
         }
 
         private void CheckUpdate(string link, string path)
@@ -438,6 +438,32 @@ namespace OrderManager
                 //MessageBox.Show(currentDateV.ToString() + " " + lastDateV.ToString());
 
             }));
+        }*/
+
+        private void LogWrite(Exception ex)
+        {
+            Logger.WriteLine(ex.StackTrace + ", " + ex.Message);
+        }
+
+        private void StartTaskUpdateApplication()
+        {
+            var task = Task.Run(() => StartUpdateApplication());
+        }
+
+        private void StartUpdateApplication()
+        {
+            try
+            {
+                var p = new Process();
+                p.StartInfo.FileName = "Updater.exe";
+                p.StartInfo.Arguments = "update";
+
+                p.Start();
+            }
+            catch (Exception ex)
+            {
+                LogWrite(ex);
+            }
         }
 
         private void AddOrdersToListViewFromList()
@@ -1101,7 +1127,7 @@ namespace OrderManager
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            StartCheckUpdate();
+            StartTaskUpdateApplication();
 
             LoadBaseConnectionParameters();
 
@@ -1133,6 +1159,7 @@ namespace OrderManager
             {
                 LoadOrdersFromBase();
                 CheckCurrentShiftActivity();
+                StartTaskUpdateApplication();
             }
         }
 
@@ -1732,7 +1759,7 @@ namespace OrderManager
                     {
                         if (targetTime > wOut)
                         {
-                            int targetCount = (targetTime - wOut) * norm / 60;
+                            int targetCount = (targetTime - wOut - mkTime) * norm / 60;
                             int targetAmount = done + targetCount;
                             int lackOfTime = targetTime - (60 * lastCount / norm + mkTime);
 
