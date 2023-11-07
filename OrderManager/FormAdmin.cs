@@ -3243,7 +3243,7 @@ namespace OrderManager
 
             for (int i = 0; i < machines.Count; i++)
             {
-                if (Convert.ToBoolean(getInfo.GetActiveOrder(machines[i])) == true)
+                if (getInfo.GetActiveOrder(machines[i]))
                 {
                     FormAddCloseOrder form = new FormAddCloseOrder(shiftID, userId, machines[i]);
                     form.ShowDialog();

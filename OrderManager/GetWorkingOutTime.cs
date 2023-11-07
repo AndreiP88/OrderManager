@@ -254,7 +254,7 @@ namespace OrderManager
 
                 if (shiftsBase.CheckShiftActivity(shiftID))//активна ли смена
                 {
-                    bool active = Convert.ToBoolean(infoBase.GetActiveOrder(machine));
+                    bool active = infoBase.GetActiveOrder(machine);
 
                     if (!active)
                     {

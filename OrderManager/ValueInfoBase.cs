@@ -49,9 +49,23 @@ namespace OrderManager
             return GetValue("machine", machine, "nameOfExecutor");
         }
 
-        public String GetActiveOrder(String machine)
+        /*public String GetActiveOrder(String machine)
         {
             return GetValue("machine", machine, "activeOrder");
+        }*/
+
+        public bool GetActiveOrder(string machine)
+        {
+            bool result = false;
+
+            string value = GetValue("machine", machine, "activeOrder");
+
+            if (value != "")
+            {
+                result = Convert.ToBoolean(value);
+            }
+
+            return result; 
         }
 
         public string GetCurrentOrderID(string machine)
@@ -251,18 +265,10 @@ namespace OrderManager
 
             for (int i = 0; i < orderMachines.Count; i++)
             {
-                string activeOrderValue = GetActiveOrder(orderMachines[i]);
-
-                if (activeOrderValue != "")
+                if (GetActiveOrder(orderMachines[i]))
                 {
-                    if (Convert.ToBoolean(activeOrderValue) == true)
-                    {
-                        counter++;
-                    }
-                    //machinesActive = Convert.ToBoolean(activeOrderValue);
+                    counter++;
                 }
-                /*if (Convert.ToBoolean(GetActiveOrder(orderMachines[i])) == true)
-                    machinesActive = true;*/
             }
 
             if (counter > 0)

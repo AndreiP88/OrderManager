@@ -61,7 +61,7 @@ namespace OrderManager
         private bool CheckIsActyveSelectedMachine(string machine)
         {
             ValueInfoBase getUserID = new ValueInfoBase();
-            if (getUserID.GetActiveOrder(machine) == "True")
+            if (getUserID.GetActiveOrder(machine))
                 return true;
             else
                 return false;

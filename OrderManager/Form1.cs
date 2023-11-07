@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,8 @@ namespace OrderManager
         int selectedIndexActive = 0;
         int selectedIndexWOut1 = 0;
         int selectedIndexWOut2 = 0;
+        int selectedIndexPreviewWOut1 = 0;
+        int selectedIndexPreviewWOut2 = 0;
 
         public static string connectionFile = "connections.ini";
 
@@ -723,19 +726,32 @@ namespace OrderManager
 
             List<String> machines = (List<String>)infoBase.GetMachines(Form1.Info.nameOfExecutor);
 
+            //WOut
             comboBox2.Items.Clear();
             comboBox2.Items.Add("Общая выработка");
 
             comboBox3.Items.Clear();
 
+            //Preview
+            comboBox4.Items.Clear();
+            comboBox4.Items.Add("Общая выработка");
+
+            comboBox5.Items.Clear();
+
             for (int i = 0; i < machines.Count; i++)
             {
+                //WOut
                 comboBox2.Items.Add(infoBase.GetMachineName(machines[i]));
                 comboBox3.Items.Add(infoBase.GetMachineName(machines[i]));
+
+                //Preview
+                comboBox4.Items.Add(infoBase.GetMachineName(machines[i]));
+                comboBox5.Items.Add(infoBase.GetMachineName(machines[i]));
             }
 
             if (machines.Count > 0)
             {
+                //WOut
                 if (comboBox2.Items.Count > 0 && comboBox2.Items.Count > selectedIndexWOut1)
                     comboBox2.SelectedIndex = selectedIndexWOut1;
                 else
@@ -745,54 +761,40 @@ namespace OrderManager
                     comboBox3.SelectedIndex = selectedIndexWOut2;
                 else
                     comboBox3.SelectedIndex = 0;
+
+                //Preview
+                if (comboBox4.Items.Count > 0 && comboBox4.Items.Count > selectedIndexPreviewWOut1)
+                    comboBox4.SelectedIndex = selectedIndexPreviewWOut1;
+                else
+                    comboBox4.SelectedIndex = 1;
+
+                if (comboBox5.Items.Count > 0 && comboBox5.Items.Count > selectedIndexPreviewWOut2)
+                    comboBox5.SelectedIndex = selectedIndexPreviewWOut2;
+                else
+                    comboBox5.SelectedIndex = 0;
             }
 
+            //WOut
             if (comboBox2.Items.Count <= 2)
             {
                 tableLayoutPanel7.ColumnStyles[0].Width = 0;
                 tableLayoutPanel7.ColumnStyles[1].Width = 0;
-                //comboBox2.Visible = false;
             }
             else
             {
                 tableLayoutPanel7.ColumnStyles[0].Width = 140;
-                //tableLayoutPanel7.ColumnStyles[1].Width = 140;
-                //comboBox2.Visible = true;
             }
 
-            /*if (comboBox2.Items.Count <= 2)
+            //Preview
+            if (comboBox4.Items.Count <= 2)
             {
-                tableLayoutPanel7.ColumnStyles[0].Width = 0;
-                tableLayoutPanel7.ColumnStyles[1].Width = 0;
-                //comboBox2.Visible = false;
+                tableLayoutPanel8.ColumnStyles[0].Width = 0;
             }
             else
             {
-                tableLayoutPanel7.ColumnStyles[0].Width = 140;
-                tableLayoutPanel7.ColumnStyles[1].Width = 140;
-                //comboBox2.Visible = true;
-            }*/
-
-            /*if (comboBox2.Items.Count == 1)
-            {
-                tableLayoutPanel7.ColumnStyles[0].Width = 0;
-                tableLayoutPanel7.ColumnStyles[1].Width = 0;
-                //comboBox2.Visible = false;
+                tableLayoutPanel8.ColumnStyles[0].Width = 280;
+                //tableLayoutPanel9.ColumnStyles[0].Width = 280;
             }
-            else if (comboBox2.Items.Count == 2)
-            {
-                tableLayoutPanel7.ColumnStyles[0].Width = 140;
-                tableLayoutPanel7.ColumnStyles[1].Width = 140;
-                //comboBox2.Visible = true;
-            }
-            else if (comboBox2.Items.Count > 2)
-            {
-                tableLayoutPanel7.ColumnStyles[0].Width = 140;
-                tableLayoutPanel7.ColumnStyles[1].Width = 0;
-            }*/
-
-
-
         }
 
         private void LoadDetailsMount(CancellationToken token)
@@ -899,6 +901,16 @@ namespace OrderManager
             label21.Text = "";
             label22.Text = "";
             label23.Text = "";
+
+            numericUpDown1.Value = 0;
+
+            label41.Text = "";
+            label40.Text = "";
+
+            selectedIndexPreviewWOut1 = 0;
+            selectedIndexPreviewWOut2 = 0;
+            selectedIndexWOut1 = 0;
+            selectedIndexWOut2 = 0;
 
             ClearCurrentOrderDetails();
         }
@@ -1285,7 +1297,7 @@ namespace OrderManager
                 Info.active = false;
                 FormAddCloseOrder form;
 
-                if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && Convert.ToBoolean(getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder)))
+                if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder))
                 {
                     form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
                 }
@@ -1408,6 +1420,34 @@ namespace OrderManager
             return result;
         }
 
+        /*private int CountWorkingOutOrders(int indexOrder, string machine, bool loadAllOrder = true)
+        {
+            int result = 0;
+
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+
+            for (int i = 0; i < indexOrder; i++)
+            {
+                string status = ordersBase.GetOrderStatus(ordersCurrentShift[i].orderIndex);
+
+                if (ordersCurrentShift[i].machineOfOrder == machine || machine == "")
+                {
+                    if (loadAllOrder)
+                    {
+                        result += ordersCurrentShift[i].workingOut;
+                    }
+                    else
+                    {
+                        if (status == "4")
+                        {
+                            result += ordersCurrentShift[i].workingOut;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }*/
 
         private void LoadCurrentOrderDetails(int idx)
         {
@@ -1726,10 +1766,14 @@ namespace OrderManager
                 for (int i = 0; i < captions.Length; i++)
                 {
                     int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
+                    int lastTimeToWork = targetTime - wOut;
 
+                    int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+                    int targetAmount = done + targetCount;
+                    
                     if (status == "1")
                     {
-                        int lastTimeToWork = targetTime - wOut;
+                        int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
 
                         if (lastTimeToWork > 0)
                         {
@@ -1739,10 +1783,6 @@ namespace OrderManager
                             }
                             else
                             {
-                                int targetCount = (lastTimeToWork - mkTime) * norm / 60;
-                                int targetAmount = done + targetCount;
-                                int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
-
                                 if (targetAmount <= amount * (1 + percentOverAmount / 100))
                                 {
                                     values[i] = "Необходима вся приладка";
@@ -1766,8 +1806,6 @@ namespace OrderManager
                     {
                         if (targetTime > wOut)
                         {
-                            int targetCount = (targetTime - wOut - mkTime) * norm / 60;
-                            int targetAmount = done + targetCount;
                             int lackOfTime = targetTime - (60 * lastCount / norm + mkTime);
 
                             if (targetAmount <= amount * (1 + percentOverAmount / 100))
@@ -1797,36 +1835,6 @@ namespace OrderManager
                         }
                     }
                 }
-
-                /*if (status == "3")
-                {
-                    norm = ordersCurrentShift[idLastOrder].norm;
-                    int done = ordersCurrentShift[idLastOrder].done;
-
-                    for (int i = 0; i < captions.Length; i++)
-                    {
-                        int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
-
-                        if (targetTime > wOut)
-                        {
-                            int targetCount = (targetTime - wOut) * norm / 60;
-
-                            if ((targetCount + done) <= ordersCurrentShift[idLastOrder].amountOfOrder * 1.05)
-                            {
-                                values[i] = targetCount.ToString("N0");
-                            }
-                            else
-                            {
-                                values[i] = "н/д";
-                            }
-                        }
-                        else
-                        {
-                            values[i] = "выполнено";
-                        }
-                    }
-                }*/
-
             }
 
             label32.Text = captions[0] + ":";
@@ -1862,6 +1870,126 @@ namespace OrderManager
 
             return wOut;
         }*/
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox4.SelectedIndex == 0)
+            {
+                tableLayoutPanel9.ColumnStyles[1].Width = 50;
+
+                //comboBox3.SelectedIndex = selectedIndexWOut2;
+            }
+            else
+            {
+                tableLayoutPanel9.ColumnStyles[1].Width = 0;
+
+                selectedIndexPreviewWOut2 = comboBox4.SelectedIndex - 1;
+            }
+
+            if (comboBox5.SelectedIndex == selectedIndexPreviewWOut2)
+            {
+                UpdatePreviewWorkingOut();
+            }
+            else
+            {
+                if (comboBox5.Items.Count > selectedIndexPreviewWOut2)
+                    comboBox5.SelectedIndex = selectedIndexPreviewWOut2;
+                else
+                    comboBox5.SelectedIndex = 0;
+            }
+
+            selectedIndexPreviewWOut1 = comboBox4.SelectedIndex;
+        }
+
+        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            selectedIndexWOut2 = comboBox3.SelectedIndex;
+
+            UpdatePreviewWorkingOut();
+        }
+
+        private void UpdatePreviewWorkingOut()
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            ValueInfoBase infoBase = new ValueInfoBase();
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
+
+            int wOut, wOutAllOrders;
+            //int norm;
+            int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox5.Text);
+            string machine = infoBase.GetMachineFromName(comboBox5.Text);
+
+            bool activeOrderFromMachine = infoBase.GetActiveOrder(machine);
+
+            label40.Text = "";
+            label41.Text = "";
+            label43.Text = "";
+            label44.Text = "";
+
+            if (idLastOrder >= 0)
+            {
+                if (comboBox4.SelectedIndex == 0)
+                {
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, "", false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, "");
+                }
+                else
+                {
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine, false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
+                }
+
+                string status = ordersBase.GetOrderStatus(ordersCurrentShift[idLastOrder].orderIndex);
+                
+
+                int norm = ordersCurrentShift[idLastOrder].norm;
+                int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
+                int lastCount = ordersCurrentShift[idLastOrder].lastCount;
+                int done = amount - lastCount;// + ordersCurrentShift[idLastOrder].done;
+                int mkTime = ordersCurrentShift[idLastOrder].plannedTimeMakeready;
+
+                int previewWOut = 0;
+
+                int previewCountValue = (int)numericUpDown1.Value;
+                int previewWOutCurrentOrder = previewCountValue * 60 / norm;
+
+                label41.Text = ordersCurrentShift[idLastOrder].numberOfOrder + ": " + ordersCurrentShift[idLastOrder].nameOfOrder;
+                label40.Text = "Текущая выработка: " + timeOperations.MinuteToTimeString(wOut) + " ч.";
+
+                //if (status != "4")
+                {
+                    if (activeOrderFromMachine)
+                    {
+                        previewWOut = wOut;
+                    }
+                    else
+                    {
+                        if (ordersCurrentShift[idLastOrder].done > 0)
+                        {
+                            previewWOut = wOut;
+                        }
+                        else
+                        {
+                            previewWOut = wOutAllOrders;
+                        }
+                    }
+
+                    if (previewCountValue > 0)
+                    {
+                        previewWOut += mkTime + previewWOutCurrentOrder;
+                    }
+                }
+
+                /*if (status == "4")
+                {
+                    previewWOut = wOutAllOrders + (previewCountValue * 60 / norm);
+                }*/
+
+                label43.Text = timeOperations.MinuteToTimeString(previewWOut) + " ч.";
+                label44.Text = getPercent.PercentString(previewWOut);
+            }
+        }
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1937,6 +2065,16 @@ namespace OrderManager
         {
             FormLoadOrders fm = new FormLoadOrders(true, Info.nameOfExecutor);
             fm.ShowDialog();
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            UpdatePreviewWorkingOut();
+        }
+
+        private void numericUpDown1_Click(object sender, EventArgs e)
+        {
+            numericUpDown1.Select(0, numericUpDown1.Text.Length);
         }
     }
 }
