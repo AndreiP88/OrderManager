@@ -1892,7 +1892,7 @@ namespace OrderManager
                         }
 
                     }
-                    else if (numericUpDown4.Value >= numericUpDown3.Value && status == "3" && getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)) != "")
+                    else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && status == "3" && getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)) != "")
                     {
                         result = MessageBox.Show("Выработка превышает плановую!\r\n\r\nЗавершить заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 

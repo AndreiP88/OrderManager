@@ -1172,13 +1172,13 @@ namespace OrderManager
 
             if (currentTime.Second == 0)
             {
+                StartTaskUpdateApplication();
+
                 if (Info.active == true)
                 {
                     LoadOrdersFromBase();
                     CheckCurrentShiftActivity();
                 }
-                
-                StartTaskUpdateApplication();
             }
         }
 
