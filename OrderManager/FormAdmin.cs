@@ -1544,7 +1544,7 @@ namespace OrderManager
                     {
                         int orderIndex = Convert.ToInt32(getInfo.GetCurrentOrderID(machines[j]));
 
-                        GetLeadTime leadTimeCurr = new GetLeadTime(userBase.GetCurrentShiftStart(users[i]), orderIndex, getOrder.GetCounterRepeat(orderIndex));
+                        GetLeadTime leadTimeCurr = new GetLeadTime(userBase.GetCurrentShiftStart(users[i]), Convert.ToInt32(machines[j]), orderIndex, getOrder.GetCounterRepeat(orderIndex));
 
                         List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(userBase.GetCurrentShiftStart(users[i]), "");
 
@@ -2472,8 +2472,8 @@ namespace OrderManager
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
                             GetCountOfDone orderCalc = new GetCountOfDone(-1, (int)sqlReader["count"], 0);
-                            GetLeadTime leadTimeFirst = new GetLeadTime(-1, (int)sqlReader["count"], 0);
-                            GetLeadTime leadTimeLast = new GetLeadTime(-1, (int)sqlReader["count"], (int)sqlReader["counterRepeat"]);
+                            GetLeadTime leadTimeFirst = new GetLeadTime(-1, Convert.ToInt32(machine), (int)sqlReader["count"], 0);
+                            GetLeadTime leadTimeLast = new GetLeadTime(-1, Convert.ToInt32(machine), (int)sqlReader["count"], (int)sqlReader["counterRepeat"]);
 
 
                             Invoke(new Action(() =>

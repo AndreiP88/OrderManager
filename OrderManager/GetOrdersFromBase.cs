@@ -100,9 +100,9 @@ namespace OrderManager
             return Convert.ToInt32(GetValueFromIndex(id, "orderID"));
         }
 
-        public int LastTimeForMakeready(int shiftID, int orderIndex, int counterRepeat)
+        public int LastTimeForMakeready(int shiftID, int machine, int orderIndex, int counterRepeat)
         {
-            return LastTimeMakeready(shiftID, orderIndex, counterRepeat);
+            return LastTimeMakereadyFromTime(shiftID, machine, orderIndex, counterRepeat);
         }
 
         private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, string machine)
@@ -323,6 +323,32 @@ namespace OrderManager
             return numbers;
         }
 
+        public int GetMakereadyPartFromOrderID(int orderIndex)
+        {
+            int mkPart = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE count = @id"
+                };
+                Command.Parameters.AddWithValue("@id", orderIndex);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    mkPart = (int)sqlReader["makereadyComplete"];
+                }
+
+                Connect.Close();
+            }
+
+            return mkPart;
+        }
+
         public Object LoadAllOrdersFromBase(int shiftID, string category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
@@ -371,7 +397,7 @@ namespace OrderManager
                             lastTimeWork = (lastCount * 60) / orderNorm;
                         }
 
-                        int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
+                        int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
                         int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
                         int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
                         int lastTimeWorkForDeviation = 0;
@@ -405,7 +431,7 @@ namespace OrderManager
                             deviation = mkDeviation + ", " + wkDeviation;
                         }*/
 
-                        timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
+                        timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
                             sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
 
                         orders.Add(new Order(
@@ -442,11 +468,43 @@ namespace OrderManager
             return orders;
         }
 
-        private int LastTimeMakeready(int shiftID, int orderIndex, int counterRepeat)
+        /// <summary>
+        /// Оставшееся время на приладку для указанной смены и заказа
+        /// </summary>
+        /// <param name="shiftID"></param>
+        /// <param name="orderIndex"></param>
+        /// <param name="counterRepeat"></param>
+        /// <returns></returns>
+        private int LastTimeMakeready(int shiftID, int orderInProgressID, int machine, int orderIndex, int counterRepeat)
+        {
+            int lastTimeMakeready = 0;
+
+            int makereadyPart = GetMakereadyPartFromOrderID(orderInProgressID);
+            
+            if (makereadyPart == -2)
+            {
+                lastTimeMakeready = LastTimeMakereadyFromTime(shiftID, machine, orderIndex, counterRepeat);
+            }//возможно еще условие понадобится
+            else
+            {
+                ValueOrdersBase ordersBase = new ValueOrdersBase();
+                GetLeadTime leadTime = new GetLeadTime(shiftID, machine, orderIndex, counterRepeat);
+
+                int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
+
+                int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
+
+                lastTimeMakeready = makereadyTime  - makereadySummPreviousParts;
+            }
+            
+            return lastTimeMakeready;
+        }
+
+        private int LastTimeMakereadyFromTime(int shiftID, int machine, int orderIndex, int counterRepeat)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(shiftID, orderIndex, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(shiftID, machine, orderIndex, counterRepeat);
 
             int lastTimeMakeready = 0;
 
@@ -485,11 +543,35 @@ namespace OrderManager
             return lastTimeMakeready;
         }
 
-        private int FullWorkoutTime(int shiftID, int orderIndex, int counterRepeat, string timeMkrStop, string timeMkrStart)
+        private int FullWorkoutTime(int shiftID, int orderInProgressID, int machine, int orderIndex, int counterRepeat, string timeMkrStop, string timeMkrStart)
+        {
+            int timeWorkingOut = 0;
+
+            int makereadyPart = GetMakereadyPartFromOrderID(orderInProgressID);
+
+            if (makereadyPart == -2)
+            {
+                timeWorkingOut = FullWorkoutTimeFromTime(shiftID, machine, orderIndex, counterRepeat, timeMkrStop, timeMkrStart);
+            }//возможно еще условие понадобится
+            else
+            {
+                ValueOrdersBase ordersBase = new ValueOrdersBase();
+                GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+                GetLeadTime leadTime = new GetLeadTime(shiftID, machine, orderIndex, counterRepeat);
+
+                int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
+
+                timeWorkingOut = makereadyTime - makereadyPart;
+            }
+
+            return timeWorkingOut;
+        }
+
+        private int FullWorkoutTimeFromTime(int shiftID, int machine, int orderIndex, int counterRepeat, string timeMkrStop, string timeMkrStart)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetLeadTime lastTime = new GetLeadTime(shiftID, orderIndex, counterRepeat);
+            GetLeadTime lastTime = new GetLeadTime(shiftID, machine, orderIndex, counterRepeat);
 
             int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
             int mkrStartStop = timeOperations.DateDifferentToMinutes(timeMkrStop, timeMkrStart);
@@ -509,7 +591,7 @@ namespace OrderManager
                 mkrWorkingOut = mkrStartStop;
             }
 
-            String lastTimeMake = timeOperations.DateDifferent(lastTimeMakereadyStop, lastTime.GetLastDateTime("timeMakereadyStart")); ;
+            String lastTimeMake = timeOperations.DateDifferent(lastTimeMakereadyStop, lastTime.GetLastDateTime("timeMakereadyStart"));
 
             int timeWorkingOut = 0;
 

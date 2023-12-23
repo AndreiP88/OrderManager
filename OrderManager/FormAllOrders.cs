@@ -285,8 +285,8 @@ namespace OrderManager
                     while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                     {
                         GetCountOfDone orderCalc = new GetCountOfDone(-1, (int)sqlReader["count"], 0);
-                        GetLeadTime leadTimeFirst = new GetLeadTime(-1, (int)sqlReader["count"], 0);
-                        GetLeadTime leadTimeLast = new GetLeadTime(-1, (int)sqlReader["count"], (int)sqlReader["counterRepeat"]);
+                        GetLeadTime leadTimeFirst = new GetLeadTime(-1, (int)sqlReader["machine"], (int)sqlReader["count"], 0);
+                        GetLeadTime leadTimeLast = new GetLeadTime(-1, (int)sqlReader["machine"], (int)sqlReader["count"], (int)sqlReader["counterRepeat"]);
 
 
                         Invoke(new Action(() =>

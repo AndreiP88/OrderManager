@@ -94,7 +94,7 @@ namespace OrderManager
                 if (!machinesList.Contains(ordersCurrentShift[i].machineOfOrder))
                     machinesList.Add(ordersCurrentShift[i].machineOfOrder);
 
-                GetLeadTime leadTime = new GetLeadTime(shiftStartID, ordersCurrentShift[i].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[i].orderIndex));
+                GetLeadTime leadTime = new GetLeadTime(shiftStartID, Convert.ToInt32(ordersCurrentShift[i].machineOfOrder), ordersCurrentShift[i].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[i].orderIndex));
 
                 if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")
                 {
@@ -184,7 +184,7 @@ namespace OrderManager
                         break;
                     }
 
-                    GetLeadTime leadTime = new GetLeadTime(shifts[i], ordersCurrentShift[j].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[j].orderIndex));
+                    GetLeadTime leadTime = new GetLeadTime(shifts[i], Convert.ToInt32(ordersCurrentShift[j].machineOfOrder), ordersCurrentShift[j].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[j].orderIndex));
 
                     if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")
                     {

@@ -9,12 +9,14 @@ namespace OrderManager
     internal class GetLeadTime
     {
         int shiftIndex;
+        int machine;
         int orderIndex;
         int repeatCounter;
 
-        public GetLeadTime(int shiftID, int orderID, int counterRepeat)
+        public GetLeadTime(int shiftID, int machineLoad, int orderID, int counterRepeat)
         {
             this.shiftIndex = shiftID;
+            this.machine = machineLoad;
             this.orderIndex = orderID;
             this.repeatCounter = counterRepeat;
         }
@@ -44,6 +46,63 @@ namespace OrderManager
             return GetDateTime(nameOfColomn).Item5;
         }
 
+        public int CalculateMakereadyParts(bool calculatePreviousParts, bool calculateCurrentParts, bool calculateSubsequentParts)
+        {
+            int summMakereadyParts = 0;
+
+            List<int> parts = new List<int>();
+            int indexPartsCurrentShift = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND (counterRepeat = @counterRepeat AND machine = @machine)"
+                };
+                Command.Parameters.AddWithValue("@id", orderIndex);
+                Command.Parameters.AddWithValue("@counterRepeat", repeatCounter);
+                Command.Parameters.AddWithValue("@machine", machine);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    if ((int)sqlReader["makereadyComplete"] >= 0)
+                    {
+                        parts.Add((int)sqlReader["makereadyComplete"]);
+
+                        if ((int)sqlReader["shiftID"] == shiftIndex)
+                        {
+                            indexPartsCurrentShift = parts.Count - 1;
+                        }
+                    }
+                }
+
+                Connect.Close();
+            }
+            
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (i < indexPartsCurrentShift && calculatePreviousParts)
+                {
+                    summMakereadyParts += parts[i];
+                }
+                    
+                if (i == indexPartsCurrentShift && calculateCurrentParts)
+                {
+                    summMakereadyParts += parts[i];
+                }
+
+                if (i > indexPartsCurrentShift && calculateSubsequentParts)
+                {
+                    summMakereadyParts += parts[i];
+                }
+            }
+
+            return summMakereadyParts;
+        }
+
         private (String, String, String, String, String) GetDateTime(String nameOfColomn)
         {
             String lastTime = "";
@@ -61,10 +120,11 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND counterRepeat = @counterRepeat"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND (counterRepeat = @counterRepeat AND machine = @machine)"
                 };
                 Command.Parameters.AddWithValue("@id", orderIndex);
                 Command.Parameters.AddWithValue("@counterRepeat", repeatCounter);
+                Command.Parameters.AddWithValue("@machine", machine);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())

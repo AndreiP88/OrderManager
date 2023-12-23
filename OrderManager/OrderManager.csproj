@@ -135,6 +135,12 @@
     <Compile Include="FormAddTimeMkWork.Designer.cs">
       <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormEnterMakereadyPart.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormEnterMakereadyPart.Designer.cs">
+      <DependentUpon>FormEnterMakereadyPart.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormForExperience.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -332,6 +338,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormAddTimeMkWork.resx">
       <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormEnterMakereadyPart.resx">
+      <DependentUpon>FormEnterMakereadyPart.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormForExperience.resx">
       <DependentUpon>FormForExperience.cs</DependentUpon>
