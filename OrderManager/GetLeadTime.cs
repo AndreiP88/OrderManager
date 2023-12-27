@@ -135,7 +135,7 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     datetimes.Add(sqlReader[nameOfColomn].ToString());
-
+                    
                     if ((int)sqlReader["shiftID"] == shiftIndex)
                     {
                         indexCurrent = datetimes.Count - 1;
@@ -145,7 +145,7 @@ namespace OrderManager
 
                 Connect.Close();
             }
-
+            
             if (indexCurrent == 0)
             {
                 lastTime = "";

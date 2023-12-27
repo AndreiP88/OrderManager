@@ -1498,7 +1498,7 @@ namespace OrderManager
 
             int amountComplete = orderCalc.OrderFullCalculate();
             int amountFull = 0;
-
+            
             if (amountOrder != "")
                 amountFull = Convert.ToInt32(amountOrder);
 
@@ -1583,7 +1583,7 @@ namespace OrderManager
         private void LoadOrderInProgressFromDB(int shiftID, int orderID, string machine, int counterRepeat)
         {
             GetDateTimeOperations timeDif = new GetDateTimeOperations();
-            GetLeadTime leadTime = new GetLeadTime(shiftID, orderID, Convert.ToInt32(machine), counterRepeat);
+            GetLeadTime leadTime = new GetLeadTime(shiftID, Convert.ToInt32(machine), orderID, counterRepeat);
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
             GetOrdersFromBase getOrder = new GetOrdersFromBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -1598,7 +1598,7 @@ namespace OrderManager
             int amountComplete = orderCalc.OrderCalculate(true, false);
             int amountDone = orderCalc.OrderCalculate(false, true);
             int amountFull = 0;
-
+            
             if (amountOrder != "")
                 amountFull = Convert.ToInt32(amountOrder);
 
@@ -1710,7 +1710,6 @@ namespace OrderManager
 
                 button6.Enabled = false;
             }
-
 
             //SetEnabledElements(1);
             LoadOrderFromDB(orderID);
