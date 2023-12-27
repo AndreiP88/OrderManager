@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.IO;
 
@@ -71,17 +72,21 @@ namespace OrderManager
                     if ((int)sqlReader["makereadyComplete"] >= 0)
                     {
                         parts.Add((int)sqlReader["makereadyComplete"]);
+                    }
+                    else
+                    {
+                        parts.Add(0);
+                    }
 
-                        if ((int)sqlReader["shiftID"] == shiftIndex)
-                        {
-                            indexPartsCurrentShift = parts.Count - 1;
-                        }
+                    if ((int)sqlReader["shiftID"] == shiftIndex)
+                    {
+                        indexPartsCurrentShift = parts.Count - 1;
                     }
                 }
 
                 Connect.Close();
             }
-            
+
             for (int i = 0; i < parts.Count; i++)
             {
                 if (i < indexPartsCurrentShift && calculatePreviousParts)

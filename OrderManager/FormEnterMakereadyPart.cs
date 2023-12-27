@@ -26,6 +26,8 @@ namespace OrderManager
 
             _edit = true;
 
+            LoadOtherParameters(orderInProgressID);
+
             this.OrderInProgressID = orderInProgressID;
         }
 
@@ -44,37 +46,71 @@ namespace OrderManager
             this.OrderInProgressID = -1;
         }
 
+        private void LoadOtherParameters(int orderInProgressID)
+        {
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+
+            this.ShiftID = getOrders.GetShiftIDFromOrderInProgressID(orderInProgressID);
+            this.Machine = getOrders.GetMachineFromOrderInProgressID(orderInProgressID);
+            this.OrderIndex = getOrders.GetOrderID(orderInProgressID);
+            this.CounterRepeat = getOrders.GetCounterRepeatFromOrderInProgressID(orderInProgressID);
+        }
+
         int maxValueTrackBox = 1000;
 
-        private void SetValue()
+        private void SetValueForEdit()
         {
-            if (!_edit)
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetLeadTime leadTime = new GetLeadTime(ShiftID, Machine, OrderIndex, CounterRepeat);
+
+            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
+
+            trackBar1.Maximum = makereadyTime;
+
+            int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, true);
+            int lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
+
+            maxValueTrackBox = lastTimeMakeready;
+
+            if (CurrentTimeMakeready > lastTimeMakeready)
             {
-                ValueOrdersBase ordersBase = new ValueOrdersBase();
-                GetLeadTime leadTime = new GetLeadTime(ShiftID, Machine, OrderIndex, CounterRepeat);
-
-                int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
-
-                trackBar1.Maximum = makereadyTime;
-
-                int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
-                int lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
-                
-                maxValueTrackBox = lastTimeMakeready;
-
-                if (CurrentTimeMakeready > lastTimeMakeready)
-                {
-                    SetTrackBarValue(lastTimeMakeready);
-                    SetTimeValue(lastTimeMakeready);
-                }
-                else
-                {
-                    SetTrackBarValue(CurrentTimeMakeready);
-                    SetTimeValue(CurrentTimeMakeready);
-                }
-
-                SetPercentValue(trackBar1.Value, trackBar1.Maximum);
+                SetTrackBarValue(lastTimeMakeready);
+                SetTimeValue(lastTimeMakeready);
             }
+            else
+            {
+                SetTrackBarValue(CurrentTimeMakeready);
+                SetTimeValue(CurrentTimeMakeready);
+            }
+
+            SetPercentValue(trackBar1.Value, trackBar1.Maximum);
+        }
+        private void SetValueForAdd()
+        {
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetLeadTime leadTime = new GetLeadTime(ShiftID, Machine, OrderIndex, CounterRepeat);
+
+            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
+
+            trackBar1.Maximum = makereadyTime;
+
+            int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
+            int lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
+
+            maxValueTrackBox = lastTimeMakeready;
+
+            if (CurrentTimeMakeready > lastTimeMakeready)
+            {
+                SetTrackBarValue(lastTimeMakeready);
+                SetTimeValue(lastTimeMakeready);
+            }
+            else
+            {
+                SetTrackBarValue(CurrentTimeMakeready);
+                SetTimeValue(CurrentTimeMakeready);
+            }
+
+            SetPercentValue(trackBar1.Value, trackBar1.Maximum);
         }
 
         private void SetTimeValue(int time)
@@ -164,7 +200,14 @@ namespace OrderManager
 
         private void FormPrivateNote_Load(object sender, EventArgs e)
         {
-            SetValue();
+            if (_edit)
+            {
+                SetValueForEdit();
+            }
+            else
+            {
+                SetValueForAdd();
+            }
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)

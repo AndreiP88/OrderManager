@@ -57,8 +57,8 @@ namespace OrderManager
         /// <returns>Фактическое время начал выполнения заказа</returns>
         public string GetOrderStartTime(int id)
         {
-            string startMK = GetValueFromIndex(id, "timeMakereadyStart");
-            string startWK = GetValueFromIndex(id, "timeToWorkStart");
+            string startMK = (string)GetValueFromIndex(id, "timeMakereadyStart");
+            string startWK = (string)GetValueFromIndex(id, "timeToWorkStart");
 
             if (startMK != "")
             {
@@ -77,7 +77,7 @@ namespace OrderManager
         /// <returns></returns>
         public string GetTimeToWorkStop(int id)
         {
-            return GetValueFromIndex(id, "timeToWorkStop");
+            return (string)GetValueFromIndex(id, "timeToWorkStop");
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace OrderManager
         /// <returns></returns>
         public string GetTimeToMakereadyStop(int id)
         {
-            return GetValueFromIndex(id, "timeMakereadyStop");
+            return (string)GetValueFromIndex(id, "timeMakereadyStop");
         }
 
         /// <summary>
@@ -97,7 +97,37 @@ namespace OrderManager
         /// <returns>Индекс заказа</returns>
         public int GetOrderID(int id)
         {
-            return Convert.ToInt32(GetValueFromIndex(id, "orderID"));
+            return (int)GetValueFromIndex(id, "orderID");
+        }
+
+        /// <summary>
+        /// Получить индекс смены по индексу заказа в работе
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Индекс смены</returns>
+        public int GetShiftIDFromOrderInProgressID(int id)
+        {
+            return (int)GetValueFromIndex(id, "shiftID");
+        }
+
+        /// <summary>
+        /// Получить индекс оборудования по индексу заказа в работе
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Индекс оборудования</returns>
+        public int GetMachineFromOrderInProgressID(int id)
+        {
+            return (int)GetValueFromIndex(id, "machine");
+        }
+
+        /// <summary>
+        /// Получить количество прерываний заказа по индексу заказа в работе
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Количество прерываний заказа</returns>
+        public int GetCounterRepeatFromOrderInProgressID(int id)
+        {
+            return (int)GetValueFromIndex(id, "counterRepeat");
         }
 
         public int LastTimeForMakeready(int shiftID, int machine, int orderIndex, int counterRepeat)
@@ -134,9 +164,9 @@ namespace OrderManager
             return result;
         }
 
-        private String GetValueFromIndex(int count, string nameOfColomn)
+        private object GetValueFromIndex(int count, string nameOfColomn)
         {
-            String result = "";
+            object result = null;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -152,7 +182,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    result = sqlReader[nameOfColomn].ToString();
+                    result = sqlReader[nameOfColomn];
                 }
 
                 Connect.Close();
@@ -494,7 +524,7 @@ namespace OrderManager
 
                 int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
 
-                lastTimeMakeready = makereadyTime  - makereadySummPreviousParts;
+                lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
             }
             
             return lastTimeMakeready;
@@ -549,10 +579,27 @@ namespace OrderManager
 
             int makereadyPart = GetMakereadyPartFromOrderID(orderInProgressID);
 
-            if (makereadyPart == -2)
+            switch (makereadyPart)
+            {
+                case -2:
+                    timeWorkingOut = FullWorkoutTimeFromTime(shiftID, machine, orderIndex, counterRepeat, timeMkrStop, timeMkrStart);
+                    break;
+                case -1:
+                    timeWorkingOut = 0;
+                    break;
+                default:
+                    timeWorkingOut = makereadyPart;
+                    break;
+            }
+
+            /*if (makereadyPart == -2)
             {
                 timeWorkingOut = FullWorkoutTimeFromTime(shiftID, machine, orderIndex, counterRepeat, timeMkrStop, timeMkrStart);
-            }//возможно еще условие понадобится
+            }
+            else if (makereadyPart == -1)
+            {
+                timeWorkingOut = 0;
+            }
             else
             {
                 ValueOrdersBase ordersBase = new ValueOrdersBase();
@@ -561,8 +608,9 @@ namespace OrderManager
 
                 int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(orderIndex));
 
-                timeWorkingOut = makereadyTime - makereadyPart;
-            }
+                //timeWorkingOut = makereadyTime - makereadyPart;
+                timeWorkingOut = makereadyPart;
+            }*/
 
             return timeWorkingOut;
         }

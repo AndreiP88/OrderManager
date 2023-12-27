@@ -131,8 +131,9 @@
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(7, 33);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 2;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44F));
+            this.tableLayoutPanel3.RowCount = 3;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(467, 92);
             this.tableLayoutPanel3.TabIndex = 10;
@@ -144,7 +145,7 @@
             this.trackBar1.Location = new System.Drawing.Point(3, 3);
             this.trackBar1.Maximum = 1000;
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(340, 38);
+            this.trackBar1.Size = new System.Drawing.Size(340, 39);
             this.trackBar1.TabIndex = 1;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
@@ -156,7 +157,7 @@
             this.label2.Font = new System.Drawing.Font("Lucida Console", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label2.Location = new System.Drawing.Point(349, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(115, 44);
+            this.label2.Size = new System.Drawing.Size(115, 45);
             this.label2.TabIndex = 2;
             this.label2.Text = "00:00";
             this.label2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -167,12 +168,12 @@
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 47);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 48);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 2;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(340, 42);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(340, 39);
             this.tableLayoutPanel4.TabIndex = 3;
             // 
             // label3
@@ -180,10 +181,11 @@
             this.label3.AutoSize = true;
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label3.Font = new System.Drawing.Font("Lucida Console", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(349, 44);
+            this.label3.Location = new System.Drawing.Point(349, 45);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(115, 48);
+            this.label3.Size = new System.Drawing.Size(115, 45);
             this.label3.TabIndex = 4;
+            this.label3.Text = "0 %";
             this.label3.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // FormEnterMakereadyPart
