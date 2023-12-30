@@ -1370,11 +1370,6 @@ namespace OrderManager
             SelectMachines();
         }
 
-        private void statisticToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ShowStatisticForm();
-        }
-
         private void cancelShiftToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CancelShift();
@@ -2075,6 +2070,17 @@ namespace OrderManager
         private void numericUpDown1_Click(object sender, EventArgs e)
         {
             numericUpDown1.Select(0, numericUpDown1.Text.Length);
+        }
+
+        private void statisticAllUsersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowStatisticForm();
+        }
+
+        private void statisticAllWorkingOutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormStatisticAllUsers fm = new FormStatisticAllUsers();
+            fm.ShowDialog();
         }
     }
 }

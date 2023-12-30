@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +55,22 @@ namespace OrderManager
                 }
 
             }
+        }
+
+        public static SqlConnection GetSQLServerConnection()
+        {
+            /*string host = "25.21.38.172";
+            int port = 3309;
+            string database = "order_manager";
+            string username = "oxyfox";
+            string password = "root";*/
+
+            string host = "SRV-ACS\\DSACS";
+            string database = "asystem";
+            string username = "ds";
+            string password = "1";
+
+            return DBMySQLUtils.GetSQLServerConnection(host, database, username, password);
         }
 
         public void SetDBParameter()

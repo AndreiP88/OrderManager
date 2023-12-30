@@ -142,7 +142,6 @@ namespace OrderManager
             this.planToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewAllOrdersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.statisticToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.normToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.passwordChangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -153,12 +152,15 @@ namespace OrderManager
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelShiftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAppToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statisticAllUsersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statisticAllWorkingOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1323,6 +1325,7 @@ namespace OrderManager
             this.toolStripLabel1,
             this.toolStripButton1,
             this.toolStripDropDownButton1,
+            this.toolStripDropDownButton4,
             this.toolStripDropDownButton2,
             this.toolStripDropDownButton3});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
@@ -1404,7 +1407,6 @@ namespace OrderManager
             this.planToolStripMenuItem,
             this.viewAllOrdersToolStripMenuItem,
             this.viewOperationsToolStripMenuItem,
-            this.statisticToolStripMenuItem,
             this.normToolStripMenuItem});
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -1416,35 +1418,28 @@ namespace OrderManager
             // planToolStripMenuItem
             // 
             this.planToolStripMenuItem.Name = "planToolStripMenuItem";
-            this.planToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.planToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.planToolStripMenuItem.Text = "Просмотр плана";
             this.planToolStripMenuItem.Click += new System.EventHandler(this.planToolStripMenuItem_Click);
             // 
             // viewAllOrdersToolStripMenuItem
             // 
             this.viewAllOrdersToolStripMenuItem.Name = "viewAllOrdersToolStripMenuItem";
-            this.viewAllOrdersToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.viewAllOrdersToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.viewAllOrdersToolStripMenuItem.Text = "Просмотр всех заказов";
             this.viewAllOrdersToolStripMenuItem.Click += new System.EventHandler(this.просмотрВсехЗаказовToolStripMenuItem_Click);
             // 
             // viewOperationsToolStripMenuItem
             // 
             this.viewOperationsToolStripMenuItem.Name = "viewOperationsToolStripMenuItem";
-            this.viewOperationsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.viewOperationsToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.viewOperationsToolStripMenuItem.Text = "Просмотр операций";
             this.viewOperationsToolStripMenuItem.Click += new System.EventHandler(this.просмотрОперацийToolStripMenuItem_Click);
-            // 
-            // statisticToolStripMenuItem
-            // 
-            this.statisticToolStripMenuItem.Name = "statisticToolStripMenuItem";
-            this.statisticToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.statisticToolStripMenuItem.Text = "Статистика";
-            this.statisticToolStripMenuItem.Click += new System.EventHandler(this.statisticToolStripMenuItem_Click);
             // 
             // normToolStripMenuItem
             // 
             this.normToolStripMenuItem.Name = "normToolStripMenuItem";
-            this.normToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.normToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.normToolStripMenuItem.Text = "Нормы";
             this.normToolStripMenuItem.Click += new System.EventHandler(this.normToolStripMenuItem_Click);
             // 
@@ -1525,6 +1520,18 @@ namespace OrderManager
             this.closeAppToolStripMenuItem.Text = "Закрыть программу";
             this.closeAppToolStripMenuItem.Click += new System.EventHandler(this.закрытьToolStripMenuItem_Click);
             // 
+            // toolStripDropDownButton4
+            // 
+            this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statisticAllUsersToolStripMenuItem,
+            this.statisticAllWorkingOutToolStripMenuItem});
+            this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
+            this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
+            this.toolStripDropDownButton4.ShowDropDownArrow = false;
+            this.toolStripDropDownButton4.Size = new System.Drawing.Size(101, 22);
+            this.toolStripDropDownButton4.Text = "Информация";
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1568,6 +1575,20 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
+            // 
+            // statisticAllUsersToolStripMenuItem
+            // 
+            this.statisticAllUsersToolStripMenuItem.Name = "statisticAllUsersToolStripMenuItem";
+            this.statisticAllUsersToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.statisticAllUsersToolStripMenuItem.Text = "Отработанные смены";
+            this.statisticAllUsersToolStripMenuItem.Click += new System.EventHandler(this.statisticAllUsersToolStripMenuItem_Click);
+            // 
+            // statisticAllWorkingOutToolStripMenuItem
+            // 
+            this.statisticAllWorkingOutToolStripMenuItem.Name = "statisticAllWorkingOutToolStripMenuItem";
+            this.statisticAllWorkingOutToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.statisticAllWorkingOutToolStripMenuItem.Text = "Статистика за месяц";
+            this.statisticAllWorkingOutToolStripMenuItem.Click += new System.EventHandler(this.statisticAllWorkingOutToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -1673,7 +1694,6 @@ namespace OrderManager
         private System.Windows.Forms.ToolStripMenuItem noteToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader columnHeader13;
         private System.Windows.Forms.ToolStripMenuItem machinesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem statisticToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem normToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cancelShiftToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
@@ -1744,6 +1764,9 @@ namespace OrderManager
         private Label label43;
         private Label label44;
         private Label label40;
+        private ToolStripDropDownButton toolStripDropDownButton4;
+        private ToolStripMenuItem statisticAllUsersToolStripMenuItem;
+        private ToolStripMenuItem statisticAllWorkingOutToolStripMenuItem;
     }
 }
 

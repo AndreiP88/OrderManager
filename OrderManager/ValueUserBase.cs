@@ -62,6 +62,16 @@ namespace OrderManager
 
             return fullName;
         }
+
+        public int GetIndexUserFromASBase(int userID)
+        {
+            int index = -1;
+
+            index = Convert.ToInt32(GetValue("id", userID.ToString(), "indexUserFromAS"));
+
+            return index;
+        }
+
         public String GetIDUserFromName(String nameUser)
         {
             String result = "";
@@ -87,14 +97,40 @@ namespace OrderManager
             return result;
         }
 
-        public String GetCategoryesMachine(String id)
+        public List<int> GetEquipsListForSelectedUser(int userId)
         {
-            return GetValue("id", id, "categoryesMachine");
+            List<int> result = new List<int>();
+
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            List<int> categoryes = GetCategoryesList(userId);
+
+            for (int i = 0; i < categoryes.Count; i++)
+            {
+                result.AddRange(infoBase.GetMachinesList(categoryes[i]));
+            }
+
+            return result;
+        }
+
+        public string GetCategoryesMachine(string id)
+        {
+            return (string)GetValue("id", id, "categoryesMachine");
+        }
+
+        public int GetCategoryesMachine(int userID)
+        {
+            return (int)GetValue("id", userID.ToString(), "categoryesMachine");
         }
 
         public string[] GetMachinesArr(string id)
         {
             return GetCategoryesMachine(id).Split(';');
+        }
+
+        public List<int> GetCategoryesList(int userID)
+        {
+            return GetCategoryesMachine(userID.ToString())?.Split(';')?.Select(Int32.Parse)?.ToList();
         }
 
         public bool CategoryForUser(String id, String category)
@@ -114,12 +150,12 @@ namespace OrderManager
 
         public String GetActiveUser(String id)
         {
-            return GetValue("id", id, "activeUser");
+            return (string)GetValue("id", id, "activeUser");
         }
 
         public String GetPasswordUser(String id)
         {
-            return GetValue("id", id, "passwordUser");
+            return (string)GetValue("id", id, "passwordUser");
         }
 
         public int GetCurrentShiftStart(string id)
@@ -431,9 +467,9 @@ namespace OrderManager
             }
         }
 
-        private String GetValue(String findColomnName, String findParameter, String valueColomn)
+        private object GetValue(String findColomnName, String findParameter, String valueColomn)
         {
-            String result = "";
+            object result = "";
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -447,7 +483,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    result = sqlReader[valueColomn].ToString();
+                    result = sqlReader[valueColomn];
                 }
 
                 Connect.Close();
