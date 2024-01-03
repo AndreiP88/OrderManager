@@ -126,7 +126,7 @@ namespace OrderManager
             {
                 ChartType = SeriesChartType.Pie,
                 LabelBackColor = Color.Transparent,
-                IsVisibleInLegend = false
+                IsVisibleInLegend = true
 
             });
 
@@ -173,6 +173,8 @@ namespace OrderManager
         private void ClearAll()
         {
             listView1.Items.Clear();
+            label2.Text = "";
+            chart1.Series.Clear();
         }
 
         CancellationTokenSource cancelTokenSource;
@@ -187,8 +189,6 @@ namespace OrderManager
             if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
             {
                 cancelTokenSource = new CancellationTokenSource();
-
-                ClearAll();
 
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1).AddMonths(comboBox2.SelectedIndex);
@@ -227,6 +227,9 @@ namespace OrderManager
                 comboBox1.Enabled = false;
                 comboBox2.Enabled = false;
                 comboBox3.Enabled = false;
+                comboBox4.Enabled = false;
+
+                ClearAll();
 
                 category = categoryValue.GetCategoryFromName(comboBox3.Text);
             }));
@@ -352,6 +355,7 @@ namespace OrderManager
                 comboBox1.Enabled = true;
                 comboBox2.Enabled = true;
                 comboBox3.Enabled = true;
+                comboBox4.Enabled = true;
             }));
         }
 
