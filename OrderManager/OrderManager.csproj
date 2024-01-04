@@ -136,6 +136,12 @@
     <Compile Include="FormAddTimeMkWork.Designer.cs">
       <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormStatisticYearForUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormStatisticYearForUser.Designer.cs">
+      <DependentUpon>FormStatisticYearForUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormStatisticAllUsers.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -208,6 +214,7 @@
     <Compile Include="FormTypesInTheOrder.Designer.cs">
       <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>
     </Compile>
+    <Compile Include="GetWorkingOutSum.cs" />
     <Compile Include="GetWorkingOutTime.cs" />
     <Compile Include="INISettings.cs" />
     <Compile Include="Logger.cs" />
@@ -345,6 +352,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormAddTimeMkWork.resx">
       <DependentUpon>FormAddTimeMkWork.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormStatisticYearForUser.resx">
+      <DependentUpon>FormStatisticYearForUser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormStatisticAllUsers.resx">
       <DependentUpon>FormStatisticAllUsers.cs</DependentUpon>

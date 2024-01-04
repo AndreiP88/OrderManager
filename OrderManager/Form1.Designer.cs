@@ -161,6 +161,7 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statisticYearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1343,9 +1344,10 @@ namespace OrderManager
             // toolStripButton1
             // 
             this.toolStripButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.paramToolStripMenuItem,
-            this.shiftsToolStripMenuItem,
             this.machinesToolStripMenuItem,
+            this.shiftsToolStripMenuItem,
+            this.statisticYearToolStripMenuItem,
+            this.paramToolStripMenuItem,
             this.testToolStripMenuItem,
             this.базаДанныхToolStripMenuItem,
             this.downloadUpadaterToolStripMenuItem});
@@ -1590,6 +1592,13 @@ namespace OrderManager
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
             // 
+            // statisticYearToolStripMenuItem
+            // 
+            this.statisticYearToolStripMenuItem.Name = "statisticYearToolStripMenuItem";
+            this.statisticYearToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.statisticYearToolStripMenuItem.Text = "График выработки";
+            this.statisticYearToolStripMenuItem.Click += new System.EventHandler(this.statisticYearToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1767,6 +1776,7 @@ namespace OrderManager
         private ToolStripDropDownButton toolStripDropDownButton4;
         private ToolStripMenuItem statisticAllUsersToolStripMenuItem;
         private ToolStripMenuItem statisticAllWorkingOutToolStripMenuItem;
+        private ToolStripMenuItem statisticYearToolStripMenuItem;
     }
 }
 

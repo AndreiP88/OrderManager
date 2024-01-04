@@ -2082,5 +2082,11 @@ namespace OrderManager
             FormStatisticAllUsers fm = new FormStatisticAllUsers();
             fm.ShowDialog();
         }
+
+        private void statisticYearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormStatisticYearForUser fm = new FormStatisticYearForUser(Convert.ToInt32(Info.nameOfExecutor));
+            fm.ShowDialog();
+        }
     }
 }

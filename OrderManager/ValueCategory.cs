@@ -16,27 +16,27 @@ namespace OrderManager
 
         public string GetCategoryName(string id)
         {
-            return (string)GetValue("id", id, "category");
+            return (string)GetValue("id", id, "category").ToString();
         }
 
         public String GetMainIDNormOperation(String id)
         {
-            return (string)GetValue("id", id, "mainIdNormOperation");
+            return GetValue("id", id, "mainIdNormOperation").ToString();
         }
 
         public String GetIDOptionView(String id)
         {
-            return (string)GetValue("id", id, "idOptionForView");
+            return (string)GetValue("id", id, "idOptionForView").ToString();
         }
 
         public String GetMKIDNormOperation(String id)
         {
-            return (string)GetValue("id", id, "mkIdNormOperation");
+            return (string)GetValue("id", id, "mkIdNormOperation").ToString();
         }
 
         public String GetWKIDNormOperation(String id)
         {
-            return (string)GetValue("id", id, "wkIdNormOperation");
+            return (string)GetValue("id", id, "wkIdNormOperation").ToString();
         }
 
         public string GetCategoryFromName(string category)
@@ -85,7 +85,7 @@ namespace OrderManager
 
         private object GetValue(string findColomnName, string findParameter, string valueColomn)
         {
-            object result = null;
+            object result = -1;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

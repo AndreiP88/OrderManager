@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,15 +15,15 @@ using System.Xml.Linq;
 
 namespace OrderManager
 {
-    public partial class FormStatisticAllUsers : Form
+    public partial class FormStatisticYearForUser : Form
     {
-        bool adminMode;
+        int UserID;
 
-        public FormStatisticAllUsers(bool aMode = false)
+        public FormStatisticYearForUser(int userID)
         {
             InitializeComponent();
 
-            this.adminMode = aMode;
+            this.UserID = userID;
         }
 
         bool thJob = false;
@@ -124,9 +126,9 @@ namespace OrderManager
 
             chart1.Series.Add(new Series("ColumnSeries")
             {
-                ChartType = SeriesChartType.Pie,
+                ChartType = SeriesChartType.Column,
                 LabelBackColor = Color.Transparent,
-                IsVisibleInLegend = true
+                IsVisibleInLegend = false
 
             });
 
@@ -135,27 +137,18 @@ namespace OrderManager
             //string[] xValues = { "France", "Canada", "Germany", "USA", "Italy" };
             chart1.Series["ColumnSeries"].Points.DataBindXY(xValues, yValues);
 
-            chart1.ChartAreas[0].Area3DStyle.Enable3D = true;
+            chart1.AlignDataPointsByAxisLabel();
+            
+            //chart1.ChartAreas[0].Area3DStyle.Enable3D = true;
         }
 
         private void SetItemsComboBox()
         {
-            ValueCategory category = new ValueCategory();
-
-            List<String> categoryes = new List<String>(category.GetCategoryesList());
-
-            comboBox3.Items.AddRange(categoryes.ToArray());
-
             DateTime dateTime = DateTime.Now;
 
             //comboBox1.SelectedIndex = comboBox1.FindString(dateTime.Year.ToString());
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf(dateTime.Year.ToString());
-            comboBox2.SelectedIndex = dateTime.Month - 1;
 
-            if (comboBox3.Items.Count > 0)
-            {
-                comboBox3.SelectedIndex = 0;
-            }
         }
 
         private void LoadYears()
@@ -173,7 +166,6 @@ namespace OrderManager
         private void ClearAll()
         {
             listView1.Items.Clear();
-            label2.Text = "";
             chart1.Series.Clear();
         }
 
@@ -186,12 +178,12 @@ namespace OrderManager
                 //Thread.Sleep(100);
             }
 
-            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
+            if (comboBox1.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
             {
                 cancelTokenSource = new CancellationTokenSource();
 
                 DateTime date;
-                date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1).AddMonths(comboBox2.SelectedIndex);
+                date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1);
 
                 int selectLoadBase = comboBox4.SelectedIndex;
 
@@ -209,7 +201,6 @@ namespace OrderManager
                     task.Start();
                 }
             }
-
         }
 
         private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
@@ -218,157 +209,145 @@ namespace OrderManager
             GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
             ValueUserBase getUser = new ValueUserBase();
             ValueInfoBase getInfo = new ValueInfoBase();
-            ValueCategory categoryValue = new ValueCategory();
-
-            string cLine = " WHERE activeUser = 'True'";
-
-            int category = -1;
 
             Invoke(new Action(() =>
             {
                 comboBox1.Enabled = false;
-                comboBox2.Enabled = false;
-                comboBox3.Enabled = false;
                 comboBox4.Enabled = false;
 
                 ClearAll();
-
-                category = categoryValue.GetIDCategoryFromName(comboBox3.Text);
             }));
 
-            List<int> usersList = new List<int>();
-            List<string> usersNames = new List<string>();
+            List<int> monthList = new List<int>();
+            List<string> monthNames = new List<string>();
 
-            while (true)
+            Invoke(new Action(() =>
             {
-                //token.ThrowIfCancellationRequested();
+                listView1.Items.Clear();
+            }));
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                monthList.Add(i);
+                monthNames.Add(CultureInfo.GetCultureInfoByIetfLanguageTag("ru-RU").DateTimeFormat.GetMonthName(i + 1));
+
+                ListViewItem item = new ListViewItem();
+
+                item.Name = i.ToString();
+                item.Text = (i + 1).ToString();
+                item.SubItems.Add(monthNames[monthNames.Count - 1]);
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                item.SubItems.Add("");
 
                 Invoke(new Action(() =>
                 {
-                    listView1.Items.Clear();
+                    listView1.Items.Add(item);
                 }));
-
-                using (MySqlConnection Connect = DBConnection.GetDBConnection())
-                {
-                    Connect.Open();
-                    MySqlCommand Command = new MySqlCommand
-                    {
-                        Connection = Connect,
-                        CommandText = @"SELECT * FROM users" + cLine
-                    };
-                    DbDataReader sqlReader = Command.ExecuteReader();
-
-                    while (sqlReader.Read())
-                    {
-                        if (token.IsCancellationRequested)
-                        {
-                            break;
-                        }
-
-                        if (getUser.CategoryForUser(sqlReader["id"].ToString(), category.ToString()))
-                        {
-                            usersList.Add((int)sqlReader["id"]);
-                            usersNames.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-
-                            ListViewItem item = new ListViewItem();
-
-                            item.Name = sqlReader["id"].ToString();
-                            item.Text = (listView1.Items.Count + 1).ToString();
-                            item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-
-                            Invoke(new Action(() =>
-                            {
-                                listView1.Items.Add(item);
-                            }));
-                        }
-                    }
-                    Connect.Close();
-                }
-                
-                List<int> workingOut = new List<int>();
-                int summWorkingOut = 0;
-
-                for (int i = 0; i < usersList.Count; i++)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
-
-                    List<int> equipsListForCategory = getInfo.GetMachinesList(category);
-
-                    int workingOutUser = 0;
-
-                    if (selectLoadBase == 0)
-                    {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
-                    }
-                    else
-                    {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(usersList[i], equipsListForCategory, date);
-                    }
-
-                    workingOut.Add(workingOutUser);
-                    summWorkingOut += workingOutUser;
-
-                    Invoke(new Action(() =>
-                    {
-                        int index = listView1.Items.IndexOfKey(usersList[i].ToString());
-
-                        if (index >= 0)
-                        {
-                            ListViewItem item = listView1.Items[index];
-
-                            if (item != null)
-                            {
-                                item.SubItems[2].Text = workingOutUser.ToString("N0");
-                            }
-                        }
-                    }));
-                }
-
-                for (int i = 0; i < usersList.Count; i++)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    Invoke(new Action(() =>
-                    {
-                        int index = listView1.Items.IndexOfKey(usersList[i].ToString());
-
-                        if (index >= 0)
-                        {
-                            ListViewItem item = listView1.Items[index];
-
-                            if (item != null)
-                            {
-                                item.SubItems[3].Text = ((float)workingOut[i] / summWorkingOut).ToString("P2");
-                            }
-                        }
-                    }));
-                }
-
-                Invoke(new Action(() =>
-                {
-                    DrawDiagram(workingOut, usersNames);
-
-                    label2.Text = summWorkingOut.ToString("N0");
-                }));
-
-                break;
             }
+
+            List<int> workingOut = new List<int>();
+            int summWorkingOut = 0;
+
+            for (int i = 0; i < monthList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                DateTime currentDateTime = date.AddMonths(monthList[i]);
+
+                List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(UserID);
+
+                int workingOutUser = 0;
+
+                if (selectLoadBase == 0)
+                {
+                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(UserID, equipsListForUser, currentDateTime);
+                }
+                else
+                {
+                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(UserID, equipsListForUser, currentDateTime);
+                }
+
+                workingOut.Add(workingOutUser);
+                summWorkingOut += workingOutUser;
+
+                Invoke(new Action(() =>
+                {
+                    int index = listView1.Items.IndexOfKey(monthList[i].ToString());
+
+                    if (index >= 0)
+                    {
+                        ListViewItem item = listView1.Items[index];
+
+                        if (item != null)
+                        {
+                            item.SubItems[2].Text = workingOutUser.ToString("N0");
+                        }
+                    }
+                }));
+            }
+
+            for (int i = 0; i < monthList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                Invoke(new Action(() =>
+                {
+                    int index = listView1.Items.IndexOfKey(monthList[i].ToString());
+
+                    if (index >= 0)
+                    {
+                        ListViewItem item = listView1.Items[index];
+
+                        if (item != null)
+                        {
+                            item.SubItems[3].Text = ((float)workingOut[i] / summWorkingOut).ToString("P2");
+                        }
+                    }
+                }));
+            }
+
+            ListViewItem itemSum = new ListViewItem();
+
+            itemSum.Name = "sum";
+            itemSum.Text = "";
+            itemSum.SubItems.Add("ИТОГ");
+            itemSum.SubItems.Add(summWorkingOut.ToString("N0"));
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+
+            itemSum.Font = new Font(ListView.DefaultFont, FontStyle.Bold);
+
+            Invoke(new Action(() =>
+            {
+                listView1.Items.Add(itemSum);
+            }));
+
+            Invoke(new Action(() =>
+            {
+                DrawDiagram(workingOut, monthNames);
+
+                //label2.Text = summWorkingOut.ToString("N0");
+            }));
 
             Invoke(new Action(() =>
             {
                 comboBox1.Enabled = true;
-                comboBox2.Enabled = true;
-                comboBox3.Enabled = true;
                 comboBox4.Enabled = true;
             }));
         }
