@@ -161,6 +161,7 @@ namespace OrderManager
             int allTime = 0;
             float allPercentWorkingOut = 0;
             float percent = 0;
+            float fullPercentBonus = 0;
 
             List<int> shifts = new List<int>(LoadShiftsList(selectDate));
 
@@ -216,6 +217,7 @@ namespace OrderManager
                 allTimeWorkingOut += fullTimeWorkingOut;
                 allTime += fullTimeWorking;
                 allPercentWorkingOut += getPercent.Percent(fullTimeWorkingOut);
+                fullPercentBonus = getPercent.GetBonusWorkingOutF(fullTimeWorkingOut);
 
                 countShifts++;
 
@@ -246,7 +248,8 @@ namespace OrderManager
                 countOrders,
                 countMakeready,
                 amountAllOrders,
-                percent
+                percent,
+                fullPercentBonus
                 );
 
             return shiftsDetails;

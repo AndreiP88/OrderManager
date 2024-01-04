@@ -10,9 +10,10 @@
         public int countMakereadyShift;
         public int amountAllOrdersShift;
         public float percentWorkingOutShift;
+        public float percentBonusShift;
 
 
-        public ShiftsDetails(int shiftsCount, int workingTime, int shiftAllTime, int ShiftallTimeWorkingOut, int shiftCountOrders, int shiftCountMakeready, int shiftAmountAllOrders, float shiftPercentWorkingOut)
+        public ShiftsDetails(int shiftsCount, int workingTime, int shiftAllTime, int ShiftallTimeWorkingOut, int shiftCountOrders, int shiftCountMakeready, int shiftAmountAllOrders, float shiftPercentWorkingOut, float percentBonusShift)
         {
             this.countShifts = shiftsCount;
             this.shiftsWorkingTime = workingTime;
@@ -22,6 +23,7 @@
             this.countMakereadyShift = shiftCountMakeready;
             this.amountAllOrdersShift = shiftAmountAllOrders;
             this.percentWorkingOutShift = shiftPercentWorkingOut;
+            this.percentBonusShift = percentBonusShift;
         }
 
     }

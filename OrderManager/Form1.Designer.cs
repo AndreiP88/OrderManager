@@ -1467,8 +1467,8 @@ namespace OrderManager
             // statisticAllWorkingOutToolStripMenuItem
             // 
             this.statisticAllWorkingOutToolStripMenuItem.Name = "statisticAllWorkingOutToolStripMenuItem";
-            this.statisticAllWorkingOutToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
-            this.statisticAllWorkingOutToolStripMenuItem.Text = "Статистика по месяцам";
+            this.statisticAllWorkingOutToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.statisticAllWorkingOutToolStripMenuItem.Text = "Диаграмма выработки";
             this.statisticAllWorkingOutToolStripMenuItem.Click += new System.EventHandler(this.statisticAllWorkingOutToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton2

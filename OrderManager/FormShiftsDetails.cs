@@ -257,7 +257,6 @@ namespace OrderManager
                 }
 
                 ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, "", token); //добавить выбор категорий
-                //добавить подсчёт бонусов за месяц и присваивать значение переменной
 
                 Invoke(new Action(() =>
                 {

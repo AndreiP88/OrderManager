@@ -20,6 +20,11 @@ namespace OrderManager
 
         public string GetBonusWorkingOut(int wOut)
         {
+            return GetBonusWorkingOutF(wOut).ToString("P0");
+        }
+
+        public float GetBonusWorkingOutF(int wOut)
+        {
             float result = 0;
 
             if (wOut < 600)
@@ -43,7 +48,7 @@ namespace OrderManager
                 result = 0.2f;
             }
 
-            return result.ToString("P0");
+            return result;
         }
     }
 }

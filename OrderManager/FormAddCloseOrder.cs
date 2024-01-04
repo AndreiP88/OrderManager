@@ -985,15 +985,15 @@ namespace OrderManager
 
                             done += orderCalc.OrderCalculate(false, true);
 
-                            /*int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, timeMakereadyStop);
-                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);*/
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);
 
-                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
-                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeOperations.DateTimeAmountMunutes(makereadyStop, 1));
+                            /*UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeOperations.DateTimeAmountMunutes(makereadyStop, 1));*/
                             UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyLastPart);
                             UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
@@ -1146,15 +1146,15 @@ namespace OrderManager
 
                             done += orderCalc.OrderCalculate(false, true);
 
-                            /*int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, timeMakereadyStop);
-                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);*/
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);
 
-                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
-                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeOperations.DateTimeAmountMunutes(makereadyStop, 1));
+                            /*UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeOperations.DateTimeAmountMunutes(makereadyStop, 1));*/
                             UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyLastPart);
                             UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
@@ -1258,15 +1258,15 @@ namespace OrderManager
 
                             done += orderCalc.OrderCalculate(false, true);
 
-                            /*int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, timeMakereadyStop);
-                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);*/
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeToWorkStart);
 
-                            UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
-                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeOperations.DateTimeAmountMunutes(makereadyStop, 1));
+                            /*UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
+                            UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, timeOperations.DateTimeAmountMunutes(makereadyStop, 1));*/
                             UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyLastPart);
                             UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
