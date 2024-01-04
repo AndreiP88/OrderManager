@@ -63,13 +63,15 @@ namespace OrderManager
             return fullName;
         }
 
-        public int GetIndexUserFromASBase(int userID)
+        public List<int> GetIndexUserFromASBase(int userID)
         {
-            int index = -1;
+            //List<int> indexes = new List<int>();
 
-            index = Convert.ToInt32(GetValue("id", userID.ToString(), "indexUserFromAS"));
+            string load = (string)GetValue("id", userID.ToString(), "indexUserFromAS");
 
-            return index;
+            var indexes = load?.Split(';')?.Select(Int32.Parse)?.ToList();
+
+            return indexes;
         }
 
         public String GetIDUserFromName(String nameUser)
@@ -316,6 +318,7 @@ namespace OrderManager
                         sqlReader["dateOfEmployment"].ToString(),
                         sqlReader["dateOfBirth"].ToString(),
                         sqlReader["activeUser"].ToString(),
+                        sqlReader["indexUserFromAS"].ToString(),
                         sqlReader["dateOfDismissal"].ToString(),
                         sqlReader["note"].ToString()
                         ));
@@ -329,7 +332,7 @@ namespace OrderManager
 
         public Object GetUserInfoFromID(string userID)
         {
-            UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "");
+            UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "", "");
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -355,6 +358,7 @@ namespace OrderManager
                         sqlReader["dateOfEmployment"].ToString(),
                         sqlReader["dateOfBirth"].ToString(),
                         sqlReader["activeUser"].ToString(),
+                        sqlReader["indexUserFromAS"].ToString(),
                         sqlReader["dateOfDismissal"].ToString(),
                         sqlReader["note"].ToString()
                         );

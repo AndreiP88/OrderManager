@@ -197,7 +197,7 @@ namespace OrderManager
 
                 //Task task = new Task(() => LoadUsersFromBase(token, date));
                 Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
-                //LoadUsersFromBase(cancelTokenSource.Token, date);
+                //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase);
 
                 if (thJob == true)
                 {
@@ -216,11 +216,12 @@ namespace OrderManager
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             ValueUserBase getUser = new ValueUserBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
             ValueCategory categoryValue = new ValueCategory();
 
             string cLine = " WHERE activeUser = 'True'";
 
-            string category = "";
+            int category = -1;
 
             Invoke(new Action(() =>
             {
@@ -231,7 +232,7 @@ namespace OrderManager
 
                 ClearAll();
 
-                category = categoryValue.GetCategoryFromName(comboBox3.Text);
+                category = categoryValue.GetIDCategoryFromName(comboBox3.Text);
             }));
 
             List<int> usersList = new List<int>();
@@ -258,7 +259,12 @@ namespace OrderManager
 
                     while (sqlReader.Read())
                     {
-                        if (getUser.CategoryForUser(sqlReader["id"].ToString(), category))
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        if (getUser.CategoryForUser(sqlReader["id"].ToString(), category.ToString()))
                         {
                             usersList.Add((int)sqlReader["id"]);
                             usersNames.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
@@ -268,11 +274,6 @@ namespace OrderManager
                             item.Name = sqlReader["id"].ToString();
                             item.Text = (listView1.Items.Count + 1).ToString();
                             item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
                             item.SubItems.Add("");
                             item.SubItems.Add("");
 
@@ -290,17 +291,24 @@ namespace OrderManager
 
                 for (int i = 0; i < usersList.Count; i++)
                 {
-                    List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
+
+                    List<int> equipsListForCategory = getInfo.GetMachinesList(category);
 
                     int workingOutUser = 0;
 
                     if (selectLoadBase == 0)
                     {
-                        workingOutUser = CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForUser, date);
+                        workingOutUser = CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
                     }
                     else
                     {
-                        workingOutUser = CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(usersList[i], equipsListForUser, date);
+                        workingOutUser = CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(usersList[i], equipsListForCategory, date);
                     }
 
                     workingOut.Add(workingOutUser);
@@ -324,6 +332,11 @@ namespace OrderManager
 
                 for (int i = 0; i < usersList.Count; i++)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     Invoke(new Action(() =>
                     {
                         int index = listView1.Items.IndexOfKey(usersList[i].ToString());
@@ -447,7 +460,14 @@ namespace OrderManager
 
             try
             {
-                int userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
+                List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
+
+                string usersStr = "man_factjob.id_common_employee = " + userIndexFromAS[0];
+                
+                for (int i = 1; i < userIndexFromAS.Count; i++)
+                {
+                    usersStr += " OR man_factjob.id_common_employee = " + userIndexFromAS[i];
+                }
 
                 string equipsStr = "man_factjob.id_equip = " + infoBase.GetIDEquipMachine(equips[0]);
 
@@ -480,10 +500,10 @@ namespace OrderManager
 	                                    fbc_brigade.date_begin <= CONVERT ( VARCHAR ( 24 ), @endDate, 21 )
 	                                    AND eff_output_coeff <> 0
 	                                    --AND man_factjob.flags <> 576
-	                                    AND man_factjob.id_common_employee = @userId
+	                                    AND (" + usersStr + @")
 	                                    AND (" + equipsStr + @")"
                     };
-                    Command.Parameters.AddWithValue("@userId", userIndexFromAS);
+                    Command.Parameters.AddWithValue("@userId", usersStr);
                     Command.Parameters.AddWithValue("@equipsStr", equipsStr);
                     Command.Parameters.AddWithValue("@startDate", startDateTime);
                     Command.Parameters.AddWithValue("@endDate", endDateTime);
@@ -507,16 +527,10 @@ namespace OrderManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Ошибка: " + ex.Message);
             }
 
             return result;
-        }
-
-        private void LoadShiftdetails(String user, int yearCur, int monthCur)
-        {
-            FormShiftsDetails form = new FormShiftsDetails(adminMode, user, yearCur, monthCur);
-            form.ShowDialog();
         }
 
         private void FormShiftsDetails_Load(object sender, EventArgs e)
@@ -539,14 +553,6 @@ namespace OrderManager
         {
             StartLoading();
             //LoadShiftsFromBase();
-        }
-
-        private void listView1_DoubleClick(object sender, EventArgs e)
-        {
-            if (listView1.SelectedItems.Count != 0)
-            {
-                LoadShiftdetails(listView1.SelectedItems[0].Name, Convert.ToInt32(comboBox1.Text), comboBox2.SelectedIndex);
-            }
         }
 
         private void FormShiftsDetails_FormClosing(object sender, FormClosingEventArgs e)

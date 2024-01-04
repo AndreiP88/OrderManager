@@ -12,6 +12,7 @@ namespace OrderManager
         public String dateOfEmployment;
         public String dateOfBirth;
         public String activeUser;
+        public string indexUser;
         public String dateOfDismissal;
         public String note;
         private object v;
@@ -21,7 +22,7 @@ namespace OrderManager
             this.v = v;
         }
 
-        public UserInfo(int userID, string surname, string name, string patronymic, string categoryesMachine, string dateOfEmployment, string dateOfBirth, string activeUser, string dateOfDismissal, string note)
+        public UserInfo(int userID, string surname, string name, string patronymic, string categoryesMachine, string dateOfEmployment, string dateOfBirth, string activeUser, string indexUser, string dateOfDismissal, string note)
         {
             this.userID = userID;
             this.surname = surname;
@@ -31,6 +32,7 @@ namespace OrderManager
             this.dateOfEmployment = dateOfEmployment;
             this.dateOfBirth = dateOfBirth;
             this.activeUser = activeUser;
+            this.indexUser = indexUser;
             this.dateOfDismissal = dateOfDismissal;
             this.note = note;
         }

@@ -14,39 +14,53 @@ namespace OrderManager
 
         }
 
-        public String GetCategoryName(String id)
+        public string GetCategoryName(string id)
         {
-            return GetValue("id", id, "category");
+            return (string)GetValue("id", id, "category");
         }
 
         public String GetMainIDNormOperation(String id)
         {
-            return GetValue("id", id, "mainIdNormOperation");
+            return (string)GetValue("id", id, "mainIdNormOperation");
         }
 
         public String GetIDOptionView(String id)
         {
-            return GetValue("id", id, "idOptionForView");
+            return (string)GetValue("id", id, "idOptionForView");
         }
 
         public String GetMKIDNormOperation(String id)
         {
-            return GetValue("id", id, "mkIdNormOperation");
+            return (string)GetValue("id", id, "mkIdNormOperation");
         }
 
         public String GetWKIDNormOperation(String id)
         {
-            return GetValue("id", id, "wkIdNormOperation");
+            return (string)GetValue("id", id, "wkIdNormOperation");
         }
 
-        public String GetCategoryFromName(String category)
+        public string GetCategoryFromName(string category)
         {
-            return GetValue("category", category, "id");
+            return GetValue("category", category, "id").ToString();
         }
 
-        public List<String> GetCategoryesList()
+        public int GetIDCategoryFromName(string category)
         {
-            List<String> categoryList = new List<String>();
+            int result = -1;
+
+            object load = GetValue("category", category, "id");
+
+            if (load != null)
+            {
+                result = (int)load;
+            }
+
+            return result;
+        }
+
+        public List<string> GetCategoryesList()
+        {
+            List<string> categoryList = new List<string>();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -69,9 +83,9 @@ namespace OrderManager
             return categoryList;
         }
 
-        private String GetValue(String findColomnName, String findParameter, String valueColomn)
+        private object GetValue(string findColomnName, string findParameter, string valueColomn)
         {
-            String result = "";
+            object result = null;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -85,7 +99,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    result = sqlReader[valueColomn].ToString();
+                    result = sqlReader[valueColomn];
                 }
 
                 Connect.Close();

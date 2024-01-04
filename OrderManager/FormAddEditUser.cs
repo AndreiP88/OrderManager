@@ -47,11 +47,13 @@ namespace OrderManager
             public string LastName;
             public string FirstName;
             public string MiddleName;
-            public UserName(string nLastName, string nFirstName, string nMiddleName)
+            public string indexUser;
+            public UserName(string nLastName, string nFirstName, string nMiddleName, string indexUser)
             {
                 this.LastName = nLastName;
                 this.FirstName = nFirstName;
                 this.MiddleName = nMiddleName;
+                this.indexUser = indexUser;
             }
         }
 
@@ -88,6 +90,7 @@ namespace OrderManager
             textBox1.Text = getInfo.surname;
             textBox2.Text = getInfo.name;
             textBox3.Text = getInfo.patronymic;
+            textBox5.Text = getInfo.indexUser;
 
             dateTimePicker1.Text = getInfo.dateOfBirth;
             dateTimePicker2.Text = getInfo.dateOfEmployment;
@@ -165,7 +168,8 @@ namespace OrderManager
                         userNames.Add(new UserName(
                             sqlReader["employee_lastname"].ToString(),
                             sqlReader["employee_firstname"].ToString(),
-                            sqlReader["employee_middlename"].ToString()
+                            sqlReader["employee_middlename"].ToString(),
+                            sqlReader["id_common_employee"].ToString()
                             ));
 
                         comboBox1.Items.Add(sqlReader["employee_speciality_name"].ToString() + ": " +
@@ -191,7 +195,7 @@ namespace OrderManager
         {
             ValueCategory getCategory = new ValueCategory();
 
-            List<String> categoryes = new List<String>(getCategory.GetCategoryesList());
+            List<string> categoryes = new List<string>(getCategory.GetCategoryesList());
 
             for (int i = 0; i < categoryes.Count; i++)
             {
@@ -278,15 +282,17 @@ namespace OrderManager
 
             String note = textBox4.Text;
 
+            string indexUserFromAS = textBox5.Text;
+
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
-                    commandText = "INSERT INTO users (nameUser, surname, name, patronymic, categoryesMachine, dateOfBirth, dateOfEmployment, activeUser, note) " +
-                        "VALUES (@nameUser, @surname, @name, @patronymic, @categoryesMachine, @dateOfBirth, @dateOfEmployment, @activeUser, @note)";
+                    commandText = "INSERT INTO users (nameUser, surname, name, patronymic, categoryesMachine, dateOfBirth, dateOfEmployment, activeUser, indexUserFromAS, note) " +
+                        "VALUES (@nameUser, @surname, @name, @patronymic, @categoryesMachine, @dateOfBirth, @dateOfEmployment, @activeUser, @indexUserFromAS, @note)";
                 else
                     commandText = "UPDATE users SET nameUser = @nameUser, surname = @surname, name = @name, patronymic = @patronymic, categoryesMachine = @categoryesMachine, " +
-                    "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, dateOfDismissal = @dateOfDismissal, note = @note " +
+                    "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, dateOfDismissal = @dateOfDismissal, indexUserFromAS = @indexUserFromAS, note = @note " +
                     "WHERE id = @userIDLoad";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -299,6 +305,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@dateOfBirth", dateOfBirth);
                 Command.Parameters.AddWithValue("@dateOfEmployment", dateOfEmployment);
                 Command.Parameters.AddWithValue("@activeUser", activeUser);
+                Command.Parameters.AddWithValue("@indexUserFromAS", indexUserFromAS);
                 Command.Parameters.AddWithValue("@dateOfDismissal", dateOfDismissal);
                 Command.Parameters.AddWithValue("@note", note);
 
@@ -396,6 +403,7 @@ namespace OrderManager
             textBox1.Text = userNames[comboBox1.SelectedIndex].LastName;
             textBox2.Text = userNames[comboBox1.SelectedIndex].FirstName;
             textBox3.Text = userNames[comboBox1.SelectedIndex].MiddleName;
+            textBox5.Text = userNames[comboBox1.SelectedIndex].indexUser.ToString();
         }
     }
 }
