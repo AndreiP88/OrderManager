@@ -266,7 +266,7 @@ namespace OrderManager
 
                     label13.Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
                     label14.Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
-                    label15.Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+                    label15.Text = shiftsDetails.percentWorkingOutShift.ToString("P1");
                 }));
 
                 Invoke(new Action(() =>

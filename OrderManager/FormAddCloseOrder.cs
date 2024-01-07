@@ -934,6 +934,8 @@ namespace OrderManager
             string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
             string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
 
+            //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
+
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
             String workStart = dateTimePicker3.Text;
@@ -985,7 +987,8 @@ namespace OrderManager
 
                             done += orderCalc.OrderCalculate(false, true);
 
-                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            //int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, orderInProgressID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            int lastTimeMakeready = makereadyLastPart;
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
@@ -1086,6 +1089,8 @@ namespace OrderManager
             string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));
             string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
 
+            //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
+
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
             String workStart = dateTimePicker2.Value.AddMinutes(1).ToString("HH:mm dd.MM.yyyy");
@@ -1146,7 +1151,8 @@ namespace OrderManager
 
                             done += orderCalc.OrderCalculate(false, true);
 
-                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            //int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            int lastTimeMakeready = makereadyLastPart;
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
@@ -1217,6 +1223,8 @@ namespace OrderManager
             string currentOrderID = getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text));
             string lastOrderID = getInfo.GetLastOrderID(getInfo.GetMachineFromName(comboBox3.Text));
 
+            //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
+
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
             String workStart = dateTimePicker3.Text;
@@ -1258,7 +1266,8 @@ namespace OrderManager
 
                             done += orderCalc.OrderCalculate(false, true);
 
-                            int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            //int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
+                            int lastTimeMakeready = makereadyLastPart;
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 

@@ -1,17 +1,14 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using libSql;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Reflection.Emit;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -169,13 +166,49 @@ namespace OrderManager
             chart1.Series.Clear();
         }
 
+        private void ClearValues(List<int> columns)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                int index = listView1.Items.IndexOfKey((i + 1).ToString());
+
+                if (index >= 0)
+                {
+                    ListViewItem item = listView1.Items[index];
+
+                    if (item != null)
+                    {
+                        for (int j = 0; j < columns.Count; j++)
+                        {
+                            item.SubItems[columns[j]].Text = "";
+                        }
+                    }
+                }
+            }
+
+            int indexSum = listView1.Items.IndexOfKey("sum");
+
+            if (indexSum >= 0)
+            {
+                ListViewItem item = listView1.Items[indexSum];
+
+                if (item != null)
+                {
+                    for (int j = 0; j < columns.Count; j++)
+                    {
+                        item.SubItems[columns[j]].Text = "";
+                    }
+                }
+            }
+        }
+
         CancellationTokenSource cancelTokenSource;
+
         private void StartLoading()
         {
             if (cancelTokenSource != null)
             {
                 cancelTokenSource.Cancel();
-                //Thread.Sleep(100);
             }
 
             if (comboBox1.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
@@ -187,20 +220,56 @@ namespace OrderManager
 
                 int selectLoadBase = comboBox4.SelectedIndex;
 
+                AddMonthToListView();
+
                 //Task task = new Task(() => LoadUsersFromBase(token, date));
                 Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
+                Task taskWorkingOut = new Task(() => LoadWorkingOut(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
                 //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase);
+                //LoadWorkingOut(cancelTokenSource.Token, date, selectLoadBase);
+                  
+                //await Task.WhenAny(task);
+                //await Task.WhenAny(taskWorkingOut);
 
-                if (thJob == true)
-                {
-                    cancelTokenSource.Cancel();
-                }
-                else
-                {
-                    //thJob = true;
-                    task.Start();
-                }
+                task.Start();
+                taskWorkingOut.Start();
             }
+        }
+
+        private void AddMonthToListView()
+        {
+            ClearAll();
+
+            for (int i = 0; i < 12; i++)
+            {
+                ListViewItem item = new ListViewItem();
+
+                item.Name = (i + 1).ToString();
+                item.Text = (i + 1).ToString();
+                item.SubItems.Add(CultureInfo.GetCultureInfoByIetfLanguageTag("ru-RU").DateTimeFormat.GetMonthName(i + 1));
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+
+                listView1.Items.Add(item);
+            }
+
+            ListViewItem itemSum = new ListViewItem();
+
+            itemSum.Name = "sum";
+            itemSum.Text = "";
+            itemSum.SubItems.Add("ИТОГ");
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
+
+            itemSum.Font = new Font(ListView.DefaultFont, FontStyle.Bold);
+
+            listView1.Items.Add(itemSum);
         }
 
         private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
@@ -215,16 +284,16 @@ namespace OrderManager
                 comboBox1.Enabled = false;
                 comboBox4.Enabled = false;
 
-                ClearAll();
+                List<int> cols = new List<int>
+                {
+                    2,
+                    3
+                };
+
+                ClearValues(cols);
             }));
 
-            List<int> monthList = new List<int>();
             List<string> monthNames = new List<string>();
-
-            Invoke(new Action(() =>
-            {
-                listView1.Items.Clear();
-            }));
 
             for (int i = 0; i < 12; i++)
             {
@@ -233,10 +302,9 @@ namespace OrderManager
                     break;
                 }
 
-                monthList.Add(i);
                 monthNames.Add(CultureInfo.GetCultureInfoByIetfLanguageTag("ru-RU").DateTimeFormat.GetMonthName(i + 1));
 
-                ListViewItem item = new ListViewItem();
+                /*ListViewItem item = new ListViewItem();
 
                 item.Name = i.ToString();
                 item.Text = (i + 1).ToString();
@@ -250,20 +318,20 @@ namespace OrderManager
                 Invoke(new Action(() =>
                 {
                     listView1.Items.Add(item);
-                }));
+                }));*/
             }
 
             List<int> workingOut = new List<int>();
             int summWorkingOut = 0;
 
-            for (int i = 0; i < monthList.Count; i++)
+            for (int i = 0; i < 12; i++)
             {
                 if (token.IsCancellationRequested)
                 {
                     break;
                 }
 
-                DateTime currentDateTime = date.AddMonths(monthList[i]);
+                DateTime currentDateTime = date.AddMonths(i);
 
                 List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(UserID);
 
@@ -283,7 +351,7 @@ namespace OrderManager
 
                 Invoke(new Action(() =>
                 {
-                    int index = listView1.Items.IndexOfKey(monthList[i].ToString());
+                    int index = listView1.Items.IndexOfKey((i + 1).ToString());
 
                     if (index >= 0)
                     {
@@ -297,7 +365,14 @@ namespace OrderManager
                 }));
             }
 
-            for (int i = 0; i < monthList.Count; i++)
+            Invoke(new Action(() =>
+            {
+                DrawDiagram(workingOut, monthNames);
+
+                //label2.Text = summWorkingOut.ToString("N0");
+            }));
+
+            for (int i = 0; i < 12; i++)
             {
                 if (token.IsCancellationRequested)
                 {
@@ -306,7 +381,7 @@ namespace OrderManager
 
                 Invoke(new Action(() =>
                 {
-                    int index = listView1.Items.IndexOfKey(monthList[i].ToString());
+                    int index = listView1.Items.IndexOfKey((i + 1).ToString());
 
                     if (index >= 0)
                     {
@@ -320,29 +395,19 @@ namespace OrderManager
                 }));
             }
 
-            ListViewItem itemSum = new ListViewItem();
-
-            itemSum.Name = "sum";
-            itemSum.Text = "";
-            itemSum.SubItems.Add("ИТОГ");
-            itemSum.SubItems.Add(summWorkingOut.ToString("N0"));
-            itemSum.SubItems.Add("");
-            itemSum.SubItems.Add("");
-            itemSum.SubItems.Add("");
-            itemSum.SubItems.Add("");
-
-            itemSum.Font = new Font(ListView.DefaultFont, FontStyle.Bold);
-
             Invoke(new Action(() =>
             {
-                listView1.Items.Add(itemSum);
-            }));
+                int index = listView1.Items.IndexOfKey("sum");
 
-            Invoke(new Action(() =>
-            {
-                DrawDiagram(workingOut, monthNames);
+                if (index >= 0)
+                {
+                    ListViewItem item = listView1.Items[index];
 
-                //label2.Text = summWorkingOut.ToString("N0");
+                    if (item != null)
+                    {
+                        item.SubItems[2].Text = summWorkingOut.ToString("N0");
+                    }
+                }
             }));
 
             Invoke(new Action(() =>
@@ -350,7 +415,259 @@ namespace OrderManager
                 comboBox1.Enabled = true;
                 comboBox4.Enabled = true;
             }));
+
+            if (token.IsCancellationRequested)
+            {
+                List<int> cols = new List<int>
+                {
+                    2,
+                    3
+                };
+
+                Invoke(new Action(() =>
+                {
+                    ClearValues(cols);
+                }));
+            }
         }
+
+        private void LoadWorkingOut(CancellationToken token, DateTime date, int selectLoadBase)
+        {
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(UserID.ToString());
+            GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+
+            Invoke(new Action(() =>
+            {
+                comboBox1.Enabled = false;
+                comboBox4.Enabled = false;
+
+                List<int> cols = new List<int>
+                {
+                    4,
+                    5,
+                    6
+                };
+
+                ClearValues(cols);
+
+            }));
+
+            int countMonthEctive = 0;
+            int summWorkingOutHour = 0;
+            float summWorkingOutPercent = 0;
+            float summBonus = 0;
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                DateTime currentDateTime = date.AddMonths(i);
+
+                ShiftsDetails shiftsDetails;
+
+                if (selectLoadBase == 0)
+                {
+                    shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(currentDateTime, "", token);
+                }
+                else
+                {
+                    shiftsDetails = WorkingOutAS(currentDateTime, token);
+                }
+
+                if (shiftsDetails != null)
+                {
+                    summWorkingOutHour += shiftsDetails.allTimeWorkingOutShift;
+                    summWorkingOutPercent += shiftsDetails.percentWorkingOutShift;
+                    summBonus += shiftsDetails.percentBonusShift;
+
+
+                    if (shiftsDetails.allTimeWorkingOutShift > 0)
+                    {
+                        countMonthEctive++;
+                    }
+
+
+                    Invoke(new Action(() =>
+                    {
+                        int index = listView1.Items.IndexOfKey((i + 1).ToString());
+
+                        if (index >= 0)
+                        {
+                            ListViewItem item = listView1.Items[index];
+
+                            if (item != null)
+                            {
+                                item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
+                                item.SubItems[5].Text = shiftsDetails.percentWorkingOutShift.ToString("P2");
+                                item.SubItems[6].Text = shiftsDetails.percentBonusShift.ToString("P0");
+                            }
+                        }
+                    }));
+                }
+            }
+
+            Invoke(new Action(() =>
+            {
+                int index = listView1.Items.IndexOfKey("sum");
+
+                if (index >= 0)
+                {
+                    ListViewItem item = listView1.Items[index];
+
+                    if (item != null)
+                    {
+                        item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(summWorkingOutHour);
+                        item.SubItems[5].Text = (summWorkingOutPercent / countMonthEctive).ToString("P2");
+                        item.SubItems[6].Text = summBonus.ToString("P0");
+                    }
+                }
+            }));
+
+            Invoke(new Action(() =>
+            {
+                comboBox1.Enabled = true;
+                comboBox4.Enabled = true;
+            }));
+
+            if (token.IsCancellationRequested)
+            {
+                List<int> cols = new List<int>
+                {
+                    4,
+                    5,
+                    6
+                };
+
+                Invoke(new Action(() =>
+                {
+                    ClearValues(cols);
+                }));
+            }
+        }
+
+        private ShiftsDetails WorkingOutAS(DateTime selectDate, CancellationToken token)
+        {
+            ShiftsDetails shiftsDetails = null;
+
+            GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
+            ValueShifts valueShifts = new ValueShifts();
+            ValueUserBase userBase = new ValueUserBase();
+
+            List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(UserID);
+            
+            List<User> usersList = new List<User>();
+
+            for (int i = 0; i < userIndexFromAS.Count; i++)
+            {
+                usersList.Add(new User(userIndexFromAS[i]));
+                usersList[usersList.Count - 1].Shifts = new List<UserShift>();
+            }
+            try
+            {
+                usersList = valueShifts.LoadShiftsForSelectedMonth(usersList, selectDate, 2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}");
+            }
+
+            float totalTimeWorkigOut = 0;
+            //float totalPercentWorkingOut = 0;
+            float totalBonusWorkingOut = 0;
+            List<float> totalPercentWorkingOutList = new List<float>();
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                for (int j = 0; j < usersList[i].Shifts.Count; j++)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    
+                    UserShift shift = usersList[i].Shifts[j];
+
+                    bool currentShift;// = CheckCurrentShift(shiftDate, shiftNumber);
+
+                    if (shift.ShiftDateEnd == "")
+                    {
+                        currentShift = true;
+                    }
+                    else
+                    {
+                        currentShift = false;
+                    }
+
+                    if (!currentShift)
+                    {
+                        float timeWorkigOut = CalculateWorkTime(shift.Orders);
+
+                        totalTimeWorkigOut += timeWorkigOut;
+                        totalPercentWorkingOutList.Add(getPercent.Percent((int)timeWorkigOut));
+                        totalBonusWorkingOut += getPercent.GetBonusWorkingOutF((int)timeWorkigOut);
+                    }
+                }
+
+                float percentWorkingOutAverage = totalPercentWorkingOutList.Sum() / totalPercentWorkingOutList.Count;
+
+                shiftsDetails = new ShiftsDetails(
+                -1,
+                -1,
+                -1,
+                (int)totalTimeWorkigOut,
+                -1,
+                -1,
+                -1,
+                percentWorkingOutAverage,
+                totalBonusWorkingOut
+                );
+            }
+
+            return shiftsDetails;
+        }
+
+        private float CalculateWorkTime(List<UserShiftOrder> order)
+        {
+            float workingOut = 0;
+
+            for (int i = 0; i < order.Count; i++)
+            {
+                workingOut += CalculateWorkTimeForOneOrder(order[i]);
+            }
+
+            return workingOut;
+        }
+
+        private float CalculateWorkTimeForOneOrder(UserShiftOrder order)
+        {
+            float workingOut = 0;
+
+            if (order.Normtime > 0)
+            {
+                if (order.PlanOutQty > 0)
+                {
+                    workingOut += ((float)order.FactOutQty * (float)order.Normtime) / (float)order.PlanOutQty;
+                }
+                else
+                {
+                    if (order.FactOutQty > 0)
+                    {
+                        workingOut += (float)order.Normtime;
+                    }
+                }
+            }
+
+            return workingOut;
+        }
+
 
         private void FormShiftsDetails_Load(object sender, EventArgs e)
         {

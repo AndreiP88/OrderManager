@@ -31,6 +31,20 @@ namespace OrderManager
 
         }
 
+        public int GetOrderInProgressID(int shiftID, int orderIndex, int counterRepeat, string machine)
+        {
+            int result = -1;
+
+            string load = GetValue("count", shiftID, orderIndex, counterRepeat, machine);
+
+            if (load != "")
+            {
+                result = Convert.ToInt32(load);
+            }
+
+            return result;
+        }
+
         public string GetIndex(int shiftID, int orderIndex, int counterRepeat, string machine)
         {
             return GetValue("count", shiftID, orderIndex, counterRepeat, machine);
@@ -133,6 +147,11 @@ namespace OrderManager
         public int LastTimeForMakeready(int shiftID, int machine, int orderIndex, int counterRepeat)
         {
             return LastTimeMakereadyFromTime(shiftID, machine, orderIndex, counterRepeat);
+        }
+
+        public int LastTimeForMakeready(int shiftID, int orderInProgressID, int machine, int orderIndex, int counterRepeat)
+        {
+            return LastTimeMakeready(shiftID, orderInProgressID, machine, orderIndex, counterRepeat);
         }
 
         private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, string machine)
@@ -370,7 +389,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    mkPart = (int)sqlReader["makereadyComplete"];
+                    mkPart = Convert.ToInt32(sqlReader["makereadyComplete"]);
                 }
 
                 Connect.Close();

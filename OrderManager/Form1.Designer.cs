@@ -132,9 +132,10 @@ namespace OrderManager
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.paramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shiftsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.machinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shiftsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statisticYearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.paramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -161,7 +162,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.statisticYearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1358,31 +1358,38 @@ namespace OrderManager
             this.toolStripButton1.Size = new System.Drawing.Size(81, 22);
             this.toolStripButton1.Text = "Оператор";
             // 
-            // paramToolStripMenuItem
+            // machinesToolStripMenuItem
             // 
-            this.paramToolStripMenuItem.Name = "paramToolStripMenuItem";
-            this.paramToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.paramToolStripMenuItem.Text = "Календарь смен";
-            this.paramToolStripMenuItem.Click += new System.EventHandler(this.параметрыToolStripMenuItem_Click);
+            this.machinesToolStripMenuItem.Name = "machinesToolStripMenuItem";
+            this.machinesToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.machinesToolStripMenuItem.Text = "Выбор оборудования";
+            this.machinesToolStripMenuItem.Click += new System.EventHandler(this.machinesToolStripMenuItem_Click);
             // 
             // shiftsToolStripMenuItem
             // 
             this.shiftsToolStripMenuItem.Name = "shiftsToolStripMenuItem";
-            this.shiftsToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.shiftsToolStripMenuItem.Text = "Выработка";
+            this.shiftsToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.shiftsToolStripMenuItem.Text = "Детали выработки";
             this.shiftsToolStripMenuItem.Click += new System.EventHandler(this.отработанныеСменыToolStripMenuItem_Click);
             // 
-            // machinesToolStripMenuItem
+            // statisticYearToolStripMenuItem
             // 
-            this.machinesToolStripMenuItem.Name = "machinesToolStripMenuItem";
-            this.machinesToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.machinesToolStripMenuItem.Text = "Выбор оборудования";
-            this.machinesToolStripMenuItem.Click += new System.EventHandler(this.machinesToolStripMenuItem_Click);
+            this.statisticYearToolStripMenuItem.Name = "statisticYearToolStripMenuItem";
+            this.statisticYearToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.statisticYearToolStripMenuItem.Text = "График выработки за год";
+            this.statisticYearToolStripMenuItem.Click += new System.EventHandler(this.statisticYearToolStripMenuItem_Click);
+            // 
+            // paramToolStripMenuItem
+            // 
+            this.paramToolStripMenuItem.Name = "paramToolStripMenuItem";
+            this.paramToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.paramToolStripMenuItem.Text = "Календарь смен";
+            this.paramToolStripMenuItem.Click += new System.EventHandler(this.параметрыToolStripMenuItem_Click);
             // 
             // testToolStripMenuItem
             // 
             this.testToolStripMenuItem.Name = "testToolStripMenuItem";
-            this.testToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.testToolStripMenuItem.Text = "Test";
             this.testToolStripMenuItem.Visible = false;
             this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
@@ -1390,7 +1397,7 @@ namespace OrderManager
             // базаДанныхToolStripMenuItem
             // 
             this.базаДанныхToolStripMenuItem.Name = "базаДанныхToolStripMenuItem";
-            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.базаДанныхToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.базаДанныхToolStripMenuItem.Text = "База данных";
             this.базаДанныхToolStripMenuItem.Visible = false;
             this.базаДанныхToolStripMenuItem.Click += new System.EventHandler(this.базаДанныхToolStripMenuItem_Click);
@@ -1398,7 +1405,7 @@ namespace OrderManager
             // downloadUpadaterToolStripMenuItem
             // 
             this.downloadUpadaterToolStripMenuItem.Name = "downloadUpadaterToolStripMenuItem";
-            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.downloadUpadaterToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.downloadUpadaterToolStripMenuItem.Text = "Скачать Updater";
             this.downloadUpadaterToolStripMenuItem.Visible = false;
             this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
@@ -1460,15 +1467,15 @@ namespace OrderManager
             // statisticAllUsersToolStripMenuItem
             // 
             this.statisticAllUsersToolStripMenuItem.Name = "statisticAllUsersToolStripMenuItem";
-            this.statisticAllUsersToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.statisticAllUsersToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.statisticAllUsersToolStripMenuItem.Text = "Отработанные смены";
             this.statisticAllUsersToolStripMenuItem.Click += new System.EventHandler(this.statisticAllUsersToolStripMenuItem_Click);
             // 
             // statisticAllWorkingOutToolStripMenuItem
             // 
             this.statisticAllWorkingOutToolStripMenuItem.Name = "statisticAllWorkingOutToolStripMenuItem";
-            this.statisticAllWorkingOutToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.statisticAllWorkingOutToolStripMenuItem.Text = "Диаграмма выработки";
+            this.statisticAllWorkingOutToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.statisticAllWorkingOutToolStripMenuItem.Text = "Общая выработка";
             this.statisticAllWorkingOutToolStripMenuItem.Click += new System.EventHandler(this.statisticAllWorkingOutToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton2
@@ -1591,13 +1598,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // statisticYearToolStripMenuItem
-            // 
-            this.statisticYearToolStripMenuItem.Name = "statisticYearToolStripMenuItem";
-            this.statisticYearToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.statisticYearToolStripMenuItem.Text = "График выработки";
-            this.statisticYearToolStripMenuItem.Click += new System.EventHandler(this.statisticYearToolStripMenuItem_Click);
             // 
             // Form1
             // 

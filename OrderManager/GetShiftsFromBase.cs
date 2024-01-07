@@ -217,7 +217,7 @@ namespace OrderManager
                 allTimeWorkingOut += fullTimeWorkingOut;
                 allTime += fullTimeWorking;
                 allPercentWorkingOut += getPercent.Percent(fullTimeWorkingOut);
-                fullPercentBonus = getPercent.GetBonusWorkingOutF(fullTimeWorkingOut);
+                fullPercentBonus += getPercent.GetBonusWorkingOutF(fullTimeWorkingOut);
 
                 countShifts++;
 

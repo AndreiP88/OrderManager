@@ -4,16 +4,14 @@ namespace OrderManager
 {
     internal class GetPercentFromWorkingOut
     {
-        public String PercentString(int workOut)
+        public string PercentString(int workOut)
         {
-            String result = ((float)(workOut) * 100 / 650).ToString("N1") + "%";
-
-            return result;
+            return Percent(workOut).ToString("P1");
         }
 
         public float Percent(int workOut)
         {
-            float result = ((float)(workOut) * 100 / 650);
+            float result = (float)workOut / 650;
 
             return result;
         }
