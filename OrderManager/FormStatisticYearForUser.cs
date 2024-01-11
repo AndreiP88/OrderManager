@@ -168,6 +168,14 @@ namespace OrderManager
 
         private void ClearValues(List<int> columns)
         {
+            /*List<int> cols = new List<int>
+                {
+                    2,
+                    3
+                };
+
+            ClearValues(cols);*/
+
             for (int i = 0; i < 12; i++)
             {
                 int index = listView1.Items.IndexOfKey((i + 1).ToString());
@@ -209,6 +217,8 @@ namespace OrderManager
             if (cancelTokenSource != null)
             {
                 cancelTokenSource.Cancel();
+
+                Thread.Sleep(200);
             }
 
             if (comboBox1.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
@@ -281,16 +291,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
-                comboBox1.Enabled = false;
-                comboBox4.Enabled = false;
-
-                List<int> cols = new List<int>
-                {
-                    2,
-                    3
-                };
-
-                ClearValues(cols);
+                /*comboBox1.Enabled = false;
+                comboBox4.Enabled = false;*/
             }));
 
             List<string> monthNames = new List<string>();
@@ -362,6 +364,19 @@ namespace OrderManager
                             item.SubItems[2].Text = workingOutUser.ToString("N0");
                         }
                     }
+
+                    int indexSum = listView1.Items.IndexOfKey("sum");
+
+                    if (indexSum >= 0)
+                    {
+                        ListViewItem item = listView1.Items[indexSum];
+
+                        if (item != null)
+                        {
+                            item.SubItems[2].Text = summWorkingOut.ToString("N0");
+                        }
+                    }
+
                 }));
             }
 
@@ -395,40 +410,26 @@ namespace OrderManager
                 }));
             }
 
-            Invoke(new Action(() =>
+            /*Invoke(new Action(() =>
             {
-                int index = listView1.Items.IndexOfKey("sum");
+                int indexSum = listView1.Items.IndexOfKey("sum");
 
-                if (index >= 0)
+                if (indexSum >= 0)
                 {
-                    ListViewItem item = listView1.Items[index];
+                    ListViewItem item = listView1.Items[indexSum];
 
                     if (item != null)
                     {
                         item.SubItems[2].Text = summWorkingOut.ToString("N0");
                     }
                 }
-            }));
+            }));*/
 
             Invoke(new Action(() =>
             {
-                comboBox1.Enabled = true;
-                comboBox4.Enabled = true;
+                /*comboBox1.Enabled = true;
+                comboBox4.Enabled = true;*/
             }));
-
-            if (token.IsCancellationRequested)
-            {
-                List<int> cols = new List<int>
-                {
-                    2,
-                    3
-                };
-
-                Invoke(new Action(() =>
-                {
-                    ClearValues(cols);
-                }));
-            }
         }
 
         private void LoadWorkingOut(CancellationToken token, DateTime date, int selectLoadBase)
@@ -438,18 +439,8 @@ namespace OrderManager
 
             Invoke(new Action(() =>
             {
-                comboBox1.Enabled = false;
-                comboBox4.Enabled = false;
-
-                List<int> cols = new List<int>
-                {
-                    4,
-                    5,
-                    6
-                };
-
-                ClearValues(cols);
-
+                /*comboBox1.Enabled = false;
+                comboBox4.Enabled = false;*/
             }));
 
             int countMonthEctive = 0;
@@ -505,17 +496,31 @@ namespace OrderManager
                                 item.SubItems[6].Text = shiftsDetails.percentBonusShift.ToString("P0");
                             }
                         }
+
+                        int indexSum = listView1.Items.IndexOfKey("sum");
+
+                        if (indexSum >= 0)
+                        {
+                            ListViewItem item = listView1.Items[indexSum];
+
+                            if (item != null)
+                            {
+                                item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(summWorkingOutHour);
+                                item.SubItems[5].Text = (summWorkingOutPercent / countMonthEctive).ToString("P2");
+                                item.SubItems[6].Text = summBonus.ToString("P0");
+                            }
+                        }
                     }));
                 }
             }
 
-            Invoke(new Action(() =>
+            /*Invoke(new Action(() =>
             {
-                int index = listView1.Items.IndexOfKey("sum");
+                int indexSum = listView1.Items.IndexOfKey("sum");
 
-                if (index >= 0)
+                if (indexSum >= 0)
                 {
-                    ListViewItem item = listView1.Items[index];
+                    ListViewItem item = listView1.Items[indexSum];
 
                     if (item != null)
                     {
@@ -524,28 +529,13 @@ namespace OrderManager
                         item.SubItems[6].Text = summBonus.ToString("P0");
                     }
                 }
-            }));
+            }));*/
 
             Invoke(new Action(() =>
             {
                 comboBox1.Enabled = true;
                 comboBox4.Enabled = true;
             }));
-
-            if (token.IsCancellationRequested)
-            {
-                List<int> cols = new List<int>
-                {
-                    4,
-                    5,
-                    6
-                };
-
-                Invoke(new Action(() =>
-                {
-                    ClearValues(cols);
-                }));
-            }
         }
 
         private ShiftsDetails WorkingOutAS(DateTime selectDate, CancellationToken token)
