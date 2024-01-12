@@ -203,6 +203,7 @@ namespace OrderManager
             else
             {
                 SetValueForAdd();
+                button2.Enabled = false;
             }
         }
 
