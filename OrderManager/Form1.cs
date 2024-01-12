@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using File = System.IO.File;
 using ToolTip = System.Windows.Forms.ToolTip;
 
@@ -1350,9 +1351,48 @@ namespace OrderManager
             Info.active = true;
         }
 
+        private void LoadMakereadyParts(int orderInProgressID)
+        {
+            Info.active = false;
+
+            FormEnterMakereadyPart form = new FormEnterMakereadyPart(orderInProgressID);
+            form.ShowDialog();
+
+            if (form.NewValue)
+            {
+                int result = form.NewMKPart;
+
+                SaveValueMakereadyPart(orderInProgressID, result);
+
+                LoadOrdersFromBase();
+            }
+
+            Info.active = true;
+        }
+
+        private void SaveValueMakereadyPart(int orderInProgressID, int value)
+        {
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+
+            getOrders.SetMakereadyPart(orderInProgressID, value);
+        }
+
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             e.Cancel = listView1.SelectedItems.Count == 0;
+
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+
+            int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(ordersCurrentShift[listView1.SelectedIndices[0]].id);
+
+            if (currentMakereadyPart < 0)
+            {
+                makereadyPartToolStripMenuItem.Visible = false;
+            }
+            else
+            {
+                makereadyPartToolStripMenuItem.Visible = true;
+            }
         }
 
         private void viewToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2007,6 +2047,11 @@ namespace OrderManager
         private void typesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadTypes();
+        }
+
+        private void makereadyPartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadMakereadyParts(ordersCurrentShift[listView1.SelectedIndices[0]].id);
         }
 
         private void labelTime_DoubleClick(object sender, EventArgs e)

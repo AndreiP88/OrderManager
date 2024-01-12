@@ -60,6 +60,7 @@ namespace OrderManager
 
         private void SetValueForEdit()
         {
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             GetLeadTime leadTime = new GetLeadTime(ShiftID, Machine, OrderIndex, CounterRepeat);
 
@@ -72,16 +73,10 @@ namespace OrderManager
 
             maxValueTrackBox = lastTimeMakeready;
 
-            if (CurrentTimeMakeready > lastTimeMakeready)
-            {
-                SetTrackBarValue(lastTimeMakeready);
-                SetTimeValue(lastTimeMakeready);
-            }
-            else
-            {
-                SetTrackBarValue(CurrentTimeMakeready);
-                SetTimeValue(CurrentTimeMakeready);
-            }
+            int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(OrderInProgressID);
+
+            SetTrackBarValue(currentMakereadyPart);
+            SetTimeValue(currentMakereadyPart);
 
             SetPercentValue(trackBar1.Value, trackBar1.Maximum);
         }
@@ -203,6 +198,7 @@ namespace OrderManager
             if (_edit)
             {
                 SetValueForEdit();
+                button2.Enabled = true;
             }
             else
             {

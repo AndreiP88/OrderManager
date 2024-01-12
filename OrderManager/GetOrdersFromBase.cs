@@ -398,6 +398,23 @@ namespace OrderManager
             return mkPart;
         }
 
+        public void SetMakereadyPart(int orderInProgressID, int value)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE ordersInProgress SET makereadyComplete = @value " +
+                    "WHERE count = @id";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", orderInProgressID);
+                Command.Parameters.AddWithValue("@value", value);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
         public Object LoadAllOrdersFromBase(int shiftID, string category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
