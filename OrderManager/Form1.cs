@@ -1385,7 +1385,7 @@ namespace OrderManager
 
             int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(ordersCurrentShift[listView1.SelectedIndices[0]].id);
 
-            if (currentMakereadyPart < 0)
+            if (currentMakereadyPart <= 0)
             {
                 makereadyPartToolStripMenuItem.Visible = false;
             }
