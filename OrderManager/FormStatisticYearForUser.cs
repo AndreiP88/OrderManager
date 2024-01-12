@@ -474,12 +474,17 @@ namespace OrderManager
                     summWorkingOutPercent += shiftsDetails.percentWorkingOutShift;
                     summBonus += shiftsDetails.percentBonusShift;
 
-
                     if (shiftsDetails.allTimeWorkingOutShift > 0)
                     {
                         countMonthEctive++;
                     }
 
+                    float averagePercent = 0;
+
+                    if (countMonthEctive > 0)
+                    {
+                        averagePercent = summWorkingOutPercent / countMonthEctive;
+                    }
 
                     Invoke(new Action(() =>
                     {
@@ -506,10 +511,12 @@ namespace OrderManager
                             if (item != null)
                             {
                                 item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(summWorkingOutHour);
-                                item.SubItems[5].Text = (summWorkingOutPercent / countMonthEctive).ToString("P2");
+                                item.SubItems[5].Text = averagePercent.ToString("P2");
                                 item.SubItems[6].Text = summBonus.ToString("P0");
                             }
                         }
+
+                        //MessageBox.Show(summWorkingOutPercent + " / " + countMonthEctive + " = " + (summWorkingOutPercent / countMonthEctive));
                     }));
                 }
             }
@@ -605,8 +612,13 @@ namespace OrderManager
                         totalBonusWorkingOut += getPercent.GetBonusWorkingOutF((int)timeWorkigOut);
                     }
                 }
+                
+                float percentWorkingOutAverage = 0;
 
-                float percentWorkingOutAverage = totalPercentWorkingOutList.Sum() / totalPercentWorkingOutList.Count;
+                if (totalPercentWorkingOutList.Count > 0)
+                {
+                    percentWorkingOutAverage = totalPercentWorkingOutList.Sum() / totalPercentWorkingOutList.Count;
+                }
 
                 shiftsDetails = new ShiftsDetails(
                 -1,

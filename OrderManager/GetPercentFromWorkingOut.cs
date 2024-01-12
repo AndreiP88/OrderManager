@@ -11,7 +11,12 @@ namespace OrderManager
 
         public float Percent(int workOut)
         {
-            float result = (float)workOut / 650;
+            float result = 0;
+
+            if (workOut > 0)
+            {
+                result = (float)workOut / 650;
+            }
 
             return result;
         }
