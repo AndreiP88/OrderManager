@@ -244,7 +244,7 @@ namespace OrderManager
                                 item.Font = new Font(listView1.Font, FontStyle.Bold);
                             }
 
-                            if (getPercent.Percent(currentShift.workingOutShift) >= 80)
+                            if (getPercent.Percent(currentShift.workingOutShift) >= 0.8)
                             {
                                 item.ForeColor = Color.SeaGreen;
                             }

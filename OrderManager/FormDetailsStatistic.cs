@@ -308,9 +308,9 @@ namespace OrderManager
                                         item.SubItems[5].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
                                         item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
                                         item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
-                                        item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("N1") + "%";
+                                        item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("P1");
 
-                                        if (shiftsDetails.percentWorkingOutShift >= 80)
+                                        if (shiftsDetails.percentWorkingOutShift >= 0.8)
                                         {
                                             item.ForeColor = Color.SeaGreen;
                                         }
@@ -330,7 +330,7 @@ namespace OrderManager
 
                                 label13.Text = fullCountOrders.ToString() + "/" + fullCountMakeready.ToString();
                                 label14.Text = fullAmountOrders.ToString("N0");
-                                label15.Text = (fullPercentWorkingOut / countActiveUser).ToString("N1") + "%";
+                                label15.Text = (fullPercentWorkingOut / countActiveUser).ToString("P1");
                             }));
 
                             if (token.IsCancellationRequested)
