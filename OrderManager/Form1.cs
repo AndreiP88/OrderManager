@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Reflection.Emit;
 using System.Text;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using File = System.IO.File;
 using ToolTip = System.Windows.Forms.ToolTip;
 
@@ -1381,17 +1383,31 @@ namespace OrderManager
         {
             e.Cancel = listView1.SelectedItems.Count == 0;
 
-            GetOrdersFromBase getOrders = new GetOrdersFromBase();
-
-            int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(ordersCurrentShift[listView1.SelectedIndices[0]].id);
-
-            if (currentMakereadyPart <= 0)
+            if (listView1.SelectedIndices.Count > 0)
             {
-                makereadyPartToolStripMenuItem.Visible = false;
-            }
-            else
-            {
-                makereadyPartToolStripMenuItem.Visible = true;
+                GetOrdersFromBase getOrders = new GetOrdersFromBase();
+
+                int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(ordersCurrentShift[listView1.SelectedIndices[0]].id);
+
+                if (currentMakereadyPart <= 0)
+                {
+                    makereadyPartToolStripMenuItem.Visible = false;
+                }
+                else
+                {
+                    ValueOrdersBase orders = new ValueOrdersBase();
+
+                    string status = orders.GetOrderStatus(ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex);
+
+                    if (status == "1")// || status == "2")
+                    {
+                        makereadyPartToolStripMenuItem.Visible = true;
+                    }
+                    else
+                    {
+                        makereadyPartToolStripMenuItem.Visible = false;
+                    }
+                }
             }
         }
 
