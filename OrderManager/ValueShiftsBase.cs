@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
@@ -229,6 +230,54 @@ namespace OrderManager
             }
 
             return years;
+        }
+
+        public List<int> LoadUsersListFromMonth(DateTime date)
+        {
+            List<int> usersList = new List<int>();
+
+            DateTime startPeriod = Convert.ToDateTime("01." + date.Month + "." + date.Year + " 00:00:00");
+            DateTime endPeriod = Convert.ToDateTime(date.AddMonths(1).AddDays(-1).Day + "." + date.Month + "." + date.Year + " 23:59:59");
+
+            string startDateTime = startPeriod.ToString("dd.MM.yyyy HH:mm:ss");
+            string endDateTime = endPeriod.ToString("dd.MM.yyyy HH:mm:ss");
+
+            try
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT DISTINCT nameUser FROM shifts WHERE 
+                                        (STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S') >= STR_TO_DATE(@startDate,'%d.%m.%Y %H:%i:%S') 
+	                                    AND STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S') <= STR_TO_DATE(@endDate,'%d.%m.%Y %H:%i:%S'))"
+                    };
+                    Command.Parameters.AddWithValue("@startDate", startDateTime);
+                    Command.Parameters.AddWithValue("@endDate", endDateTime);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        int load = Convert.ToInt32(sqlReader["nameUser"]);
+                        
+                        if (!usersList.Contains(load))
+                        {
+                            usersList.Add(load);
+                        }
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Ошибка получения списка сотрудников: " + ex.ToString());
+            }
+
+            return usersList;
         }
 
         private List<String> GetValue(String findColomnName, String findParameter, String valueColomn)

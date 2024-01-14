@@ -102,14 +102,16 @@ namespace OrderManager
 
             try
             {
-                List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
+                /*List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
 
                 string usersStr = "man_factjob.id_common_employee = " + userIndexFromAS[0];
 
                 for (int i = 1; i < userIndexFromAS.Count; i++)
                 {
                     usersStr += " OR man_factjob.id_common_employee = " + userIndexFromAS[i];
-                }
+                }*/
+
+                string usersStr = "man_factjob.id_common_employee = " + userId;
 
                 string equipsStr = "man_factjob.id_equip = " + infoBase.GetIDEquipMachine(equips[0]);
 

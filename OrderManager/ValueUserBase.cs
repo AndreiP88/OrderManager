@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections;
@@ -469,6 +470,63 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+        }
+
+        public int GetUserIdFromASystemID(int userASystemID)
+        {
+            int result = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM users"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    string load = sqlReader["indexUserFromAS"].ToString();
+
+                    List<int> indexesAS = load?.Split(';')?.Select(Int32.Parse)?.ToList();
+
+                    if (indexesAS.Contains(userASystemID))
+                    {
+                        result = Convert.ToInt32(sqlReader["id"]);
+                    }
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        private List<string> LoadUsersASystemIDs()
+        {
+            List<string> result = new List<string>();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM users"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result.Add(sqlReader["indexUserFromAS"].ToString());
+                }
+
+                Connect.Close();
+            }
+
+            return result;
         }
 
         private object GetValue(String findColomnName, String findParameter, String valueColomn)

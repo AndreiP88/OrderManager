@@ -1,15 +1,15 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using libSql;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Drawing;
-using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -162,8 +162,18 @@ namespace OrderManager
         {
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            List<String> years = shiftsBase.LoadYears();
+            List<string> years = new List<string>();
 
+            //years = shiftsBase.LoadYears();
+
+            int startYear = 2017;
+            int currentYear = DateTime.Now.Year;
+
+            for (int year = startYear; year <= currentYear; year++)
+            {
+                years.Add(year.ToString());
+            }
+            
             comboBox1.Items.AddRange(years.ToArray());
 
             /*for (int i = years.Count - 1; i >= 0; i--)
@@ -199,17 +209,182 @@ namespace OrderManager
                 Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
                 //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase);
 
-                if (thJob == true)
+                task.Start();
+            }
+        }
+
+        private List<int> LoadUserListFromMonthOM(CancellationToken token, List<int> equips, DateTime date)
+        {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            ValueUserBase userBase = new ValueUserBase();
+
+            List<int> usersList = new List<int>();
+
+            List<int> usersListLoad = shiftsBase.LoadUsersListFromMonth(date);
+            //Console.WriteLine(usersListLoad.Count);
+            for (int i = 0; i < usersListLoad.Count; i++)
+            {
+                if (token.IsCancellationRequested)
                 {
-                    cancelTokenSource.Cancel();
+                    break;
                 }
-                else
+                
+                List<int> equipsListForSelectedUser = userBase.GetEquipsListForSelectedUser(usersListLoad[i]);
+
+                bool isEquipForUser = false;
+
+                for (int j = 0; j < equipsListForSelectedUser.Count; j++)
                 {
-                    //thJob = true;
-                    task.Start();
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    if (equips.Contains(equipsListForSelectedUser[j]))
+                    {
+                        isEquipForUser = true;
+                        break;
+                    }
+                }
+
+                if (isEquipForUser)
+                {
+                    usersList.Add(usersListLoad[i]);
                 }
             }
 
+            return usersList;
+        }
+
+        private (List<int>, List<int>) LoadUserListFromMonthAS(CancellationToken token, List<int> equips, DateTime date)
+        {
+            ValueUsers valueUsers = new ValueUsers();
+            ValueUserBase userBase = new ValueUserBase();
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            List<int> usersList = new List<int>();
+            List<int> equipsAS = new List<int>();
+
+            for (int i = 0; i < equips.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                equipsAS.Add(infoBase.GetIDEquipMachine(equips[i]));
+            }
+
+            List<int> usersListAS = valueUsers.LoadUsersListOnlyIDFromSelectMonth(equipsAS, date);
+
+            //Добавляется в список только сотрудники, которые есть в базе данных OM
+            for (int i = 0; i < usersListAS.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                int userID = userBase.GetUserIdFromASystemID(usersListAS[i]);
+
+                if (userID != -1)
+                {
+                    if (!usersList.Contains(userID))
+                    {
+                        usersList.Add(userID);
+                    }
+                }
+            }
+            
+            return (usersList, usersListAS);
+        }
+        private List<int> LoadUserList(CancellationToken token, int category)
+        {
+            ValueUserBase getUser = new ValueUserBase();
+
+            List<int> usersList = new List<int>();
+
+            string cLine = "";
+            cLine += " WHERE activeUser = 'True'";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM users" + cLine
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    if (getUser.CategoryForUser(sqlReader["id"].ToString(), category.ToString()))
+                    {
+                        usersList.Add((int)sqlReader["id"]);
+                    }
+                }
+                Connect.Close();
+            }
+
+            return usersList;
+        }
+
+        private void AddUsersToListView(CancellationToken token, List<int> usersList)
+        {
+            ValueUserBase getUser = new ValueUserBase();
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                ListViewItem item = new ListViewItem();
+
+                item.Name = usersList[i].ToString();
+                item.Text = (listView1.Items.Count + 1).ToString();
+                item.SubItems.Add(getUser.GetNameUser(usersList[i].ToString()));
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+
+                Invoke(new Action(() =>
+                {
+                    listView1.Items.Add(item);
+                }));
+            }
+        }
+
+        private void AddUsersASToListView(CancellationToken token, List<int> usersList)
+        {
+            ValueUsers valueUsers = new ValueUsers();
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                ListViewItem item = new ListViewItem();
+
+                item.Name = usersList[i].ToString();
+                item.Text = (listView1.Items.Count + 1).ToString();
+                item.SubItems.Add(valueUsers.GetUserNameFromID(usersList[i]));
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+
+                Invoke(new Action(() =>
+                {
+                    listView1.Items.Add(item);
+                }));
+            }
         }
 
         private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
@@ -219,9 +394,11 @@ namespace OrderManager
             ValueUserBase getUser = new ValueUserBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueCategory categoryValue = new ValueCategory();
+            ValueUsers valueUsers = new ValueUsers();
 
-            string cLine = " WHERE activeUser = 'True'";
-
+            List<string> usersNames = new List<string>();
+            List<int> workingOut = new List<int>();
+            int summWorkingOut = 0;
             int category = -1;
 
             Invoke(new Action(() =>
@@ -236,132 +413,94 @@ namespace OrderManager
                 category = categoryValue.GetIDCategoryFromName(comboBox3.Text);
             }));
 
-            List<int> usersList = new List<int>();
-            List<string> usersNames = new List<string>();
+            List<int> equipsListForCategory = getInfo.GetMachinesList(category);
 
-            while (true)
+            List<int> usersList;
+
+            if (selectLoadBase == 0)
             {
-                //token.ThrowIfCancellationRequested();
+                //usersList = LoadUserList(token, category);
+                usersList = LoadUserListFromMonthOM(token, equipsListForCategory, date);
+                AddUsersToListView(token, usersList);
+            }
+            else
+            {
+                //usersList = LoadUserList(token, category);
+                usersList = LoadUserListFromMonthAS(token, equipsListForCategory, date).Item2;
+                AddUsersASToListView(token, usersList);
+            }
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                //List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
+
+                int workingOutUser = 0;
+
+                if (selectLoadBase == 0)
+                {
+                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
+                    usersNames.Add(getUser.GetNameUser(usersList[i].ToString()));
+                }
+                else
+                {
+                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(usersList[i], equipsListForCategory, date);
+                    usersNames.Add(valueUsers.GetUserNameFromID(usersList[i]));
+                }
+
+                workingOut.Add(workingOutUser);
+                summWorkingOut += workingOutUser;
 
                 Invoke(new Action(() =>
                 {
-                    listView1.Items.Clear();
-                }));
+                    int index = listView1.Items.IndexOfKey(usersList[i].ToString());
 
-                using (MySqlConnection Connect = DBConnection.GetDBConnection())
-                {
-                    Connect.Open();
-                    MySqlCommand Command = new MySqlCommand
+                    if (index >= 0)
                     {
-                        Connection = Connect,
-                        CommandText = @"SELECT * FROM users" + cLine
-                    };
-                    DbDataReader sqlReader = Command.ExecuteReader();
+                        ListViewItem item = listView1.Items[index];
 
-                    while (sqlReader.Read())
-                    {
-                        if (token.IsCancellationRequested)
+                        if (item != null)
                         {
-                            break;
-                        }
-
-                        if (getUser.CategoryForUser(sqlReader["id"].ToString(), category.ToString()))
-                        {
-                            usersList.Add((int)sqlReader["id"]);
-                            usersNames.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-
-                            ListViewItem item = new ListViewItem();
-
-                            item.Name = sqlReader["id"].ToString();
-                            item.Text = (listView1.Items.Count + 1).ToString();
-                            item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-
-                            Invoke(new Action(() =>
-                            {
-                                listView1.Items.Add(item);
-                            }));
+                            item.SubItems[2].Text = workingOutUser.ToString("N0");
                         }
                     }
-                    Connect.Close();
-                }
-                
-                List<int> workingOut = new List<int>();
-                int summWorkingOut = 0;
-
-                for (int i = 0; i < usersList.Count; i++)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
-
-                    List<int> equipsListForCategory = getInfo.GetMachinesList(category);
-
-                    int workingOutUser = 0;
-
-                    if (selectLoadBase == 0)
-                    {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
-                    }
-                    else
-                    {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(usersList[i], equipsListForCategory, date);
-                    }
-
-                    workingOut.Add(workingOutUser);
-                    summWorkingOut += workingOutUser;
-
-                    Invoke(new Action(() =>
-                    {
-                        int index = listView1.Items.IndexOfKey(usersList[i].ToString());
-
-                        if (index >= 0)
-                        {
-                            ListViewItem item = listView1.Items[index];
-
-                            if (item != null)
-                            {
-                                item.SubItems[2].Text = workingOutUser.ToString("N0");
-                            }
-                        }
-                    }));
-                }
-
-                for (int i = 0; i < usersList.Count; i++)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    Invoke(new Action(() =>
-                    {
-                        int index = listView1.Items.IndexOfKey(usersList[i].ToString());
-
-                        if (index >= 0)
-                        {
-                            ListViewItem item = listView1.Items[index];
-
-                            if (item != null)
-                            {
-                                item.SubItems[3].Text = ((float)workingOut[i] / summWorkingOut).ToString("P2");
-                            }
-                        }
-                    }));
-                }
-
-                Invoke(new Action(() =>
-                {
-                    DrawDiagram(workingOut, usersNames);
 
                     label2.Text = summWorkingOut.ToString("N0");
                 }));
+            }
 
-                break;
+            Invoke(new Action(() =>
+            {
+                DrawDiagram(workingOut, usersNames);
+
+                //label2.Text = summWorkingOut.ToString("N0");
+            }));
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                Invoke(new Action(() =>
+                {
+                    int index = listView1.Items.IndexOfKey(usersList[i].ToString());
+
+                    if (index >= 0)
+                    {
+                        ListViewItem item = listView1.Items[index];
+
+                        if (item != null)
+                        {
+                            item.SubItems[3].Text = ((float)workingOut[i] / summWorkingOut).ToString("P2");
+                        }
+                    }
+                }));
             }
 
             Invoke(new Action(() =>
