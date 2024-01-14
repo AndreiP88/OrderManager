@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Drawing;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
 {
@@ -81,20 +82,35 @@ namespace OrderManager
             return result;
         }
 
-        public int CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(int userId, List<int> equips, DateTime startMonth)
+        public int CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromOM(int userId, List<int> equips, DateTime startMonth)
         {
+            ValueUserBase userBase = new ValueUserBase();
+
             DateTime startPeriod = Convert.ToDateTime("01." + startMonth.Month + "." + startMonth.Year + " 00:00:00");
             DateTime endPeriod = Convert.ToDateTime(startMonth.AddMonths(1).AddDays(-1).Day + "." + startMonth.Month + "." + startMonth.Year + " 23:59:59");
 
-            return CalculateWorkingOutForUserDataBaseAS(userId, equips, startPeriod, endPeriod);
+            List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
+
+            return CalculateWorkingOutForUserDataBaseAS(userIndexFromAS, equips, startPeriod, endPeriod);
         }
 
-        private int CalculateWorkingOutForUserDataBaseAS(int userId, List<int> equips, DateTime startPeriod, DateTime endPeriod)
+        public int CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(int userId, List<int> equips, DateTime startMonth)
+        {
+            ValueUserBase userBase = new ValueUserBase();
+
+            DateTime startPeriod = Convert.ToDateTime("01." + startMonth.Month + "." + startMonth.Year + " 00:00:00");
+            DateTime endPeriod = Convert.ToDateTime(startMonth.AddMonths(1).AddDays(-1).Day + "." + startMonth.Month + "." + startMonth.Year + " 23:59:59");
+
+            List<int> userIndexAS = new List<int> { userId };
+
+            return CalculateWorkingOutForUserDataBaseAS(userIndexAS, equips, startPeriod, endPeriod);
+        }
+
+        private int CalculateWorkingOutForUserDataBaseAS(List<int> userIDs, List<int> equips, DateTime startPeriod, DateTime endPeriod)
         {
             int result = 0;
 
             ValueInfoBase infoBase = new ValueInfoBase();
-            ValueUserBase userBase = new ValueUserBase();
 
             //2023-11-01 00:00:00.000
             string startDateTime = startPeriod.ToString("yyyy-MM-dd") + "T" + startPeriod.ToString("HH:mm:ss") + ".000";
@@ -102,16 +118,14 @@ namespace OrderManager
 
             try
             {
-                /*List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
+                string usersStr = "man_factjob.id_common_employee = " + userIDs[0];
 
-                string usersStr = "man_factjob.id_common_employee = " + userIndexFromAS[0];
-
-                for (int i = 1; i < userIndexFromAS.Count; i++)
+                for (int i = 1; i < userIDs.Count; i++)
                 {
-                    usersStr += " OR man_factjob.id_common_employee = " + userIndexFromAS[i];
-                }*/
+                    usersStr += " OR man_factjob.id_common_employee = " + userIDs[i];
+                }
 
-                string usersStr = "man_factjob.id_common_employee = " + userId;
+                //string usersStr = "man_factjob.id_common_employee = " + userId;
 
                 string equipsStr = "man_factjob.id_equip = " + infoBase.GetIDEquipMachine(equips[0]);
 

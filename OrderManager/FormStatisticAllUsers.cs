@@ -448,7 +448,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseAS(usersList[i], equipsListForCategory, date);
+                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
                     usersNames.Add(valueUsers.GetUserNameFromID(usersList[i]));
                 }
 
