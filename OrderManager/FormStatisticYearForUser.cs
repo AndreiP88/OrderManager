@@ -150,9 +150,15 @@ namespace OrderManager
 
         private void LoadYears()
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            List<string> years = new List<string>();
 
-            List<String> years = shiftsBase.LoadYears();
+            int startYear = 2017;
+            int currentYear = DateTime.Now.Year;
+
+            for (int year = startYear; year <= currentYear; year++)
+            {
+                years.Add(year.ToString());
+            }
 
             comboBox1.Items.AddRange(years.ToArray());
 

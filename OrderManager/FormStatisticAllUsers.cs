@@ -160,11 +160,7 @@ namespace OrderManager
 
         private void LoadYears()
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
-
             List<string> years = new List<string>();
-
-            //years = shiftsBase.LoadYears();
 
             int startYear = 2017;
             int currentYear = DateTime.Now.Year;
