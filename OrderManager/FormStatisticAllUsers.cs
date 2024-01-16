@@ -484,7 +484,7 @@ namespace OrderManager
                             else
                             {
                                 item.SubItems[2].Text = workingOutUser.ToString("P1");
-                                label2.Text = summWorkingOut.ToString("P1");
+                                label2.Text = (summWorkingOut / i).ToString("P1");
                             }
                         }
                     }

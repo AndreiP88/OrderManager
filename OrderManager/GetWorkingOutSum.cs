@@ -354,14 +354,20 @@ namespace OrderManager
                 {
                     if (equipListAS.Contains(order[i].IdEquip))
                     {
-                        workingOut += CalculateWorkTimeForOneOrder(order[i]);
-                        activeShift = true;
+                        if (order[i].IdletimeName == "")
+                        {
+                            workingOut += CalculateWorkTimeForOneOrder(order[i]);
+                            activeShift = true;
+                        }
                     }
                 }
                 else
                 {
-                    workingOut += CalculateWorkTimeForOneOrder(order[i]);
-                    activeShift = true;
+                    if (order[i].IdletimeName == "")
+                    {
+                        workingOut += CalculateWorkTimeForOneOrder(order[i]);
+                        activeShift = true;
+                    }
                 }
             }
 
