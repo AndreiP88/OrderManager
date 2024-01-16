@@ -103,7 +103,7 @@ namespace OrderManager
                 ApplyParameterLine(getSettings.GetParameterLine("0", nameForm));
         }
 
-        private void DrawDiagram(List<int> yValues, List<string> xValues)
+        private void DrawDiagram(List<float> yValues, List<string> xValues)
         {
             chart1.Series.Clear();
             // Форматировать диаграмму
@@ -186,24 +186,21 @@ namespace OrderManager
         CancellationTokenSource cancelTokenSource;
         private void StartLoading()
         {
-            if (cancelTokenSource != null)
-            {
-                cancelTokenSource.Cancel();
-                //Thread.Sleep(100);
-            }
+            cancelTokenSource?.Cancel();
 
-            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
+            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1 && comboBox4.SelectedIndex != -1 && comboBox5.SelectedIndex != -1)
             {
                 cancelTokenSource = new CancellationTokenSource();
 
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1).AddMonths(comboBox2.SelectedIndex);
 
-                int selectLoadBase = comboBox4.SelectedIndex;
+                int selectLoadedBase = comboBox4.SelectedIndex;
+                int typeValueLoad = comboBox5.SelectedIndex;
 
                 //Task task = new Task(() => LoadUsersFromBase(token, date));
-                Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
-                //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase);
+                Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadedBase, typeValueLoad), cancelTokenSource.Token);
+                //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadedBase, typeValueLoad);
 
                 task.Start();
             }
@@ -383,7 +380,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
+        private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
@@ -393,8 +390,8 @@ namespace OrderManager
             ValueUsers valueUsers = new ValueUsers();
 
             List<string> usersNames = new List<string>();
-            List<int> workingOut = new List<int>();
-            int summWorkingOut = 0;
+            List<float> workingOut = new List<float>();
+            float summWorkingOut = 0;
             int category = -1;
 
             Invoke(new Action(() =>
@@ -403,6 +400,7 @@ namespace OrderManager
                 comboBox2.Enabled = false;
                 comboBox3.Enabled = false;
                 comboBox4.Enabled = false;
+                comboBox5.Enabled = false;
 
                 ClearAll();
 
@@ -435,20 +433,37 @@ namespace OrderManager
 
                 //List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
 
-                int workingOutUser = 0;
+                float workingOutUser = 0;
 
                 if (selectLoadBase == 0)
                 {
-                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
+                    if (typeValueLoad == 0)
+                    {
+                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category);
+                    }
+
                     usersNames.Add(getUser.GetNameUser(usersList[i].ToString()));
+                    workingOut.Add(workingOutUser);
                 }
                 else
                 {
-                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
+                    if (typeValueLoad == 0)
+                    {
+                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory);
+                    }
+
                     usersNames.Add(valueUsers.GetUserNameFromID(usersList[i]));
+                    workingOut.Add(workingOutUser);
                 }
 
-                workingOut.Add(workingOutUser);
                 summWorkingOut += workingOutUser;
 
                 Invoke(new Action(() =>
@@ -461,11 +476,20 @@ namespace OrderManager
 
                         if (item != null)
                         {
-                            item.SubItems[2].Text = workingOutUser.ToString("N0");
+                            if (typeValueLoad == 0)
+                            {
+                                item.SubItems[2].Text = workingOutUser.ToString("N0");
+                                label2.Text = summWorkingOut.ToString("N0");
+                            }
+                            else
+                            {
+                                item.SubItems[2].Text = workingOutUser.ToString("P1");
+                                label2.Text = summWorkingOut.ToString("P1");
+                            }
                         }
                     }
 
-                    label2.Text = summWorkingOut.ToString("N0");
+                    //label2.Text = summWorkingOut.ToString("N0");
                 }));
             }
 
@@ -505,6 +529,7 @@ namespace OrderManager
                 comboBox2.Enabled = true;
                 comboBox3.Enabled = true;
                 comboBox4.Enabled = true;
+                comboBox5.Enabled = true;
             }));
         }
 
@@ -514,6 +539,7 @@ namespace OrderManager
             LoadYears();
             SetItemsComboBox();
             comboBox4.SelectedIndex = 0;
+            comboBox5.SelectedIndex = 0;
             //StartLoading();
             //LoadShiftsFromBase();
         }
@@ -541,6 +567,11 @@ namespace OrderManager
         }
 
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            StartLoading();
+        }
+
+        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
             StartLoading();
         }

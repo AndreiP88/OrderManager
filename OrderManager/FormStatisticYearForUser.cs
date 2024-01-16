@@ -145,7 +145,6 @@ namespace OrderManager
 
             //comboBox1.SelectedIndex = comboBox1.FindString(dateTime.Year.ToString());
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf(dateTime.Year.ToString());
-
         }
 
         private void LoadYears()
@@ -442,6 +441,7 @@ namespace OrderManager
         {
             GetShiftsFromBase getShifts = new GetShiftsFromBase(UserID.ToString());
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+            GetWorkingOutSum getWorkingOut = new GetWorkingOutSum();
 
             Invoke(new Action(() =>
             {
@@ -471,7 +471,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    shiftsDetails = WorkingOutAS(currentDateTime, token);
+                    shiftsDetails = getWorkingOut.CalculateDetailWorkingOutAS(UserID, currentDateTime, token);
                 }
 
                 if (shiftsDetails != null)
@@ -551,7 +551,7 @@ namespace OrderManager
             }));
         }
 
-        private ShiftsDetails WorkingOutAS(DateTime selectDate, CancellationToken token)
+        /*private ShiftsDetails WorkingOutAS(DateTime selectDate, CancellationToken token)
         {
             ShiftsDetails shiftsDetails = null;
 
@@ -674,7 +674,7 @@ namespace OrderManager
             }
 
             return workingOut;
-        }
+        }*/
 
 
         private void FormShiftsDetails_Load(object sender, EventArgs e)

@@ -1,9 +1,13 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using libSql;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
+using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
@@ -189,6 +193,206 @@ namespace OrderManager
             }
 
             return result;
+        }
+
+        public float CalculatePercentWorkingOutOM(int userID, DateTime selectMonth, CancellationToken token, int category)
+        {
+            float result = 0;
+
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
+
+            ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
+
+            result = shiftsDetails.percentWorkingOutShift;
+
+            return result;
+        }
+
+        private List<int> GetEquipsListASFromEquipsListOM(List<int> equipsListOM)
+        {
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            List<int> equipsAS = new List<int>();
+
+            for (int i = 0; i < equipsListOM.Count; i++)
+            {
+                equipsAS.Add(infoBase.GetIDEquipMachine(equipsListOM[i]));
+            }
+
+            return equipsAS;
+        }
+
+        public ShiftsDetails CalculateDetailWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token)
+        {
+            ValueUserBase userBase = new ValueUserBase();
+
+            List<int> userIndexAS = userBase.GetIndexUserFromASBase(userID);
+
+            ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token);
+
+            return shiftsDetails;
+        }
+
+        public float CalculatePercentWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
+        {
+            float result = 0;
+
+            List<int> userIndexAS = new List<int> { userID };
+            List<int> equipListAS = GetEquipsListASFromEquipsListOM(equipListOM);
+
+            ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
+
+            result = shiftsDetails.percentWorkingOutShift;
+
+            return result;
+        }
+
+        private ShiftsDetails WorkingOutDetailsAS(List<int> userIndexFromAS, DateTime selectMonth, CancellationToken token, List<int> equipListAS = null)
+        {
+            ShiftsDetails shiftsDetails = null;
+
+            GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
+            ValueShifts valueShifts = new ValueShifts();
+            //ValueUserBase userBase = new ValueUserBase();
+
+            //List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userID);
+
+            List<User> usersList = new List<User>();
+
+            for (int i = 0; i < userIndexFromAS.Count; i++)
+            {
+                usersList.Add(new User(userIndexFromAS[i]));
+                usersList[usersList.Count - 1].Shifts = new List<UserShift>();
+            }
+
+            try
+            {
+                usersList = valueShifts.LoadShiftsForSelectedMonth(usersList, selectMonth, 2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}");
+            }
+
+            float totalTimeWorkigOut = 0;
+            //float totalPercentWorkingOut = 0;
+            float totalBonusWorkingOut = 0;
+            List<float> totalPercentWorkingOutList = new List<float>();
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                for (int j = 0; j < usersList[i].Shifts.Count; j++)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    UserShift shift = usersList[i].Shifts[j];
+
+                    bool currentShift;// = CheckCurrentShift(shiftDate, shiftNumber);
+
+                    if (shift.ShiftDateEnd == "")
+                    {
+                        currentShift = true;
+                    }
+                    else
+                    {
+                        currentShift = false;
+                    }
+
+                    if (!currentShift)
+                    {
+                        float timeWorkigOut = CalculateWorkTime(shift.Orders, equipListAS);
+
+                        totalTimeWorkigOut += timeWorkigOut;
+                        totalBonusWorkingOut += getPercent.GetBonusWorkingOutF((int)timeWorkigOut);
+
+                        if (timeWorkigOut != -1)
+                        {
+                            totalPercentWorkingOutList.Add(getPercent.Percent((int)timeWorkigOut));
+                        }
+                    }
+                }
+
+                float percentWorkingOutAverage = 0;
+
+                if (totalPercentWorkingOutList.Count > 0)
+                {
+                    percentWorkingOutAverage = totalPercentWorkingOutList.Sum() / totalPercentWorkingOutList.Count;
+                }
+
+                shiftsDetails = new ShiftsDetails(
+                -1,
+                -1,
+                -1,
+                (int)totalTimeWorkigOut,
+                -1,
+                -1,
+                -1,
+                percentWorkingOutAverage,
+                totalBonusWorkingOut
+                );
+            }
+
+            return shiftsDetails;
+        }
+
+        private float CalculateWorkTime(List<UserShiftOrder> order, List<int> equipListAS = null)
+        {
+            float workingOut = -1;
+            bool activeShift = false;
+
+            for (int i = 0; i < order.Count; i++)
+            {
+                if (equipListAS != null)
+                {
+                    if (equipListAS.Contains(order[i].IdEquip))
+                    {
+                        workingOut += CalculateWorkTimeForOneOrder(order[i]);
+                        activeShift = true;
+                    }
+                }
+                else
+                {
+                    workingOut += CalculateWorkTimeForOneOrder(order[i]);
+                    activeShift = true;
+                }
+            }
+
+            if (activeShift)
+            {
+                workingOut += 1;
+            }
+
+            return workingOut;
+        }
+
+        private float CalculateWorkTimeForOneOrder(UserShiftOrder order)
+        {
+            float workingOut = 0;
+
+            if (order.Normtime > 0)
+            {
+                if (order.PlanOutQty > 0)
+                {
+                    workingOut += ((float)order.FactOutQty * (float)order.Normtime) / (float)order.PlanOutQty;
+                }
+                else
+                {
+                    if (order.FactOutQty > 0)
+                    {
+                        workingOut += (float)order.Normtime;
+                    }
+                }
+            }
+
+            return workingOut;
         }
     }
 }
