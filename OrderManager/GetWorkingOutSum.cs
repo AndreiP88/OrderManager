@@ -208,6 +208,19 @@ namespace OrderManager
             return result;
         }
 
+        public float CalculateCountMakeReadyOM(int userID, DateTime selectMonth, CancellationToken token, int category)
+        {
+            float result = 0;
+
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
+
+            ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
+
+            result = shiftsDetails.countMakereadyShift;
+
+            return result;
+        }
+
         private List<int> GetEquipsListASFromEquipsListOM(List<int> equipsListOM)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
@@ -247,6 +260,20 @@ namespace OrderManager
             return result;
         }
 
+        public float CalculateCountMakeReadyAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
+        {
+            float result = 0;
+
+            List<int> userIndexAS = new List<int> { userID };
+            List<int> equipListAS = GetEquipsListASFromEquipsListOM(equipListOM);
+
+            ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
+
+            result = shiftsDetails.countMakereadyShift;
+
+            return result;
+        }
+
         private ShiftsDetails WorkingOutDetailsAS(List<int> userIndexFromAS, DateTime selectMonth, CancellationToken token, List<int> equipListAS = null)
         {
             ShiftsDetails shiftsDetails = null;
@@ -274,6 +301,7 @@ namespace OrderManager
                 Console.WriteLine($"{ex.Message}");
             }
 
+            int totalCountMakeReady = 0;
             float totalTimeWorkigOut = 0;
             //float totalPercentWorkingOut = 0;
             float totalBonusWorkingOut = 0;
@@ -308,6 +336,8 @@ namespace OrderManager
 
                     if (!currentShift)
                     {
+                        totalCountMakeReady += CalculateCountMakeready(shift.Orders, equipListAS);
+
                         float timeWorkigOut = CalculateWorkTime(shift.Orders, equipListAS);
 
                         totalTimeWorkigOut += timeWorkigOut;
@@ -333,7 +363,7 @@ namespace OrderManager
                 -1,
                 (int)totalTimeWorkigOut,
                 -1,
-                -1,
+                totalCountMakeReady,
                 -1,
                 percentWorkingOutAverage,
                 totalBonusWorkingOut
@@ -344,6 +374,34 @@ namespace OrderManager
         }
 
         private float CalculateWorkTime(List<UserShiftOrder> order, List<int> equipListAS = null)
+        {
+            float workingOut = -1;
+
+            for (int i = 0; i < order.Count; i++)
+            {
+                if (equipListAS != null)
+                {
+                    if (equipListAS.Contains(order[i].IdEquip))
+                    {
+                        workingOut += CalculateWorkTimeForOneOrder(order[i]);
+                    }
+                }
+                else
+                {
+                    workingOut += CalculateWorkTimeForOneOrder(order[i]);
+                }
+            }
+
+            if (workingOut > 0)
+            {
+                workingOut += 1;
+            }
+
+            return workingOut;
+        }
+
+        //другой тип проверки проверки активности смены
+        private float CalculateWorkTimeOLD(List<UserShiftOrder> order, List<int> equipListAS = null)
         {
             float workingOut = -1;
             bool activeShift = false;
@@ -401,6 +459,34 @@ namespace OrderManager
             }
 
             return workingOut;
+        }
+
+        private int CalculateCountMakeready(List<UserShiftOrder> order, List<int> equipListAS = null)
+        {
+            int countMakeReady = 0;
+
+            for (int i = 0; i < order.Count; i++)
+            {
+                if (equipListAS != null)
+                {
+                    if (equipListAS.Contains(order[i].IdEquip))
+                    {
+                        if (order[i].Flags == 576)
+                        {
+                            countMakeReady++;
+                        }
+                    }
+                }
+                else
+                {
+                    if (order[i].Flags == 576)
+                    {
+                        countMakeReady++;
+                    }
+                }
+            }
+
+            return countMakeReady;
         }
     }
 }

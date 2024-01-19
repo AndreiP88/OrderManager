@@ -448,9 +448,13 @@ namespace OrderManager
                     {
                         workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
                     }
-                    else
+                    else if (typeValueLoad == 1)
                     {
                         workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category);
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculateCountMakeReadyOM(usersList[i], date, token, category);
                     }
 
                     name = getUser.GetNameUser(usersList[i].ToString());
@@ -463,28 +467,17 @@ namespace OrderManager
                     {
                         workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
                     }
-                    else
+                    else if (typeValueLoad == 1)
                     {
                         workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory);
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculateCountMakeReadyAS(usersList[i], date, token, equipsListForCategory);
                     }
 
                     name = valueUsers.GetUserNameFromID(usersList[i]);
                     
-                    workingOut.Add(workingOutUser * 100);
-                }
-                else
-                {
-                    if (typeValueLoad == 0)
-                    {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
-                    }
-                    else
-                    {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory);
-                    }
-
-                    name = valueUsers.GetUserNameFromID(usersList[i]);
-
                     workingOut.Add(workingOutUser * 100);
                 }
 
