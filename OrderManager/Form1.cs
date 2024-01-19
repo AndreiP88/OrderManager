@@ -1843,7 +1843,7 @@ namespace OrderManager
                                 }
                                 else
                                 {
-                                    values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                    values[i] = "Не хватит " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
                                 }
                             }
                         }
@@ -1865,7 +1865,7 @@ namespace OrderManager
                             }
                             else
                             {
-                                values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                values[i] = "Не хватит " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
                             }
                         }
                         else

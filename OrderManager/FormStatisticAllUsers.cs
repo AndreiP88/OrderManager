@@ -457,7 +457,7 @@ namespace OrderManager
 
                     workingOut.Add(workingOutUser);
                 }
-                else
+                else if (selectLoadBase == 1)
                 {
                     if (typeValueLoad == 0)
                     {
@@ -470,6 +470,21 @@ namespace OrderManager
 
                     name = valueUsers.GetUserNameFromID(usersList[i]);
                     
+                    workingOut.Add(workingOutUser * 100);
+                }
+                else
+                {
+                    if (typeValueLoad == 0)
+                    {
+                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory);
+                    }
+
+                    name = valueUsers.GetUserNameFromID(usersList[i]);
+
                     workingOut.Add(workingOutUser * 100);
                 }
 

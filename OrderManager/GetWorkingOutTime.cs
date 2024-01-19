@@ -74,6 +74,8 @@ namespace OrderManager
                 shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
             }
 
+            int doneFromPreviewShifts = ordersCurrentShift[indexOrder].amountOfOrder - ordersCurrentShift[indexOrder].lastCount;
+
             int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
             int countPreviusWorkingOut = CountWorkingOutOrders(indexOrder, machine);// считать до указанного индекса
             int countPreviusOutages = CountPreviusOutages(); // еще проработка требуется
@@ -223,7 +225,7 @@ namespace OrderManager
                 }
 
                 orderStatus.caption_2 = "Плановая выработка: ";
-                orderStatus.value_2 = planedCoutOrder.ToString("N0");
+                orderStatus.value_2 = planedCoutOrder.ToString("N0") + " (" + (doneFromPreviewShifts + planedCoutOrder).ToString("N0") + ")";
 
                 orderStatus.caption_3 = "Планирумое время завершения: ";
                 orderStatus.value_3 = timeToEndWork;
