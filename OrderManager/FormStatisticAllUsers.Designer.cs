@@ -170,7 +170,8 @@
             this.comboBox5.FormattingEnabled = true;
             this.comboBox5.Items.AddRange(new object[] {
             "Количество продукции",
-            "Процент выработки"});
+            "Процент выработки",
+            "Количество приладок"});
             this.comboBox5.Location = new System.Drawing.Point(763, 3);
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(234, 21);
@@ -222,6 +223,8 @@
             this.chart1.Location = new System.Drawing.Point(3, 3);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
+            series1.EmptyPointStyle.LabelAngle = -90;
+            series1.LabelAngle = 60;
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);

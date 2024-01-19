@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -124,18 +125,23 @@ namespace OrderManager
 
             chart1.Series.Add(new Series("ColumnSeries")
             {
-                ChartType = SeriesChartType.Pie,
+                ChartType = SeriesChartType.Column,
+                //ChartType = SeriesChartType.Pie,
                 LabelBackColor = Color.Transparent,
-                IsVisibleInLegend = true
+                IsVisibleInLegend = false
 
             });
 
-            // Salary series data
-            //double[] yValues = { 2222, 2724, 2720, 3263, 2445 };
-            //string[] xValues = { "France", "Canada", "Germany", "USA", "Italy" };
             chart1.Series["ColumnSeries"].Points.DataBindXY(xValues, yValues);
 
-            chart1.ChartAreas[0].Area3DStyle.Enable3D = true;
+            chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -30;
+            //chart1.ChartAreas[0].AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
+            //chart1.ChartAreas[0].AxisX.IsLabelAutoFit = false;
+            chart1.ChartAreas[0].AxisX.Interval = 1;
+
+
+            //chart1.ChartAreas[0].Area3DStyle.Enable3D = true;
+            chart1.AlignDataPointsByAxisLabel();
         }
 
         private void SetItemsComboBox()
@@ -434,6 +440,7 @@ namespace OrderManager
                 //List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
 
                 float workingOutUser = 0;
+                string name = "";
 
                 if (selectLoadBase == 0)
                 {
@@ -446,7 +453,8 @@ namespace OrderManager
                         workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category);
                     }
 
-                    usersNames.Add(getUser.GetNameUser(usersList[i].ToString()));
+                    name = getUser.GetNameUser(usersList[i].ToString());
+
                     workingOut.Add(workingOutUser);
                 }
                 else
@@ -460,9 +468,19 @@ namespace OrderManager
                         workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory);
                     }
 
-                    usersNames.Add(valueUsers.GetUserNameFromID(usersList[i]));
-                    workingOut.Add(workingOutUser);
+                    name = valueUsers.GetUserNameFromID(usersList[i]);
+                    
+                    workingOut.Add(workingOutUser * 100);
                 }
+
+                string add = "";
+
+                if (usersNames.Contains(name))
+                {
+                    add += " ";
+                }
+
+                usersNames.Add(name + add);
 
                 summWorkingOut += workingOutUser;
 
