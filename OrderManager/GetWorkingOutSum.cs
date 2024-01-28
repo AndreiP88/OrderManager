@@ -376,6 +376,7 @@ namespace OrderManager
         private float CalculateWorkTime(List<UserShiftOrder> order, List<int> equipListAS = null)
         {
             float workingOut = -1;
+            bool activeShift = false;
 
             for (int i = 0; i < order.Count; i++)
             {
@@ -384,15 +385,25 @@ namespace OrderManager
                     if (equipListAS.Contains(order[i].IdEquip))
                     {
                         workingOut += CalculateWorkTimeForOneOrder(order[i]);
+
+                        if (order[i].IdletimeName == "")
+                        {
+                            activeShift = true;
+                        }
                     }
                 }
                 else
                 {
                     workingOut += CalculateWorkTimeForOneOrder(order[i]);
+
+                    if (order[i].IdletimeName == "")
+                    {
+                        activeShift = true;
+                    }
                 }
             }
 
-            if (workingOut > 0)
+            if (activeShift || workingOut > 0)
             {
                 workingOut += 1;
             }
