@@ -450,7 +450,7 @@ namespace OrderManager
                     }
                     else if (typeValueLoad == 1)
                     {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category);
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category) * 100;
                     }
                     else
                     {
@@ -469,7 +469,7 @@ namespace OrderManager
                     }
                     else if (typeValueLoad == 1)
                     {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory);
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory) * 100;
                     }
                     else
                     {
@@ -478,7 +478,7 @@ namespace OrderManager
 
                     name = valueUsers.GetUserNameFromID(usersList[i]);
                     
-                    workingOut.Add(workingOutUser * 100);
+                    workingOut.Add(workingOutUser);
                 }
 
                 string add = "";
@@ -507,10 +507,15 @@ namespace OrderManager
                                 item.SubItems[2].Text = workingOutUser.ToString("N0");
                                 label2.Text = summWorkingOut.ToString("N0");
                             }
+                            else if (typeValueLoad == 1)
+                            {
+                                item.SubItems[2].Text = (workingOutUser / 100).ToString("P1");
+                                label2.Text = ((summWorkingOut / 100) / (i + 1)).ToString("P1");                                
+                            }
                             else
                             {
-                                item.SubItems[2].Text = workingOutUser.ToString("P1");
-                                label2.Text = (summWorkingOut / i).ToString("P1");
+                                item.SubItems[2].Text = workingOutUser.ToString("N0");
+                                label2.Text = summWorkingOut.ToString("N0");
                             }
                         }
                     }
