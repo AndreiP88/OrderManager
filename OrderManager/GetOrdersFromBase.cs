@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Reflection.Emit;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -31,7 +32,7 @@ namespace OrderManager
 
         }
 
-        public int GetOrderInProgressID(int shiftID, int orderIndex, int counterRepeat, string machine)
+        public int GetOrderInProgressID(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             int result = -1;
 
@@ -45,21 +46,49 @@ namespace OrderManager
             return result;
         }
 
-        public string GetIndex(int shiftID, int orderIndex, int counterRepeat, string machine)
+        public string GetIndex(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             return GetValue("count", shiftID, orderIndex, counterRepeat, machine);
         }
 
-        public String GetNote(int shiftID, int orderIndex, int counterRepeat, string machine)
+        public int GetMakereadyConsider(int shiftID, int orderIndex, int counterRepeat, int machine)
+        {
+            int result = 1;
+
+            string value = GetValue("makereadyConsider", shiftID, orderIndex, counterRepeat, machine);
+
+            if (Int32.TryParse(value, out int res))
+            {
+                result = res;
+            }
+
+            return result;
+        }
+
+        public int GetMakereadyPart(int shiftID, int orderIndex, int counterRepeat, int machine)
+        {
+            int result = -1;
+
+            string value = GetValue("makereadyComplete", shiftID, orderIndex, counterRepeat, machine);
+
+            if (Int32.TryParse(value, out int res))
+            {
+                result = res;
+            }
+
+            return result;
+        }
+
+        public String GetNote(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             return GetValue("note", shiftID, orderIndex, counterRepeat, machine);
         }
 
-        public String GetPrivateNote(int shiftID, int orderIndex, int counterRepeat, string machine)
+        public String GetPrivateNote(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             return GetValue("privateNote", shiftID, orderIndex, counterRepeat, machine);
         }
-        public String GetDone(int shiftID, int orderIndex, int counterRepeat, string machine)
+        public String GetDone(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             return GetValue("done", shiftID, orderIndex, counterRepeat, machine);
         }
@@ -154,7 +183,7 @@ namespace OrderManager
             return LastTimeMakeready(shiftID, orderInProgressID, machine, orderIndex, counterRepeat);
         }
 
-        private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, string machine)
+        private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             String result = "";
 
@@ -397,6 +426,32 @@ namespace OrderManager
 
             return mkPart;
         }
+        public int GetMakereadyConsiderFromOrderID(int orderIndex)
+        {
+            int mkConsider = 1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE count = @id"
+                };
+                Command.Parameters.AddWithValue("@id", orderIndex);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    mkConsider = Convert.ToInt32(sqlReader["makereadyConsider"]);
+                }
+
+                Connect.Close();
+            }
+
+            return mkConsider;
+        }
+
 
         public void SetMakereadyPart(int orderInProgressID, int value)
         {
@@ -420,6 +475,7 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
             //DateTime shiftStart = timeOperations.StringToDateTime(startOfShift);
 
@@ -468,6 +524,8 @@ namespace OrderManager
                         int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
                         int lastTimeWorkForDeviation = 0;
 
+                        int makereadyConsider = getOrders.GetMakereadyConsider(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"], (int)sqlReader["machine"]);
+
                         if (timeWorkingOut > 0)
                         {
                             lastTimeWorkForDeviation = timeWorkingOut;
@@ -512,7 +570,7 @@ namespace OrderManager
                             sqlReader["nameOfOrder"].ToString(),
                             amountThisOrder,
                             lastCount,
-                            lastTimeMakeready,
+                            lastTimeMakeready * makereadyConsider,
                             lastTimeWork,
                             timeMakeready,
                             timeWork,
@@ -614,6 +672,7 @@ namespace OrderManager
             int timeWorkingOut = 0;
 
             int makereadyPart = GetMakereadyPartFromOrderID(orderInProgressID);
+            int makereadyConsider = GetMakereadyConsiderFromOrderID(orderInProgressID);
 
             switch (makereadyPart)
             {
@@ -624,7 +683,7 @@ namespace OrderManager
                     timeWorkingOut = 0;
                     break;
                 default:
-                    timeWorkingOut = makereadyPart;
+                    timeWorkingOut = makereadyPart * makereadyConsider;
                     break;
             }
 

@@ -45,7 +45,7 @@ namespace OrderManager
         private void LoadNote()
         {
             GetOrdersFromBase getOrder = new GetOrdersFromBase();
-            String pNote = getOrder.GetPrivateNote(loadShiftID, loadOrderID, loadCounterRepeat, loadMachine);
+            String pNote = getOrder.GetPrivateNote(loadShiftID, loadOrderID, loadCounterRepeat, Convert.ToInt32(loadMachine));
             textBox1.Text = pNote;
         }
 

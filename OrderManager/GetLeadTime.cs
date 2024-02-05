@@ -71,7 +71,7 @@ namespace OrderManager
                 {
                     if ((int)sqlReader["makereadyComplete"] >= 0)
                     {
-                        parts.Add((int)sqlReader["makereadyComplete"]);
+                        parts.Add((int)sqlReader["makereadyComplete"] * (int)sqlReader["makereadyConsider"]);
                     }
                     else
                     {

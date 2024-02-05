@@ -2,13 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Drawing;
-using System.Globalization;
-using System.Linq.Expressions;
 using System.Windows.Forms;
-using static OrderManager.Form1;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OrderManager
 {
@@ -216,6 +211,7 @@ namespace OrderManager
                 groupBox4.Visible = false;
 
                 textBox6.Enabled = false;
+                checkBox1.Enabled = true;
             }
             if (status == "1") // начата приладка
             {
@@ -237,6 +233,7 @@ namespace OrderManager
                     groupBox4.Visible = false;
 
                     textBox6.Enabled = false;
+                    checkBox1.Enabled = true;
                 }
                 else
                 {
@@ -274,9 +271,11 @@ namespace OrderManager
                     }
 
                     textBox6.Enabled = true;
+                    checkBox1.Enabled = false;
                 }
 
             }
+
             if (status == "2") // приладка завершена
             {
                 button1.Visible = true;
@@ -300,7 +299,9 @@ namespace OrderManager
                 groupBox4.Visible = false;
 
                 textBox6.Enabled = false;
+                checkBox1.Enabled = false;
             }
+
             if (status == "3") // начата склейка
             {
                 if (currentOrder == "-1")
@@ -357,6 +358,8 @@ namespace OrderManager
 
                     textBox6.Enabled = true;
                 }
+
+                checkBox1.Enabled = false;
             }
         }
 
@@ -632,7 +635,7 @@ namespace OrderManager
         }
 
         private void AddNewOrderInProgress(string machine, string executor, int shiftID, int orderIndex, string makereadyStart,
-            string makereadyStop, string workStart, string workStop, float makereadyPartComplete, string done, int counterRepeat, string note)
+            string makereadyStop, string workStart, string workStop, int makereadyConsider, int makereadyPartComplete, string done, int counterRepeat, string note)
         {
             ValueOrdersBase valueOrders = new ValueOrdersBase();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
@@ -662,8 +665,8 @@ namespace OrderManager
             {
                 using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
-                    string commandText = "INSERT INTO ordersInProgress (machine, executor, shiftID, orderID, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, makereadyComplete, done, counterRepeat, note) " +
-                        "VALUES(@machine, @executor, @shiftID, @orderID, @makereadyStart, @makereadyStop, @workStart, @workStop, @makereadyComplete, @done, @counterRepeat, @note)";
+                    string commandText = "INSERT INTO ordersInProgress (machine, executor, shiftID, orderID, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, makereadyConsider, makereadyComplete, done, counterRepeat, note) " +
+                        "VALUES(@machine, @executor, @shiftID, @orderID, @makereadyStart, @makereadyStop, @workStart, @workStop, @makereadyConsider, @makereadyComplete, @done, @counterRepeat, @note)";
 
                     MySqlCommand Command = new MySqlCommand(commandText, Connect);
                     Command.Parameters.AddWithValue("@machine", machine); // присваиваем переменной значение
@@ -674,6 +677,7 @@ namespace OrderManager
                     Command.Parameters.AddWithValue("@makereadyStop", makereadyStop);
                     Command.Parameters.AddWithValue("@workStart", workStart);
                     Command.Parameters.AddWithValue("@workStop", workStop);
+                    Command.Parameters.AddWithValue("@makereadyConsider", makereadyConsider);
                     Command.Parameters.AddWithValue("@makereadyComplete", makereadyPartComplete);
                     Command.Parameters.AddWithValue("@done", done);
                     Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
@@ -934,6 +938,10 @@ namespace OrderManager
             string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
             string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
 
+            GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
+
+            int amountComplete = orderCalc.OrderCalculate(true, false);
+
             //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
 
             String makereadyStart = dateTimePicker1.Text;
@@ -942,6 +950,7 @@ namespace OrderManager
             String workStop = dateTimePicker4.Text;
             String note = textBox6.Text;
             int done = (int)numericUpDown4.Value;
+            int makereadyConsider = Convert.ToInt32(checkBox1.Checked);
 
             GetLeadTime leadTime = new GetLeadTime(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
 
@@ -951,21 +960,30 @@ namespace OrderManager
             int makereadyPart = 0;
 
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
+
             int makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+
+            int lastMakereadyPart = -1;
+
+            if (makereadyLastPart > 0 && amountComplete == 0)
+            {
+                lastMakereadyPart = makereadyLastPart;
+            }
 
             userBase.UpdateLastMachine(executor, infoBase.GetMachineFromName(comboBox3.Text));
 
             if (status == "0") //новая запись
             {
-                AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyPart, done.ToString(), counterRepeat, note);
+                AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyConsider, makereadyPart, done.ToString(), counterRepeat, note);
                 infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
                 newStatus = "1";
             }
+
             if (status == "1") // начата приладка
             {
                 if (currentOrderID == "-1")
                 {
-                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyPart, done.ToString(), counterRepeat, note);
+                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyConsider, makereadyPart, done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
                     newStatus = "1";
                 }
@@ -983,8 +1001,6 @@ namespace OrderManager
                     {
                         if (done > 0)
                         {
-                            GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
-
                             done += orderCalc.OrderCalculate(false, true);
 
                             //int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, orderInProgressID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
@@ -1020,11 +1036,12 @@ namespace OrderManager
                 }
 
             }
+
             if (status == "2") // приладка завершена
             {
                 if (currentOrderID == "-1")
                 {
-                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", -1, done.ToString(), counterRepeat, note);
+                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", makereadyConsider, lastMakereadyPart, done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
 
                     newStatus = "3";
@@ -1038,18 +1055,18 @@ namespace OrderManager
                     newStatus = "3";
                 }
             }
-            if (status == "3") // начата склейка
+
+            if (status == "3") // начата работа
             {
                 if (currentOrderID == "-1")
                 {
-                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", -1, done.ToString(), counterRepeat, note);
+                    AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", makereadyConsider, lastMakereadyPart, done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
 
                     newStatus = status;
                 }
                 else
                 {
-                    GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
                     UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
                     UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
@@ -1502,6 +1519,7 @@ namespace OrderManager
             GetLeadTime leadTime = new GetLeadTime(shiftID, machine, orderID, counterRepeat);
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
             ValueOrdersBase getValue = new ValueOrdersBase();
+            GetOrdersFromBase getOrder = new GetOrdersFromBase();
 
             String currentTime = DateTime.Now.ToString();
             String prevMakereadyStart = leadTime.GetLastDateTime("timeMakereadyStart");
@@ -1595,13 +1613,12 @@ namespace OrderManager
                 groupBox3.Visible = true;
             else
                 groupBox3.Visible = false;
-
         }
 
-        private void LoadOrderInProgressFromDB(int shiftID, int orderID, string machine, int counterRepeat)
+        private void LoadOrderInProgressFromDB(int shiftID, int orderID, int machine, int counterRepeat)
         {
             GetDateTimeOperations timeDif = new GetDateTimeOperations();
-            GetLeadTime leadTime = new GetLeadTime(shiftID, Convert.ToInt32(machine), orderID, counterRepeat);
+            GetLeadTime leadTime = new GetLeadTime(shiftID, machine, orderID, counterRepeat);
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
             GetOrdersFromBase getOrder = new GetOrdersFromBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -1685,12 +1702,14 @@ namespace OrderManager
             numericUpDown4.Value = amountDone;
 
             textBox6.Text = getOrder.GetNote(shiftID, orderID, counterRepeat, machine);
+            checkBox1.Checked = Convert.ToBoolean(getOrder.GetMakereadyConsider(shiftID, orderID, counterRepeat, machine));
         }
 
-        private void LoadOrderForEdit(int shiftID, int orderID, string machine, int counterRepeat)
+        private void LoadOrderForEdit(int shiftID, int orderID, int machine, int counterRepeat)
         {
             ValueOrdersBase getOrder = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
             this.Text = "Детали заказа";
 
@@ -1701,13 +1720,24 @@ namespace OrderManager
             if (modification != "")
                 strModification = " (" + modification + ")";
 
+            int mkComplete = ordersFromBase.GetMakereadyPart(shiftID, orderID, counterRepeat, machine);
+
+            if (mkComplete == -1)
+            {
+                checkBox1.Enabled = false;
+            }
+            else
+            {
+                checkBox1.Enabled = true;
+            }
+
             comboBox1.Items.Add("");
             comboBox1.Items.Add(number + ": " +
                 getOrder.GetOrderName(orderID) + strModification + " - " + Convert.ToInt32(getOrder.GetAmountOfOrder(orderID)).ToString("N0"));
             comboBox1.SelectedIndex = 1;
             comboBox1.Enabled = false;
 
-            comboBox3.Items.Add(getInfo.GetMachineName(machine));
+            comboBox3.Items.Add(getInfo.GetMachineName(machine.ToString()));
             comboBox3.SelectedIndex = 0;
             comboBox3.Enabled = false;
 
@@ -1759,6 +1789,7 @@ namespace OrderManager
             UpdateData("note", machine, shiftID, orderIndex, counterRepeat, textBox6.Text);
             UpdateData("done", machine, shiftID, orderIndex, counterRepeat, numericUpDown4.Value.ToString());
 
+            UpdateData("makereadyConsider", machine, shiftID, orderIndex, counterRepeat, Convert.ToInt32(checkBox1.Checked));
         }
 
         private void AddEditCloseOrder_Load(object sender, EventArgs e)
@@ -1782,8 +1813,8 @@ namespace OrderManager
 
             if (loadOrderId != -1)
             {
-                LoadOrderForEdit(shiftIndex, loadOrderId, loadMachine, loadCounterRepeat);
-                LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, loadMachine, shiftsValue.GetNameUserFromStartShift(shiftIndex));
+                LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
+                LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
 
                 timer1.Enabled = false;
             }
@@ -1894,7 +1925,7 @@ namespace OrderManager
                 orderIndex = ordersIndexes[comboBox1.SelectedIndex];
             }
 
-            string machine = getInfo.GetMachineFromName(comboBox3.Text);
+            int machine = Convert.ToInt32(getInfo.GetMachineFromName(comboBox3.Text));
             int counterRepeat = getValue.GetCounterRepeat(orderIndex);
             
 
@@ -1903,19 +1934,19 @@ namespace OrderManager
             form = new FormTypesInTheOrder(shiftIndex,
                 orderIndex,
                 counterRepeat,
-                machine,
+                machine.ToString(),
                 shiftsBase.GetNameUserFromStartShift(shiftIndex));
 
             form.ShowDialog();
 
-            LoadTypesFromCurrentOrder(orderIndex, counterRepeat, machine, getInfo.GetIDUser(machine));
+            LoadTypesFromCurrentOrder(orderIndex, counterRepeat, machine, getInfo.GetIDUser(machine.ToString()));
         }
 
-        private void LoadTypesFromCurrentOrder(int orderIndex, int counterRepeat, string machine, string user)
+        private void LoadTypesFromCurrentOrder(int orderIndex, int counterRepeat, int machine, string user)
         {
             listView1.Items.Clear();
 
-            ValueTypesBase typeBase = new ValueTypesBase(shiftIndex, orderIndex, counterRepeat, machine, user);
+            ValueTypesBase typeBase = new ValueTypesBase(shiftIndex, orderIndex, counterRepeat, machine.ToString(), user);
             
             List<TypeInTheOrder> typesCurrent = typeBase.GetData();
 
@@ -1941,21 +1972,23 @@ namespace OrderManager
 
                 int orderIndex = ordersIndexes[comboBox1.SelectedIndex];
                 
-                string machine = getInfo.GetMachineFromName(comboBox3.Text);
+                int machine = Convert.ToInt32(getInfo.GetMachineFromName(comboBox3.Text));
                 int counterRepeat = getValue.GetCounterRepeat(orderIndex);
                 
                 ClearAllValue();
 
                 LoadOrderFromDB(orderIndex);
-                SetVisibleElements(getValue.GetOrderStatus(orderIndex), getInfo.GetCurrentOrderID(machine));
+                SetVisibleElements(getValue.GetOrderStatus(orderIndex), getInfo.GetCurrentOrderID(machine.ToString()));
+
                 if (comboBox1.SelectedIndex != 0)
                 {
                     LoadCurrentOrderInProgressFromDB(shiftIndex, Convert.ToInt32(machine), orderIndex, counterRepeat);
 
-                    LoadTypesFromCurrentOrder(orderIndex, counterRepeat, machine, getInfo.GetIDUser(machine));
+                    LoadTypesFromCurrentOrder(orderIndex, counterRepeat, machine, getInfo.GetIDUser(machine.ToString()));
 
                     GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase();
                     textBox6.Text = getOrdersInProgressValue.GetNote(shiftIndex, orderIndex, counterRepeat, machine);
+                    checkBox1.Checked = Convert.ToBoolean(getOrdersInProgressValue.GetMakereadyConsider(shiftIndex, orderIndex, counterRepeat, machine));
                 }
             }
         }
@@ -2007,6 +2040,22 @@ namespace OrderManager
                         }
 
                     }
+                    else if (!checkBox1.Checked && status == "0")
+                    {
+                        result = MessageBox.Show("Приладка не включена в выработку!\r\nНачать выполнение заказа?", "Добавление заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            orders.SetNewStatus(orderIndex, "3");
+                            AcceptOrderInProgressToDB();
+                            Close();
+                        }
+                        else if (result == DialogResult.No)
+                        {
+                            //return;
+                        }
+
+                    }
                     else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)) != "")
                     {
                         if (status == "1" || status == "3")
@@ -2030,7 +2079,6 @@ namespace OrderManager
                         AcceptOrderInProgressToDB();
                         Close();
                     }
-
                 }
                 else
                 {
@@ -2280,6 +2328,11 @@ namespace OrderManager
             {
                 SetNewOrder(fm.SetValue, fm.Types);
             }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 

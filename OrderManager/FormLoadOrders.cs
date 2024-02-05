@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OrderManager
 {
@@ -990,6 +991,11 @@ namespace OrderManager
             {
                 label1.Text = $"Загружено заказов: {index + 1}";
             }));
+        }
+
+        private void calculateCountProductionFromPreviousOperations(int idManPlanjobList)
+        {
+
         }
 
         private void button2_Click(object sender, EventArgs e)

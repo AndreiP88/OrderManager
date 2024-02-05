@@ -41,7 +41,7 @@ namespace OrderManager
             int previous = 0, current = 0, full = 0;
 
             List<int> countOfShifts = new List<int>();
-            int indexCurrentShift = 0;
+            int indexCurrentShift = -1;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -66,6 +66,11 @@ namespace OrderManager
                 }
 
                 Connect.Close();
+            }
+
+            if (indexCurrentShift == -1)
+            {
+                indexCurrentShift = countOfShifts.Count;
             }
 
             for (int i = 0; i < countOfShifts.Count; i++)

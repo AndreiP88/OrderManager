@@ -30,7 +30,7 @@ namespace OrderManager
 
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
-            _orderInProgressID = getOrders.GetIndex(shiftID, orderID, orderCounterRepeat, machine);
+            _orderInProgressID = getOrders.GetIndex(shiftID, orderID, orderCounterRepeat,Convert.ToInt32(machine));
         }
 
         public ValueTypesBase()
