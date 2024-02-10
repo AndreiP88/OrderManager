@@ -183,6 +183,52 @@ namespace OrderManager
             return LastTimeMakeready(shiftID, orderInProgressID, machine, orderIndex, counterRepeat);
         }
 
+        /// <summary>
+        /// Есть ли заказ в базе
+        /// </summary>
+        /// <param name="shiftID"></param>
+        /// <param name="orderIndex"></param>
+        /// <param name="counterRepeat"></param>
+        /// <param name="machine"></param>
+        /// <returns></returns>
+        public bool IsThereAnOrder(int machine, int orderIndex, int counterRepeat, int shiftID = -1)
+        {
+            bool result = false;
+
+            string cLine = "";
+            int count = 0;
+
+            if (shiftID != -1)
+            {
+                cLine = " AND shiftID = @shiftID";
+            }
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT COUNT(*) FROM ordersInProgress WHERE machine = @machine AND orderID = @id AND counterRepeat = @counterRepeat" + cLine
+                };
+
+                Command.Parameters.AddWithValue("@shiftID", shiftID);
+                Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
+                Command.Parameters.AddWithValue("@id", orderIndex);
+                Command.Parameters.AddWithValue("@machine", machine);
+
+                Connect.Open();
+                count = Convert.ToInt32(Command.ExecuteScalar());
+                Connect.Close();
+            }
+
+            if (count > 0)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
         private String GetValue(String nameOfColomn, int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             String result = "";

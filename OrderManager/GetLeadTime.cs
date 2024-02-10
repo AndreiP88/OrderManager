@@ -87,6 +87,11 @@ namespace OrderManager
                 Connect.Close();
             }
 
+            if (indexPartsCurrentShift == -1)
+            {
+                indexPartsCurrentShift = parts.Count;
+            }
+
             for (int i = 0; i < parts.Count; i++)
             {
                 if (i < indexPartsCurrentShift && calculatePreviousParts)

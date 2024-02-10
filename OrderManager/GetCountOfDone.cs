@@ -11,12 +11,14 @@ namespace OrderManager
         int shiftIndex;
         int orderIndex;
         int counterRepeat;
+        int Machine;
 
-        public GetCountOfDone(int shiftID, int orderID, int counterOfRepeat)
+        public GetCountOfDone(int shiftID, int orderID, int counterOfRepeat, int machine = -1)
         {
             this.shiftIndex = shiftID;
             this.orderIndex = orderID;
             this.counterRepeat = counterOfRepeat;
+            this.Machine = machine;
         }
 
         public int OrderCalculate(bool previousShift, bool currentShift)
@@ -40,6 +42,13 @@ namespace OrderManager
         {
             int previous = 0, current = 0, full = 0;
 
+            string cLine = "";
+
+            if (Machine != -1)
+            {
+                cLine = " AND machine = @machine";
+            }
+
             List<int> countOfShifts = new List<int>();
             int indexCurrentShift = -1;
 
@@ -49,9 +58,9 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id" + cLine
                 };
-                //Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@machine", Machine);
                 Command.Parameters.AddWithValue("@id", orderIndex);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -85,50 +94,5 @@ namespace OrderManager
 
             return (previous, current, full);
         }
-
-        /*
-        public int OrderCalculateOld(bool previousShift, bool currentShift)
-        {
-            int previous = 0, current = 0;
-            int value = 0;
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE numberOfOrder = @number AND modification = @orderModification"
-                };
-                Command.Parameters.AddWithValue("@number", orderNumber);
-                Command.Parameters.AddWithValue("@orderModification", orderModification);
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read())
-                {
-                    if ((sqlReader["startOfShift"].ToString() == startShift) && (sqlReader["counterRepeat"].ToString() == counterRepeat))
-                    {
-                        if (sqlReader["done"].ToString() != "")
-                            current += Convert.ToInt32(sqlReader["done"].ToString());
-                    }
-                    else
-                    {
-                        if (sqlReader["done"].ToString() != "")
-                            previous += Convert.ToInt32(sqlReader["done"].ToString());
-                    }
-                }
-
-                Connect.Close();
-            }
-
-            if (previousShift)
-                value += previous;
-            if (currentShift)
-                value += current;
-            return value;
-        }
-        */
     }
-
-
 }
