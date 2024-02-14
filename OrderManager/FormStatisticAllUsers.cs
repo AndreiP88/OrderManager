@@ -1,4 +1,5 @@
-﻿using libData;
+﻿using BrightIdeasSoftware;
+using libData;
 using libSql;
 using MySql.Data.MySqlClient;
 using System;
@@ -16,17 +17,15 @@ namespace OrderManager
 {
     public partial class FormStatisticAllUsers : Form
     {
-        bool adminMode;
-
-        public FormStatisticAllUsers(bool aMode = false)
+        public FormStatisticAllUsers()
         {
             InitializeComponent();
 
-            this.adminMode = aMode;
+            lvwColumnSorter = new ListViewColumnSorter();
+            this.listView1.ListViewItemSorter = lvwColumnSorter;
         }
 
-        bool thJob = false;
-        bool calculateNullShiftsFromUser = false;
+        private ListViewColumnSorter lvwColumnSorter;
 
         string GetParametersLine()
         {
@@ -386,7 +385,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
+        private void LoadUsersFromBaseOLD(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
@@ -524,13 +523,6 @@ namespace OrderManager
                 }));
             }
 
-            Invoke(new Action(() =>
-            {
-                DrawDiagram(workingOut, usersNames);
-
-                //label2.Text = summWorkingOut.ToString("N0");
-            }));
-
             for (int i = 0; i < usersList.Count; i++)
             {
                 if (token.IsCancellationRequested)
@@ -553,6 +545,276 @@ namespace OrderManager
                     }
                 }));
             }
+
+            ///Sort
+            ///
+
+            float tmpWorkimgOut;
+            string tmpUserNames;
+
+            for (int i = 0; i < workingOut.Count - 1; i++)
+            {
+                for (int j = i + 1; j < workingOut.Count; j++)
+                {
+                    if (workingOut[i] < workingOut[j])
+                    {
+                        tmpUserNames = usersNames[i];
+                        usersNames[i] = usersNames[j];
+                        usersNames[j] = tmpUserNames;
+
+                        tmpWorkimgOut = workingOut[i];
+                        workingOut[i] = workingOut[j];
+                        workingOut[j] = tmpWorkimgOut;
+                    }
+                }
+            }
+
+            Invoke(new Action(() =>
+            {
+                DrawDiagram(workingOut, usersNames);
+
+                //label2.Text = summWorkingOut.ToString("N0");
+            }));
+
+            Invoke(new Action(() =>
+            {
+                comboBox1.Enabled = true;
+                comboBox2.Enabled = true;
+                comboBox3.Enabled = true;
+                comboBox4.Enabled = true;
+                comboBox5.Enabled = true;
+            }));
+        }
+
+        private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
+        {
+            GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+            GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
+            ValueUserBase getUser = new ValueUserBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueCategory categoryValue = new ValueCategory();
+            ValueUsers valueUsers = new ValueUsers();
+
+            List<string> usersNames = new List<string>();
+            List<float> workingOut = new List<float>();
+            float summWorkingOut = 0;
+            int category = -1;
+
+            Invoke(new Action(() =>
+            {
+                comboBox1.Enabled = false;
+                comboBox2.Enabled = false;
+                comboBox3.Enabled = false;
+                comboBox4.Enabled = false;
+                comboBox5.Enabled = false;
+
+                ClearAll();
+
+                category = categoryValue.GetIDCategoryFromName(comboBox3.Text);
+            }));
+
+            List<int> equipsListForCategory = getInfo.GetMachinesList(category);
+
+            List<int> usersList;
+
+            if (selectLoadBase == 0)
+            {
+                //usersList = LoadUserList(token, category);
+                usersList = LoadUserListFromMonthOM(token, equipsListForCategory, date);
+                //AddUsersToListView(token, usersList);
+            }
+            else
+            {
+                //usersList = LoadUserList(token, category);
+                usersList = LoadUserListFromMonthAS(token, equipsListForCategory, date).Item2;
+                //AddUsersASToListView(token, usersList);
+            }
+
+            Invoke(new Action(() =>
+            {
+                progressBar1.Minimum = 0;
+                progressBar1.Maximum = usersList.Count * 3;
+                progressBar1.Value = 0;
+            }));
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                //List<int> equipsListForUser = getUser.GetEquipsListForSelectedUser(usersList[i]);//не используется
+
+                float workingOutUser = 0;
+                string name = "";
+
+                if (selectLoadBase == 0)
+                {
+                    if (typeValueLoad == 0)
+                    {
+                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseOM(usersList[i], equipsListForCategory, date);
+                    }
+                    else if (typeValueLoad == 1)
+                    {
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category) * 100;
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculateCountMakeReadyOM(usersList[i], date, token, category);
+                    }
+
+                    name = getUser.GetNameUser(usersList[i].ToString());
+
+                    workingOut.Add(workingOutUser);
+                }
+                else if (selectLoadBase == 1)
+                {
+                    if (typeValueLoad == 0)
+                    {
+                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
+                    }
+                    else if (typeValueLoad == 1)
+                    {
+                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory) * 100;
+                    }
+                    else
+                    {
+                        workingOutUser = workingOutSum.CalculateCountMakeReadyAS(usersList[i], date, token, equipsListForCategory);
+                    }
+
+                    name = valueUsers.GetUserNameFromID(usersList[i]);
+
+                    workingOut.Add(workingOutUser);
+                }
+
+                string add = "";
+
+                if (usersNames.Contains(name))
+                {
+                    add += " ";
+                }
+
+                usersNames.Add(name + add);
+
+                Invoke(new Action(() =>
+                {
+                    progressBar1.Value++;
+                }));
+            }
+
+            ///Sort
+            ///
+
+            int tmpUsersList;
+            float tmpWorkimgOut;
+            string tmpUserNames;
+
+            for (int i = 0; i < workingOut.Count - 1; i++)
+            {
+                for (int j = i + 1; j < workingOut.Count; j++)
+                {
+                    if (workingOut[i] < workingOut[j])
+                    {
+                        tmpUsersList = usersList[i];
+                        usersList[i] = usersList[j];
+                        usersList[j] = tmpUsersList;
+
+                        tmpUserNames = usersNames[i];
+                        usersNames[i] = usersNames[j];
+                        usersNames[j] = tmpUserNames;
+
+                        tmpWorkimgOut = workingOut[i];
+                        workingOut[i] = workingOut[j];
+                        workingOut[j] = tmpWorkimgOut;
+                    }
+                }
+            }
+
+            if (selectLoadBase == 0)
+            {
+                AddUsersToListView(token, usersList);
+            }
+            else
+            {
+                AddUsersASToListView(token, usersList);
+            }
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                summWorkingOut += workingOut[i];
+
+                Invoke(new Action(() =>
+                {
+                    int index = listView1.Items.IndexOfKey(usersList[i].ToString());
+
+                    if (index >= 0)
+                    {
+                        ListViewItem item = listView1.Items[index];
+
+                        if (item != null)
+                        {
+                            if (typeValueLoad == 0)
+                            {
+                                item.SubItems[2].Text = workingOut[i].ToString("N0");
+                                label2.Text = summWorkingOut.ToString("N0");
+                            }
+                            else if (typeValueLoad == 1)
+                            {
+                                item.SubItems[2].Text = (workingOut[i] / 100).ToString("P1");
+                                label2.Text = ((summWorkingOut / 100) / (i + 1)).ToString("P1");
+                            }
+                            else
+                            {
+                                item.SubItems[2].Text = workingOut[i].ToString("N0");
+                                label2.Text = summWorkingOut.ToString("N0");
+                            }
+                        }
+                    }
+
+                    //label2.Text = summWorkingOut.ToString("N0");
+                }));
+
+                Invoke(new Action(() =>
+                {
+                    progressBar1.Value++;
+                }));
+            }
+
+            for (int i = 0; i < usersList.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                Invoke(new Action(() =>
+                {
+                    int index = listView1.Items.IndexOfKey(usersList[i].ToString());
+
+                    if (index >= 0)
+                    {
+                        ListViewItem item = listView1.Items[index];
+
+                        if (item != null)
+                        {
+                            item.SubItems[3].Text = ((float)workingOut[i] / summWorkingOut).ToString("P2");
+                        }
+                    }
+                }));
+
+                Invoke(new Action(() =>
+                {
+                    progressBar1.Value++;
+                }));
+            }
+
+            Invoke(new Action(() =>
+            {
+                DrawDiagram(workingOut, usersNames);
+
+                //label2.Text = summWorkingOut.ToString("N0");
+            }));
 
             Invoke(new Action(() =>
             {
@@ -605,6 +867,32 @@ namespace OrderManager
         private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
             StartLoading();
+        }
+
+        private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine if clicked column is already the column that is being sorted.
+            if (e.Column == lvwColumnSorter.SortColumn)
+            {
+                // Reverse the current sort direction for this column.
+                if (lvwColumnSorter.Order == SortOrder.Ascending)
+                {
+                    lvwColumnSorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    lvwColumnSorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                // Set the column number that is to be sorted; default to ascending.
+                lvwColumnSorter.SortColumn = e.Column;
+                lvwColumnSorter.Order = SortOrder.Ascending;
+            }
+
+            // Perform the sort with these new sort options.
+            this.listView1.Sort();
         }
     }
 }

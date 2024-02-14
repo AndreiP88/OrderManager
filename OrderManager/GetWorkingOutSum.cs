@@ -255,7 +255,10 @@ namespace OrderManager
 
             ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
 
-            result = shiftsDetails.percentWorkingOutShift;
+            if (shiftsDetails != null)
+            {
+                result = shiftsDetails.percentWorkingOutShift;
+            }
 
             return result;
         }
@@ -269,8 +272,11 @@ namespace OrderManager
 
             ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
 
-            result = shiftsDetails.countMakereadyShift;
-
+            if (shiftsDetails != null)
+            {
+                result = shiftsDetails.countMakereadyShift;
+            }
+            
             return result;
         }
 
