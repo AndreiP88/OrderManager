@@ -1,19 +1,12 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Reflection.Emit;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using File = System.IO.File;
 using ToolTip = System.Windows.Forms.ToolTip;
 
 namespace OrderManager
@@ -21,10 +14,14 @@ namespace OrderManager
     public partial class Form1 : Form
     {
         bool adminMode = false;
+        public static ManualResetEvent _pauseEvent = new ManualResetEvent(true);
+        public static FormDataBaseReconnect formSQLException;// = new FormDataBaseReconnect();
 
         public Form1(string[] args)
         {
             InitializeComponent();
+
+            new Thread(() => { formSQLException = new FormDataBaseReconnect(); }).Start();
 
             if (args.Length > 0)
             {
@@ -76,30 +73,6 @@ namespace OrderManager
             public static string caption2 = "";
             public static string caption3 = "";
             public static string caption4 = "";
-        }
-
-        public bool IsServerConnected()
-        {
-            string host = Form1.BaseConnectionParameters.host;
-            int port = Form1.BaseConnectionParameters.port;
-            string database = Form1.BaseConnectionParameters.database;
-            string username = Form1.BaseConnectionParameters.username;
-            string password = Form1.BaseConnectionParameters.password;
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection(host, port, database, username, password))
-            {
-                try
-                {
-                    Connect.Open();
-                    Connect.Close();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -297,8 +270,15 @@ namespace OrderManager
         private void LoadParametersFromBase(String nameForm)
         {
             ValueSettingsBase getSettings = new ValueSettingsBase();
+            DBConnection connection = new DBConnection();
 
-            if (IsServerConnected())
+            string host = Form1.BaseConnectionParameters.host;
+            int port = Form1.BaseConnectionParameters.port;
+            string database = Form1.BaseConnectionParameters.database;
+            string username = Form1.BaseConnectionParameters.username;
+            string password = Form1.BaseConnectionParameters.password;
+
+            if (connection.IsServerConnected(host, port, database, username, password))
             {
                 if (Form1.Info.nameOfExecutor != "")
                     ApplyParameterLine(getSettings.GetParameterLine(Form1.Info.nameOfExecutor, nameForm));
@@ -1146,7 +1126,15 @@ namespace OrderManager
 
             LoadBaseConnectionParameters();
 
-            if (IsServerConnected())
+            DBConnection connection = new DBConnection();
+
+            string host = Form1.BaseConnectionParameters.host;
+            int port = Form1.BaseConnectionParameters.port;
+            string database = Form1.BaseConnectionParameters.database;
+            string username = Form1.BaseConnectionParameters.username;
+            string password = Form1.BaseConnectionParameters.password;
+
+            if (connection.IsServerConnected(host, port, database, username, password))
             {
                 if (!adminMode)
                 {
@@ -1205,7 +1193,15 @@ namespace OrderManager
         {
             LoadBaseConnectionParameters();
 
-            if (!IsServerConnected())
+            DBConnection connection = new DBConnection();
+
+            string host = Form1.BaseConnectionParameters.host;
+            int port = Form1.BaseConnectionParameters.port;
+            string database = Form1.BaseConnectionParameters.database;
+            string username = Form1.BaseConnectionParameters.username;
+            string password = Form1.BaseConnectionParameters.password;
+
+            if (!connection.IsServerConnected(host, port, database, username, password))
             {
                 DataBaseSelect(false);
             }
@@ -1223,7 +1219,15 @@ namespace OrderManager
         {
             cancelTokenSource?.Cancel();
 
-            if (IsServerConnected())
+            DBConnection connection = new DBConnection();
+
+            string host = Form1.BaseConnectionParameters.host;
+            int port = Form1.BaseConnectionParameters.port;
+            string database = Form1.BaseConnectionParameters.database;
+            string username = Form1.BaseConnectionParameters.username;
+            string password = Form1.BaseConnectionParameters.password;
+
+            if (connection.IsServerConnected(host, port, database, username, password))
             {
                 SaveParameterToBase("mainForm");
             }            

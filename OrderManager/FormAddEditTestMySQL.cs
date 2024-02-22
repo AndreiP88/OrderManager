@@ -255,9 +255,6 @@ namespace OrderManager
                     SelectCurerntConnection(ini.ReadString("selected", "general").Substring(5));
                 }
             }
-
-            
-            
         }
 
         private void button3_Click(object sender, EventArgs e)

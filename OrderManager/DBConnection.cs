@@ -1,23 +1,28 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static OrderManager.Form1;
 
 namespace OrderManager
 {
     internal class DBConnection
     {
-        public static MySqlConnection GetDBConnection()
+        //static ManualResetEvent _pauseEvent = new ManualResetEvent(false);
+
+        /*public static MySqlConnection GetDBConnection()
         {
-            /*string host = "25.21.38.172";
+            *//*string host = "25.21.38.172";
             int port = 3309;
             string database = "order_manager";
             string username = "oxyfox";
-            string password = "root";*/
+            string password = "root";*//*
+
+            _pauseEvent.WaitOne(Timeout.Infinite);
+
+        NewConnect:
 
             string host = Form1.BaseConnectionParameters.host;
             int port = Form1.BaseConnectionParameters.port;
@@ -25,23 +30,110 @@ namespace OrderManager
             string username = Form1.BaseConnectionParameters.username;
             string password = Form1.BaseConnectionParameters.password;
 
-            return DBMySQLUtils.GetDBConnection(host, port, database, username, password);
-        }
+            MySqlConnection connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password);
 
-        public static MySqlConnection GetDBConnection(string host, int port, string database, string username, string password)
+            //_pauseEvent.WaitOne(Timeout.Infinite);
+
+            string exception;
+
+            using (connect)
+            {
+                try
+                {
+                    connect.Open();
+                    connect.Close();
+                    exception = "";
+                }
+                catch (Exception ex)
+                {
+                    exception = ex.Message;
+
+                    bool reconectionRequest = DataBaseReconnectionRequest(exception);
+
+                    //_pauseEvent.WaitOne(Timeout.Infinite);
+
+                    if (reconectionRequest)
+                    {
+                        goto NewConnect;
+                    }
+                    else
+                    {
+                        Application.Exit();
+                    }
+                }
+            }
+
+            if (exception != "")
+            {
+                *//*bool reconectionRequest = DataBaseReconnectionRequest(exception);
+
+                _pauseEvent.WaitOne(Timeout.Infinite);
+
+                if (reconectionRequest)
+                {
+                    goto NewConnect;
+                }
+                else
+                {
+                    Application.Exit();
+                }*//*
+            }
+
+            return connect;
+        }*/
+
+        public static MySqlConnection GetDBConnection()
         {
             /*string host = "25.21.38.172";
             int port = 3309;
             string database = "order_manager";
             string username = "oxyfox";
             string password = "root";*/
+            
+            _pauseEvent.WaitOne();
 
-            return DBMySQLUtils.GetDBConnection(host, port, database, username, password);
+        NewConnect:
+
+            _pauseEvent.WaitOne();
+
+            string host = Form1.BaseConnectionParameters.host;
+            int port = Form1.BaseConnectionParameters.port;
+            string database = Form1.BaseConnectionParameters.database;
+            string username = Form1.BaseConnectionParameters.username;
+            string password = Form1.BaseConnectionParameters.password;
+
+            MySqlConnection connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password);
+
+            //_pauseEvent.WaitOne(Timeout.Infinite);
+
+            using (connect)
+            {
+                try
+                {
+                    connect.Open();
+                    connect.Close();
+                }
+                catch (Exception ex)
+                {
+                    bool reconectionRequest = DataBaseReconnectionRequest(ex.Message);
+
+                    //_pauseEvent.WaitOne();
+
+                    if (reconectionRequest)
+                    {
+                        goto NewConnect;
+                    }
+
+                    //_pauseEvent.WaitOne();
+                }
+            }
+
+            return connect;
         }
 
         public bool IsServerConnected(string host, int port, string database, string username, string password)
         {
-            using (MySqlConnection Connect = GetDBConnection(host, port, database, username, password))
+            using (MySqlConnection Connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password))
             {
                 try
                 {
@@ -55,6 +147,47 @@ namespace OrderManager
                 }
 
             }
+        }
+
+        public static async Task<bool> IsServerConnectedAsync(string host, int port, string database, string username, string password)
+        {
+            using (MySqlConnection Connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password))
+
+                try
+                {
+                    await Connect.OpenAsync();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+        }
+
+        private static bool DataBaseReconnectionRequest(string exception)
+        {
+            bool result = false;
+
+            _pauseEvent.Reset();
+
+            FormDataBaseReconnect form = new FormDataBaseReconnect(exception);
+            //form.ShowDialog();
+
+            result = formSQLException.Reconnect;
+
+            //
+            Thread.Sleep(5000);
+            //form.Close();
+            Console.WriteLine("Reconnect: " + DateTime.Now);
+            result = true;
+            //
+
+            /*Form1.formSQLException.ExceptionStr = exception;
+            Form1.formSQLException.ShowDialog();*/
+
+            _pauseEvent.Set();
+
+            return result;
         }
 
         public static SqlConnection GetSQLServerConnection()
