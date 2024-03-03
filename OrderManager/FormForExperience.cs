@@ -318,14 +318,14 @@ namespace OrderManager
             return orderStatus;
         }
 
-        private void AddOrdersToListViewFromList()
+        private async void AddOrdersToListViewFromList()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueSettingsBase valueSettings = new ValueSettingsBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
-            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.shiftIndex, "");
+            ordersCurrentShift = (List<Order>) await ordersFromBase.LoadAllOrdersFromBase(Form1.Info.shiftIndex, "");
 
             /*if (listView1.SelectedItems.Count > 0)
             {
@@ -404,7 +404,7 @@ namespace OrderManager
 
                 item.Name = ordersCurrentShift[index].numberOfOrder.ToString();
                 item.Text = (index + 1).ToString();
-                item.SubItems.Add(getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
+                item.SubItems.Add(await getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
                 item.SubItems.Add(ordersCurrentShift[index].numberOfOrder.ToString() + modification);
                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));

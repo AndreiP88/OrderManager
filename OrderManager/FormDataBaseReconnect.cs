@@ -89,7 +89,10 @@ namespace OrderManager
             {
                 timer1.Enabled = false;
 
-                HideThisForm(true);
+                this.DialogResult = DialogResult.Retry;
+                //Close();
+
+                //HideThisForm(true);
             }
         }
 
@@ -102,12 +105,26 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-            HideThisForm(true);
+            //Close();
+            //HideThisForm(true);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            //Close();
             Application.Exit();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
+            form.ShowDialog();
+
+            DBConnection connection = new DBConnection();
+
+            connection.SetDBParameter();
+
+            this.DialogResult = DialogResult.Retry;
         }
     }
 }

@@ -185,7 +185,7 @@ namespace OrderManager
 
         }
 
-        private void LoadUsersFromBase(CancellationToken token, DateTime date)
+        private async void LoadUsersFromBase(CancellationToken token, DateTime date)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             ValueUserBase getUser = new ValueUserBase();
@@ -277,7 +277,7 @@ namespace OrderManager
                         {
                             GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
 
-                            ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, category, token);
+                            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, category, token);
 
                             fullCountShifts += shiftsDetails.countShifts;
                             fullTimeShifts += shiftsDetails.allTimeShift;

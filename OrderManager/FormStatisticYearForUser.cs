@@ -437,7 +437,7 @@ namespace OrderManager
             }));
         }
 
-        private void LoadWorkingOut(CancellationToken token, DateTime date, int selectLoadBase)
+        private async void LoadWorkingOut(CancellationToken token, DateTime date, int selectLoadBase)
         {
             GetShiftsFromBase getShifts = new GetShiftsFromBase(UserID.ToString());
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
@@ -467,7 +467,7 @@ namespace OrderManager
 
                 if (selectLoadBase == 0)
                 {
-                    shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(currentDateTime, "", token);
+                    shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(currentDateTime, "", token);
                 }
                 else
                 {

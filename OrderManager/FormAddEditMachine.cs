@@ -69,7 +69,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadForEdit()
+        private async void LoadForEdit()
         {
             this.Text = "Редактирование оборудование";
             button1.Text = "Сохранить";
@@ -79,13 +79,13 @@ namespace OrderManager
 
             LoadCategoryes();
 
-            textBox1.Text = getMachine.GetMachineName(machineIDLoad);
+            textBox1.Text = await getMachine.GetMachineName(machineIDLoad);
 
-            dateTimePicker1.Text = getMachine.GetMachineStartWork(machineIDLoad);
+            dateTimePicker1.Text = await getMachine.GetMachineStartWork(machineIDLoad);
 
-            textBox4.Text = getMachine.GetMachineNote(machineIDLoad);
+            textBox4.Text = await getMachine.GetMachineNote(machineIDLoad);
 
-            comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(getMachine.GetCategoryMachine(machineIDLoad)));
+            comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(await getMachine.GetCategoryMachine(machineIDLoad)));
 
             SelectMainNormOperationIndex(machineIDLoad);
         }
@@ -193,7 +193,7 @@ namespace OrderManager
             }
         }
 
-        private void AddNewMachine()
+        private async void AddNewMachine()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
             ValueCategory valueCategory = new ValueCategory();
@@ -236,7 +236,7 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            String machineID = getMachine.GetMachineFromName(name);
+            string machineID = await getMachine.GetMachineFromName(name);
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

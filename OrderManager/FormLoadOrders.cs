@@ -57,7 +57,7 @@ namespace OrderManager
         List<OrdersLoad> orders = new List<OrdersLoad>();
         List<OrderLoadNumber> orderNumbers = new List<OrderLoadNumber>();
 
-        private void LoadMachine()
+        private async Task LoadMachine()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueUserBase getUser = new ValueUserBase();
@@ -116,7 +116,7 @@ namespace OrderManager
             {
                 comboBox1.Enabled = false;
                 comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
-                comboBox1.Items.Add(getInfo.GetMachineName(loadMachine));
+                comboBox1.Items.Add(await getInfo.GetMachineName(loadMachine));
                 comboBox1.SelectedIndex = 0;
             }
 
@@ -167,7 +167,7 @@ namespace OrderManager
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            string category = getInfo.GetCategoryMachine(loadMachine);
+            string category = getInfo.GetCategoryMachine(loadMachine).ToString();
 
             int normOperation = Convert.ToInt32(valueCategory.GetIDOptionView(category));
 
@@ -268,7 +268,7 @@ namespace OrderManager
             return result;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             //LoadOrdersByNumber(textBox1.Text);
             StartSearch(textBox1.Text);
@@ -287,7 +287,7 @@ namespace OrderManager
             task.Start();
         }
 
-        private void LoadOrdersByNumber(CancellationToken token, string searchNumber)
+        private async void LoadOrdersByNumber(CancellationToken token, string searchNumber)
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -300,7 +300,7 @@ namespace OrderManager
                 listView1.Items.Clear();
             }));
 
-            string category = valueInfo.GetCategoryMachine(loadMachine);
+            string category = await valueInfo.GetCategoryMachine(loadMachine);
 
             string idNormOperation = valueCategory.GetMainIDNormOperation(category);
             string idNormOperationMakeReady = valueCategory.GetMKIDNormOperation(category);
@@ -663,7 +663,7 @@ namespace OrderManager
             task.Start();
         }
 
-        private void LoadPlan(CancellationToken token)
+        private async void LoadPlan(CancellationToken token)
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -675,11 +675,11 @@ namespace OrderManager
                 listView1.Items.Clear();
             }));
 
-            string category = valueInfo.GetCategoryMachine(loadMachine);
+            string category = await valueInfo.GetCategoryMachine(loadMachine);
 
             string idNormOperationMakeReady = valueCategory.GetMKIDNormOperation(category);
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
-            string idMachine = valueInfo.GetIDEquipMachine(loadMachine);
+            string idMachine = await valueInfo.GetIDEquipMachine(loadMachine);
 
             string endDate = DateTime.Now.AddMonths(-6).ToString();
 
@@ -1093,7 +1093,7 @@ namespace OrderManager
             //Types.Clear();
         }
 
-        private void FormLoadOrders_Load(object sender, EventArgs e)
+        private async void FormLoadOrders_Load(object sender, EventArgs e)
         {
             if (_loadForViewOrders)
             {
@@ -1107,7 +1107,7 @@ namespace OrderManager
                 button4.Text = "Отмена";
             }
 
-            LoadMachine();
+            await LoadMachine();
             StartLoading();
         }
 
@@ -1179,7 +1179,7 @@ namespace OrderManager
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
@@ -1190,7 +1190,7 @@ namespace OrderManager
                     cancelTokenSource.Cancel();
                 }
 
-                loadMachine = infoBase.GetMachineFromName(comboBox1.Text);
+                loadMachine = await infoBase.GetMachineFromName(comboBox1.Text);
 
                 StartLoading();
             }

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using static OrderManager.Form1;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
 {
@@ -20,15 +16,15 @@ namespace OrderManager
 
         List<String> users;
 
-        private void LoadUserForm_Load(object sender, EventArgs e)
+        private async void LoadUserForm_Load(object sender, EventArgs e)
         {
-            LoadUsersList();
+            await LoadUsersList();
             UpdateCurrentDateTime();
 
             timer1.Enabled = true;
         }
 
-        private void LoadUsersList()
+        private async Task LoadUsersList()
         {
             //ValueInfoBase getMachine = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
@@ -61,10 +57,52 @@ namespace OrderManager
                 listView1.Items.Add(item);
             }
 
-            UpdateMachineFromUsers();
+            await UpdateMachineFromUsers();
         }
 
-        private void UpdateMachineFromUsers()
+        private async Task UpdateMachineFromUsers222()
+        {
+            ValueInfoBase getMachine = new ValueInfoBase();
+            ValueUserBase userBase = new ValueUserBase();
+
+            //int index = listView1.Items.IndexOfKey(sqlReader["id"].ToString());
+
+            //users = userBase.GetUserListForCategory(true, loadMode);
+
+            bool reconnectionRequired = false;
+
+            do
+            {
+                reconnectionRequired = false;
+
+                //if (!Form1._viewDatabaseRequestForm)
+                {
+                    try
+                    {
+                        for (int i = 0; i < users.Count; i++)
+                        {
+                            string machines = await getMachine.GetMachinesStr(users[i].ToString());
+
+                            ListViewItem item = listView1.Items[i];
+
+                            if (item != null)
+                            {
+                                item.SubItems[2].Text = machines;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.Message);
+                        ////Form1._viewDatabaseRequestForm = true;
+                        //reconnectionRequired = DataBaseReconnect.DataBaseReconnectionRequest(ex.Message);
+                    }
+                }
+            }
+            while (reconnectionRequired);
+        }
+
+        private async Task UpdateMachineFromUsers()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
@@ -75,7 +113,7 @@ namespace OrderManager
 
             for (int i = 0; i < users.Count; i++)
             {
-                String machines = getMachine.GetMachinesStr(users[i].ToString());
+                string machines = await getMachine.GetMachinesStr(users[i].ToString());
 
                 ListViewItem item = listView1.Items[i];
 
@@ -194,13 +232,13 @@ namespace OrderManager
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private async void timer1_Tick(object sender, EventArgs e)
         {
-            UpdateMachineFromUsers();
+            await UpdateMachineFromUsers();
             UpdateCurrentDateTime();
         }
 
-        private void LoadFormDataBaseSelect()
+        private async Task LoadFormDataBaseSelect()
         {
             FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
             form.ShowDialog();
@@ -211,22 +249,21 @@ namespace OrderManager
 
             timer1.Enabled = false;
 
-            if (users != null)
-                users.Clear();
+            users?.Clear();
 
-            LoadUsersList();
+            await LoadUsersList();
 
             timer1.Enabled = true;
         }
 
-        private void LoadFormCategoryesSelect()
+        private async Task LoadFormCategoryesSelect()
         {
             FormSelectCategory form = new FormSelectCategory();
             form.ShowDialog();
 
             timer1.Enabled = false;
 
-            LoadUsersList();
+            await LoadUsersList();
 
             timer1.Enabled = true;
         }
@@ -236,14 +273,19 @@ namespace OrderManager
             //LoadFormDataBaseSelect();
         }
 
-        private void selectDataBaseToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void selectDataBaseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadFormDataBaseSelect();
+            await LoadFormDataBaseSelect();
         }
 
-        private void selectCategoryesToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void selectCategoryesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadFormCategoryesSelect();
+            await LoadFormCategoryesSelect();
+        }
+
+        private void statusStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
     }
 }

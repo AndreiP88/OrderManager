@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.FormAddTimeMkWork;
 
@@ -98,7 +99,7 @@ namespace OrderManager
             //SaveParameterToBase("fullListForm");
         }
 
-        private void GetValueFromStampNumber(String orderStamp)
+        private async Task GetValueFromStampNumber(String orderStamp)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase valueInfo = new ValueInfoBase();
@@ -122,7 +123,7 @@ namespace OrderManager
 
                     item.Name = orderStamp;
                     item.Text = (listView1.Items.Count + 1).ToString();
-                    item.SubItems.Add(valueInfo.GetMachineName(sqlReader["machine"].ToString()));
+                    item.SubItems.Add(await valueInfo.GetMachineName(sqlReader["machine"].ToString()));
                     item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
                     item.SubItems.Add(sqlReader["modification"].ToString());
                     item.SubItems.Add(Convert.ToDateTime(sqlReader["orderAddedDate"]).ToString("Y"));
@@ -137,10 +138,10 @@ namespace OrderManager
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             listView1.Items.Clear();
-            GetValueFromStampNumber(textBox1.Text);
+            await GetValueFromStampNumber(textBox1.Text);
         }
     }
 }

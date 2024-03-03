@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.Form1;
 
@@ -119,7 +120,7 @@ namespace OrderManager
             return result;
         }
 
-        private void AddOrdersToListViewFromList()
+        private async Task AddOrdersToListViewFromList()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
@@ -128,7 +129,7 @@ namespace OrderManager
             
             ValueShiftsBase getShift = new ValueShiftsBase();
 
-            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(timeShiftID, "");
+            ordersCurrentShift = (List<Order>) await ordersFromBase.LoadAllOrdersFromBase(timeShiftID, "");
 
             GetWorkingOutTime workingOutTime = new GetWorkingOutTime(timeShiftID, ordersCurrentShift);
 
@@ -260,7 +261,7 @@ namespace OrderManager
 
                 item.Name = ordersCurrentShift[index].numberOfOrder.ToString();
                 item.Text = (index + 1).ToString();
-                item.SubItems.Add(getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
+                item.SubItems.Add(await getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
                 item.SubItems.Add(ordersCurrentShift[index].numberOfOrder.ToString() + modification);
                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
@@ -305,10 +306,10 @@ namespace OrderManager
 
         }
 
-        private void LoadOrdersFromBase()
+        private async Task LoadOrdersFromBase()
         {
             ClearAll();
-            AddOrdersToListViewFromList();
+            await AddOrdersToListViewFromList();
             ViewDetailsForUser();
         }
 
@@ -325,7 +326,7 @@ namespace OrderManager
             label12.Text = "";
         }
 
-        private void DetailsOrder()
+        private async Task DetailsOrder()
         {
             if (listView1.SelectedItems.Count != 0)
             {
@@ -339,7 +340,7 @@ namespace OrderManager
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
 
                 form.ShowDialog();
-                LoadOrdersFromBase();
+                await LoadOrdersFromBase();
             }
         }
 
@@ -369,9 +370,9 @@ namespace OrderManager
             SaveParameterToBase("oneShiftDetails");
         }
 
-        private void listView1_DoubleClick(object sender, EventArgs e)
+        private async void listView1_DoubleClick(object sender, EventArgs e)
         {
-            DetailsOrder();
+            await DetailsOrder();
         }
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
@@ -382,9 +383,9 @@ namespace OrderManager
                 e.Cancel = true;
         }
 
-        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DetailsOrder();
+            await DetailsOrder();
         }
 
         private void noteToolStripMenuItem_Click(object sender, EventArgs e)

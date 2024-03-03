@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
@@ -195,26 +196,26 @@ namespace OrderManager
             return result;
         }
 
-        public float CalculatePercentWorkingOutOM(int userID, DateTime selectMonth, CancellationToken token, int category)
+        public async Task<float> CalculatePercentWorkingOutOM(int userID, DateTime selectMonth, CancellationToken token, int category)
         {
             float result = 0;
 
             GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
 
-            ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
+            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
 
             result = shiftsDetails.percentWorkingOutShift;
 
             return result;
         }
 
-        public float CalculateCountMakeReadyOM(int userID, DateTime selectMonth, CancellationToken token, int category)
+        public async Task<float> CalculateCountMakeReadyOM(int userID, DateTime selectMonth, CancellationToken token, int category)
         {
             float result = 0;
 
             GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
 
-            ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
+            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
 
             result = shiftsDetails.countMakereadyShift;
 

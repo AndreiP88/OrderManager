@@ -385,7 +385,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadUsersFromBaseOLD(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
+        private async void LoadUsersFromBaseOLD(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
@@ -449,11 +449,11 @@ namespace OrderManager
                     }
                     else if (typeValueLoad == 1)
                     {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category) * 100;
+                        workingOutUser = await workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category) * 100;
                     }
                     else
                     {
-                        workingOutUser = workingOutSum.CalculateCountMakeReadyOM(usersList[i], date, token, category);
+                        workingOutUser = await workingOutSum.CalculateCountMakeReadyOM(usersList[i], date, token, category);
                     }
 
                     name = getUser.GetNameUser(usersList[i].ToString());
@@ -586,7 +586,7 @@ namespace OrderManager
             }));
         }
 
-        private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
+        private async void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase, int typeValueLoad)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
@@ -657,11 +657,11 @@ namespace OrderManager
                     }
                     else if (typeValueLoad == 1)
                     {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category) * 100;
+                        workingOutUser = await workingOutSum.CalculatePercentWorkingOutOM(usersList[i], date, token, category) * 100;
                     }
                     else
                     {
-                        workingOutUser = workingOutSum.CalculateCountMakeReadyOM(usersList[i], date, token, category);
+                        workingOutUser = await workingOutSum.CalculateCountMakeReadyOM(usersList[i], date, token, category);
                     }
 
                     name = getUser.GetNameUser(usersList[i].ToString());

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -473,7 +474,7 @@ namespace OrderManager
             textBox5.Text = "";
         }
 
-        private void LoadMachine()
+        private async Task LoadMachine()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -492,7 +493,7 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), nameOfExecutor) == true)
-                        comboBox3.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
+                        comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
                     //else
                     //comboBox3.Items.Add(sqlReader["machine"].ToString());
                 }
@@ -502,7 +503,7 @@ namespace OrderManager
 
             if (comboBox3.Items.Count > 0)
             {
-                SelectLastMschineToComboBox(nameOfExecutor);
+                await SelectLastMschineToComboBox(nameOfExecutor);
             }
         }
 
@@ -515,7 +516,7 @@ namespace OrderManager
                 return false;
         }
 
-        private void SelectLastMschineToComboBox(String idUser)
+        private async Task SelectLastMschineToComboBox(String idUser)
         {
             ValueUserBase getMachine = new ValueUserBase();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -532,13 +533,13 @@ namespace OrderManager
                 //comboBox3.Enabled = false;
             }
 
-            if (machine != "" && comboBox3.Items.IndexOf(getInfo.GetMachineName(machine)) != -1)
-                comboBox3.SelectedIndex = comboBox3.Items.IndexOf(getInfo.GetMachineName(machine));
+            if (machine != "" && comboBox3.Items.IndexOf(await getInfo.GetMachineName(machine)) != -1)
+                comboBox3.SelectedIndex = comboBox3.Items.IndexOf(await getInfo.GetMachineName(machine));
             else
                 comboBox3.SelectedIndex = 0;
         }
 
-        private void AddOrderToDB()
+        private async void AddOrderToDB()
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -546,7 +547,7 @@ namespace OrderManager
 
             String orderAddedDate = DateTime.Now.ToString();
             //String machine = mashine;
-            string machine = getInfo.GetMachineFromName(comboBox3.Text);
+            string machine = await getInfo.GetMachineFromName(comboBox3.Text);
             String number = textBox1.Text;
             String name = comboBox2.Text;
             String modification = textBox5.Text;
@@ -989,7 +990,7 @@ namespace OrderManager
             return result;
         }
 
-        private void AcceptOrderInProgressToDB()
+        private async void AcceptOrderInProgressToDB()
         {
             //ValueInfoBase getInfo = new ValueInfoBase();
             //ValueOrdersBase getValue = new ValueOrdersBase();
@@ -1007,13 +1008,13 @@ namespace OrderManager
 
             String newStatus = "0";
 
-            String machineCurrent = infoBase.GetMachineFromName(comboBox3.Text);
+            String machineCurrent = await infoBase.GetMachineFromName(comboBox3.Text);
             int orderID = orders.GetOrderID(machineCurrent, number, modification);
 
             string status = orders.GetOrderStatus(orderID);
             int counterRepeat = orders.GetCounterRepeat(orderID);
-            string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
-            string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
+            string currentOrderID = infoBase.GetCurrentOrderID(await infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
+            string lastOrderID = infoBase.GetLastOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
 
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
             
@@ -1045,7 +1046,7 @@ namespace OrderManager
                 lastMakereadyPart = makereadyLastPart;
             }*/
 
-            userBase.UpdateLastMachine(executor, infoBase.GetMachineFromName(comboBox3.Text));
+            userBase.UpdateLastMachine(executor, await infoBase.GetMachineFromName(comboBox3.Text));
 
             if (status == "0") //новая запись
             {
@@ -1165,7 +1166,7 @@ namespace OrderManager
             orders.SetNewStatus(orderID, newStatus);
         }
 
-        private void CloseOrderInProgressToDB()
+        private async void CloseOrderInProgressToDB()
         {
             ValueInfoBase infoBase = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -1181,13 +1182,13 @@ namespace OrderManager
             
             String newStatus = "0";
 
-            String machineCurrent = infoBase.GetMachineFromName(comboBox3.Text);
+            String machineCurrent = await infoBase.GetMachineFromName(comboBox3.Text);
             int orderID = getValue.GetOrderID(machineCurrent, number, modification);
 
             string status = getValue.GetOrderStatus(orderID);
             int counterRepeat = getValue.GetCounterRepeat(orderID);
-            string currentOrderID = infoBase.GetCurrentOrderID(infoBase.GetMachineFromName(comboBox3.Text));
-            string lastOrderID = infoBase.GetLastOrderID(infoBase.GetMachineFromName(comboBox3.Text));
+            string currentOrderID = infoBase.GetCurrentOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
+            string lastOrderID = infoBase.GetLastOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
 
             //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
 
@@ -1205,7 +1206,7 @@ namespace OrderManager
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
             int makereadyLastPart = makereadyTime - makereadySummPreviousParts;
 
-            userBase.UpdateLastMachine(executor, infoBase.GetMachineFromName(comboBox3.Text));
+            userBase.UpdateLastMachine(executor, await infoBase.GetMachineFromName(comboBox3.Text));
 
             if (status == "1") // начата приладка
             {
@@ -1299,7 +1300,7 @@ namespace OrderManager
             Close();
         }
 
-        private void AbortOrderInProgressToDB()
+        private async void AbortOrderInProgressToDB()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -1315,13 +1316,13 @@ namespace OrderManager
             
             String newStatus = "0";
 
-            String machineCurrent = getInfo.GetMachineFromName(comboBox3.Text);
+            String machineCurrent = await getInfo.GetMachineFromName(comboBox3.Text);
             int orderID = getValue.GetOrderID(machineCurrent, number, modification);
 
             string status = getValue.GetOrderStatus(orderID);
             int counterRepeat = getValue.GetCounterRepeat(orderID);
-            string currentOrderID = getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text));
-            string lastOrderID = getInfo.GetLastOrderID(getInfo.GetMachineFromName(comboBox3.Text));
+            string currentOrderID = getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text));
+            string lastOrderID = getInfo.GetLastOrderID(await getInfo.GetMachineFromName(comboBox3.Text));
 
             //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
 
@@ -1344,7 +1345,7 @@ namespace OrderManager
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
             int makereadyLastPart = makereadyTime - makereadySummPreviousParts;
 
-            userBase.UpdateLastMachine(executor, getInfo.GetMachineFromName(comboBox3.Text));
+            userBase.UpdateLastMachine(executor, await getInfo.GetMachineFromName(comboBox3.Text));
 
             if (status == "1") // начата приладка
             {
@@ -1443,7 +1444,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadOrdersToComboBox()
+        private async void LoadOrdersToComboBox()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -1460,8 +1461,10 @@ namespace OrderManager
             ordersIndexes.Clear();
             ordersIndexes.Add(-1);
 
+            string machine = await getInfo.GetMachineFromName(comboBox3.Text);
+
             if (loadAllOrdersToCurrentMachine == true)
-                cLine = " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
+                cLine = " AND machine = '" + machine + "'";
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -1508,12 +1511,12 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            if (getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)) != "-1")
+            if (getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != "-1")
             {
                 int index = 0;
                 for (int i = 0; i < ordersIndexes.Count; i++)
                 {
-                    if (ordersIndexes[i].ToString() == getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)))
+                    if (ordersIndexes[i].ToString() == getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)))
                     {
                         index = i;
                         break;
@@ -1523,12 +1526,12 @@ namespace OrderManager
                 comboBox1.Enabled = false;
                 //button7.Enabled = false;
             }
-            else if (getInfo.GetLastOrderID(getInfo.GetMachineFromName(comboBox3.Text)) != "-1")
+            else if (getInfo.GetLastOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != "-1")
             {
                 int index = 0;
                 for (int i = 0; i < ordersIndexes.Count; i++)
                 {
-                    if (ordersIndexes[i].ToString() == getInfo.GetLastOrderID(getInfo.GetMachineFromName(comboBox3.Text)))
+                    if (ordersIndexes[i].ToString() == getInfo.GetLastOrderID(await getInfo.GetMachineFromName(comboBox3.Text)))
                     {
                         index = i;
                         break;
@@ -1796,7 +1799,7 @@ namespace OrderManager
             checkBox1.Checked = Convert.ToBoolean(getOrder.GetMakereadyConsider(shiftID, orderID, counterRepeat, machine));
         }
 
-        private void LoadOrderForEdit(int shiftID, int orderID, int machine, int counterRepeat)
+        private async Task LoadOrderForEdit(int shiftID, int orderID, int machine, int counterRepeat)
         {
             ValueOrdersBase getOrder = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -1828,7 +1831,7 @@ namespace OrderManager
             comboBox1.SelectedIndex = 1;
             comboBox1.Enabled = false;
 
-            comboBox3.Items.Add(getInfo.GetMachineName(machine.ToString()));
+            comboBox3.Items.Add(await getInfo.GetMachineName(machine.ToString()));
             comboBox3.SelectedIndex = 0;
             comboBox3.Enabled = false;
 
@@ -1883,7 +1886,7 @@ namespace OrderManager
             UpdateData("makereadyConsider", machine, shiftID, orderIndex, counterRepeat, Convert.ToInt32(checkBox1.Checked));
         }
 
-        private void AddEditCloseOrder_Load(object sender, EventArgs e)
+        private async void AddEditCloseOrder_Load(object sender, EventArgs e)
         {
             ValueShiftsBase shiftsValue = new ValueShiftsBase();
             ValueSettingsBase valueSettings = new ValueSettingsBase();
@@ -1904,14 +1907,14 @@ namespace OrderManager
 
             if (loadOrderId != -1)
             {
-                LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
+                await LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
                 LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
 
                 timer1.Enabled = false;
             }
             else
             {
-                LoadMachine();
+                await LoadMachine();
 
                 //LoadOrdersToComboBox();
 
@@ -1964,11 +1967,11 @@ namespace OrderManager
             items = itemsOrder;
         }*/
 
-        private void SetNewOrder(OrdersLoad order, List<string> itemsOrder)
+        private async void SetNewOrder(OrdersLoad order, List<string> itemsOrder)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
-            string machine = infoBase.GetMachineFromName(comboBox3.Text);
+            string machine = await infoBase.GetMachineFromName(comboBox3.Text);
 
             if (!OrderSelectionIfItExists(machine, order.numberOfOrder, order.nameItem))
             {
@@ -1999,7 +2002,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadTypes()
+        private async void LoadTypes()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -2016,7 +2019,7 @@ namespace OrderManager
                 orderIndex = ordersIndexes[comboBox1.SelectedIndex];
             }
 
-            int machine = Convert.ToInt32(getInfo.GetMachineFromName(comboBox3.Text));
+            int machine = Convert.ToInt32(await getInfo.GetMachineFromName(comboBox3.Text));
             int counterRepeat = getValue.GetCounterRepeat(orderIndex);
             
 
@@ -2054,7 +2057,7 @@ namespace OrderManager
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (loadOrderId == -1)
             {
@@ -2063,7 +2066,7 @@ namespace OrderManager
 
                 int orderIndex = ordersIndexes[comboBox1.SelectedIndex];
                 
-                int machine = Convert.ToInt32(getInfo.GetMachineFromName(comboBox3.Text));
+                int machine = await getInfo.GetMachineIDFromName(comboBox3.Text);
                 int counterRepeat = getValue.GetCounterRepeat(orderIndex);
                 
                 ClearAllValue();
@@ -2073,7 +2076,7 @@ namespace OrderManager
 
                 if (comboBox1.SelectedIndex != 0)
                 {
-                    LoadCurrentOrderInProgressFromDB(shiftIndex, Convert.ToInt32(machine), orderIndex, counterRepeat);
+                    LoadCurrentOrderInProgressFromDB(shiftIndex, machine, orderIndex, counterRepeat);
 
                     LoadTypesFromCurrentOrder(orderIndex, counterRepeat, machine, getInfo.GetIDUser(machine.ToString()));
 
@@ -2096,7 +2099,7 @@ namespace OrderManager
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase orders = new ValueOrdersBase();
@@ -2113,7 +2116,7 @@ namespace OrderManager
                 {
                     DialogResult result;
 
-                    if (!CheckOrderAvailable(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text))
+                    if (!CheckOrderAvailable(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text))
                     {
                         AddOrderToDB();
                     }
@@ -2123,7 +2126,7 @@ namespace OrderManager
                         return;
                     }
 
-                    int orderIndex = orders.GetOrderID(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+                    int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
                     String status = orders.GetOrderStatus(orderIndex);
 
@@ -2159,7 +2162,7 @@ namespace OrderManager
                         }
 
                     }
-                    else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(getInfo.GetMachineFromName(comboBox3.Text)) != "")
+                    else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != "")
                     {
                         if (status == "1" || status == "3")
                         {
@@ -2190,7 +2193,7 @@ namespace OrderManager
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase orders = new ValueOrdersBase();
@@ -2201,7 +2204,7 @@ namespace OrderManager
 
             DialogResult result;
 
-            int orderIndex = orders.GetOrderID(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
             String status = orders.GetOrderStatus(orderIndex);
 
@@ -2245,14 +2248,14 @@ namespace OrderManager
             Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private async void timer1_Tick(object sender, EventArgs e)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase orders = new ValueOrdersBase();
 
-            string machine = getInfo.GetMachineFromName(comboBox3.Text);
+            string machine = await getInfo.GetMachineFromName(comboBox3.Text);
 
-            int orderIndex = orders.GetOrderID(getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+            int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
             LoadCurrentOrderInProgressFromDB(shiftIndex, Convert.ToInt32(machine), orderIndex, orders.GetCounterRepeat(orderIndex));
         }
@@ -2397,11 +2400,11 @@ namespace OrderManager
                 textBox4.Text = timeOperations.DateDifferent(dateTimePicker4.Text, dateTimePicker3.Text);
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private async void button5_Click(object sender, EventArgs e)
         {
             ValueInfoBase valueInfoBase = new ValueInfoBase();
 
-            string machine = valueInfoBase.GetMachineFromName(comboBox3.Text);
+            string machine = await valueInfoBase.GetMachineFromName(comboBox3.Text);
 
             FormAddTimeMkWork fm = new FormAddTimeMkWork(machine, numericUpDown1.Value, textBox2.Text);
             fm.ShowDialog();
@@ -2418,11 +2421,11 @@ namespace OrderManager
             LoadTypes();
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private async void button7_Click(object sender, EventArgs e)
         {
             ValueInfoBase valueInfoBase = new ValueInfoBase();
 
-            string machine = valueInfoBase.GetMachineFromName(comboBox3.Text);
+            string machine = await valueInfoBase.GetMachineFromName(comboBox3.Text);
 
             FormLoadOrders fm = new FormLoadOrders(machine);
             fm.ShowDialog();

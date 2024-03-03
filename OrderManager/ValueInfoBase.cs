@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -14,24 +15,59 @@ namespace OrderManager
 
         }
 
-        public String GetMachineName(String machine)
+        public async Task<string> GetMachineName(string machine)
         {
-            return GetValueMachines("id", machine, "name");
+            string result = "";
+            object load = await GetValueMachines("id", machine, "name");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
-        public string GetMachineFromName(string machineName)
+        public async Task<string> GetMachineFromName(string machineName)
         {
-            return GetValueMachines("name", machineName, "id");
+            string result = "";
+            object load = await GetValueMachines("name", machineName, "id");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
-        public String GetCategoryMachine(String machine)
+        public async Task<int> GetMachineIDFromName(string machineName)
         {
-            return GetValueMachines("id", machine, "category");
+            int result = -1;
+            object load = await GetValueMachines("name", machineName, "id");
+
+            result = Convert.ToInt32(load ?? -1);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
-        public String GetIDEquipMachine(String machine)
+        public async Task<string> GetCategoryMachine(string machine)
         {
-            return GetValueMachines("id", machine, "idEquip");
+            string result = "";
+            object load = await GetValueMachines("id", machine, "category");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
+        }
+
+        public async Task<string> GetIDEquipMachine(string machine)
+        {
+            string result = "";
+            object load = await GetValueMachines("id", machine, "idEquip");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
         public int GetIDEquipMachine(int machine)
@@ -39,17 +75,29 @@ namespace OrderManager
             return Convert.ToInt32(GetValueMachines("id", machine.ToString(), "idEquip"));
         }
 
-        public String GetMachineStartWork(String machine)
+        public async Task<string> GetMachineStartWork(string machine)
         {
-            return GetValueMachines("id", machine, "dateStartWork");
+            string result = "";
+            object load = await GetValueMachines("id", machine, "dateStartWork");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
-        public String GetMachineNote(String machine)
+        public async Task<string> GetMachineNote(string machine)
         {
-            return GetValueMachines("id", machine, "note");
+            string result = "";
+            object load = await GetValueMachines("id", machine, "note");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
-        public String GetIDUser(String machine)
+        public string GetIDUser(string machine)
         {
             return GetValue("machine", machine, "nameOfExecutor");
         }
@@ -113,9 +161,9 @@ namespace OrderManager
         /// Получить список всего оборудования
         /// </summary>
         /// <returns>List содержащий все оборудование</returns>
-        public List<String> GetMachinesList()
+        public List<string> GetMachinesList()
         {
-            List<String> machinesList = new List<String>(GetAllMachines(""));
+            List<string> machinesList = new List<string>(GetAllMachines(""));
 
             return machinesList;
         }
@@ -199,7 +247,7 @@ namespace OrderManager
             return machinesList;
         }
 
-        private String GetValueMachines(String findColomnName, String findParameter, String valueColomn)
+        private String GetValueMachinesOLD(String findColomnName, String findParameter, String valueColomn)
         {
             String result = "";
 
@@ -220,6 +268,62 @@ namespace OrderManager
 
                 Connect.Close();
             }
+
+            return result;
+        }
+
+        private async Task<object> GetValueMachines(string findColomnName, string findParameter, string valueColomn)
+        {
+            object result = null;
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                        {
+                            await Connect.OpenAsync();
+                            MySqlCommand Command = new MySqlCommand
+                            {
+                                Connection = Connect,
+                                CommandText = @"SELECT * FROM machines WHERE " + findColomnName + " = '" + findParameter + "'"
+                            };
+                            DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                            while (await sqlReader.ReadAsync())
+                            {
+                                result = sqlReader[valueColomn].ToString();
+                            }
+
+                            await Connect.CloseAsync();
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine("GetValueMachinesAS: " + ex.Message);
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+
+                        throw new ApplicationException(ex.Message);
+                    }
+                }
+            }
+            while (reconnectionRequired);
 
             return result;
         }
@@ -254,7 +358,8 @@ namespace OrderManager
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        public Object GetMachines(String userID)
+        /// Для проверки обработки исключения 
+        public Object GetMachinesS(String userID)
         {
             List<String> result = new List<String>();
             result.Clear();
@@ -279,16 +384,73 @@ namespace OrderManager
             return result;
         }
 
-        public String GetMachinesStr(String userID)
+        public async Task<List<string>> GetMachines(string userID)
+        {
+            List<string> result = new List<string>();
+            //result.Clear();
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                        {
+                            await Connect.OpenAsync();
+                            MySqlCommand Command = new MySqlCommand
+                            {
+                                Connection = Connect,
+                                CommandText = @"SELECT * FROM machinesInfo WHERE nameOfExecutor = '" + userID + "'"
+                            };
+                            DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                            while (await sqlReader.ReadAsync())
+                            {
+                                result.Add(sqlReader["machine"].ToString());
+                                //result.Add(sqlReader["machine"] == DBNull.Value ? string.Empty : (string)sqlReader["machine"]);
+                            }
+
+                            await Connect.CloseAsync();
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine("GetMachines: " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
+            }
+            while (reconnectionRequired);
+
+            return result;
+        }
+
+        public async Task<string> GetMachinesStr(string userID)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            List<String> orderMachines = (List<String>)GetMachines(userID);
-            String machines = "";
+            List<string> orderMachines = await GetMachines(userID);
+            string machines = "";
 
             for (int i = 0; i < orderMachines.Count; i++)
             {
-                machines += getInfo.GetMachineName(orderMachines[i]);
+                machines += await GetMachineName(orderMachines[i]);
 
                 if (i != orderMachines.Count - 1)
                     machines += ", ";
@@ -299,9 +461,9 @@ namespace OrderManager
             return machines;
         }
 
-        public bool GetMachinesForUserActive(String userID)
+        public async Task<bool> GetMachinesForUserActive(string userID)
         {
-            List<String> orderMachines = (List<String>)GetMachines(userID);
+            List<string> orderMachines = await GetMachines(userID);
 
             bool machinesActive = false;
             int counter = 0;
@@ -352,14 +514,14 @@ namespace OrderManager
             UpdateInfoParameter(machine, "currentOrderID", orderIndex.ToString());
         }
 
-        public void CompleteTheShift(String nameOfExecutor)
+        public async void CompleteTheShift(string nameOfExecutor)
         {
 
             ValueInfoBase getMachine = new ValueInfoBase();
 
-            List<String> machines = (List<String>)getMachine.GetMachines(nameOfExecutor);
+            List<String> machines = await getMachine.GetMachines(nameOfExecutor);
 
-            foreach (String machine in machines)
+            foreach (string machine in machines)
             {
                 CompleteTheShiftFromMachines(machine);
             }

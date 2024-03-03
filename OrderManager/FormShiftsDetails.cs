@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -27,7 +25,6 @@ namespace OrderManager
             this.monthOfStatistic = mouthSt;
         }
 
-        String nameThread = "";
         bool thJob = false;
 
         String GetParametersLine()
@@ -174,7 +171,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadShiftsFromBase(CancellationToken token, DateTime date)
+        private async void LoadShiftsFromBase(CancellationToken token, DateTime date)
         {
             GetShiftsFromBase getShifts = new GetShiftsFromBase(nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
@@ -222,7 +219,7 @@ namespace OrderManager
 
                 for (int i = 0; i < shifts.Count; i++)
                 {
-                    Shifts currentShift = getShifts.LoadCurrentShift(shifts[i]);
+                    Shifts currentShift = await getShifts.LoadCurrentShift(shifts[i]);
 
                     Invoke(new Action(() =>
                     {
@@ -256,7 +253,7 @@ namespace OrderManager
                     }));
                 }
 
-                ShiftsDetails shiftsDetails = getShifts.LoadCurrentDateShiftsDetails(date, "", token); //добавить выбор категорий
+                ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, "", token); //добавить выбор категорий
 
                 Invoke(new Action(() =>
                 {

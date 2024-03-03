@@ -15,7 +15,9 @@ namespace OrderManager
     {
         bool adminMode = false;
         public static ManualResetEvent _pauseEvent = new ManualResetEvent(true);
+        public static bool _viewDatabaseRequestForm = false;
         public static FormDataBaseReconnect formSQLException;// = new FormDataBaseReconnect();
+        public static int reconectionCount = 5;
 
         public Form1(string[] args)
         {
@@ -75,14 +77,14 @@ namespace OrderManager
             public static string caption4 = "";
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            CheckCurrentShiftActivity();
+            await CheckCurrentShiftActivity();
 
             Info.active = false;
             FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
             form.ShowDialog();
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
             Info.active = true;
         }
 
@@ -116,7 +118,7 @@ namespace OrderManager
             toolStripStatusLabel5.Text = "";
         }
 
-        private void ShowUserForm()
+        private async Task ShowUserForm()
         {
             Info.active = false;
 
@@ -128,14 +130,14 @@ namespace OrderManager
 
             LoadParametersFromBase("mainForm");
 
-            LoadUser();
+            await LoadUser();
 
             ViewBaseConnectionParameters();
 
 
             if (Form1.Info.shiftIndex == -1)
             {
-                ShowUserSelectMachineForm();
+                await ShowUserSelectMachineForm();
             }
 
             if (Info.nameOfExecutor == "1")
@@ -150,14 +152,14 @@ namespace OrderManager
             Info.active = true;
         }
 
-        private void ShowUserSelectMachineForm()
+        private async Task ShowUserSelectMachineForm()
         {
             Info.active = false;
             FormSelectMachine form = new FormSelectMachine();
             form.ShowDialog();
 
             //LoadUser();
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
 
             Info.active = true;
         }
@@ -174,14 +176,14 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void ShowShiftsForm()
+        private async Task ShowShiftsForm()
         {
             Info.active = false;
             FormShiftsDetails form = new FormShiftsDetails(adminMode, Form1.Info.nameOfExecutor, 0, 0);
             form.ShowDialog();
 
             //LoadUser();
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
             Info.active = true;
         }
 
@@ -194,11 +196,11 @@ namespace OrderManager
             Info.active = true;
         }
 
-        private void ShowSetUserForm()
+        private async void ShowSetUserForm()
         {
             FormUserProfile form = new FormUserProfile(Form1.Info.nameOfExecutor);
             form.ShowDialog();
-            ViewDetailsForUser();
+            await ViewDetailsForUser();
         }
 
         String GetParametersLine()
@@ -452,14 +454,14 @@ namespace OrderManager
             }
         }
 
-        private void AddOrdersToListViewFromList()
+        private async Task AddOrdersToListViewFromList()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueSettingsBase valueSettings = new ValueSettingsBase();
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
-            ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(Form1.Info.shiftIndex, "");
+            ordersCurrentShift = (List<Order>)await ordersFromBase.LoadAllOrdersFromBase(Info.shiftIndex, "");
 
             GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
@@ -633,7 +635,7 @@ namespace OrderManager
 
                 item.Name = ordersCurrentShift[index].numberOfOrder.ToString();
                 item.Text = (index + 1).ToString();
-                item.SubItems.Add(getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
+                item.SubItems.Add(await getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
                 item.SubItems.Add(ordersCurrentShift[index].numberOfOrder.ToString() + modification);
                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
                 item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
@@ -652,7 +654,7 @@ namespace OrderManager
                 listView1.Items.Add(item);
             }
 
-            LoadSelectedMachines();
+            await LoadSelectedMachines();
             LoadSelectedMachinesForPlannedWorkinout();
 
             /*if (listView1.Items.Count > 0)
@@ -665,17 +667,17 @@ namespace OrderManager
             //listView1.Items[0].Selected = false;
         }
 
-        private void LoadSelectedMachines()
+        private async Task LoadSelectedMachines()
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
-            List<String> machines = (List<String>)infoBase.GetMachines(Form1.Info.nameOfExecutor);
+            List<string> machines = await infoBase.GetMachines(Form1.Info.nameOfExecutor);
 
             comboBox1.Items.Clear();
 
             for (int i = 0; i < machines.Count; i++)
             {
-                comboBox1.Items.Add(infoBase.GetMachineName(machines[i]));
+                comboBox1.Items.Add(await infoBase.GetMachineName(machines[i]));
             }
 
             if (machines.Count > 0)
@@ -703,11 +705,11 @@ namespace OrderManager
                 
         }
 
-        private void LoadSelectedMachinesForPlannedWorkinout()
+        private async Task LoadSelectedMachinesForPlannedWorkinout()
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
-            List<String> machines = (List<String>)infoBase.GetMachines(Form1.Info.nameOfExecutor);
+            List<String> machines = await infoBase.GetMachines(Form1.Info.nameOfExecutor);
 
             //WOut
             comboBox2.Items.Clear();
@@ -724,12 +726,12 @@ namespace OrderManager
             for (int i = 0; i < machines.Count; i++)
             {
                 //WOut
-                comboBox2.Items.Add(infoBase.GetMachineName(machines[i]));
-                comboBox3.Items.Add(infoBase.GetMachineName(machines[i]));
+                comboBox2.Items.Add(await infoBase.GetMachineName(machines[i]));
+                comboBox3.Items.Add(await infoBase.GetMachineName(machines[i]));
 
                 //Preview
-                comboBox4.Items.Add(infoBase.GetMachineName(machines[i]));
-                comboBox5.Items.Add(infoBase.GetMachineName(machines[i]));
+                comboBox4.Items.Add(await infoBase.GetMachineName(machines[i]));
+                comboBox5.Items.Add(await infoBase.GetMachineName(machines[i]));
             }
 
             if (machines.Count > 0)
@@ -780,7 +782,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadDetailsMount(CancellationToken token)
+        private async void LoadDetailsMount(CancellationToken token)
         {
             GetShiftsFromBase getShifts = new GetShiftsFromBase(Form1.Info.nameOfExecutor);
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
@@ -799,7 +801,7 @@ namespace OrderManager
                     break;
                 }
 
-                ShiftsDetails currentShift = getShifts.LoadCurrentDateShiftsDetails(date, "", token);
+                ShiftsDetails currentShift = await getShifts.LoadCurrentDateShiftsDetails(date, "", token);
 
                 if (currentShift == null)
                     break;
@@ -814,7 +816,7 @@ namespace OrderManager
                     label21.Text = currentShift.amountAllOrdersShift.ToString("N0");
 
                     label22.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeWorkingOutShift);
-                    label23.Text = currentShift.percentWorkingOutShift.ToString("N1") + "%";
+                    label23.Text = currentShift.percentWorkingOutShift.ToString("P1");
 
                 }));
 
@@ -835,11 +837,11 @@ namespace OrderManager
             //var task = Task.Run(() => LoadDetailsMount(cancelTokenSource.Token), cancelTokenSource.Token);
         }
 
-        private void LoadOrdersFromBase()
+        private async Task LoadOrdersFromBase()
         {
-            AddOrdersToListViewFromList();
-            ViewDetailsForUser();
-            LoadMachinesDetailsForUser();
+            await AddOrdersToListViewFromList();
+            await ViewDetailsForUser();
+            await LoadMachinesDetailsForUser();
 
             ValueSettingsBase valueSettings = new ValueSettingsBase();
 
@@ -898,7 +900,7 @@ namespace OrderManager
             ClearCurrentOrderDetails();
         }
 
-        private void ViewDetailsForUser()
+        private async Task ViewDetailsForUser()
         {
             GetDateTimeOperations dtOperations = new GetDateTimeOperations();
             ValueUserBase usersBase = new ValueUserBase();
@@ -909,7 +911,7 @@ namespace OrderManager
             int fullWorkingOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
             int fullDone = CountFullDoneOrders(ordersCurrentShift.Count, "");
 
-            if (getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
+            if (await getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
                 button6.Enabled = false;
             else
                 button6.Enabled = true;
@@ -938,12 +940,12 @@ namespace OrderManager
             this.Text = "Менеджер заказов";
         }
 
-        private void LoadUser()
+        private async Task LoadUser()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
             ValueUserBase userBase = new ValueUserBase();
 
-            List<String> machines = (List<String>)getMachine.GetMachines(Form1.Info.nameOfExecutor);
+            List<String> machines = await getMachine.GetMachines(Form1.Info.nameOfExecutor);
 
             EraseInfo();
 
@@ -957,18 +959,18 @@ namespace OrderManager
                 //LoadOrdersFromBase();
             }
 
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
 
         }
 
-        private void LoadMachinesDetailsForUser()
+        private async Task LoadMachinesDetailsForUser()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getOrder = new ValueOrdersBase();
 
             ValueUserBase userBase = new ValueUserBase();
 
-            List<String> machines = (List<String>)getInfo.GetMachines(Form1.Info.nameOfExecutor);
+            List<String> machines = await getInfo.GetMachines(Form1.Info.nameOfExecutor);
 
             listView2.Items.Clear();
 
@@ -987,7 +989,7 @@ namespace OrderManager
                     ListViewItem item = new ListViewItem();
 
                     item.Name = machine;
-                    item.Text = getInfo.GetMachineName(machine);
+                    item.Text = await getInfo.GetMachineName(machine);
                     item.SubItems.Add(getOrder.GetOrderStatusName(currentOrderID));
                     item.SubItems.Add(order);
 
@@ -996,13 +998,13 @@ namespace OrderManager
             }
         }
 
-        private void SelectMachines()
+        private async Task SelectMachines()
         {
             Info.active = false;
-            ShowUserSelectMachineForm();
+            await ShowUserSelectMachineForm();
             if (Form1.Info.nameOfExecutor != "")
                 LoadParametersForTheSelectedUserFromBase();
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
             Info.active = true;
         }
 
@@ -1012,7 +1014,7 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void CancelShift()
+        private async Task CancelShift()
         {
             /*DialogResult result;
             result = MessageBox.Show("Вы действительно хотите завершить смену?", "Завершение смены", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -1056,13 +1058,13 @@ namespace OrderManager
 
                 ClearAll();
                 EraseInfo();
-                ShowUserForm();
+                await ShowUserForm();
             }
 
             Info.active = true;
         }
 
-        private void CheckCurrentShiftActivity()
+        private async Task CheckCurrentShiftActivity()
         {
             ValueUserBase userBase = new ValueUserBase();
             ValueShiftsBase valueShifts = new ValueShiftsBase();
@@ -1078,7 +1080,7 @@ namespace OrderManager
                     Info.active = false;
                     ClearAll();
                     EraseInfo();
-                    ShowUserForm();
+                    await ShowUserForm();
                     Info.active = true;
                 }
             }
@@ -1101,7 +1103,7 @@ namespace OrderManager
 
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private async void button6_Click(object sender, EventArgs e)
         {
             ValueUserBase userBase = new ValueUserBase();
 
@@ -1111,16 +1113,16 @@ namespace OrderManager
             {
                 Info.active = false;
                 ClearAll();
-                ShowUserForm();
+                await ShowUserForm();
                 Info.active = true;
             }
             else
             {
-                CancelShift();
+                await CancelShift();
             }
         }
 
-        private void Form1_Shown(object sender, EventArgs e)
+        private async void Form1_Shown(object sender, EventArgs e)
         {
             StartTaskUpdateApplication();
 
@@ -1140,7 +1142,7 @@ namespace OrderManager
                 {
                     Info.active = false;
                     ClearAll();
-                    ShowUserForm();
+                    await ShowUserForm();
                 }
                 else
                 {
@@ -1151,11 +1153,11 @@ namespace OrderManager
             }
             else
             {
-                DataBaseSelect(false);
+                await DataBaseSelect(false);
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private async void timer1_Tick(object sender, EventArgs e)
         {
             DateTime currentTime = DateTime.Now;
 
@@ -1167,29 +1169,29 @@ namespace OrderManager
 
                 if (Info.active == true)
                 {
-                    LoadOrdersFromBase();
-                    CheckCurrentShiftActivity();
+                    await LoadOrdersFromBase();
+                    await CheckCurrentShiftActivity();
                 }
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
-            ShowShiftsForm();
+            await ShowShiftsForm();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_Click(object sender, EventArgs e)
         {
-            ShowShiftsForm();
+            await ShowShiftsForm();
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private async void button7_Click(object sender, EventArgs e)
         {
-            CheckCurrentShiftActivity();
-            SelectMachines();
+            await CheckCurrentShiftActivity();
+            await SelectMachines();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             LoadBaseConnectionParameters();
 
@@ -1203,7 +1205,7 @@ namespace OrderManager
 
             if (!connection.IsServerConnected(host, port, database, username, password))
             {
-                DataBaseSelect(false);
+                await DataBaseSelect(false);
             }
 
             LoadParametersFromBase("mainForm");
@@ -1233,7 +1235,7 @@ namespace OrderManager
             }            
         }
 
-        private void labelTime_Click(object sender, EventArgs e)
+        private async void labelTime_Click(object sender, EventArgs e)
         {
             if (Form1.Info.nameOfExecutor == "1")
             {
@@ -1242,14 +1244,14 @@ namespace OrderManager
                 form.ShowDialog();
 
                 LoadParametersFromBase("mainForm");
-                LoadUser();
+                await LoadUser();
             }
 
         }
 
-        private void отработанныеСменыToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void отработанныеСменыToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowShiftsForm();
+            await ShowShiftsForm();
         }
 
         private void параметрыToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1267,21 +1269,11 @@ namespace OrderManager
             ShowFullOrdersForm();
         }
 
-        private void выборОборудованияToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Info.active = false;
-            ShowUserSelectMachineForm();
-            if (Form1.Info.nameOfExecutor != "")
-                LoadParametersForTheSelectedUserFromBase();
-            LoadOrdersFromBase();
-            Info.active = false;
-        }
-
-        private void выйтиToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void выйтиToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Info.active = false;
             ClearAll();
-            ShowUserForm();
+            await ShowUserForm();
             Info.active = true;
         }
 
@@ -1290,12 +1282,12 @@ namespace OrderManager
             Application.Exit();
         }
 
-        private void listView1_DoubleClick(object sender, EventArgs e)
+        private async void listView1_DoubleClick(object sender, EventArgs e)
         {
-            LoadOrderDetails();
+            await LoadOrderDetails();
         }
 
-        private void LoadOrderDetails()
+        private async Task LoadOrderDetails()
         {
             if (listView1.SelectedItems.Count != 0)
             {
@@ -1317,12 +1309,12 @@ namespace OrderManager
                 }
 
                 form.ShowDialog();
-                LoadOrdersFromBase();
+                await LoadOrdersFromBase();
                 Info.active = true;
             }
         }
 
-        private void LoadOrderNote()
+        private async Task LoadOrderNote()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -1335,11 +1327,11 @@ namespace OrderManager
                 ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
 
             form.ShowDialog();
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
             Info.active = true;
         }
 
-        private void LoadTypes()
+        private async Task LoadTypes()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -1353,11 +1345,11 @@ namespace OrderManager
                 Info.nameOfExecutor);
 
             form.ShowDialog();
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
             Info.active = true;
         }
 
-        private void LoadMakereadyParts(int orderInProgressID)
+        private async Task LoadMakereadyParts(int orderInProgressID)
         {
             Info.active = false;
 
@@ -1370,7 +1362,7 @@ namespace OrderManager
 
                 SaveValueMakereadyPart(orderInProgressID, result);
 
-                LoadOrdersFromBase();
+                await LoadOrdersFromBase();
             }
 
             Info.active = true;
@@ -1415,24 +1407,24 @@ namespace OrderManager
             }
         }
 
-        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadOrderDetails();
+            await LoadOrderDetails();
         }
 
-        private void noteToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void noteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadOrderNote();
+            await LoadOrderNote();
         }
 
-        private void machinesToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void machinesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SelectMachines();
+            await SelectMachines();
         }
 
-        private void cancelShiftToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void cancelShiftToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CancelShift();
+            await CancelShift();
         }
 
         private int CountFullDoneOrders(int indexOrder, string machine)
@@ -1673,24 +1665,24 @@ namespace OrderManager
 
         }
 
-        private void DataBaseSelect(bool available)
+        private async Task DataBaseSelect(bool available)
         {
             FormAddEditTestMySQL form = new FormAddEditTestMySQL(available);
             form.ShowDialog();
 
             LoadBaseConnectionParameters();
 
-            LoadUser();
+            await LoadUser();
 
             if (Form1.Info.nameOfExecutor != "")
                 LoadParametersForTheSelectedUserFromBase();
 
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
         }
 
-        private void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataBaseSelect(true);
+            await DataBaseSelect(true);
         }
 
         private void normToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1698,7 +1690,7 @@ namespace OrderManager
             ShowNormForm();
         }
 
-        private int GetIDLastOrderFromSelectedMachine(string machineName)
+        private async Task<int> GetIDLastOrderFromSelectedMachine(string machineName)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
@@ -1706,7 +1698,7 @@ namespace OrderManager
 
             for (int i = 0; i < ordersCurrentShift.Count; i++)
             {
-                if (infoBase.GetMachineName(ordersCurrentShift[i].machineOfOrder) == machineName)
+                if (await infoBase.GetMachineName(ordersCurrentShift[i].machineOfOrder) == machineName)
                 {
                     idx = i;
                 }
@@ -1715,11 +1707,11 @@ namespace OrderManager
             return idx;
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
-            int idx = GetIDLastOrderFromSelectedMachine(comboBox1.Text);
+            int idx = await GetIDLastOrderFromSelectedMachine(comboBox1.Text);
 
             /*ValueInfoBase infoBase = new ValueInfoBase();
 
@@ -1781,7 +1773,7 @@ namespace OrderManager
             UpdateWorkingOut();
         }
 
-        private void UpdateWorkingOut()
+        private async void UpdateWorkingOut()
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase infoBase = new ValueInfoBase();
@@ -1794,8 +1786,8 @@ namespace OrderManager
 
             int wOut, wOutAllOrders;
             //int norm;
-            int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox3.Text);
-            string machine = infoBase.GetMachineFromName(comboBox3.Text);
+            int idLastOrder = await GetIDLastOrderFromSelectedMachine(comboBox3.Text);
+            string machine = await infoBase.GetMachineFromName(comboBox3.Text);
 
             if (idLastOrder >= 0)
             {
@@ -1963,7 +1955,7 @@ namespace OrderManager
             UpdatePreviewWorkingOut();
         }
 
-        private void UpdatePreviewWorkingOut()
+        private async void UpdatePreviewWorkingOut()
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase infoBase = new ValueInfoBase();
@@ -1972,8 +1964,8 @@ namespace OrderManager
 
             int wOut, wOutAllOrders;
             //int norm;
-            int idLastOrder = GetIDLastOrderFromSelectedMachine(comboBox5.Text);
-            string machine = infoBase.GetMachineFromName(comboBox5.Text);
+            int idLastOrder = await GetIDLastOrderFromSelectedMachine(comboBox5.Text);
+            string machine = await infoBase.GetMachineFromName(comboBox5.Text);
 
             bool activeOrderFromMachine = infoBase.GetActiveOrder(machine);
 
@@ -2064,14 +2056,14 @@ namespace OrderManager
             StartDowloadUpdater();
         }
 
-        private void typesToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void typesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadTypes();
+            await LoadTypes();
         }
 
-        private void makereadyPartToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void makereadyPartToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadMakereadyParts(ordersCurrentShift[listView1.SelectedIndices[0]].id);
+            await LoadMakereadyParts(ordersCurrentShift[listView1.SelectedIndices[0]].id);
         }
 
         private void labelTime_DoubleClick(object sender, EventArgs e)
@@ -2113,12 +2105,12 @@ namespace OrderManager
             setValueUsers.UpdateLastUID(Info.nameOfExecutor, "");
         }
 
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FormSettings form = new FormSettings(Info.nameOfExecutor);
             form.ShowDialog();
 
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
         }
 
         private void planToolStripMenuItem_Click(object sender, EventArgs e)

@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
@@ -24,7 +23,7 @@ namespace OrderManager
             InitializeComponent();
 
             this.editOrderLoad = true;
-            this.orderrMachineLoad = orderMachine;
+            this.orderrMachineLoad = orderMachine.ToString();
             this.orderIDLoad = orderIndex;
 
         }
@@ -34,21 +33,21 @@ namespace OrderManager
             InitializeComponent();
 
             this.editOrderLoad = false;
-            this.orderrMachineLoad = orderMachine;
+            this.orderrMachineLoad = orderMachine.ToString();
             this.orderIDLoad = -1;
         }
 
-        private void SelectCurrentMachineToComboBox(String machine)
+        private async Task SelectCurrentMachineToComboBox(string machine)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            if (machine != "" && comboBox1.Items.IndexOf(getInfo.GetMachineName(machine)) != -1)
-                comboBox1.SelectedIndex = comboBox1.Items.IndexOf(getInfo.GetMachineName(machine));
+            if (machine != "" && comboBox1.Items.IndexOf(await getInfo.GetMachineName(machine)) != -1)
+                comboBox1.SelectedIndex = comboBox1.Items.IndexOf(await getInfo.GetMachineName(machine));
             else
                 comboBox1.SelectedIndex = 0;
         }
 
-        private void LoadMachine()
+        private async Task LoadMachine()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -64,13 +63,13 @@ namespace OrderManager
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    comboBox1.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
+                    comboBox1.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();
             }
 
-            SelectCurrentMachineToComboBox(orderrMachineLoad);
+            await SelectCurrentMachineToComboBox(orderrMachineLoad);
         }
 
         private void LoadOrdersToComboBox()
@@ -142,7 +141,7 @@ namespace OrderManager
             return result;
         }
 
-        private void AddOrderToDB()
+        private async void AddOrderToDB()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
@@ -150,7 +149,7 @@ namespace OrderManager
 
             int orderCount = orderIDLoad;
             String orderAddedDate = DateTime.Now.ToString();
-            String machine = getInfo.GetMachineFromName(comboBox1.Text);
+            String machine = await getInfo.GetMachineFromName(comboBox1.Text);
             String number = textBox1.Text;
             String name = comboBox2.Text;
             String modification = textBox5.Text;
@@ -240,11 +239,11 @@ namespace OrderManager
             }
         }
 
-        private void EditOrderInProgress()
+        private async void EditOrderInProgress()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            string machine = getInfo.GetMachineFromName(comboBox1.Text);
+            string machine = await getInfo.GetMachineFromName(comboBox1.Text);
 
             for (int i = 0; i < numbersOrdersInProgress.Count; i++)
             {
@@ -265,10 +264,10 @@ namespace OrderManager
             }
         }
 
-        private void EditCurrentOrderInfo()
+        private async void EditCurrentOrderInfo()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
-            String machine = getInfo.GetMachineFromName(comboBox1.Text);
+            String machine = await getInfo.GetMachineFromName(comboBox1.Text);
 
             ValueInfoBase setInfo = new ValueInfoBase();
 
@@ -282,7 +281,7 @@ namespace OrderManager
 
         }
 
-        private void LoadOrderFromDB(string orderMachine, int orderIndex)
+        private async void LoadOrderFromDB(string orderMachine, int orderIndex)
         {
             //int orderStatus = 0;
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -306,7 +305,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    comboBox1.Text = getInfo.GetMachineName(sqlReader["machine"].ToString());
+                    comboBox1.Text = await getInfo.GetMachineName(sqlReader["machine"].ToString());
                     textBox1.Text = sqlReader["numberOfOrder"].ToString();
                     comboBox2.Text = sqlReader["nameOfOrder"].ToString();
                     numericUpDown1.Value = Convert.ToInt32(sqlReader["amountOfOrder"]);
@@ -321,12 +320,12 @@ namespace OrderManager
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
 
-            int orderIndex = getValue.GetOrderID(getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text);
+            int orderIndex = getValue.GetOrderID(await getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text);
 
             if (CheckNotEmptyFields() == true)
             {
@@ -419,9 +418,9 @@ namespace OrderManager
             numericUpDown8.Select(0, numericUpDown8.Text.Length);
         }
 
-        private void FormAddNewOrder_Load(object sender, EventArgs e)
+        private async void FormAddNewOrder_Load(object sender, EventArgs e)
         {
-            LoadMachine();
+            await LoadMachine();
             LoadOrdersToComboBox();
             if (editOrderLoad)
             {
@@ -431,11 +430,11 @@ namespace OrderManager
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             ValueInfoBase valueInfoBase = new ValueInfoBase();
 
-            string machine = valueInfoBase.GetMachineFromName(orderrMachineLoad);
+            string machine = await valueInfoBase.GetMachineFromName(orderrMachineLoad);
 
             FormAddTimeMkWork fm = new FormAddTimeMkWork(orderrMachineLoad, numericUpDown1.Value, textBox2.Text);
             fm.ShowDialog();
@@ -464,11 +463,11 @@ namespace OrderManager
             numericUpDown8.Value = workM;
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_Click(object sender, EventArgs e)
         {
             ValueInfoBase valueInfoBase = new ValueInfoBase();
 
-            string machine = valueInfoBase.GetMachineFromName(comboBox1.Text);
+            string machine = await valueInfoBase.GetMachineFromName(comboBox1.Text);
 
             FormLoadOrders fm = new FormLoadOrders(machine);
             fm.ShowDialog();

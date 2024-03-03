@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -69,7 +70,7 @@ namespace OrderManager
         /// </summary>
         /// <param name="shiftStart"></param>
         /// <returns></returns>
-        public Shifts LoadCurrentShift(int shiftStartID)
+        public async Task<Shifts> LoadCurrentShift(int shiftStartID)
         {
             Shifts shifts = null;
 
@@ -80,13 +81,13 @@ namespace OrderManager
             ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase();
             ValueOrdersBase getOrder = new ValueOrdersBase();
 
-            List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shiftStartID, "");
+            List<Order> ordersCurrentShift = (List<Order>) await ordersFromBase.LoadAllOrdersFromBase(shiftStartID, "");
 
             int fullDone = 0;
             int fullTimeWorkingOut = 0;
             int makeReadyCount = 0;
 
-            String machines = "";
+            string machines = "";
             List<String> machinesList = new List<String>();
 
             for (int i = 0; i < ordersCurrentShift.Count; i++)
@@ -109,9 +110,9 @@ namespace OrderManager
             for (int i = 0; i < machinesList.Count; i++)
             {
                 if (i != machinesList.Count - 1)
-                    machines += getInfo.GetMachineName(machinesList[i]) + ", ";
+                    machines += await getInfo.GetMachineName(machinesList[i]) + ", ";
                 else
-                    machines += getInfo.GetMachineName(machinesList[i]) + ".";
+                    machines += await getInfo.GetMachineName(machinesList[i]) + ".";
             }
 
             string startShift = getValueFromShiftsBase.GetStartShiftFromID(shiftStartID);
@@ -141,7 +142,7 @@ namespace OrderManager
         /// <param name="selectDate"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        public ShiftsDetails LoadCurrentDateShiftsDetails(DateTime selectDate, string category, CancellationToken token)
+        public async Task<ShiftsDetails> LoadCurrentDateShiftsDetails(DateTime selectDate, string category, CancellationToken token)
         {
             ShiftsDetails shiftsDetails = null;
 
@@ -173,7 +174,7 @@ namespace OrderManager
                     break;
                 }
 
-                List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(shifts[i], category);
+                List<Order> ordersCurrentShift = (List<Order>) await ordersFromBase.LoadAllOrdersFromBase(shifts[i], category);
 
                 int fullDone = 0;
                 int fullTimeWorkingOut = 0;
@@ -261,7 +262,7 @@ namespace OrderManager
         /// <param name="currentDate"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        public List<Shifts> LoadShiftsFromBase(DateTime currentDate)
+        public async Task<List<Shifts>> LoadShiftsFromBase(DateTime currentDate)
         {
             List<Shifts> shifts = new List<Shifts>();
 
@@ -271,7 +272,7 @@ namespace OrderManager
             {
                 //Shifts currentShift = LoadCurrentShift(shiftsList[i]);
 
-                shifts.Add(LoadCurrentShift(shiftsList[i]));
+                shifts.Add(await LoadCurrentShift(shiftsList[i]));
             }
 
             return shifts;

@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.Form1;
 
@@ -81,20 +82,20 @@ namespace OrderManager
             return (result);
         }
 
-        private bool CheckCategoryForUser(String user, String machine)
+        private async Task<bool> CheckCategoryForUser(String user, String machine)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueUserBase getUser = new ValueUserBase();
 
-            String categoryCurrentMachine = getInfo.GetCategoryMachine(machine);
-            String categoryesCurrentUser = getUser.GetCategoryesMachine(user);
+            string categoryCurrentMachine = await getInfo.GetCategoryMachine(machine);
+            string categoryesCurrentUser = getUser.GetCategoryesMachine(user);
 
-            String[] categoryes = categoryesCurrentUser.Split(';');
+            string[] categoryes = categoryesCurrentUser.Split(';');
 
             return categoryes.Contains(categoryCurrentMachine);
         }
 
-        private void LoadMachine()
+        private async Task LoadMachine()
         {
             checkBoxesMachines.Clear();
 
@@ -124,19 +125,19 @@ namespace OrderManager
                     else
                         orderName = "";
 
-                    if (CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
+                    if (await CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
                     {
                         if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
                         {
-                            AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, true);
+                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, true);
                         }
                         else if (CheckFreeMachine(machine) == true || CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
                         {
-                            AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, false);
+                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, false);
                         }
                         else
                         {
-                            AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
+                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
                         }
                     }
 
@@ -146,9 +147,9 @@ namespace OrderManager
             }
         }
 
-        private void FolrmSelectMachine_Load(object sender, EventArgs e)
+        private async void FolrmSelectMachine_Load(object sender, EventArgs e)
         {
-            LoadMachine();
+            await LoadMachine();
             ChangeCaptionButton();
         }
 
@@ -263,7 +264,7 @@ namespace OrderManager
         }
 
 
-        private void AddControl(String name, String user, String order, bool enabled, bool check)
+        private async Task AddControl(String name, String user, String order, bool enabled, bool check)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -293,7 +294,7 @@ namespace OrderManager
             checkBoxesMachines[checkBoxesMachines.Count - 1].Checked = check;
             checkBoxesMachines[checkBoxesMachines.Count - 1].Location = new Point(x, y + h * (checkBoxesMachines.Count - 1));
 
-            checkBoxesMachines[checkBoxesMachines.Count - 1].Text += String.Format("{0,-25}{1,-25:f4}{2,-50:f4}", getInfo.GetMachineName(name), user, order);
+            checkBoxesMachines[checkBoxesMachines.Count - 1].Text += String.Format("{0,-25}{1,-25:f4}{2,-50:f4}", await getInfo.GetMachineName(name), user, order);
             checkBoxesMachines[checkBoxesMachines.Count - 1].AutoSize = true;
             checkBoxesMachines[checkBoxesMachines.Count - 1].Font = new Font("Consolas", 9);
             checkBoxesMachines[checkBoxesMachines.Count - 1].Font = new Font(checkBoxesMachines[checkBoxesMachines.Count - 1].Font, FontStyle.Underline);
@@ -324,7 +325,7 @@ namespace OrderManager
             */
         }
 
-        private void EditControl(string machine, string user, string order, bool enabled, bool check)
+        private async Task EditControl(string machine, string user, string order, bool enabled, bool check)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -333,10 +334,10 @@ namespace OrderManager
             checkBoxesMachines[index].Enabled = enabled;
             checkBoxesMachines[index].Checked = check;
 
-            checkBoxesMachines[index].Text = String.Format("{0,-25}{1,-25:f4}{2,-50:f4}", getInfo.GetMachineName(machine), user, order);
+            checkBoxesMachines[index].Text = String.Format("{0,-25}{1,-25:f4}{2,-50:f4}", await getInfo.GetMachineName(machine), user, order);
         }
 
-        private void UpdateMachinesStatus()
+        private async void UpdateMachinesStatus()
         {
             ValueOrdersBase order = new ValueOrdersBase();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -358,19 +359,19 @@ namespace OrderManager
                 {
                     if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == false)
                     {
-                        EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
+                        await EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
                     }
                 }
                 else
                 {
                     bool check = checkBoxesMachines[i].Checked;
 
-                    EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, check);
+                    await EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, check);
                 }
 
 
 
-                if (CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
+                if (await CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
                 {
 
 
@@ -402,9 +403,9 @@ namespace OrderManager
             Close();
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private async void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            LoadMachine();
+            await LoadMachine();
             ChangeCaptionButton();
         }
 
@@ -413,14 +414,14 @@ namespace OrderManager
             ChangeCaptionButton();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_Click(object sender, EventArgs e)
         {
-            LoadMachine();
+            await LoadMachine();
         }
 
-        private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
+        private async void checkBox1_CheckedChanged_1(object sender, EventArgs e)
         {
-            LoadMachine();
+            await LoadMachine();
         }
 
         private void timer1_Tick(object sender, EventArgs e)

@@ -1,7 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Data.SqlClient;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.Form1;
@@ -82,6 +81,7 @@ namespace OrderManager
             return connect;
         }*/
 
+        //сделать потом асинхронным
         public static MySqlConnection GetDBConnection()
         {
             /*string host = "25.21.38.172";
@@ -90,11 +90,7 @@ namespace OrderManager
             string username = "oxyfox";
             string password = "root";*/
             
-            _pauseEvent.WaitOne();
-
-        NewConnect:
-
-            _pauseEvent.WaitOne();
+            //_pauseEvent.WaitOne();
 
             string host = Form1.BaseConnectionParameters.host;
             int port = Form1.BaseConnectionParameters.port;
@@ -103,30 +99,6 @@ namespace OrderManager
             string password = Form1.BaseConnectionParameters.password;
 
             MySqlConnection connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password);
-
-            //_pauseEvent.WaitOne(Timeout.Infinite);
-
-            using (connect)
-            {
-                try
-                {
-                    connect.Open();
-                    connect.Close();
-                }
-                catch (Exception ex)
-                {
-                    bool reconectionRequest = DataBaseReconnectionRequest(ex.Message);
-
-                    //_pauseEvent.WaitOne();
-
-                    if (reconectionRequest)
-                    {
-                        goto NewConnect;
-                    }
-
-                    //_pauseEvent.WaitOne();
-                }
-            }
 
             return connect;
         }
@@ -170,16 +142,30 @@ namespace OrderManager
 
             _pauseEvent.Reset();
 
-            FormDataBaseReconnect form = new FormDataBaseReconnect(exception);
-            //form.ShowDialog();
+            //if (!_viewDatabaseRequestForm)
+            {
+                FormDataBaseReconnect form = new FormDataBaseReconnect(exception);
+                form.ShowDialog();
 
-            result = formSQLException.Reconnect;
+                result = form.Reconnect;
+            }
+            
+
+            
 
             //
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
+
+            if (reconectionCount <= 0)
+            {
+                //Application.Exit();
+            }
+
+            reconectionCount--;
+
             //form.Close();
-            Console.WriteLine("Reconnect: " + DateTime.Now);
-            result = true;
+            Console.WriteLine("Reconnect: " + reconectionCount + "; Time: " + DateTime.Now);
+            //result = true;
             //
 
             /*Form1.formSQLException.ExceptionStr = exception;

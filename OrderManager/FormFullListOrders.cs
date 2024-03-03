@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -118,7 +119,7 @@ namespace OrderManager
             comboBox2.SelectedIndex = dateTime.Month - 1;
         }
 
-        private void LoadMachine()
+        private async Task LoadMachine()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -134,7 +135,7 @@ namespace OrderManager
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    comboBox3.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
+                    comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();
@@ -176,7 +177,7 @@ namespace OrderManager
                 comboBox1.Items.Add(years[i].ToString());
         }
 
-        private void LoadOrdersFromBase()
+        private async Task LoadOrdersFromBase()
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueUserBase usersBase = new ValueUserBase();
@@ -304,14 +305,14 @@ namespace OrderManager
             {
                 comboBox1.Text = year;
                 comboBox2.Text = month;
-                comboBox3.Text = getInfo.GetMachineName(machine);
+                comboBox3.Text = await getInfo.GetMachineName(machine);
             }
 
             label7.Text = countOrders.ToString();
             label8.Text = amountAllOrders.ToString("N0");
         }
 
-        private void FormFullListOrders_Load(object sender, EventArgs e)
+        private async void FormFullListOrders_Load(object sender, EventArgs e)
         {
             LoadParametersFromBase("fullListForm");
 
@@ -329,37 +330,37 @@ namespace OrderManager
                 textBox1.Visible = false;
 
                 LoadYears();
-                LoadMachine();
+                await LoadMachine();
 
                 //LoadOrdersFromBase();
             }
             else
             {
                 LoadYears();
-                LoadMachine();
+                await LoadMachine();
                 SetItemsComboBox();
             }
 
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
         }
 
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
         }
 
-        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private async void textBox1_TextChanged(object sender, EventArgs e)
         {
-            LoadOrdersFromBase();
+            await LoadOrdersFromBase();
         }
 
         private void FormFullListOrders_FormClosing(object sender, FormClosingEventArgs e)

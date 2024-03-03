@@ -1,16 +1,13 @@
 ﻿using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Drawing;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -92,7 +89,7 @@ namespace OrderManager
         bool thJob = false;
         bool calculateNullShiftsFromUser = false;
 
-        private void FormAdmin_Load(object sender, EventArgs e)
+        private async void FormAdmin_Load(object sender, EventArgs e)
         {
             selectedYear = DateTime.Now.Year;
             selectedMonth = DateTime.Now.Month;
@@ -100,7 +97,7 @@ namespace OrderManager
             LoadBaseInfo();
             LoadVariables();
 
-            LoadPage(currentPage);
+            await LoadPage(currentPage);
             timer1.Enabled = true;
         }
 
@@ -305,11 +302,11 @@ namespace OrderManager
             return years;
         }
 
-        private List<String> LoadMachine()
+        private async Task<List<string>> LoadMachine()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            List<String> machine = new List<String>();
+            List<string> machine = new List<string>();
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -323,7 +320,7 @@ namespace OrderManager
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    machine.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
+                    machine.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();
@@ -338,7 +335,7 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void ShowFullOrdersForm(bool editOrder, int selectedIndex)
+        private async Task ShowFullOrdersForm(bool editOrder, int selectedIndex)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
@@ -346,9 +343,9 @@ namespace OrderManager
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersIndexes[selectedIndex]);
+                form = new FormAddNewOrder(await getInfo.GetMachineFromName(comboBoxMachine.Text), ordersIndexes[selectedIndex]);
             else
-                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBoxMachine.Text));
+                form = new FormAddNewOrder(await getInfo.GetMachineFromName(comboBoxMachine.Text));
 
             form.ShowDialog();
         }
@@ -421,12 +418,12 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void DeleteMachine(String id)
+        private async Task DeleteMachine(String id)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
             DialogResult result;
-            result = MessageBox.Show("Вы действительно хотите удалить оборудование '" + infoBase.GetMachineName(id) + "'?", "Удаление оборудования", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            result = MessageBox.Show("Вы действительно хотите удалить оборудование '" + await infoBase.GetMachineName(id) + "'?", "Удаление оборудования", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 infoBase.DeleteMachine(id);
@@ -443,7 +440,7 @@ namespace OrderManager
                 orders.SetNewStatus(orderIndex, "4");
         }
 
-        private void AbortOrder(String machine, int orderIndex)
+        private async void AbortOrder(String machine, int orderIndex)
         {
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
@@ -464,7 +461,7 @@ namespace OrderManager
             {
                 orders.SetNewStatus(orderIndex, "0");
                 orders.IncrementCounterRepeat(orderIndex);
-                infoBase.UpdateInfo(getInfo.GetMachineFromName(comboBoxMachine.Text), 0, -1, -1, false);
+                infoBase.UpdateInfo(await getInfo.GetMachineFromName(comboBoxMachine.Text), 0, -1, -1, false);
             }
         }
 
@@ -1038,11 +1035,11 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label2", "", ContentAlignment.MiddleLeft), 3, 1);
         }
 
-        private void CreateAllOrdersControls()
+        private async Task CreateAllOrdersControls()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
 
-            List<String> machine = new List<String>(LoadMachine());
+            List<string> machine = new List<string>(await LoadMachine());
 
             var name = "tableLayoutPanelControl";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
@@ -1056,10 +1053,10 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
             tableLayoutPanelControl.RowCount = 3;
 
@@ -1069,8 +1066,8 @@ namespace OrderManager
             Button addButton = new Button();
             addButton.Name = "addButton";
             addButton.Dock = DockStyle.Fill;
-            addButton.Location = new System.Drawing.Point(3, 3);
-            addButton.Size = new System.Drawing.Size(144, 21);
+            addButton.Location = new Point(3, 3);
+            addButton.Size = new Size(144, 21);
             addButton.TabIndex = 0;
             addButton.Text = "Добавить";
             addButton.Visible = true;
@@ -1079,14 +1076,14 @@ namespace OrderManager
             addButton.TextImageRelation = TextImageRelation.ImageAboveText;
             tableLayoutPanelControl.SetRowSpan(addButton, 3);
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
-            addButton.Click += new System.EventHandler(addButton_Click);
+            addButton.Click += new EventHandler(addButton_Click);
 
 
             DateTimePicker dateTime = new DateTimePicker();
             dateTime.Name = "dateTime";
             dateTime.Dock = DockStyle.Fill;
-            dateTime.Location = new System.Drawing.Point(3, 3);
-            dateTime.Size = new System.Drawing.Size(144, 21);
+            dateTime.Location = new Point(3, 3);
+            dateTime.Size = new Size(144, 21);
             dateTime.TabIndex = 0;
             dateTime.Value = selectedDateTime;
             dateTime.Visible = true;
@@ -1096,11 +1093,11 @@ namespace OrderManager
 
             ComboBox comboBoxMachine = new ComboBox();
             comboBoxMachine.Name = "comboBoxMachine";
-            comboBoxMachine.Dock = System.Windows.Forms.DockStyle.Fill;
-            comboBoxMachine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comboBoxMachine.Dock = DockStyle.Fill;
+            comboBoxMachine.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxMachine.FormattingEnabled = true;
-            comboBoxMachine.Location = new System.Drawing.Point(3, 3);
-            comboBoxMachine.Size = new System.Drawing.Size(144, 21);
+            comboBoxMachine.Location = new Point(3, 3);
+            comboBoxMachine.Size = new Size(144, 21);
             comboBoxMachine.TabIndex = 1;
             comboBoxMachine.Items.AddRange(machine.ToArray());
             comboBoxMachine.SelectedIndex = 0;
@@ -1108,17 +1105,17 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add(comboBoxMachine, 2, 1);
 
             comboBoxMachine.Visible = true;
-            if (comboBoxMachine.Items.IndexOf(getMachine.GetMachineName(selectedMachine)) != -1)
-                comboBoxMachine.SelectedIndex = comboBoxMachine.Items.IndexOf(getMachine.GetMachineName(selectedMachine));
+            if (comboBoxMachine.Items.IndexOf(await getMachine.GetMachineName(selectedMachine)) != -1)
+                comboBoxMachine.SelectedIndex = comboBoxMachine.Items.IndexOf(await getMachine.GetMachineName(selectedMachine));
 
             comboBoxMachine.SelectedIndexChanged += new System.EventHandler(comboBoxMachine_SelectedIndexChanged);
 
 
             TextBox textBox = new TextBox();
             textBox.Name = "textBoxFilter";
-            textBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            textBox.Location = new System.Drawing.Point(3, 3);
-            textBox.Size = new System.Drawing.Size(144, 21);
+            textBox.Dock = DockStyle.Fill;
+            textBox.Location = new Point(3, 3);
+            textBox.Size = new Size(144, 21);
             textBox.TabIndex = 2;
             textBox.Text = "";
             textBox.Visible = true;
@@ -1131,11 +1128,11 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label003", "- фильтр", ContentAlignment.MiddleLeft), 3, 2);
         }
 
-        private void CreateUsersControls()
+        private async void CreateUsersControls()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
 
-            List<String> machine = new List<String>(LoadMachine());
+            List<string> machine = new List<string>(await LoadMachine());
 
             var name = "tableLayoutPanelControl";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
@@ -1149,10 +1146,10 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
             tableLayoutPanelControl.RowCount = 1;
 
@@ -1162,8 +1159,8 @@ namespace OrderManager
             Button addButton = new Button();
             addButton.Name = "addButton";
             addButton.Dock = DockStyle.Fill;
-            addButton.Location = new System.Drawing.Point(3, 3);
-            addButton.Size = new System.Drawing.Size(144, 21);
+            addButton.Location = new Point(3, 3);
+            addButton.Size = new Size(144, 21);
             addButton.TabIndex = 0;
             addButton.Text = "Добавить";
             addButton.Visible = true;
@@ -1171,16 +1168,16 @@ namespace OrderManager
             addButton.ImageIndex = 2;
             addButton.TextImageRelation = TextImageRelation.ImageAboveText;
             tableLayoutPanelControl.Controls.Add(addButton, 0, 0);
-            addButton.Click += new System.EventHandler(addButton_Click);
+            addButton.Click += new EventHandler(addButton_Click);
 
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "", ContentAlignment.MiddleRight), 1, 0);
         }
 
-        private void CreateMachineControls()
+        private async void CreateMachineControls()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
 
-            List<String> machine = new List<String>(LoadMachine());
+            List<string> machine = new List<string>(await LoadMachine());
 
             var name = "tableLayoutPanelControl";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
@@ -1194,10 +1191,10 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
             tableLayoutPanelControl.RowCount = 1;
 
@@ -1235,11 +1232,11 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label01", "", ContentAlignment.MiddleRight), 2, 0);
         }
 
-        private void CreateNormControls()
+        private async void CreateNormControls()
         {
             ValueInfoBase getMachine = new ValueInfoBase();
 
-            List<String> machine = new List<String>(LoadMachine());
+            List<string> machine = new List<string>(await LoadMachine());
 
             String[] m = { "1 месяц", "2 месяца", "3 месяца", "4 месяца", "5 месяцев", "6 месяцев", "7 месяцев", "8 месяцев", "9 месяцев", "10 месяцев", "11 месяцев", "12 месяцев" };
 
@@ -1255,8 +1252,8 @@ namespace OrderManager
             tableLayoutPanelControl.Dock = DockStyle.Fill;
             tableLayoutPanelControl.Name = "tableLayoutPanelControl";
 
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150));
-            tableLayoutPanelControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
+            tableLayoutPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
             tableLayoutPanelControl.RowCount = 3;
 
@@ -1304,14 +1301,14 @@ namespace OrderManager
             tableLayoutPanelControl.Controls.Add((Label)CreateLabel("label003", "- фильтр", ContentAlignment.MiddleLeft), 1, 2);
         }
 
-        private void CreateSettingsControls()
+        private async void CreateSettingsControls()
         {
             ValueOrdersBase getOrders = new ValueOrdersBase();
             ValueUserBase getUser = new ValueUserBase();
             ValueInfoBase getMachine = new ValueInfoBase();
             INISettings ini = new INISettings();
 
-            List<String> machine = new List<String>(LoadMachine());
+            List<string> machine = new List<string>(await LoadMachine());
 
             /*String path = ini.Path().Replace(@"\\", @"\");*/
 
@@ -1512,7 +1509,7 @@ namespace OrderManager
             return label;
         }
 
-        private void MainLVInsertValue()
+        private async void MainLVInsertValue()
         {
             ValueShiftsBase getShifts = new ValueShiftsBase();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -1522,7 +1519,7 @@ namespace OrderManager
 
             ValueUserBase userBase = new ValueUserBase();
 
-            List<String> users = new List<String>(getShifts.GetActiveUser());
+            List<string> users = new List<string>(getShifts.GetActiveUser());
 
             var name = "listView";
             if (tableLayoutPanel1.Controls.ContainsKey(name))
@@ -1538,7 +1535,7 @@ namespace OrderManager
 
                 for (int i = 0; i < users.Count; i++)
                 {
-                    List<String> machines = (List<String>)getInfo.GetMachines(users[i]);
+                    List<string> machines = await getInfo.GetMachines(users[i]);
 
                     for (int j = 0; j < machines.Count; j++)
                     {
@@ -1546,12 +1543,12 @@ namespace OrderManager
 
                         GetLeadTime leadTimeCurr = new GetLeadTime(userBase.GetCurrentShiftStart(users[i]), Convert.ToInt32(machines[j]), orderIndex, getOrder.GetCounterRepeat(orderIndex));
 
-                        List<Order> ordersCurrentShift = (List<Order>)ordersFromBase.LoadAllOrdersFromBase(userBase.GetCurrentShiftStart(users[i]), "");
+                        List<Order> ordersCurrentShift = (List<Order>) await ordersFromBase.LoadAllOrdersFromBase(userBase.GetCurrentShiftStart(users[i]), "");
 
-                        String user = "";
-                        String currentTime = "";
+                        string user = "";
+                        string currentTime = "";
                         int currentShiftStart = -1;
-                        String order = "";
+                        string order = "";
 
                         string orderNumCurrent = getOrder.GetOrderNumber(orderIndex);
 
@@ -1644,7 +1641,7 @@ namespace OrderManager
                         item.Name = userBase.GetCurrentShiftStart(users[i]).ToString();
                         item.Text = userBase.GetNameUser(user);
                         item.SubItems.Add(getShifts.GetStartShiftFromID(currentShiftStart));
-                        item.SubItems.Add(getInfo.GetMachineName(machines[j]));
+                        item.SubItems.Add(await getInfo.GetMachineName(machines[j]));
                         item.SubItems.Add(order);
                         item.SubItems.Add(getOrder.GetOrderStatusName(orderIndex));
                         item.SubItems.Add(currentTime);
@@ -1747,7 +1744,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadUsersFromBase(CancellationToken token, DateTime date)
+        private async void LoadUsersFromBase(CancellationToken token, DateTime date)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             ValueUserBase getUser = new ValueUserBase();
@@ -1879,7 +1876,7 @@ namespace OrderManager
                             {
                                 GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
 
-                                ShiftsDetails shiftsDetails = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, category, token);
+                                ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, category, token);
 
                                 fullCountShifts += shiftsDetails.countShifts;
                                 fullTimeShifts += shiftsDetails.allTimeShift;
@@ -1978,7 +1975,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadShiftsFromBase(CancellationToken token, DateTime date, String nameOfExecutor)
+        private async void LoadShiftsFromBase(CancellationToken token, DateTime date, String nameOfExecutor)
         {
             ValueShiftsBase shiftValue = new ValueShiftsBase();
             GetShiftsFromBase getShifts = new GetShiftsFromBase(nameOfExecutor);
@@ -2063,7 +2060,7 @@ namespace OrderManager
 
                     for (int i = 0; i < shifts.Count; i++)
                     {
-                        Shifts currentShift = getShifts.LoadCurrentShift(shifts[i]);
+                        Shifts currentShift = await getShifts.LoadCurrentShift(shifts[i]);
 
                         Invoke(new Action(() =>
                         {
@@ -2082,7 +2079,7 @@ namespace OrderManager
                         }));
                     }
 
-                    ShiftsDetails shiftsDetailsSumm = (ShiftsDetails)getShifts.LoadCurrentDateShiftsDetails(date, "", token);
+                    ShiftsDetails shiftsDetailsSumm = await getShifts.LoadCurrentDateShiftsDetails(date, "", token);
 
                     Invoke(new Action(() =>
                     {
@@ -2148,7 +2145,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadMachinesFromBase(CancellationToken token, DateTime date)
+        private async void LoadMachinesFromBase(CancellationToken token, DateTime date)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             ValueUserBase getUser = new ValueUserBase();
@@ -2214,16 +2211,16 @@ namespace OrderManager
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            if (getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
+                            if (await getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
                             {
-                                Invoke(new Action(() =>
+                                Invoke(new Action(async () =>
                                 {
                                     ListViewItem item = new ListViewItem();
 
                                     item.Name = sqlReader["id"].ToString();
                                     item.Text = (listView.Items.Count + 1).ToString();
-                                    item.SubItems.Add(categoryValue.GetCategoryName(getInfo.GetCategoryMachine(sqlReader["id"].ToString())));
-                                    item.SubItems.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
+                                    item.SubItems.Add(categoryValue.GetCategoryName(await getInfo.GetCategoryMachine(sqlReader["id"].ToString())));
+                                    item.SubItems.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
                                     item.SubItems.Add("");
                                     item.SubItems.Add("");
 
@@ -2253,7 +2250,7 @@ namespace OrderManager
 
                         while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                         {
-                            if (getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
+                            if (await getInfo.GetCategoryMachine(sqlReader["id"].ToString()) == category || selectedCategory == 0)
                             {
                                 List<int> orderCountAmountMonth = new List<int>((List<int>)getOrder.GetOrdersFromMachineForTheMonth(date, sqlReader["id"].ToString()));
                                 
@@ -2312,7 +2309,7 @@ namespace OrderManager
             }));
         }
 
-        private void StartLoadingAllOrders()
+        private async void StartLoadingAllOrders()
         {
             DateTimePicker dateTime = (DateTimePicker)ControlFromKey("tableLayoutPanelControl", "dateTime");
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
@@ -2326,20 +2323,20 @@ namespace OrderManager
                 String filterKey;
                 filterKey = textBoxFilter.Text;
 
-                List<string> indexes = new List<string>(LoadIndexesOrdersFromBase(date, filterKey));
+                List<string> indexes = new List<string>(await LoadIndexesOrdersFromBase(date, filterKey));
 
                 StartLoading(indexes);
             }
         }
 
         CancellationTokenSource cancelTokenSource;
-        private void StartLoading(List<string> indexes)
+        private async void StartLoading(List<string> indexes)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
-            string machine = getInfo.GetMachineFromName(comboBoxMachine.Text);
+            string machine = await getInfo.GetMachineFromName(comboBoxMachine.Text);
 
             if (cancelTokenSource != null)
             {
@@ -2353,14 +2350,14 @@ namespace OrderManager
             task.Start();
         }
 
-        private List<string> LoadIndexesOrdersFromBase(DateTime dateTime, String filter)
+        private async Task<List<string>> LoadIndexesOrdersFromBase(DateTime dateTime, string filter)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ComboBox comboBoxMachine = (ComboBox)ControlFromKey("tableLayoutPanelControl", "comboBoxMachine");
 
             List<string> result = new List<string>();
 
-            String machine = getInfo.GetMachineFromName(comboBoxMachine.Text);
+            String machine = await getInfo.GetMachineFromName(comboBoxMachine.Text);
 
             EnabledButtons(false);
 
@@ -2391,7 +2388,7 @@ namespace OrderManager
                     MySqlCommand Command = new MySqlCommand
                     {
                         Connection = Connect,
-                        CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBoxMachine.Text) + "'"
+                        CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(comboBoxMachine.Text) + "'"
                     };
                     DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -2526,7 +2523,7 @@ namespace OrderManager
 
         }
 
-        private void LoadNormFromBase(DateTime dateTimeStart, DateTime dateTimeEnd, String filter)
+        private async void LoadNormFromBase(DateTime dateTimeStart, DateTime dateTimeEnd, String filter)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -2574,7 +2571,7 @@ namespace OrderManager
                         item.SubItems.Add(sqlReader["orderStamp"].ToString());
                         item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
                         item.SubItems.Add(sqlReader["modification"].ToString());
-                        item.SubItems.Add(getInfo.GetMachineName(sqlReader["machine"].ToString()));
+                        item.SubItems.Add(await getInfo.GetMachineName(sqlReader["machine"].ToString()));
                         item.SubItems.Add(Convert.ToDateTime(sqlReader["orderAddedDate"]).ToString("D"));
                         item.SubItems.Add(timeOperations.TotalMinutesToHoursAndMinutesStr(Convert.ToInt32(sqlReader["timeMakeready"])));
                         item.SubItems.Add((60 * Convert.ToInt32(sqlReader["amountOfOrder"]) / Convert.ToInt32(sqlReader["timeToWork"])).ToString("N0"));
@@ -2671,7 +2668,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadMachinesAndCategoryesFromBase()
+        private async void LoadMachinesAndCategoryesFromBase()
         {
             CancellationToken token;
 
@@ -2709,7 +2706,7 @@ namespace OrderManager
 
                     for (int i = 0; i < categoryes.Count; i++)
                     {
-                        List<String> machines = new List<String>(getMachines.GetMachinesList(getCategoryes.GetCategoryFromName(categoryes[i])));
+                        List<string> machines = new List<string>(getMachines.GetMachinesList(getCategoryes.GetCategoryFromName(categoryes[i])));
 
                         ListViewGroup listViewGroup = new ListViewGroup(categoryes[i]);
                         listViewGroup.Name = getCategoryes.GetCategoryFromName(categoryes[i]);
@@ -2730,17 +2727,17 @@ namespace OrderManager
                         {
                             for (int j = 0; j < machines.Count; j++)
                             {
-                                String timeStartWork = getMachines.GetMachineStartWork(machines[j]);
-                                String timeWork = getTime.WorkExperience(DateTime.Now.ToString(), timeStartWork);
+                                string timeStartWork = await getMachines.GetMachineStartWork(machines[j]);
+                                string timeWork = getTime.WorkExperience(DateTime.Now.ToString(), timeStartWork);
 
                                 ListViewItem itemMachine = new ListViewItem(listViewGroup);
 
                                 itemMachine.Name = machines[j];
                                 itemMachine.Text = (j + 1).ToString();
-                                itemMachine.SubItems.Add(getMachines.GetMachineName(machines[j]));
+                                itemMachine.SubItems.Add(await getMachines.GetMachineName(machines[j]));
                                 itemMachine.SubItems.Add(timeStartWork);
                                 itemMachine.SubItems.Add(timeWork);
-                                itemMachine.SubItems.Add(getMachines.GetMachineNote(machines[j]));
+                                itemMachine.SubItems.Add(await getMachines.GetMachineNote(machines[j]));
 
                                 Invoke(new Action(() => listView.Items.Add(itemMachine)));
                             }
@@ -2758,7 +2755,7 @@ namespace OrderManager
             }
         }
 
-        private void LoadPage(int page)
+        private async Task LoadPage(int page)
         {
             SelectedButton(page);
 
@@ -2809,7 +2806,7 @@ namespace OrderManager
                     break;
                 case 5:
                     tableLayoutPanel1.RowStyles[1].Height = 90;
-                    CreateAllOrdersControls();
+                    await CreateAllOrdersControls();
                     head = new List<ColumnHeader>(Headers(page));
                     CreateListView(head);
                     ContextMenuToLV();
@@ -2923,7 +2920,7 @@ namespace OrderManager
         private void comboBoxMachine_SelectedIndexChanged(object sender, EventArgs e)
         {
             ValueInfoBase getMachine = new ValueInfoBase();
-            selectedMachine = getMachine.GetMachineFromName(((ComboBox)sender).Text);
+            selectedMachine = getMachine.GetMachineFromName(((ComboBox)sender).Text).ToString();
 
             UpdatePage(currentPage);
         }
@@ -2988,7 +2985,7 @@ namespace OrderManager
         }
 
 
-        private void ListViewDoubleClick(object sender, EventArgs e)
+        private async void ListViewDoubleClick(object sender, EventArgs e)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueUserBase getUser = new ValueUserBase();
@@ -3005,7 +3002,7 @@ namespace OrderManager
                     break;
                 case 2:
                     selectedUser = getUser.GetNameUser(selectedName);
-                    LoadPage(3);
+                    await LoadPage(3);
                     break;
                 case 3:
                     LoadShiftdetails(Convert.ToInt32(selectedName));
@@ -3068,7 +3065,7 @@ namespace OrderManager
             //MessageBox.Show(e.ToString());
         }
 
-        private void acceptBaseButton_Click(object sender, EventArgs e)
+        private async void acceptBaseButton_Click(object sender, EventArgs e)
         {
             ComboBox comboBoxBase = null;
 
@@ -3117,7 +3114,7 @@ namespace OrderManager
 
                 LoadBaseInfo();
 
-                LoadPage(currentPage);
+                await LoadPage(currentPage);
             }
             else
             {
@@ -3125,16 +3122,16 @@ namespace OrderManager
             }
         }
 
-        private void editBaseButton_Click(object sender, EventArgs e)
+        private async void editBaseButton_Click(object sender, EventArgs e)
         {
             FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
             form.ShowDialog();
             LoadBaseInfo();
 
-            LoadPage(currentPage);
+            await LoadPage(currentPage);
         }
 
-        private void addButton_Click(object sender, EventArgs e)
+        private async void addButton_Click(object sender, EventArgs e)
         {
             Button addButton = (Button)ControlFromKey("tableLayoutPanelControl", "addCategoryButton");
 
@@ -3153,7 +3150,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    ShowFullOrdersForm(false, 0);
+                    await ShowFullOrdersForm(false, 0);
                     //StartLoadingAllOrders();
                     break;
                 case 6:
@@ -3228,7 +3225,7 @@ namespace OrderManager
             }
         }
 
-        private void closeShift_Click(object sender, EventArgs e)
+        private async void closeShift_Click(object sender, EventArgs e)
         {
             //Завершение смены с вводом всех времени завершения операций дляя каждой машины и количеством выполненной продукции
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -3239,7 +3236,7 @@ namespace OrderManager
             int shiftID = Convert.ToInt32(listV.SelectedItems[0].Name);
             String userId = getUser.GetCurrentUserIDFromShiftStart(shiftID);
 
-            List<String> machines = (List<String>)getInfo.GetMachines(userId);
+            List<String> machines = await getInfo.GetMachines(userId);
 
             for (int i = 0; i < machines.Count; i++)
             {
@@ -3250,7 +3247,7 @@ namespace OrderManager
                 }
             }
 
-            if (getInfo.GetMachinesForUserActive(userId) == true)
+            if (await getInfo.GetMachinesForUserActive(userId) == true)
             {
                 MessageBox.Show("Смена не была завершена т.к. не все операции были завершены.", "Завершение смены", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -3272,7 +3269,7 @@ namespace OrderManager
 
 
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
@@ -3296,7 +3293,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    ShowFullOrdersForm(true, listV.SelectedIndices[0]);
+                    await ShowFullOrdersForm(true, listV.SelectedIndices[0]);
                     break;
                 case 6:
 
@@ -3318,7 +3315,7 @@ namespace OrderManager
             UpdatePage(currentPage);
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
@@ -3342,7 +3339,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    ShowFullOrdersForm(true, listV.SelectedIndices[0]);
+                    await ShowFullOrdersForm(true, listV.SelectedIndices[0]);
                     break;
                 case 6:
 
@@ -3355,7 +3352,7 @@ namespace OrderManager
                     if (nameItem == "editCategoryItem")
                         DeleteCategory(listV.Items[selectedIndex].Group.Name);
                     if (nameItem == "editMachineItem")
-                        DeleteMachine(selectedName);
+                        await DeleteMachine(selectedName);
                     //LoadUsersFromBase();
                     break;
                 default:
@@ -3387,7 +3384,7 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    AbortOrder(getInfo.GetMachineFromName(comboBoxMachine.Text), ordersIndexes[listV.SelectedIndices[0]]);
+                    AbortOrder(getInfo.GetMachineFromName(comboBoxMachine.Text).ToString(), ordersIndexes[listV.SelectedIndices[0]]);
                     UpdatePage(currentPage);
                     break;
 
@@ -3471,49 +3468,49 @@ namespace OrderManager
                 UpdatePage(currentPage);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            LoadPage(1);
+            await LoadPage(1);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
-            LoadPage(2);
+            await LoadPage(2);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_Click(object sender, EventArgs e)
         {
-            LoadPage(3);
+            await LoadPage(3);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private async void button4_Click(object sender, EventArgs e)
         {
-            LoadPage(4);
+            await LoadPage(4);
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private async void button5_Click(object sender, EventArgs e)
         {
-            LoadPage(5);
+            await LoadPage(5);
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private async void button6_Click(object sender, EventArgs e)
         {
-            LoadPage(6);
+            await LoadPage(6);
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private async void button7_Click(object sender, EventArgs e)
         {
-            LoadPage(7);
+            await LoadPage(7);
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private async void button8_Click(object sender, EventArgs e)
         {
-            LoadPage(8);
+            await LoadPage(8);
         }
 
-        private void button9_Click(object sender, EventArgs e)
+        private async void button9_Click(object sender, EventArgs e)
         {
-            LoadPage(9);
+            await LoadPage(9);
         }
 
         private void button10_Click(object sender, EventArgs e)

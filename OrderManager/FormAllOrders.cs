@@ -49,16 +49,16 @@ namespace OrderManager
             form.ShowDialog();
         }
 
-        private void ShowFullOrdersForm(bool editOrder)
+        private async void ShowFullOrdersForm(bool editOrder)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
             FormAddNewOrder form;
 
             if (editOrder)
-                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text), ordersIndexes[listView1.SelectedIndices[0]]);
+                form = new FormAddNewOrder(await getInfo.GetMachineFromName(comboBox1.Text), ordersIndexes[listView1.SelectedIndices[0]]);
             else
-                form = new FormAddNewOrder(getInfo.GetMachineFromName(comboBox1.Text));
+                form = new FormAddNewOrder(await getInfo.GetMachineFromName(comboBox1.Text));
 
             form.ShowDialog();
         }
@@ -139,7 +139,7 @@ namespace OrderManager
                 ApplyParameterLine(getSettings.GetParameterLine("0", "allOrdersForm"));
         }
 
-        private void LoadMachine()
+        private async Task LoadMachine()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -155,7 +155,7 @@ namespace OrderManager
 
                 while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
                 {
-                    comboBox1.Items.Add(getInfo.GetMachineName(sqlReader["id"].ToString()));
+                    comboBox1.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
                 }
 
                 Connect.Close();
@@ -338,9 +338,9 @@ namespace OrderManager
             }
         }
 
-        private void FormFullListOrders_Load(object sender, EventArgs e)
+        private async void FormFullListOrders_Load(object sender, EventArgs e)
         {
-            LoadMachine();
+            await LoadMachine();
             SetStartPeriodDTPicker();
             LoadParametersFromBase();
         }
