@@ -2,9 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace OrderManager
 {
@@ -497,7 +501,6 @@ namespace OrderManager
             return mkConsider;
         }
 
-
         public void SetMakereadyPart(int orderInProgressID, int value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -515,279 +518,138 @@ namespace OrderManager
             }
         }
 
-        //Сделать проверку
-        public async Task<object> LoadAllOrdersFromBaseOLD(int shiftID, string category)
-        {
-            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueInfoBase getInfo = new ValueInfoBase();
-            ValueOrdersBase ordersBase = new ValueOrdersBase();
-            GetOrdersFromBase getOrders = new GetOrdersFromBase();
-
-            //DateTime shiftStart = timeOperations.StringToDateTime(startOfShift);
-
-            List<Order> orders = new List<Order>();
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    //CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
-                    CommandText = @"SELECT * FROM allOrdersInJob WHERE shiftID = '" + shiftID + "'"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read())
-                {
-                    if (category == await getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
-                    {
-                        //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                        GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
-
-                        //int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
-                        int amountThisOrder = (int)sqlReader["amountOfOrder"];
-                        int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
-
-                        if (lastCount < 0)
-                            lastCount = 0;
-
-                        //int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
-                        int workTime = (int)sqlReader["timeToWork"];
-                        int orderNorm = 0;
-                        int timeWorkingOut = 0;
-                        int lastTimeWork = 0;
-
-                        if (workTime != 0)
-                        {
-                            orderNorm = amountThisOrder * 60 / workTime;
-                            timeWorkingOut = (int)sqlReader["done"] * 60 / orderNorm;
-                            lastTimeWork = (lastCount * 60) / orderNorm;
-                        }
-
-                        int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
-                        int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
-                        int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
-                        int lastTimeWorkForDeviation = 0;
-
-                        int makereadyConsider = getOrders.GetMakereadyConsider(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"], (int)sqlReader["machine"]);
-
-                        if (timeWorkingOut > 0)
-                        {
-                            lastTimeWorkForDeviation = timeWorkingOut;
-                        }
-                        else
-                        {
-                            lastTimeWorkForDeviation = lastTimeWork;
-                        }
-
-                        int mkDeviation = timeOperations.MinuteDifference(lastTimeMakeready, timeMakeready, false);
-                        int wkDeviation = timeOperations.MinuteDifference(lastTimeWorkForDeviation, timeWork, false);
-
-                        /*int deviation;
-
-                        if (_unionDeviation)
-                        {
-                            int timeFull = timeMakeready + timeWork;
-                            int lastTimeFull = lastTimeMakeready + lastTimeWorkForDeviation;
-
-                            deviation = timeOperations.MinuteDifference(lastTimeFull, timeFull, false);
-                        }
-                        else
-                        {
-                            int mkDeviation = timeOperations.MinuteDifference(lastTimeMakeready, timeMakeready, false);
-                            int wkDeviation = timeOperations.MinuteDifference(lastTimeWorkForDeviation, timeWork, false);
-
-                            deviation = mkDeviation + ", " + wkDeviation;
-                        }*/
-
-                        timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
-                            sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
-
-                        orders.Add(new Order(
-                            Convert.ToInt32(sqlReader["count"]),
-                            (int)sqlReader["orderID"],
-                            sqlReader["machine"].ToString(),
-                            /*ordersBase.GetOrderNumber((int)sqlReader["orderID"]),
-                            ordersBase.GetOrderModification((int)sqlReader["orderID"]),
-                            ordersBase.GetOrderName((int)sqlReader["orderID"]).ToString(),*/
-                            sqlReader["numberOfOrder"].ToString(),
-                            sqlReader["modification"].ToString(),
-                            sqlReader["nameOfOrder"].ToString(),
-                            amountThisOrder,
-                            lastCount,
-                            lastTimeMakeready * makereadyConsider,
-                            lastTimeWork,
-                            timeMakeready,
-                            timeWork,
-                            Convert.ToInt32(sqlReader["done"]),
-                            orderNorm,
-                            timeWorkingOut,
-                            mkDeviation,
-                            wkDeviation,
-                            (int)sqlReader["counterRepeat"],
-                            sqlReader["note"].ToString(),
-                            sqlReader["privateNote"].ToString()
-                            ));
-                    }
-                }
-
-                Connect.Close();
-            }
-
-            return orders;
-        }
-
         public async Task<object> LoadAllOrdersFromBase(int shiftID, string category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase getInfo = new ValueInfoBase();
-            ValueOrdersBase ordersBase = new ValueOrdersBase();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
             //DateTime shiftStart = timeOperations.StringToDateTime(startOfShift);
 
             List<Order> orders = new List<Order>();
-            bool reconnectionRequired = false;
-            DialogResult dialog = DialogResult.Retry;
 
-            do
+            try
             {
-                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
-                    try
+                    await Connect.OpenAsync();
+                    MySqlCommand Command = new MySqlCommand
                     {
-                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                        Connection = Connect,
+                        //CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
+                        CommandText = @"SELECT * FROM allOrdersInJob WHERE shiftID = '" + shiftID + "'"
+                    };
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                    while (await sqlReader.ReadAsync())
+                    {
+                        if (category == await getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
                         {
-                            await Connect.OpenAsync();
-                            MySqlCommand Command = new MySqlCommand
+                            //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
+                            GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+
+                            //int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
+                            int amountThisOrder = (int)sqlReader["amountOfOrder"];
+                            int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
+
+                            if (lastCount < 0)
+                                lastCount = 0;
+
+                            //int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
+                            int workTime = (int)sqlReader["timeToWork"];
+                            int orderNorm = 0;
+                            int timeWorkingOut = 0;
+                            int lastTimeWork = 0;
+
+                            if (workTime != 0)
                             {
-                                Connection = Connect,
-                                //CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
-                                CommandText = @"SELECT * FROM allOrdersInJob WHERE shiftID = '" + shiftID + "'"
-                            };
-                            DbDataReader sqlReader = await Command.ExecuteReaderAsync();
-
-                            while (await sqlReader.ReadAsync())
-                            {
-                                if (category == await getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
-                                {
-                                    //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                                    GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
-
-                                    //int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
-                                    int amountThisOrder = (int)sqlReader["amountOfOrder"];
-                                    int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
-
-                                    if (lastCount < 0)
-                                        lastCount = 0;
-
-                                    //int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
-                                    int workTime = (int)sqlReader["timeToWork"];
-                                    int orderNorm = 0;
-                                    int timeWorkingOut = 0;
-                                    int lastTimeWork = 0;
-
-                                    if (workTime != 0)
-                                    {
-                                        orderNorm = amountThisOrder * 60 / workTime;
-                                        timeWorkingOut = (int)sqlReader["done"] * 60 / orderNorm;
-                                        lastTimeWork = (lastCount * 60) / orderNorm;
-                                    }
-
-                                    int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
-                                    int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
-                                    int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
-                                    int lastTimeWorkForDeviation = 0;
-
-                                    int makereadyConsider = getOrders.GetMakereadyConsider(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"], (int)sqlReader["machine"]);
-
-                                    if (timeWorkingOut > 0)
-                                    {
-                                        lastTimeWorkForDeviation = timeWorkingOut;
-                                    }
-                                    else
-                                    {
-                                        lastTimeWorkForDeviation = lastTimeWork;
-                                    }
-
-                                    int mkDeviation = timeOperations.MinuteDifference(lastTimeMakeready, timeMakeready, false);
-                                    int wkDeviation = timeOperations.MinuteDifference(lastTimeWorkForDeviation, timeWork, false);
-
-                                    /*int deviation;
-
-                                    if (_unionDeviation)
-                                    {
-                                        int timeFull = timeMakeready + timeWork;
-                                        int lastTimeFull = lastTimeMakeready + lastTimeWorkForDeviation;
-
-                                        deviation = timeOperations.MinuteDifference(lastTimeFull, timeFull, false);
-                                    }
-                                    else
-                                    {
-                                        int mkDeviation = timeOperations.MinuteDifference(lastTimeMakeready, timeMakeready, false);
-                                        int wkDeviation = timeOperations.MinuteDifference(lastTimeWorkForDeviation, timeWork, false);
-
-                                        deviation = mkDeviation + ", " + wkDeviation;
-                                    }*/
-
-                                    timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
-                                        sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
-
-                                    orders.Add(new Order(
-                                        Convert.ToInt32(sqlReader["count"]),
-                                        (int)sqlReader["orderID"],
-                                        sqlReader["machine"].ToString(),
-                                        /*ordersBase.GetOrderNumber((int)sqlReader["orderID"]),
-                                        ordersBase.GetOrderModification((int)sqlReader["orderID"]),
-                                        ordersBase.GetOrderName((int)sqlReader["orderID"]).ToString(),*/
-                                        sqlReader["numberOfOrder"].ToString(),
-                                        sqlReader["modification"].ToString(),
-                                        sqlReader["nameOfOrder"].ToString(),
-                                        amountThisOrder,
-                                        lastCount,
-                                        lastTimeMakeready * makereadyConsider,
-                                        lastTimeWork,
-                                        timeMakeready,
-                                        timeWork,
-                                        Convert.ToInt32(sqlReader["done"]),
-                                        orderNorm,
-                                        timeWorkingOut,
-                                        mkDeviation,
-                                        wkDeviation,
-                                        (int)sqlReader["counterRepeat"],
-                                        sqlReader["note"].ToString(),
-                                        sqlReader["privateNote"].ToString()
-                                        ));
-                                }
+                                orderNorm = amountThisOrder * 60 / workTime;
+                                timeWorkingOut = (int)sqlReader["done"] * 60 / orderNorm;
+                                lastTimeWork = (lastCount * 60) / orderNorm;
                             }
 
-                            await Connect.CloseAsync();
-                        }
+                            int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
+                            int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
+                            int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
+                            int lastTimeWorkForDeviation = 0;
 
-                        reconnectionRequired = false;
+                            int makereadyConsider = getOrders.GetMakereadyConsider(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"], (int)sqlReader["machine"]);
+
+                            if (timeWorkingOut > 0)
+                            {
+                                lastTimeWorkForDeviation = timeWorkingOut;
+                            }
+                            else
+                            {
+                                lastTimeWorkForDeviation = lastTimeWork;
+                            }
+
+                            int mkDeviation = timeOperations.MinuteDifference(lastTimeMakeready, timeMakeready, false);
+                            int wkDeviation = timeOperations.MinuteDifference(lastTimeWorkForDeviation, timeWork, false);
+
+                            /*int deviation;
+
+                            if (_unionDeviation)
+                            {
+                                int timeFull = timeMakeready + timeWork;
+                                int lastTimeFull = lastTimeMakeready + lastTimeWorkForDeviation;
+
+                                deviation = timeOperations.MinuteDifference(lastTimeFull, timeFull, false);
+                            }
+                            else
+                            {
+                                int mkDeviation = timeOperations.MinuteDifference(lastTimeMakeready, timeMakeready, false);
+                                int wkDeviation = timeOperations.MinuteDifference(lastTimeWorkForDeviation, timeWork, false);
+
+                                deviation = mkDeviation + ", " + wkDeviation;
+                            }*/
+
+                            timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
+                                sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
+
+                            orders.Add(new Order(
+                                Convert.ToInt32(sqlReader["count"]),
+                                (int)sqlReader["orderID"],
+                                sqlReader["machine"].ToString(),
+                                /*ordersBase.GetOrderNumber((int)sqlReader["orderID"]),
+                                ordersBase.GetOrderModification((int)sqlReader["orderID"]),
+                                ordersBase.GetOrderName((int)sqlReader["orderID"]).ToString(),*/
+                                sqlReader["numberOfOrder"].ToString(),
+                                sqlReader["modification"].ToString(),
+                                sqlReader["nameOfOrder"].ToString(),
+                                amountThisOrder,
+                                lastCount,
+                                lastTimeMakeready * makereadyConsider,
+                                lastTimeWork,
+                                timeMakeready,
+                                timeWork,
+                                Convert.ToInt32(sqlReader["done"]),
+                                orderNorm,
+                                timeWorkingOut,
+                                mkDeviation,
+                                wkDeviation,
+                                (int)sqlReader["counterRepeat"],
+                                sqlReader["note"].ToString(),
+                                sqlReader["privateNote"].ToString()
+                                ));
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        LogException.WriteLine("GetMachines: " + ex.Message);
 
-                        dialog = DataBaseReconnectionRequest(ex.Message);
-
-                        if (dialog == DialogResult.Retry)
-                        {
-                            reconnectionRequired = true;
-                        }
-                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
-                        {
-                            reconnectionRequired = false;
-                            Application.Exit();
-                        }
-                    }
+                    await Connect.CloseAsync();
                 }
-            }
-            while (reconnectionRequired);
 
-            return orders;
+                return orders;
+            }
+            catch (SqlException sqlEx)
+            {
+                LogException.WriteLine("LoadAllOrdersFromBase: " + string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+                throw new ApplicationException(string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+            }
+            catch (Exception ex)
+            {
+                LogException.WriteLine("LoadAllOrdersFromBase: " + ex.Message);
+                throw new ApplicationException(ex.Message);
+            }
         }
 
         /// <summary>

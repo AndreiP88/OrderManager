@@ -61,13 +61,14 @@
             // textBox1
             // 
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Enabled = false;
             this.textBox1.Location = new System.Drawing.Point(3, 48);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(644, 141);
             this.textBox1.TabIndex = 0;
+            this.textBox1.TabStop = false;
             // 
             // label1
             // 
@@ -78,7 +79,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(644, 45);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Ошибка соединения с базой данных";
+            this.label1.Text = "Во время работы программы возникла ошибка";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tableLayoutPanel2
@@ -131,7 +132,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(154, 33);
             this.button3.TabIndex = 2;
-            this.button3.Text = "Параметры";
+            this.button3.Text = "Параметры соединения";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -151,7 +152,7 @@
             this.MinimizeBox = false;
             this.Name = "FormDataBaseReconnect";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Соединение";
+            this.Text = "Ошибка";
             this.Load += new System.EventHandler(this.FormDataBaseReconnect_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

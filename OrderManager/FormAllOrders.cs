@@ -170,7 +170,7 @@ namespace OrderManager
 
         }
 
-        private List<string> LoadIndexesOrdersFromBase(string key)
+        private async Task<List<string>> LoadIndexesOrdersFromBase(string key)
         {
             List<string> result = new List<string>();
 
@@ -193,7 +193,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox1.Text) + "'"
+                    CommandText = @"SELECT * FROM orders WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(comboBox1.Text) + "'"
                 };
                 DbDataReader sqlReader = Command.ExecuteReader();
 
@@ -236,9 +236,9 @@ namespace OrderManager
             return result;
         }
 
-        private void LoadOrdersFromTheKey(string key)
+        private async Task LoadOrdersFromTheKey(string key)
         {
-            List<string> indexes = new List<string>(LoadIndexesOrdersFromBase(key));
+            List<string> indexes = new List<string>(await LoadIndexesOrdersFromBase(key));
 
             StartLoading(indexes);
         }
@@ -350,29 +350,29 @@ namespace OrderManager
             SaveParameterToBase();
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadOrdersFromBase();
-            LoadOrdersFromTheKey(textBox1.Text);
+            await LoadOrdersFromTheKey(textBox1.Text);
         }
 
-        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        private async void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
             LoadOrdersFromBase();
-            LoadOrdersFromTheKey(textBox1.Text);
+            await LoadOrdersFromTheKey(textBox1.Text);
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private async void textBox1_TextChanged(object sender, EventArgs e)
         {
             LoadOrdersFromBase();
-            LoadOrdersFromTheKey(textBox1.Text);
+            await LoadOrdersFromTheKey(textBox1.Text);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             ShowFullOrdersForm(false);
             LoadOrdersFromBase();
-            LoadOrdersFromTheKey(textBox1.Text);
+            await LoadOrdersFromTheKey(textBox1.Text);
         }
 
         private void listView1_DoubleClick(object sender, EventArgs e)
@@ -409,20 +409,20 @@ namespace OrderManager
                 
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowFullOrdersForm(true);
             LoadOrdersFromBase();
-            LoadOrdersFromTheKey(textBox1.Text);
+            await LoadOrdersFromTheKey(textBox1.Text);
         }
 
-        private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
             SetNewStatus(ordersIndexes[listView1.SelectedIndices[0]], "4");
             LoadOrdersFromBase();
-            LoadOrdersFromTheKey(textBox1.Text);
+            await LoadOrdersFromTheKey(textBox1.Text);
         }
     }
 }

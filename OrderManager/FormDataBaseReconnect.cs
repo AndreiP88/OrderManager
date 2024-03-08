@@ -56,6 +56,7 @@ namespace OrderManager
             timer1.Enabled = true;
 
             textBox1.Text = ExceptionString;
+            textBox1.DeselectAll();
         }
 
         private void StartCountDown()

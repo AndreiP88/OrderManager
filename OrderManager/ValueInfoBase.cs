@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace OrderManager
 {
@@ -70,9 +72,15 @@ namespace OrderManager
             return result;
         }
 
-        public int GetIDEquipMachine(int machine)
+        public async Task<int> GetIDEquipMachine(int machine)
         {
-            return Convert.ToInt32(GetValueMachines("id", machine.ToString(), "idEquip"));
+            int result = -1;
+            object load = await GetValueMachines("id", machine.ToString(), "idEquip");
+
+            result = Convert.ToInt32(load ?? -1);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
         }
 
         public async Task<string> GetMachineStartWork(string machine)
@@ -275,57 +283,38 @@ namespace OrderManager
         private async Task<object> GetValueMachines(string findColomnName, string findParameter, string valueColomn)
         {
             object result = null;
-            bool reconnectionRequired = false;
-            DialogResult dialog = DialogResult.Retry;
-
-            do
+            try
             {
-                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
-                    try
+                    await Connect.OpenAsync();
+                    MySqlCommand Command = new MySqlCommand
                     {
-                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
-                        {
-                            await Connect.OpenAsync();
-                            MySqlCommand Command = new MySqlCommand
-                            {
-                                Connection = Connect,
-                                CommandText = @"SELECT * FROM machines WHERE " + findColomnName + " = '" + findParameter + "'"
-                            };
-                            DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+                        Connection = Connect,
+                        CommandText = @"SELECT * FROM machines WHERE " + findColomnName + " = '" + findParameter + "'"
+                    };
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
 
-                            while (await sqlReader.ReadAsync())
-                            {
-                                result = sqlReader[valueColomn].ToString();
-                            }
-
-                            await Connect.CloseAsync();
-                        }
-
-                        reconnectionRequired = false;
-                    }
-                    catch (Exception ex)
+                    while (await sqlReader.ReadAsync())
                     {
-                        LogException.WriteLine("GetValueMachinesAS: " + ex.Message);
-                        dialog = DataBaseReconnectionRequest(ex.Message);
-
-                        if (dialog == DialogResult.Retry)
-                        {
-                            reconnectionRequired = true;
-                        }
-                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
-                        {
-                            reconnectionRequired = false;
-                            Application.Exit();
-                        }
-
-                        throw new ApplicationException(ex.Message);
+                        result = sqlReader[valueColomn].ToString();
                     }
+
+                    await Connect.CloseAsync();
                 }
-            }
-            while (reconnectionRequired);
 
-            return result;
+                return result;
+            }
+            catch (SqlException sqlEx)
+            {
+                LogException.WriteLine("GetValueMachines: " + string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+                throw new ApplicationException(string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+            }
+            catch (Exception ex)
+            {
+                LogException.WriteLine("GetValueMachines: " + ex.Message);
+                throw new ApplicationException(ex.Message);
+            }
         }
 
         private String GetValue(String findColomnName, String findParameter, String valueColomn)
@@ -388,57 +377,40 @@ namespace OrderManager
         {
             List<string> result = new List<string>();
             //result.Clear();
-            bool reconnectionRequired = false;
-            DialogResult dialog = DialogResult.Retry;
 
-            do
+            try
             {
-                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
                 {
-                    try
+                    await Connect.OpenAsync();
+                    MySqlCommand Command = new MySqlCommand
                     {
-                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
-                        {
-                            await Connect.OpenAsync();
-                            MySqlCommand Command = new MySqlCommand
-                            {
-                                Connection = Connect,
-                                CommandText = @"SELECT * FROM machinesInfo WHERE nameOfExecutor = '" + userID + "'"
-                            };
-                            DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+                        Connection = Connect,
+                        CommandText = @"SELECT * FROM machinesInfo WHERE nameOfExecutor = '" + userID + "'"
+                    };
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
 
-                            while (await sqlReader.ReadAsync())
-                            {
-                                result.Add(sqlReader["machine"].ToString());
-                                //result.Add(sqlReader["machine"] == DBNull.Value ? string.Empty : (string)sqlReader["machine"]);
-                            }
-
-                            await Connect.CloseAsync();
-                        }
-
-                        reconnectionRequired = false;
-                    }
-                    catch (Exception ex)
+                    while (await sqlReader.ReadAsync())
                     {
-                        LogException.WriteLine("GetMachines: " + ex.Message);
-
-                        dialog = DataBaseReconnectionRequest(ex.Message);
-
-                        if (dialog == DialogResult.Retry)
-                        {
-                            reconnectionRequired = true;
-                        }
-                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
-                        {
-                            reconnectionRequired = false;
-                            Application.Exit();
-                        }
+                        result.Add(sqlReader["machine"].ToString());
+                        //result.Add(sqlReader["machine"] == DBNull.Value ? string.Empty : (string)sqlReader["machine"]);
                     }
+
+                    await Connect.CloseAsync();
                 }
-            }
-            while (reconnectionRequired);
 
-            return result;
+                return result;
+            }
+            catch (SqlException sqlEx)
+            {
+                LogException.WriteLine("GetMachines: " + string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+                throw new ApplicationException(string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+            }
+            catch (Exception ex)
+            {
+                LogException.WriteLine("GetMachines: " + ex.Message);
+                throw new ApplicationException(ex.Message);
+            }
         }
 
         public async Task<string> GetMachinesStr(string userID)

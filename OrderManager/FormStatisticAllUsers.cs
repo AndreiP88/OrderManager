@@ -6,12 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -26,7 +24,6 @@ namespace OrderManager
         }
 
         private ListViewColumnSorter lvwColumnSorter;
-
         string GetParametersLine()
         {
             String pLine = "";
@@ -254,7 +251,7 @@ namespace OrderManager
             return usersList;
         }
 
-        private (List<int>, List<int>) LoadUserListFromMonthAS(CancellationToken token, List<int> equips, DateTime date)
+        private async Task<List<int>> LoadUserListFromMonthAS(CancellationToken token, List<int> equips, DateTime date, bool includeASuserID = false)
         {
             ValueUsers valueUsers = new ValueUsers();
             ValueUserBase userBase = new ValueUserBase();
@@ -270,7 +267,7 @@ namespace OrderManager
                     break;
                 }
 
-                equipsAS.Add(infoBase.GetIDEquipMachine(equips[i]));
+                equipsAS.Add(await infoBase.GetIDEquipMachine(equips[i]));
             }
 
             List<int> usersListAS = valueUsers.LoadUsersListOnlyIDFromSelectMonth(equipsAS, date);
@@ -293,8 +290,15 @@ namespace OrderManager
                     }
                 }
             }
-            
-            return (usersList, usersListAS);
+
+            if (includeASuserID)
+            {
+                return usersListAS;
+            }
+            else
+            {
+                return usersList;
+            }
         }
         private List<int> LoadUserList(CancellationToken token, int category)
         {
@@ -425,7 +429,7 @@ namespace OrderManager
             else
             {
                 //usersList = LoadUserList(token, category);
-                usersList = LoadUserListFromMonthAS(token, equipsListForCategory, date).Item2;
+                usersList = await LoadUserListFromMonthAS(token, equipsListForCategory, date, false);
                 AddUsersASToListView(token, usersList);
             }
 
@@ -464,15 +468,15 @@ namespace OrderManager
                 {
                     if (typeValueLoad == 0)
                     {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
+                        workingOutUser = await workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
                     }
                     else if (typeValueLoad == 1)
                     {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory) * 100;
+                        workingOutUser = await workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory) * 100;
                     }
                     else
                     {
-                        workingOutUser = workingOutSum.CalculateCountMakeReadyAS(usersList[i], date, token, equipsListForCategory);
+                        workingOutUser = await workingOutSum.CalculateCountMakeReadyAS(usersList[i], date, token, equipsListForCategory);
                     }
 
                     name = valueUsers.GetUserNameFromID(usersList[i]);
@@ -626,7 +630,7 @@ namespace OrderManager
             else
             {
                 //usersList = LoadUserList(token, category);
-                usersList = LoadUserListFromMonthAS(token, equipsListForCategory, date).Item2;
+                usersList = await LoadUserListFromMonthAS(token, equipsListForCategory, date, true);
                 //AddUsersASToListView(token, usersList);
             }
 
@@ -672,15 +676,15 @@ namespace OrderManager
                 {
                     if (typeValueLoad == 0)
                     {
-                        workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
+                        workingOutUser = await workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(usersList[i], equipsListForCategory, date);
                     }
                     else if (typeValueLoad == 1)
                     {
-                        workingOutUser = workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory) * 100;
+                        workingOutUser = await workingOutSum.CalculatePercentWorkingOutAS(usersList[i], date, token, equipsListForCategory) * 100;
                     }
                     else
                     {
-                        workingOutUser = workingOutSum.CalculateCountMakeReadyAS(usersList[i], date, token, equipsListForCategory);
+                        workingOutUser = await workingOutSum.CalculateCountMakeReadyAS(usersList[i], date, token, equipsListForCategory);
                     }
 
                     name = valueUsers.GetUserNameFromID(usersList[i]);

@@ -213,7 +213,7 @@ namespace OrderManager
                     commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
                 }
                 else
-                    commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + getInfo.GetMachineFromName(comboBox3.Text) + "'";
+                    commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(comboBox3.Text) + "'";
 
                 Connect.Open();
                 MySqlCommand Command = new MySqlCommand

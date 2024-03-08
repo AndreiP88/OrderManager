@@ -238,7 +238,7 @@ namespace OrderManager
                 AddMonthToListView();
 
                 //Task task = new Task(() => LoadUsersFromBase(token, date));
-                Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
+                Task task = new Task(async () => await LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
                 Task taskWorkingOut = new Task(() => LoadWorkingOut(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
                 //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase);
                 //LoadWorkingOut(cancelTokenSource.Token, date, selectLoadBase);
@@ -287,7 +287,7 @@ namespace OrderManager
             listView1.Items.Add(itemSum);
         }
 
-        private void LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
+        private async Task LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
         {
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetWorkingOutSum workingOutSum = new GetWorkingOutSum();
@@ -350,7 +350,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    workingOutUser = workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromOM(UserID, equipsListForUser, currentDateTime);
+                    workingOutUser = await workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromOM(UserID, equipsListForUser, currentDateTime);
                 }
 
                 workingOut.Add(workingOutUser);

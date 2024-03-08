@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
 {
@@ -87,7 +85,7 @@ namespace OrderManager
             return result;
         }
 
-        public int CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromOM(int userId, List<int> equips, DateTime startMonth)
+        public async Task<int> CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromOM(int userId, List<int> equips, DateTime startMonth)
         {
             ValueUserBase userBase = new ValueUserBase();
 
@@ -96,10 +94,10 @@ namespace OrderManager
 
             List<int> userIndexFromAS = userBase.GetIndexUserFromASBase(userId);
 
-            return CalculateWorkingOutForUserDataBaseAS(userIndexFromAS, equips, startPeriod, endPeriod);
+            return await CalculateWorkingOutForUserDataBaseAS(userIndexFromAS, equips, startPeriod, endPeriod);
         }
 
-        public int CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(int userId, List<int> equips, DateTime startMonth)
+        public async Task <int> CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromAS(int userId, List<int> equips, DateTime startMonth)
         {
             ValueUserBase userBase = new ValueUserBase();
 
@@ -108,10 +106,10 @@ namespace OrderManager
 
             List<int> userIndexAS = new List<int> { userId };
 
-            return CalculateWorkingOutForUserDataBaseAS(userIndexAS, equips, startPeriod, endPeriod);
+            return await CalculateWorkingOutForUserDataBaseAS(userIndexAS, equips, startPeriod, endPeriod);
         }
 
-        private int CalculateWorkingOutForUserDataBaseAS(List<int> userIDs, List<int> equips, DateTime startPeriod, DateTime endPeriod)
+        private async Task <int> CalculateWorkingOutForUserDataBaseAS(List<int> userIDs, List<int> equips, DateTime startPeriod, DateTime endPeriod)
         {
             int result = 0;
 
@@ -132,11 +130,11 @@ namespace OrderManager
 
                 //string usersStr = "man_factjob.id_common_employee = " + userId;
 
-                string equipsStr = "man_factjob.id_equip = " + infoBase.GetIDEquipMachine(equips[0]);
+                string equipsStr = "man_factjob.id_equip = " + await infoBase.GetIDEquipMachine(equips[0]);
 
                 for (int i = 1; i < equips.Count; i++)
                 {
-                    equipsStr += " OR man_factjob.id_equip = " + infoBase.GetIDEquipMachine(equips[i]);
+                    equipsStr += " OR man_factjob.id_equip = " + await infoBase.GetIDEquipMachine(equips[i]);
                 }
 
                 using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
@@ -222,7 +220,7 @@ namespace OrderManager
             return result;
         }
 
-        private List<int> GetEquipsListASFromEquipsListOM(List<int> equipsListOM)
+        private async Task<List<int>> GetEquipsListASFromEquipsListOM(List<int> equipsListOM)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
@@ -230,7 +228,7 @@ namespace OrderManager
 
             for (int i = 0; i < equipsListOM.Count; i++)
             {
-                equipsAS.Add(infoBase.GetIDEquipMachine(equipsListOM[i]));
+                equipsAS.Add(await infoBase.GetIDEquipMachine(equipsListOM[i]));
             }
 
             return equipsAS;
@@ -247,12 +245,12 @@ namespace OrderManager
             return shiftsDetails;
         }
 
-        public float CalculatePercentWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
+        public async Task<float> CalculatePercentWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
         {
             float result = 0;
 
             List<int> userIndexAS = new List<int> { userID };
-            List<int> equipListAS = GetEquipsListASFromEquipsListOM(equipListOM);
+            List<int> equipListAS = await GetEquipsListASFromEquipsListOM(equipListOM);
 
             ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
 
@@ -264,12 +262,12 @@ namespace OrderManager
             return result;
         }
 
-        public float CalculateCountMakeReadyAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
+        public async Task<float> CalculateCountMakeReadyAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
         {
             float result = 0;
 
             List<int> userIndexAS = new List<int> { userID };
-            List<int> equipListAS = GetEquipsListASFromEquipsListOM(equipListOM);
+            List<int> equipListAS = await GetEquipsListASFromEquipsListOM(equipListOM);
 
             ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
 

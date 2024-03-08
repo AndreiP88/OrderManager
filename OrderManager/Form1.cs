@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolTip = System.Windows.Forms.ToolTip;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -461,210 +462,231 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
-            ordersCurrentShift = (List<Order>)await ordersFromBase.LoadAllOrdersFromBase(Info.shiftIndex, "");
-
-            GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
-
-            int orderRegistrationType = valueSettings.GetOrderRegistrationType(Form1.Info.nameOfExecutor);
-
-            /*if (listView1.SelectedItems.Count > 0)
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+            do
             {
-                Info.indexItem = listView1.SelectedIndices[0];
-            }*/
-
-            listView1.Items.Clear();
-
-            for (int index = 0; index < ordersCurrentShift.Count; index++)
-            {
-                string modification = "";
-                if (ordersCurrentShift[index].modificationOfOrder != "")
-                    modification = " (" + ordersCurrentShift[index].modificationOfOrder + ")";
-
-                string deviation = "<>";
-
-                Color color = Color.DarkRed;
-
-                int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
-                int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
-
-                if (orderRegistrationType == 0)
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    if (typeLoad == 0)
+                    try
                     {
-                        //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+                        ordersCurrentShift = (List<Order>)await ordersFromBase.LoadAllOrdersFromBase(Info.shiftIndex, "");
 
-                        color = statusValue.color;
+                        GetWorkingOutTime workingOutTime = new GetWorkingOutTime(Info.shiftIndex, ordersCurrentShift);
 
-                        if (typeView == 0)
-                        {
-                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }
-                        else
-                        {
-                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
-                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }
-                    }
-                    else if (typeLoad == 1)
-                    {
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+                        int orderRegistrationType = valueSettings.GetOrderRegistrationType(Form1.Info.nameOfExecutor);
 
-                        color = statusValue.color;
-
-                        if (typeView == 0)
+                        /*if (listView1.SelectedItems.Count > 0)
                         {
-                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }
-                        else
-                        {
-                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
-                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }
-                    }
-                    else if (typeLoad == 2)
-                    {
-                        if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
-                        {
-                            color = Color.SeaGreen;
-                        }
-                        else
-                        {
-                            color = Color.DarkRed;
-                        }
-
-                        if (typeView == 0)
-                        {
-                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
-                        }
-                        else
-                        {
-                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
-                        }
-                    }
-                }
-                else
-                {
-                    if (typeLoad == 0)
-                    {
-                        //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
-
-                        if (statusValue.fullTimeDifferent > 0)
-                        {
-                            color = Color.SeaGreen;
-                        }
-                        else
-                        {
-                            color = Color.DarkRed;
-                        }
-
-                        deviation = timeOperations.MinuteToTimeString(statusValue.fullTimeDifferent);
-
-                        /*if (typeView == 0)
-                        {
-                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }
-                        else
-                        {
-                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
-                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                            Info.indexItem = listView1.SelectedIndices[0];
                         }*/
+
+                        listView1.Items.Clear();
+
+                        for (int index = 0; index < ordersCurrentShift.Count; index++)
+                        {
+                            string modification = "";
+                            if (ordersCurrentShift[index].modificationOfOrder != "")
+                                modification = " (" + ordersCurrentShift[index].modificationOfOrder + ")";
+
+                            string deviation = "<>";
+
+                            Color color = Color.DarkRed;
+
+                            int typeLoad = valueSettings.GetTypeLoadDeviationToMainLV(Info.nameOfExecutor);
+                            int typeView = valueSettings.GetTypeViewDeviationToMainLV(Info.nameOfExecutor);
+
+                            if (orderRegistrationType == 0)
+                            {
+                                if (typeLoad == 0)
+                                {
+                                    //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
+                                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+
+                                    color = statusValue.color;
+
+                                    if (typeView == 0)
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }
+                                    else
+                                    {
+                                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }
+                                }
+                                else if (typeLoad == 1)
+                                {
+                                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+
+                                    color = statusValue.color;
+
+                                    if (typeView == 0)
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }
+                                    else
+                                    {
+                                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }
+                                }
+                                else if (typeLoad == 2)
+                                {
+                                    if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
+                                    {
+                                        color = Color.SeaGreen;
+                                    }
+                                    else
+                                    {
+                                        color = Color.DarkRed;
+                                    }
+
+                                    if (typeView == 0)
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
+                                    }
+                                    else
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (typeLoad == 0)
+                                {
+                                    //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
+                                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+
+                                    if (statusValue.fullTimeDifferent > 0)
+                                    {
+                                        color = Color.SeaGreen;
+                                    }
+                                    else
+                                    {
+                                        color = Color.DarkRed;
+                                    }
+
+                                    deviation = timeOperations.MinuteToTimeString(statusValue.fullTimeDifferent);
+
+                                    /*if (typeView == 0)
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }
+                                    else
+                                    {
+                                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }*/
+                                }
+                                else if (typeLoad == 1)
+                                {
+                                    OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+
+                                    if (statusValue.fullTimeDifferent > 0)
+                                    {
+                                        color = Color.SeaGreen;
+                                    }
+                                    else
+                                    {
+                                        color = Color.DarkRed;
+                                    }
+
+                                    deviation = timeOperations.MinuteToTimeString(statusValue.fullTimeDifferent);
+
+                                    /*if (typeView == 0)
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }
+                                    else
+                                    {
+                                        //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
+                                        deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
+                                    }*/
+                                }
+                                else if (typeLoad == 2)
+                                {
+                                    if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
+                                    {
+                                        color = Color.SeaGreen;
+                                    }
+                                    else
+                                    {
+                                        color = Color.DarkRed;
+                                    }
+
+                                    deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+
+                                    /*if (typeView == 0)
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
+                                    }
+                                    else
+                                    {
+                                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
+                                    }*/
+                                }
+                            }
+
+                            string facticalTime = "";
+
+                            if (orderRegistrationType == 0)
+                            {
+                                facticalTime = timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork);
+                            }
+                            else
+                            {
+                                facticalTime = timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready + ordersCurrentShift[index].facticalTimeWork);
+                            }
+
+                            ListViewItem item = new ListViewItem();
+
+                            item.Name = ordersCurrentShift[index].numberOfOrder.ToString();
+                            item.Text = (index + 1).ToString();
+                            item.SubItems.Add(await getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
+                            item.SubItems.Add(ordersCurrentShift[index].numberOfOrder.ToString() + modification);
+                            item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
+                            item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
+                            item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
+                            item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
+                            item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+                            item.SubItems.Add(facticalTime);
+                            item.SubItems.Add(deviation);
+                            item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
+                            item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
+                            item.SubItems.Add(ordersCurrentShift[index].note.ToString());
+                            item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());
+
+                            item.ForeColor = color;
+
+                            listView1.Items.Add(item);
+                        }
+
+                        await LoadSelectedMachines();
+                        await LoadSelectedMachinesForPlannedWorkinout();
+
+                        reconnectionRequired = false;
                     }
-                    else if (typeLoad == 1)
+                    catch (Exception ex)
                     {
-                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
 
-                        if (statusValue.fullTimeDifferent > 0)
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+                        
+                        if (dialog == DialogResult.Retry)
                         {
-                            color = Color.SeaGreen;
+                            reconnectionRequired = true;
                         }
-                        else
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
                         {
-                            color = Color.DarkRed;
+                            reconnectionRequired = false;
+                            Application.Exit();
                         }
-
-                        deviation = timeOperations.MinuteToTimeString(statusValue.fullTimeDifferent);
-
-                        /*if (typeView == 0)
-                        {
-                            deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent) + ", " + timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }
-                        else
-                        {
-                            //deviation = timeOperations.MinuteToTimeString(statusValue.mkTimeDifferent + statusValue.wkTimeDifferent);
-                            deviation = timeOperations.MinuteToTimeString(statusValue.wkTimeDifferent);
-                        }*/
-                    }
-                    else if (typeLoad == 2)
-                    {
-                        if ((ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation) > 0)
-                        {
-                            color = Color.SeaGreen;
-                        }
-                        else
-                        {
-                            color = Color.DarkRed;
-                        }
-
-                        deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
-
-                        /*if (typeView == 0)
-                        {
-                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation);
-                        }
-                        else
-                        {
-                            deviation = timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation + ordersCurrentShift[index].wkDeviation);
-                        }*/
                     }
                 }
-
-                string facticalTime = "";
-
-                if (orderRegistrationType == 0)
-                {
-                    facticalTime = timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork);
-                }
-                else
-                {
-                    facticalTime = timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready + ordersCurrentShift[index].facticalTimeWork);
-                }
-
-                ListViewItem item = new ListViewItem();
-
-                item.Name = ordersCurrentShift[index].numberOfOrder.ToString();
-                item.Text = (index + 1).ToString();
-                item.SubItems.Add(await getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
-                item.SubItems.Add(ordersCurrentShift[index].numberOfOrder.ToString() + modification);
-                item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
-                item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
-                item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
-                item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
-                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
-                item.SubItems.Add(facticalTime);
-                item.SubItems.Add(deviation);
-                item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
-                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
-                item.SubItems.Add(ordersCurrentShift[index].note.ToString());
-                item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());
-
-                item.ForeColor = color;
-
-                listView1.Items.Add(item);
             }
-
-            await LoadSelectedMachines();
-            LoadSelectedMachinesForPlannedWorkinout();
-
-            /*if (listView1.Items.Count > 0)
-            {
-                if (Info.indexItem >= 0)
-                    listView1.Items[Info.indexItem].Selected = true;
-                else
-                    listView1.Items[listView1.Items.Count - 1].Selected = true;
-            }*/
-            //listView1.Items[0].Selected = false;
+            while (reconnectionRequired);
         }
 
         private async Task LoadSelectedMachines()
@@ -788,40 +810,71 @@ namespace OrderManager
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            DateTime date;
-            if (Form1.Info.shiftIndex != -1)
-                date = Convert.ToDateTime(shiftsBase.GetStartShiftFromID(Form1.Info.shiftIndex));
-            else
-                date = DateTime.Now;
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            while (!token.IsCancellationRequested)
+            do
             {
-                if (token.IsCancellationRequested)
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    break;
+                    try
+                    {
+                        DateTime date;
+                        if (Form1.Info.shiftIndex != -1)
+                            date = Convert.ToDateTime(shiftsBase.GetStartShiftFromID(Form1.Info.shiftIndex));
+                        else
+                            date = DateTime.Now;
+
+                        while (!token.IsCancellationRequested)
+                        {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            ShiftsDetails currentShift = await getShifts.LoadCurrentDateShiftsDetails(date, "", token);
+
+                            if (currentShift == null)
+                                break;
+
+                            Invoke(new Action(() =>
+                            {
+                                label18.Text = currentShift.countShifts.ToString("N0");
+                                label19.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.shiftsWorkingTime) + " (" +
+                                    dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeShift) + ")";
+
+                                label20.Text = currentShift.countOrdersShift.ToString() + "/" + currentShift.countMakereadyShift.ToString();
+                                label21.Text = currentShift.amountAllOrdersShift.ToString("N0");
+
+                                label22.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeWorkingOutShift);
+                                label23.Text = currentShift.percentWorkingOutShift.ToString("P1");
+
+                            }));
+
+                            break;
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine("LoadDetailsMount: " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
                 }
-
-                ShiftsDetails currentShift = await getShifts.LoadCurrentDateShiftsDetails(date, "", token);
-
-                if (currentShift == null)
-                    break;
-
-                Invoke(new Action(() =>
-                {
-                    label18.Text = currentShift.countShifts.ToString("N0");
-                    label19.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.shiftsWorkingTime) + " (" +
-                        dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeShift) + ")";
-
-                    label20.Text = currentShift.countOrdersShift.ToString() + "/" + currentShift.countMakereadyShift.ToString();
-                    label21.Text = currentShift.amountAllOrdersShift.ToString("N0");
-
-                    label22.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.allTimeWorkingOutShift);
-                    label23.Text = currentShift.percentWorkingOutShift.ToString("P1");
-
-                }));
-
-                break;
             }
+            while (reconnectionRequired);
         }
 
         private void LaodDetailsForCurrentMount()
@@ -839,20 +892,50 @@ namespace OrderManager
 
         private async Task LoadOrdersFromBase()
         {
-            await AddOrdersToListViewFromList();
-            await ViewDetailsForUser();
-            await LoadMachinesDetailsForUser();
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            ValueSettingsBase valueSettings = new ValueSettingsBase();
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        await AddOrdersToListViewFromList();
+                        await ViewDetailsForUser();
+                        await LoadMachinesDetailsForUser();
 
-            string load = valueSettings.GetSelectedPage(Form1.Info.nameOfExecutor);
-            int page = 0;
+                        ValueSettingsBase valueSettings = new ValueSettingsBase();
 
-            if (load != "")
-                page = Convert.ToInt32(load);
+                        string load = valueSettings.GetSelectedPage(Form1.Info.nameOfExecutor);
+                        int page = 0;
 
-            tabControl1.SelectTab(page);
-            //LaodDetailsForCurrentMount();
+                        if (load != "")
+                            page = Convert.ToInt32(load);
+
+                        tabControl1.SelectTab(page);
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
+            }
+            while (reconnectionRequired);
         }
 
         private void ClearAll()
@@ -908,27 +991,58 @@ namespace OrderManager
             ValueInfoBase getUserMachines = new ValueInfoBase();
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
-            int fullWorkingOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
-            int fullDone = CountFullDoneOrders(ordersCurrentShift.Count, "");
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            if (await getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
-                button6.Enabled = false;
-            else
-                button6.Enabled = true;
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        int fullWorkingOut = CountWorkingOutOrders(ordersCurrentShift.Count, "");
+                        int fullDone = CountFullDoneOrders(ordersCurrentShift.Count, "");
 
-            if (Form1.Info.shiftIndex != -1)
-                button1.Enabled = true;
-            else
-                button1.Enabled = false;
+                        if (await getUserMachines.GetMachinesForUserActive(Info.nameOfExecutor) == true)
+                            button6.Enabled = false;
+                        else
+                            button6.Enabled = true;
 
-            label6.Text = usersBase.GetNameUser(Info.nameOfExecutor);
-            label7.Text = valueShifts.GetStartShiftFromID(Info.shiftIndex);
-            label8.Text = dtOperations.TotalMinutesToHoursAndMinutesStr(fullWorkingOut);
-            label9.Text = getPercent.PercentString(fullWorkingOut);
-            label10.Text = fullDone.ToString("N0");
+                        if (Form1.Info.shiftIndex != -1)
+                            button1.Enabled = true;
+                        else
+                            button1.Enabled = false;
 
-            if (Info.nameOfExecutor != "")
-                LaodDetailsForCurrentMount();
+                        label6.Text = usersBase.GetNameUser(Info.nameOfExecutor);
+                        label7.Text = valueShifts.GetStartShiftFromID(Info.shiftIndex);
+                        label8.Text = dtOperations.TotalMinutesToHoursAndMinutesStr(fullWorkingOut);
+                        label9.Text = getPercent.PercentString(fullWorkingOut);
+                        label10.Text = fullDone.ToString("N0");
+
+                        if (Info.nameOfExecutor != "")
+                            LaodDetailsForCurrentMount();
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine("ViewDetailsForUser: " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
+            }
+            while (reconnectionRequired);
         }
 
         private void EraseInfo()
@@ -968,34 +1082,63 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getOrder = new ValueOrdersBase();
 
-            ValueUserBase userBase = new ValueUserBase();
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            List<String> machines = await getInfo.GetMachines(Form1.Info.nameOfExecutor);
-
-            listView2.Items.Clear();
-
-            if (machines.Count > 0)
+            do
             {
-                foreach (String machine in machines)
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
-
-                    string order = "";
-                    if (currentOrderID != -1)
+                    try
                     {
-                        order = getOrder.GetOrderNumber(currentOrderID) + ", " + getOrder.GetOrderName(currentOrderID);
+                        List<string> machines = await getInfo.GetMachines(Form1.Info.nameOfExecutor);
+
+                        listView2.Items.Clear();
+
+                        if (machines.Count > 0)
+                        {
+                            foreach (string machine in machines)
+                            {
+                                int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
+
+                                string order = "";
+                                if (currentOrderID != -1)
+                                {
+                                    order = getOrder.GetOrderNumber(currentOrderID) + ", " + getOrder.GetOrderName(currentOrderID);
+                                }
+
+                                ListViewItem item = new ListViewItem();
+
+                                item.Name = machine;
+                                item.Text = await getInfo.GetMachineName(machine);
+                                item.SubItems.Add(getOrder.GetOrderStatusName(currentOrderID));
+                                item.SubItems.Add(order);
+
+                                listView2.Items.Add(item);
+                            }
+                        }
+
+                        reconnectionRequired = false;
                     }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine("LoadMachinesDetailsForUser: " + ex.Message);
 
-                    ListViewItem item = new ListViewItem();
+                        dialog = DataBaseReconnectionRequest(ex.Message);
 
-                    item.Name = machine;
-                    item.Text = await getInfo.GetMachineName(machine);
-                    item.SubItems.Add(getOrder.GetOrderStatusName(currentOrderID));
-                    item.SubItems.Add(order);
-
-                    listView2.Items.Add(item);
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
                 }
             }
+            while (reconnectionRequired);
         }
 
         private async Task SelectMachines()
@@ -1069,31 +1212,60 @@ namespace OrderManager
             ValueUserBase userBase = new ValueUserBase();
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
-            if (Info.shiftIndex != -1)
-            {
-                int shiftID = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
-                bool activityShift = valueShifts.CheckShiftActivity(Info.shiftIndex);
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-                //if (!activityShift || startOfShift == "")
-                if (!activityShift || shiftID == -1)
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    Info.active = false;
-                    ClearAll();
-                    EraseInfo();
-                    await ShowUserForm();
-                    Info.active = true;
+                    try
+                    {
+                        if (Info.shiftIndex != -1)
+                        {
+                            int shiftID = userBase.GetCurrentShiftStart(Info.nameOfExecutor);
+                            bool activityShift = valueShifts.CheckShiftActivity(Info.shiftIndex);
+
+                            //if (!activityShift || startOfShift == "")
+                            if (!activityShift || shiftID == -1)
+                            {
+                                Info.active = false;
+                                ClearAll();
+                                EraseInfo();
+                                await ShowUserForm();
+                                Info.active = true;
+                            }
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine("CheckCurrentShiftActivity: " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
                 }
             }
-
-            
+            while (reconnectionRequired);
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private async void button5_Click(object sender, EventArgs e)
         {
             Info.active = false;
             ClearAll();
             EraseInfo();
-            ShowUserForm();
+            await ShowUserForm();
             Info.active = true;
         }
 

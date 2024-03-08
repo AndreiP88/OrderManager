@@ -143,9 +143,9 @@
             this.statusStrip1.ContextMenuStrip = this.contextMenuStrip1;
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 299);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 301);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(625, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(632, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
@@ -162,7 +162,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(625, 321);
+            this.ClientSize = new System.Drawing.Size(632, 323);
             this.ControlBox = false;
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.button4);
@@ -177,6 +177,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Выбор исполнителя";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormLoadUserForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LoadUserForm_FormClosed);
             this.Load += new System.EventHandler(this.LoadUserForm_Load);
             this.DoubleClick += new System.EventHandler(this.FormLoadUserForm_DoubleClick);
