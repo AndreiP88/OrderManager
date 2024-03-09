@@ -162,12 +162,12 @@ namespace OrderManager
             return result;
         }
 
-        private string GetStampFromOrderNumber(string searchNumber)
+        private async Task<string> GetStampFromOrderNumber(string searchNumber)
         {
             ValueCategory valueCategory = new ValueCategory();
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            string category = getInfo.GetCategoryMachine(loadMachine).ToString();
+            string category = await getInfo.GetCategoryMachine(loadMachine);
 
             int normOperation = Convert.ToInt32(valueCategory.GetIDOptionView(category));
 
@@ -351,7 +351,7 @@ namespace OrderManager
                 List<string> jobItem = new List<string>();
                 List<string> itemID = new List<string>();
 
-                string stamp = GetStampFromOrderNumber(orderNumbers[i].numberOfOrder);
+                string stamp = await GetStampFromOrderNumber(orderNumbers[i].numberOfOrder);
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
@@ -652,10 +652,7 @@ namespace OrderManager
         CancellationTokenSource cancelTokenSource;
         private void StartLoading()
         {
-            if (cancelTokenSource != null)
-            {
-                cancelTokenSource.Cancel();
-            }
+            cancelTokenSource?.Cancel();
 
             cancelTokenSource = new CancellationTokenSource();
 
@@ -768,7 +765,7 @@ namespace OrderManager
                     connection.Close();
                 }
 
-                string stamp = GetStampFromOrderNumber(orderNumber);
+                string stamp = await GetStampFromOrderNumber(orderNumber);
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
@@ -959,11 +956,6 @@ namespace OrderManager
                 }));*/
 
             }
-
-            Invoke(new Action(() =>
-            {
-
-            }));
         }
 
         private void AddOrderToListView(int index, OrdersLoad order)
@@ -1196,5 +1188,9 @@ namespace OrderManager
             }
         }
 
+        private void FormLoadOrders_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            cancelTokenSource?.Cancel();
+        }
     }
 }

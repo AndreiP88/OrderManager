@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -480,31 +481,62 @@ namespace OrderManager
 
             comboBox3.Items.Clear();
 
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT DISTINCT id FROM machines"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-                while (sqlReader.Read())
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), nameOfExecutor) == true)
-                        comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
-                    //else
-                    //comboBox3.Items.Add(sqlReader["machine"].ToString());
+                    try
+                    {
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                        {
+                            Connect.Open();
+                            MySqlCommand Command = new MySqlCommand
+                            {
+                                Connection = Connect,
+                                CommandText = @"SELECT DISTINCT id FROM machines"
+                            };
+                            DbDataReader sqlReader = Command.ExecuteReader();
+
+                            while (sqlReader.Read())
+                            {
+                                if (CheckUserToSelectedMachine(sqlReader["id"].ToString(), nameOfExecutor) == true)
+                                    comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
+                                //else
+                                //comboBox3.Items.Add(sqlReader["machine"].ToString());
+                            }
+
+                            Connect.Close();
+                        }
+
+                        if (comboBox3.Items.Count > 0)
+                        {
+                            await SelectLastMschineToComboBox(nameOfExecutor);
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
                 }
-
-                Connect.Close();
             }
-
-            if (comboBox3.Items.Count > 0)
-            {
-                await SelectLastMschineToComboBox(nameOfExecutor);
-            }
+            while (reconnectionRequired);
         }
 
         private bool CheckUserToSelectedMachine(String machine, String user)
@@ -521,7 +553,7 @@ namespace OrderManager
             ValueUserBase getMachine = new ValueUserBase();
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            String machine = "";
+            string machine = "";
 
             if (!adminCloseOrder)
             {
@@ -1577,33 +1609,65 @@ namespace OrderManager
             //int orderStatus = 0;
             GetDateTimeOperations totalMinToHM = new GetDateTimeOperations();
 
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
             {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    Connection = Connect,
-                    CommandText = @"SELECT * FROM orders WHERE count = @id"
-                };
-                Command.Parameters.AddWithValue("@id", orderIndex);
+                    try
+                    {
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                        {
+                            Connect.Open();
+                            MySqlCommand Command = new MySqlCommand
+                            {
+                                Connection = Connect,
+                                CommandText = @"SELECT * FROM orders WHERE count = @id"
+                            };
+                            Command.Parameters.AddWithValue("@id", orderIndex);
 
-                DbDataReader sqlReader = Command.ExecuteReader();
+                            DbDataReader sqlReader = Command.ExecuteReader();
 
-                while (sqlReader.Read())
-                {
-                    textBox1.Text = sqlReader["numberOfOrder"].ToString();
-                    comboBox2.Text = sqlReader["nameOfOrder"].ToString();
-                    numericUpDown1.Value = Convert.ToInt32(sqlReader["amountOfOrder"]);
-                    numericUpDown5.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeMakeready"])).Item1;
-                    numericUpDown6.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeMakeready"])).Item2;
-                    numericUpDown7.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item1;
-                    numericUpDown8.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item2;
-                    textBox2.Text = sqlReader["orderStamp"].ToString();
-                    textBox5.Text = sqlReader["modification"].ToString();
+                            while (sqlReader.Read())
+                            {
+                                textBox1.Text = sqlReader["numberOfOrder"].ToString();
+                                comboBox2.Text = sqlReader["nameOfOrder"].ToString();
+                                numericUpDown1.Value = Convert.ToInt32(sqlReader["amountOfOrder"]);
+                                numericUpDown5.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeMakeready"])).Item1;
+                                numericUpDown6.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeMakeready"])).Item2;
+                                numericUpDown7.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item1;
+                                numericUpDown8.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item2;
+                                textBox2.Text = sqlReader["orderStamp"].ToString();
+                                textBox5.Text = sqlReader["modification"].ToString();
+                            }
+                            Connect.Close();
+                        }
+
+                        SetEnabledElements(comboBox1.SelectedIndex);
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
                 }
-                Connect.Close();
             }
-            SetEnabledElements(comboBox1.SelectedIndex);
+            while (reconnectionRequired);
         }
 
         private void LoadCurrentOrderInProgressFromDB(int shiftID, int machine, int orderID, int counterRepeat)
@@ -1717,86 +1781,117 @@ namespace OrderManager
             GetOrdersFromBase getOrder = new GetOrdersFromBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
 
-            String nMakereadyStart = leadTime.GetCurrentDateTime("timeMakereadyStart");
-            String nMakereadyStop = leadTime.GetCurrentDateTime("timeMakereadyStop");
-            String nWorkStart = leadTime.GetCurrentDateTime("timeToWorkStart");
-            String nWorkStop = leadTime.GetCurrentDateTime("timeToWorkStop");
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            String amountOrder = getValue.GetAmountOfOrder(orderID);
-
-            int amountComplete = orderCalc.OrderCalculate(true, false);
-            int amountDone = orderCalc.OrderCalculate(false, true);
-            int amountFull = 0;
-            
-            if (amountOrder != "")
-                amountFull = Convert.ToInt32(amountOrder);
-
-            if (nMakereadyStart != "")
+            do
             {
-                groupBox2.Visible = true;
-                dateTimePicker1.Visible = true;
-                dateTimePicker1.Text = nMakereadyStart;
-            }
-            else
-            {
-                groupBox2.Visible = false;
-                dateTimePicker1.Visible = false;
-                dateTimePicker1.Text = "";
-            }
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        string nMakereadyStart = leadTime.GetCurrentDateTime("timeMakereadyStart");
+                        string nMakereadyStop = leadTime.GetCurrentDateTime("timeMakereadyStop");
+                        string nWorkStart = leadTime.GetCurrentDateTime("timeToWorkStart");
+                        string nWorkStop = leadTime.GetCurrentDateTime("timeToWorkStop");
 
-            if (nMakereadyStop != "")
-            {
-                dateTimePicker2.Visible = true;
-                dateTimePicker2.Text = nMakereadyStop;
-                textBox3.Visible = true;
-                textBox3.Text = timeDif.DateDifferent(dateTimePicker2.Text, dateTimePicker1.Text);
-            }
-            else
-            {
-                dateTimePicker2.Visible = false;
-                dateTimePicker2.Text = "";
-                textBox3.Visible = false;
-            }
+                        string amountOrder = getValue.GetAmountOfOrder(orderID);
 
-            if (nWorkStart != "")
-            {
-                groupBox3.Visible = true;
-                dateTimePicker3.Visible = true;
-                dateTimePicker3.Text = nWorkStart;
+                        int amountComplete = orderCalc.OrderCalculate(true, false);
+                        int amountDone = orderCalc.OrderCalculate(false, true);
+                        int amountFull = 0;
+
+                        if (amountOrder != "")
+                            amountFull = Convert.ToInt32(amountOrder);
+
+                        if (nMakereadyStart != "")
+                        {
+                            groupBox2.Visible = true;
+                            dateTimePicker1.Visible = true;
+                            dateTimePicker1.Text = nMakereadyStart;
+                        }
+                        else
+                        {
+                            groupBox2.Visible = false;
+                            dateTimePicker1.Visible = false;
+                            dateTimePicker1.Text = "";
+                        }
+
+                        if (nMakereadyStop != "")
+                        {
+                            dateTimePicker2.Visible = true;
+                            dateTimePicker2.Text = nMakereadyStop;
+                            textBox3.Visible = true;
+                            textBox3.Text = timeDif.DateDifferent(dateTimePicker2.Text, dateTimePicker1.Text);
+                        }
+                        else
+                        {
+                            dateTimePicker2.Visible = false;
+                            dateTimePicker2.Text = "";
+                            textBox3.Visible = false;
+                        }
+
+                        if (nWorkStart != "")
+                        {
+                            groupBox3.Visible = true;
+                            dateTimePicker3.Visible = true;
+                            dateTimePicker3.Text = nWorkStart;
+                        }
+                        else
+                        {
+                            groupBox3.Visible = false;
+                            dateTimePicker3.Visible = false;
+                            dateTimePicker3.Text = "";
+                        }
+
+                        if (nWorkStop != "")
+                        {
+                            dateTimePicker4.Visible = true;
+                            dateTimePicker4.Text = nWorkStop;
+                            textBox4.Visible = true;
+                            textBox4.Text = timeDif.DateDifferent(dateTimePicker4.Text, dateTimePicker3.Text);
+                        }
+                        else
+                        {
+                            dateTimePicker4.Visible = false;
+                            dateTimePicker4.Text = "";
+                            textBox4.Visible = false;
+                        }
+
+                        numericUpDown2.Value = amountComplete;
+
+                        if (amountComplete >= amountFull)
+                            numericUpDown3.Value = 0;
+                        else
+                            numericUpDown3.Value = amountFull - amountComplete;
+
+                        numericUpDown4.Enabled = false;
+                        numericUpDown4.Value = amountDone;
+
+                        textBox6.Text = getOrder.GetNote(shiftID, orderID, counterRepeat, machine);
+                        checkBox1.Checked = Convert.ToBoolean(getOrder.GetMakereadyConsider(shiftID, orderID, counterRepeat, machine));
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
             }
-            else
-            {
-                groupBox3.Visible = false;
-                dateTimePicker3.Visible = false;
-                dateTimePicker3.Text = "";
-            }
-
-            if (nWorkStop != "")
-            {
-                dateTimePicker4.Visible = true;
-                dateTimePicker4.Text = nWorkStop;
-                textBox4.Visible = true;
-                textBox4.Text = timeDif.DateDifferent(dateTimePicker4.Text, dateTimePicker3.Text);
-            }
-            else
-            {
-                dateTimePicker4.Visible = false;
-                dateTimePicker4.Text = "";
-                textBox4.Visible = false;
-            }
-
-            numericUpDown2.Value = amountComplete;
-
-            if (amountComplete >= amountFull)
-                numericUpDown3.Value = 0;
-            else
-                numericUpDown3.Value = amountFull - amountComplete;
-
-            numericUpDown4.Enabled = false;
-            numericUpDown4.Value = amountDone;
-
-            textBox6.Text = getOrder.GetNote(shiftID, orderID, counterRepeat, machine);
-            checkBox1.Checked = Convert.ToBoolean(getOrder.GetMakereadyConsider(shiftID, orderID, counterRepeat, machine));
+            while (reconnectionRequired);
         }
 
         private async Task LoadOrderForEdit(int shiftID, int orderID, int machine, int counterRepeat)
@@ -1807,55 +1902,86 @@ namespace OrderManager
 
             this.Text = "Детали заказа";
 
-            string modification = getOrder.GetOrderModification(orderID);
-            string number = getOrder.GetOrderNumber(orderID);
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            String strModification = "";
-            if (modification != "")
-                strModification = " (" + modification + ")";
-
-            int mkComplete = ordersFromBase.GetMakereadyPart(shiftID, orderID, counterRepeat, machine);
-
-            if (mkComplete == -1)
+            do
             {
-                checkBox1.Enabled = false;
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        string modification = getOrder.GetOrderModification(orderID);
+                        string number = getOrder.GetOrderNumber(orderID);
+
+                        string strModification = "";
+                        if (modification != "")
+                            strModification = " (" + modification + ")";
+
+                        int mkComplete = ordersFromBase.GetMakereadyPart(shiftID, orderID, counterRepeat, machine);
+
+                        if (mkComplete == -1)
+                        {
+                            checkBox1.Enabled = false;
+                        }
+                        else
+                        {
+                            checkBox1.Enabled = true;
+                        }
+
+                        comboBox1.Items.Add("");
+                        comboBox1.Items.Add(number + ": " +
+                            getOrder.GetOrderName(orderID) + strModification + " - " + Convert.ToInt32(getOrder.GetAmountOfOrder(orderID)).ToString("N0"));
+                        comboBox1.SelectedIndex = 1;
+                        comboBox1.Enabled = false;
+
+                        comboBox3.Items.Add(await getInfo.GetMachineName(machine.ToString()));
+                        comboBox3.SelectedIndex = 0;
+                        comboBox3.Enabled = false;
+
+                        button2.Visible = false;
+                        button3.Visible = false;
+
+                        if (shiftID == Form1.Info.shiftIndex || aMode)
+                        {
+                            button1.Visible = true;
+                            textBox6.Enabled = true;
+
+                            button6.Enabled = true;
+                        }
+                        else
+                        {
+                            button1.Visible = false;
+                            textBox6.Enabled = false;
+
+                            button6.Enabled = false;
+                        }
+
+                        //SetEnabledElements(1);
+                        LoadOrderFromDB(orderID);
+                        LoadOrderInProgressFromDB(shiftID, orderID, machine, counterRepeat);
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
             }
-            else
-            {
-                checkBox1.Enabled = true;
-            }
-
-            comboBox1.Items.Add("");
-            comboBox1.Items.Add(number + ": " +
-                getOrder.GetOrderName(orderID) + strModification + " - " + Convert.ToInt32(getOrder.GetAmountOfOrder(orderID)).ToString("N0"));
-            comboBox1.SelectedIndex = 1;
-            comboBox1.Enabled = false;
-
-            comboBox3.Items.Add(await getInfo.GetMachineName(machine.ToString()));
-            comboBox3.SelectedIndex = 0;
-            comboBox3.Enabled = false;
-
-            button2.Visible = false;
-            button3.Visible = false;
-
-            if (shiftID == Form1.Info.shiftIndex || aMode)
-            {
-                button1.Visible = true;
-                textBox6.Enabled = true;
-
-                button6.Enabled = true;
-            }
-            else
-            {
-                button1.Visible = false;
-                textBox6.Enabled = false;
-
-                button6.Enabled = false;
-            }
-
-            //SetEnabledElements(1);
-            LoadOrderFromDB(orderID);
-            LoadOrderInProgressFromDB(shiftID, orderID, machine, counterRepeat);
+            while (reconnectionRequired);
         }
 
         private void SaveChanges(int shiftID, int orderIndex, string machine, int counterRepeat)
@@ -1903,24 +2029,54 @@ namespace OrderManager
             numericUpDown3.BackColor = Color.White;
             numericUpDown3.Enabled = false;
 
-            orderRegistrationType = valueSettings.GetOrderRegistrationType(nameOfExecutor);
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            if (loadOrderId != -1)
+            do
             {
-                await LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
-                LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        orderRegistrationType = valueSettings.GetOrderRegistrationType(nameOfExecutor);
 
-                timer1.Enabled = false;
+                        if (loadOrderId != -1)
+                        {
+                            await LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
+                            LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
+
+                            timer1.Enabled = false;
+                        }
+                        else
+                        {
+                            await LoadMachine();
+
+                            //LoadOrdersToComboBox();
+
+                            timer1.Enabled = true;
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
             }
-            else
-            {
-                await LoadMachine();
-
-                //LoadOrdersToComboBox();
-
-                timer1.Enabled = true;
-            }
-
+            while (reconnectionRequired);
         }
 
         private void SetNewValue(decimal amountOrder, string stampOrder, int makereadyOrder, int workOrder)

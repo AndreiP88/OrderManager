@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
@@ -255,34 +256,10 @@ namespace OrderManager
             return machinesList;
         }
 
-        private String GetValueMachinesOLD(String findColomnName, String findParameter, String valueColomn)
-        {
-            String result = "";
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
-            {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT * FROM machines WHERE " + findColomnName + " = '" + findParameter + "'"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read())
-                {
-                    result = sqlReader[valueColomn].ToString();
-                }
-
-                Connect.Close();
-            }
-
-            return result;
-        }
-
         private async Task<object> GetValueMachines(string findColomnName, string findParameter, string valueColomn)
         {
             object result = null;
+
             try
             {
                 using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -307,12 +284,12 @@ namespace OrderManager
             }
             catch (SqlException sqlEx)
             {
-                LogException.WriteLine("GetValueMachines: " + string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+                LogException.WriteLine("GetValueMachines: " + string.Format("MySQL #{0}: {1}\n{3}", sqlEx.Number, sqlEx.Message, sqlEx.StackTrace));
                 throw new ApplicationException(string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
             }
             catch (Exception ex)
             {
-                LogException.WriteLine("GetValueMachines: " + ex.Message);
+                LogException.WriteLine(string.Format("Error #{0}: {1}\n{3}", ex.Source, ex.Message, ex.StackTrace));
                 throw new ApplicationException(ex.Message);
             }
         }

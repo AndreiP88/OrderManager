@@ -309,6 +309,7 @@
             this.Name = "FormLoadOrders";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Список заказов";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormLoadOrders_FormClosing);
             this.Load += new System.EventHandler(this.FormLoadOrders_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
