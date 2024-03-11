@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
@@ -9,135 +10,178 @@ namespace OrderManager
     public partial class FormLoadUserForm : Form
     {
         public static bool enteredPasswordSuccess = false;
+        CancellationTokenSource cancelTokenSourceLoadUsers;
+        CancellationTokenSource cancelTokenSourceLoadMachines;
 
         public FormLoadUserForm()
         {
             InitializeComponent();
         }
 
-        List<String> users;
+        List<string> users;
 
         private async void LoadUserForm_Load(object sender, EventArgs e)
         {
-            await LoadUsersList();
+            cancelTokenSourceLoadUsers?.Cancel();
+
+            cancelTokenSourceLoadUsers = new CancellationTokenSource();
+
+            await LoadUsersList(cancelTokenSourceLoadUsers.Token);
             UpdateCurrentDateTime();
 
             timer1.Enabled = true;
         }
 
-        private async Task LoadUsersList()
+        private async Task LoadUsersList(CancellationToken token)
         {
-            //ValueInfoBase getMachine = new ValueInfoBase();
-            ValueUserBase userBase = new ValueUserBase();
-            StringArray str = new StringArray();
-            INISettings settings = new INISettings();
-
-            bool reconnectionRequired = false;
-            DialogResult dialog = DialogResult.Retry;
-
-            do
+            await Task.Run(async () =>
             {
-                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                //ValueInfoBase getMachine = new ValueInfoBase();
+                ValueUserBase userBase = new ValueUserBase();
+                StringArray str = new StringArray();
+                INISettings settings = new INISettings();
+
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
+
+                do
                 {
-                    try
+                    if (token.IsCancellationRequested)
                     {
-                        string selectedCategory = settings.GetCategoryesForView();
-                        string[] arrayCat = str.ArrayFromTheString(selectedCategory);
-
-                        listView1.Items.Clear();
-                        //List<String> users = userBase.GetUserList(true);
-                        //users.Clear();
-
-                        users = userBase.GetUserListForCategory(true, arrayCat);
-
-                        int counter = 0;
-
-                        for (int i = 0; i < users.Count; i++) // считываем и вносим в комбобокс список заголовков
-                        {
-                            //String machines = getMachine.GetMachinesStr(users[i].ToString());
-
-                            counter++;
-
-                            ListViewItem item = new ListViewItem();
-                            item.Name = users[i].ToString();
-                            item.Text = counter.ToString();
-                            item.SubItems.Add(userBase.GetNameUser(users[i]));
-                            //item.SubItems.Add(machines);
-                            item.SubItems.Add("");
-                            listView1.Items.Add(item);
-                        }
-
-                        await UpdateMachineFromUsers();
-
-                        reconnectionRequired = false;
+                        break;
                     }
-                    catch (Exception ex)
+
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                     {
-                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
-
-                        dialog = DataBaseReconnectionRequest(ex.Message);
-
-                        if (dialog == DialogResult.Retry)
+                        try
                         {
-                            reconnectionRequired = true;
-                        }
-                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
-                        {
-                            reconnectionRequired = false;
-                            Application.Exit();
-                        }
-                    }
-                }
-            }
-            while (reconnectionRequired);
-        }
+                            string selectedCategory = settings.GetCategoryesForView();
+                            string[] arrayCat = str.ArrayFromTheString(selectedCategory);
 
-        private async Task UpdateMachineFromUsers()
-        {
-            ValueInfoBase getMachine = new ValueInfoBase();
-
-            bool reconnectionRequired = false;
-            DialogResult dialog = DialogResult.Retry;
-
-            do
-            {
-                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
-                {
-                    try
-                    {
-                        for (int i = 0; i < users.Count; i++)
-                        {
-                            string machines = await getMachine.GetMachinesStr(users[i].ToString());
-
-                            ListViewItem item = listView1.Items[i];
-
-                            if (item != null)
+                            Invoke(new Action(() =>
                             {
-                                item.SubItems[2].Text = machines;
+                                listView1.Items?.Clear();
+                            }));
+
+                            //List<String> users = userBase.GetUserList(true);
+                            //users.Clear();
+
+                            users = userBase.GetUserListForCategory(true, arrayCat);
+
+                            int counter = 0;
+
+                            for (int i = 0; i < users.Count; i++) // считываем и вносим в комбобокс список заголовков
+                            {
+                                //String machines = getMachine.GetMachinesStr(users[i].ToString());
+
+                                if (token.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+
+                                counter++;
+
+                                ListViewItem item = new ListViewItem();
+                                item.Name = users[i].ToString();
+                                item.Text = counter.ToString();
+                                item.SubItems.Add(userBase.GetNameUser(users[i]));
+                                //item.SubItems.Add(machines);
+                                item.SubItems.Add("");
+
+                                Invoke(new Action(() =>
+                                {
+                                    listView1.Items?.Add(item);
+                                }));
+                            }
+
+                            await UpdateMachineFromUsers(token);
+
+                            reconnectionRequired = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
                             }
                         }
-
-                        reconnectionRequired = false;
                     }
-                    catch (Exception ex)
+                }
+                while (reconnectionRequired);
+            });
+        }
+
+        private async Task UpdateMachineFromUsers(CancellationToken token)
+        {
+            await Task.Run(async () =>
+            {
+                ValueInfoBase getMachine = new ValueInfoBase();
+
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
+
+                do
+                {
+                    if (token.IsCancellationRequested)
                     {
-                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+                        break;
+                    }
 
-                        dialog = DataBaseReconnectionRequest(ex.Message);
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                    {
+                        try
+                        {
+                            for (int i = 0; i < users.Count; i++)
+                            {
+                                if (token.IsCancellationRequested)
+                                {
+                                    break;
+                                }
 
-                        if (dialog == DialogResult.Retry)
-                        {
-                            reconnectionRequired = true;
-                        }
-                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
-                        {
+                                string machines = await getMachine.GetMachinesStr(users[i].ToString());
+
+                                Invoke(new Action(() =>
+                                {
+                                    ListViewItem item = listView1.Items[i];
+
+                                    if (item != null)
+                                    {
+                                        item.SubItems[2].Text = machines;
+                                    }
+                                }));
+                            }
+
                             reconnectionRequired = false;
-                            Application.Exit();
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
+                            }
                         }
                     }
                 }
-            }
-            while (reconnectionRequired);
+                while (reconnectionRequired);
+            });
         }
 
         private void UpdateCurrentDateTime()
@@ -277,12 +321,20 @@ namespace OrderManager
 
         private async void timer1_Tick(object sender, EventArgs e)
         {
-            await UpdateMachineFromUsers();
+            cancelTokenSourceLoadMachines?.Cancel();
+
+            cancelTokenSourceLoadMachines = new CancellationTokenSource();
+
+            await UpdateMachineFromUsers(cancelTokenSourceLoadMachines.Token);
             UpdateCurrentDateTime();
         }
 
         private async Task LoadFormDataBaseSelect()
         {
+            cancelTokenSourceLoadUsers?.Cancel();
+
+            cancelTokenSourceLoadUsers = new CancellationTokenSource();
+
             FormAddEditTestMySQL form = new FormAddEditTestMySQL(true);
             form.ShowDialog();
 
@@ -294,19 +346,23 @@ namespace OrderManager
 
             users?.Clear();
 
-            await LoadUsersList();
+            await LoadUsersList(cancelTokenSourceLoadUsers.Token);
 
             timer1.Enabled = true;
         }
 
         private async Task LoadFormCategoryesSelect()
         {
+            cancelTokenSourceLoadUsers?.Cancel();
+
+            cancelTokenSourceLoadUsers = new CancellationTokenSource();
+
             FormSelectCategory form = new FormSelectCategory();
             form.ShowDialog();
 
             timer1.Enabled = false;
 
-            await LoadUsersList();
+            await LoadUsersList(cancelTokenSourceLoadUsers.Token);
 
             timer1.Enabled = true;
         }
@@ -334,6 +390,8 @@ namespace OrderManager
         private void FormLoadUserForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             timer1.Enabled = false;
+            cancelTokenSourceLoadUsers?.Cancel();
+            cancelTokenSourceLoadMachines?.Cancel();
         }
     }
 }

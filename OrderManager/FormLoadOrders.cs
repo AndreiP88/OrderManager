@@ -3,17 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OrderManager
 {
@@ -835,6 +827,11 @@ namespace OrderManager
                 {
                     for (int j = 0; j < mkNormTime.Count; j++)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
                         orders.Add(new OrdersLoad(
                             orderNumber,
                             nameCustomer,
@@ -855,6 +852,11 @@ namespace OrderManager
                 {
                     for (int j = 0; j < mkNormTime.Count; j++)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
                         if (j < wkNormTime.Count)
                         {
                             orders.Add(new OrdersLoad(
@@ -894,6 +896,11 @@ namespace OrderManager
                 {
                     for (int j = 0; j < wkNormTime.Count; j++)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
                         if (j < mkNormTime.Count)
                         {
                             orders.Add(new OrdersLoad(
@@ -1177,10 +1184,7 @@ namespace OrderManager
 
             if (_loadForViewOrders)
             {
-                if (cancelTokenSource != null)
-                {
-                    cancelTokenSource.Cancel();
-                }
+                cancelTokenSource?.Cancel();
 
                 loadMachine = await infoBase.GetMachineFromName(comboBox1.Text);
 

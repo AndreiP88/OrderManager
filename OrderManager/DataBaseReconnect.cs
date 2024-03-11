@@ -9,16 +9,28 @@ namespace OrderManager
     {
         public static DialogResult DataBaseReconnectionRequest(string exception)
         {
-            bool result = false;
+
             Form1._viewDatabaseRequestForm = true;
             //Form1._pauseEvent.Reset();
 
-            FormDataBaseReconnect form = new FormDataBaseReconnect(exception);
-            form.ShowDialog();
+            //FormDataBaseReconnect form = new FormDataBaseReconnect(exception);
+            //form.ShowDialog();
 
-            DialogResult dialog = form.DialogResult;
+            //DialogResult dialog = form.DialogResult;
 
-            result = form.Reconnect;
+            if (Form1.formSQLException == null || Form1.formSQLException.IsDisposed)
+            {
+                Form1.formSQLException = new FormDataBaseReconnect(exception);
+                Form1.formSQLException.ShowDialog();
+            }
+            else
+            {
+                //Form1.formSQLException.Activate();
+            }
+
+            DialogResult dialog = Form1.formSQLException.DialogResult;
+
+            //Form1.formSQLException?.Dispose();
 
             Form1._viewDatabaseRequestForm = false;
             //

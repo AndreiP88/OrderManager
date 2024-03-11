@@ -479,7 +479,7 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            comboBox3.Items.Clear();
+            comboBox3.Items?.Clear();
 
             bool reconnectionRequired = false;
             DialogResult dialog = DialogResult.Retry;

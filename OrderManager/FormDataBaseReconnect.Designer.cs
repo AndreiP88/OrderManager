@@ -153,6 +153,7 @@
             this.Name = "FormDataBaseReconnect";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Ошибка";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormDataBaseReconnect_FormClosed);
             this.Load += new System.EventHandler(this.FormDataBaseReconnect_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

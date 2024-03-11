@@ -163,6 +163,7 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -1188,6 +1189,7 @@ namespace OrderManager
             this.columnHeader2,
             this.columnOrderNumber,
             this.columnOrderName,
+            this.columnHeader15,
             this.columnCount,
             this.columnHeader3,
             this.columnHeader7,
@@ -1228,7 +1230,7 @@ namespace OrderManager
             // columnOrderNumber
             // 
             this.columnOrderNumber.Text = "Заказ";
-            this.columnOrderNumber.Width = 140;
+            this.columnOrderNumber.Width = 94;
             // 
             // columnOrderName
             // 
@@ -1608,6 +1610,11 @@ namespace OrderManager
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
             // 
+            // columnHeader15
+            // 
+            this.columnHeader15.Text = "Подробней";
+            this.columnHeader15.Width = 160;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1787,6 +1794,7 @@ namespace OrderManager
         private ToolStripMenuItem statisticAllWorkingOutToolStripMenuItem;
         private ToolStripMenuItem statisticYearToolStripMenuItem;
         private ToolStripMenuItem makereadyPartToolStripMenuItem;
+        private ColumnHeader columnHeader15;
     }
 }
 

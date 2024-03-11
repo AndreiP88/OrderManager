@@ -127,5 +127,10 @@ namespace OrderManager
 
             this.DialogResult = DialogResult.Retry;
         }
+
+        private void FormDataBaseReconnect_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Form1.formSQLException?.Dispose();
+        }
     }
 }
