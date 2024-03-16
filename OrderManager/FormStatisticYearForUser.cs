@@ -294,11 +294,11 @@ namespace OrderManager
             ValueUserBase getUser = new ValueUserBase();
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            Invoke(new Action(() =>
+            /*Invoke(new Action(() =>
             {
-                /*comboBox1.Enabled = false;
-                comboBox4.Enabled = false;*/
-            }));
+                *//*comboBox1.Enabled = false;
+                comboBox4.Enabled = false;*//*
+            }));*/
 
             List<string> monthNames = new List<string>();
 
@@ -353,44 +353,59 @@ namespace OrderManager
                     workingOutUser = await workingOutSum.CalculateWorkingOutForUserFromSelectedMonthDataBaseASUsersFromOM(UserID, equipsListForUser, currentDateTime);
                 }
 
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 workingOut.Add(workingOutUser);
                 summWorkingOut += workingOutUser;
 
-                Invoke(new Action(() =>
+                try
                 {
-                    int index = listView1.Items.IndexOfKey((i + 1).ToString());
-
-                    if (index >= 0)
+                    Invoke(new Action(() =>
                     {
-                        ListViewItem item = listView1.Items[index];
+                        int index = listView1.Items.IndexOfKey((i + 1).ToString());
 
-                        if (item != null)
+                        if (index >= 0)
                         {
-                            item.SubItems[2].Text = workingOutUser.ToString("N0");
+                            ListViewItem item = listView1.Items[index];
+
+                            if (item != null)
+                            {
+                                item.SubItems[2].Text = workingOutUser.ToString("N0");
+                            }
                         }
-                    }
 
-                    int indexSum = listView1.Items.IndexOfKey("sum");
+                        int indexSum = listView1.Items.IndexOfKey("sum");
 
-                    if (indexSum >= 0)
-                    {
-                        ListViewItem item = listView1.Items[indexSum];
-
-                        if (item != null)
+                        if (indexSum >= 0)
                         {
-                            item.SubItems[2].Text = summWorkingOut.ToString("N0");
-                        }
-                    }
+                            ListViewItem item = listView1.Items[indexSum];
 
-                }));
+                            if (item != null)
+                            {
+                                item.SubItems[2].Text = summWorkingOut.ToString("N0");
+                            }
+                        }
+
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    LogException.WriteLine("LoadUsersFromBase: " + ex.Message);
+                }
             }
 
-            Invoke(new Action(() =>
+            if (!token.IsCancellationRequested)
             {
-                DrawDiagram(workingOut, monthNames);
+                Invoke(new Action(() =>
+                {
+                    DrawDiagram(workingOut, monthNames);
 
-                //label2.Text = summWorkingOut.ToString("N0");
-            }));
+                    //label2.Text = summWorkingOut.ToString("N0");
+                }));
+            }
 
             for (int i = 0; i < 12; i++)
             {
@@ -430,11 +445,11 @@ namespace OrderManager
                 }
             }));*/
 
-            Invoke(new Action(() =>
+            /*Invoke(new Action(() =>
             {
-                /*comboBox1.Enabled = true;
-                comboBox4.Enabled = true;*/
-            }));
+                *//*comboBox1.Enabled = true;
+                comboBox4.Enabled = true;*//*
+            }));*/
         }
 
         private async void LoadWorkingOut(CancellationToken token, DateTime date, int selectLoadBase)
@@ -443,11 +458,11 @@ namespace OrderManager
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetWorkingOutSum getWorkingOut = new GetWorkingOutSum();
 
-            Invoke(new Action(() =>
+            /*Invoke(new Action(() =>
             {
-                /*comboBox1.Enabled = false;
-                comboBox4.Enabled = false;*/
-            }));
+                *//*comboBox1.Enabled = false;
+                comboBox4.Enabled = false;*//*
+            }));*/
 
             int countMonthEctive = 0;
             int summWorkingOutHour = 0;
@@ -544,11 +559,11 @@ namespace OrderManager
                 }
             }));*/
 
-            Invoke(new Action(() =>
+            /*Invoke(new Action(() =>
             {
                 comboBox1.Enabled = true;
                 comboBox4.Enabled = true;
-            }));
+            }));*/
         }
 
         /*private ShiftsDetails WorkingOutAS(DateTime selectDate, CancellationToken token)
@@ -702,6 +717,7 @@ namespace OrderManager
         private void FormShiftsDetails_FormClosing(object sender, FormClosingEventArgs e)
         {
             //SaveParameterToBase("statisticForm");
+            cancelTokenSource?.Cancel();
         }
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
