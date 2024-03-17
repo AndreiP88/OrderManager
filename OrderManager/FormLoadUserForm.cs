@@ -23,7 +23,6 @@ namespace OrderManager
         private async void LoadUserForm_Load(object sender, EventArgs e)
         {
             cancelTokenSourceLoadUsers?.Cancel();
-
             cancelTokenSourceLoadUsers = new CancellationTokenSource();
 
             await LoadUsersList(cancelTokenSourceLoadUsers.Token);
@@ -148,6 +147,11 @@ namespace OrderManager
                                 }
 
                                 string machines = await getMachine.GetMachinesStr(users[i].ToString());
+
+                                if (token.IsCancellationRequested)
+                                {
+                                    break;
+                                }
 
                                 Invoke(new Action(() =>
                                 {

@@ -219,15 +219,9 @@ namespace OrderManager
 
         private void StartLoading()
         {
-            if (cancelTokenSource != null)
-            {
-                cancelTokenSource.Cancel();
-
-                Thread.Sleep(200);
-            }
-
             if (comboBox1.SelectedIndex != -1 && comboBox4.SelectedIndex != -1)
             {
+                cancelTokenSource?.Cancel();
                 cancelTokenSource = new CancellationTokenSource();
 
                 DateTime date;

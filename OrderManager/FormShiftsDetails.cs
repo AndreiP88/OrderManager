@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -11,7 +12,7 @@ namespace OrderManager
     {
         bool adminMode;
 
-        String nameOfExecutor;
+        string nameOfExecutor;
         int yearOfStatistic;
         int monthOfStatistic;
 
@@ -24,8 +25,6 @@ namespace OrderManager
             this.yearOfStatistic = yearSt;
             this.monthOfStatistic = mouthSt;
         }
-
-        bool thJob = false;
 
         String GetParametersLine()
         {
@@ -112,14 +111,18 @@ namespace OrderManager
                 //comboBox1.SelectedIndex = comboBox1.FindString(dateTime.Year.ToString());
                 comboBox1.SelectedIndex = comboBox1.Items.IndexOf(dateTime.Year.ToString());
                 comboBox2.SelectedIndex = dateTime.Month - 1;
+
+                comboBox1.Enabled = true;
+                comboBox2.Enabled = true;
             }
             else
             {
                 comboBox1.SelectedIndex = comboBox1.Items.IndexOf(year.ToString());
                 comboBox2.SelectedIndex = month;
+
+                comboBox1.Enabled = false;
+                comboBox2.Enabled = false;
             }
-
-
         }
 
         private void LoadYears()
@@ -144,30 +147,22 @@ namespace OrderManager
             label15.Text = "";
         }
 
+        CancellationTokenSource cancelTokenSource;
         private void StartLoading()
         {
             if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1)
             {
+                cancelTokenSource?.Cancel();
+                cancelTokenSource = new CancellationTokenSource();
+
                 ClearAll();
 
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1).AddMonths(comboBox2.SelectedIndex);
 
-                CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-                CancellationToken token = cancelTokenSource.Token;
-
                 //Task task = new Task(LoadShiftsFromBase);
-                Task task = new Task(() => LoadShiftsFromBase(token, date));
-
-                if (thJob == true)
-                {
-                    cancelTokenSource.Cancel();
-                }
-                else
-                {
-                    //thJob = true;
-                    task.Start();
-                }
+                Task task = new Task(() => LoadShiftsFromBase(cancelTokenSource.Token, date), cancelTokenSource.Token);
+                task.Start();
             }
         }
 
@@ -179,106 +174,145 @@ namespace OrderManager
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase shiftValue = new ValueShiftsBase();
 
-            Invoke(new Action(() =>
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
             {
-                comboBox1.Enabled = false;
-                comboBox2.Enabled = false;
-            }));
-
-            while (!token.IsCancellationRequested)
-            {
-                thJob = true;
-
-                List<int> shifts = (List<int>)getShifts.LoadShiftsList(date);
-                
-                for (int i = 0; i < shifts.Count; i++)
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    string shiftStart = shiftValue.GetStartShiftFromID(shifts[i]);
-
-                    string dateStr;
-                    
-                    dateStr = Convert.ToDateTime(shiftStart).ToString("d");
-                    dateStr += ", " + getNumberShift.NumberShift(shiftStart);
-
-                    ListViewItem item = new ListViewItem();
-                    
-                    item.Name = shifts[i].ToString();
-                    item.Text = (i + 1).ToString();
-                    item.SubItems.Add(dateStr);
-                    item.SubItems.Add("");
-                    item.SubItems.Add("");
-                    item.SubItems.Add("");
-                    item.SubItems.Add("");
-                    item.SubItems.Add("");
-                    item.SubItems.Add("");
-                    if (nameOfExecutor == Form1.Info.nameOfExecutor)
-                        item.SubItems.Add(shiftValue.GetNoteShift(shifts[i]));
-                    
-                    Invoke(new Action(() => listView1.Items.Add(item)));
-                }
-
-                for (int i = 0; i < shifts.Count; i++)
-                {
-                    Shifts currentShift = await getShifts.LoadCurrentShift(shifts[i]);
-
-                    Invoke(new Action(() =>
+                    try
                     {
-                        int index = listView1.Items.IndexOfKey(shifts[i].ToString());
+                        List<int> shifts = getShifts.LoadShiftsList(date);
 
-                        ListViewItem item = listView1.Items[index];
-
-                        if (item != null)
+                        for (int i = 0; i < shifts.Count; i++)
                         {
-                            item.SubItems[2].Text = currentShift.machinesShift;
-                            item.SubItems[3].Text = currentShift.workingTimeShift;
-                            item.SubItems[4].Text = currentShift.countOrdersShift.ToString() + " / " + currentShift.countMakeReadyShift.ToString();
-                            item.SubItems[5].Text = currentShift.amountOrdersShift.ToString("N0");
-                            item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift) + " (" + getPercent.GetBonusWorkingOut(currentShift.workingOutShift) + ")";
-                            item.SubItems[7].Text = getPercent.PercentString(currentShift.workingOutShift);
-
-                            if (shiftValue.GetCheckOvertimeShift(currentShift.startShiftID))
+                            if (token.IsCancellationRequested)
                             {
-                                item.Font = new Font(listView1.Font, FontStyle.Bold);
+                                break;
                             }
 
-                            if (getPercent.Percent(currentShift.workingOutShift) >= 0.8)
+                            string shiftStart = shiftValue.GetStartShiftFromID(shifts[i]);
+                            string dateStr;
+
+                            dateStr = Convert.ToDateTime(shiftStart).ToString("d");
+                            dateStr += ", " + getNumberShift.NumberShift(shiftStart);
+
+                            ListViewItem item = new ListViewItem();
+
+                            item.Name = shifts[i].ToString();
+                            item.Text = (i + 1).ToString();
+                            item.SubItems.Add(dateStr);
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            item.SubItems.Add("");
+                            if (nameOfExecutor == Form1.Info.nameOfExecutor)
+                                item.SubItems.Add(shiftValue.GetNoteShift(shifts[i]));
+
+                            if (token.IsCancellationRequested)
                             {
-                                item.ForeColor = Color.SeaGreen;
+                                break;
                             }
-                            else
+
+                            Invoke(new Action(() => listView1.Items.Add(item)));
+                        }
+
+                        for (int i = 0; i < shifts.Count; i++)
+                        {
+                            if (token.IsCancellationRequested)
                             {
-                                item.ForeColor = Color.DarkRed;
+                                break;
+                            }
+
+                            Shifts currentShift = await getShifts.LoadCurrentShift(shifts[i]);
+
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            if (!token.IsCancellationRequested)
+                            {
+                                try
+                                {
+                                    Invoke(new Action(() =>
+                                    {
+                                        int index = listView1.Items.IndexOfKey(shifts[i].ToString());
+
+                                        ListViewItem item = listView1.Items[index];
+
+                                        if (item != null)
+                                        {
+                                            item.SubItems[2].Text = currentShift.machinesShift;
+                                            item.SubItems[3].Text = currentShift.workingTimeShift;
+                                            item.SubItems[4].Text = currentShift.countOrdersShift.ToString() + " / " + currentShift.countMakeReadyShift.ToString();
+                                            item.SubItems[5].Text = currentShift.amountOrdersShift.ToString("N0");
+                                            item.SubItems[6].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(currentShift.workingOutShift) + " (" + getPercent.GetBonusWorkingOut(currentShift.workingOutShift) + ")";
+                                            item.SubItems[7].Text = getPercent.PercentString(currentShift.workingOutShift);
+
+                                            if (shiftValue.GetCheckOvertimeShift(currentShift.startShiftID))
+                                            {
+                                                item.Font = new Font(listView1.Font, FontStyle.Bold);
+                                            }
+
+                                            if (getPercent.Percent(currentShift.workingOutShift) >= 0.8)
+                                            {
+                                                item.ForeColor = Color.SeaGreen;
+                                            }
+                                            else
+                                            {
+                                                item.ForeColor = Color.DarkRed;
+                                            }
+                                        }
+                                    }));
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogException.WriteLine("LoadShiftsFromBase: " + ex.Message);
+                                }
                             }
                         }
-                    }));
-                }
 
-                ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, "", token); //добавить выбор категорий
+                        if (!token.IsCancellationRequested)
+                        {
+                            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, "", token); //добавить выбор категорий
 
-                Invoke(new Action(() =>
-                {
-                    label7.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
-                    label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
-                    label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
+                            Invoke(new Action(() =>
+                            {
+                                label7.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
+                                label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
+                                label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
 
-                    label13.Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
-                    label14.Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
-                    label15.Text = shiftsDetails.percentWorkingOutShift.ToString("P1");
-                }));
+                                label13.Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
+                                label14.Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
+                                label15.Text = shiftsDetails.percentWorkingOutShift.ToString("P1");
+                            }));
+                        }
 
-                Invoke(new Action(() =>
-                {
-                    if (yearOfStatistic == 0 && monthOfStatistic == 0)
-                    {
-                        comboBox1.Enabled = true;
-                        comboBox2.Enabled = true;
+                        reconnectionRequired = false;
                     }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
 
-                }));
+                        dialog = DataBaseReconnectionRequest(ex.Message);
 
-                thJob = false;
-                break;
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
             }
+            while (reconnectionRequired);
         }
 
         private void UpdateNote(int shiftID)
@@ -356,6 +390,8 @@ namespace OrderManager
 
         private void FormShiftsDetails_FormClosing(object sender, FormClosingEventArgs e)
         {
+            cancelTokenSource?.Cancel();
+
             SaveParameterToBase("shiftsForm");
         }
 

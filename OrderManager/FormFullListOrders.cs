@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -12,6 +14,10 @@ namespace OrderManager
     {
         bool detailsLoad;
         int orderID;
+
+        CancellationTokenSource cancelTokenSource;
+        CancellationTokenSource cancelTokenSourceYear;
+        CancellationTokenSource cancelTokenSourceMachine;
         /*String orderrMachineLoad;
         String orderNumberLoad;
         String orderModificationLoad;
@@ -119,65 +125,179 @@ namespace OrderManager
             comboBox2.SelectedIndex = dateTime.Month - 1;
         }
 
-        private async Task LoadMachine()
+        private async Task LoadMachine(CancellationToken token)
         {
-            ValueInfoBase getInfo = new ValueInfoBase();
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            await Task.Run(async () =>
             {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT DISTINCT id FROM machines"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
 
-                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                do
                 {
-                    comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                    {
+                        try
+                        {
+                            ValueInfoBase getInfo = new ValueInfoBase();
+
+                            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                            {
+                                await Connect.OpenAsync();
+                                MySqlCommand Command = new MySqlCommand
+                                {
+                                    Connection = Connect,
+                                    CommandText = @"SELECT DISTINCT id FROM machines"
+                                };
+                                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                                while (await sqlReader.ReadAsync()) // считываем и вносим в комбобокс список заголовков
+                                {
+                                    if (token.IsCancellationRequested)
+                                    {
+                                        break;
+                                    }
+
+                                    Invoke(new Action(async () =>
+                                    {
+                                        comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
+                                    }));
+                                }
+
+                                Connect.Close();
+                            }
+                            Invoke(new Action(() =>
+                            {
+                                if (comboBox3.Items.Count > 0)
+                                    comboBox3.SelectedIndex = 0;
+                            }));
+
+                            reconnectionRequired = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
+                            }
+                        }
+                    }
                 }
-
-                Connect.Close();
-            }
-
-            if (comboBox3.Items.Count > 0)
-                comboBox3.SelectedIndex = 0;
+                while (reconnectionRequired);
+            });
         }
 
-        private void LoadYears()
+        private async Task LoadYears(CancellationToken token)
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
-
-            List<String> years = new List<String>();
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            await Task.Run(async () =>
             {
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @"SELECT DISTINCT shiftID FROM ordersInProgress"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
 
-                while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                do
                 {
-                    int orderID = (int)sqlReader["shiftID"];
-                    string year = Convert.ToDateTime(shiftsBase.GetStartShiftFromID(orderID)).ToString("yyyy");
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
 
-                    if (years.IndexOf(year) == -1)
-                        years.Add(year);
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                    {
+                        try
+                        {
+                            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+                            List<string> years = new List<string>();
+
+                            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                            {
+                                await Connect.OpenAsync();
+                                MySqlCommand Command = new MySqlCommand
+                                {
+                                    Connection = Connect,
+                                    CommandText = @"SELECT DISTINCT startShift FROM shifts"
+                                };
+                                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                                while (await sqlReader.ReadAsync()) // считываем и вносим в комбобокс список заголовков
+                                {
+                                    if (token.IsCancellationRequested)
+                                    {
+                                        break;
+                                    }
+
+                                    string year = Convert.ToDateTime(sqlReader["startShift"]).ToString("yyyy");
+
+                                    if (years.IndexOf(year) == -1)
+                                        years.Add(year);
+                                }
+
+                                Connect.Close();
+                            }
+
+                            for (int i = years.Count - 1; i >= 0; i--)
+                            {
+                                if (token.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+
+                                Invoke(new Action(() =>
+                                {
+                                    comboBox1.Items.Add(years[i].ToString());
+                                }));
+
+                            }
+
+                            reconnectionRequired = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
+                            }
+                        }
+                    }
                 }
-
-                Connect.Close();
-            }
-
-            for (int i = years.Count - 1; i >= 0; i--)
-                comboBox1.Items.Add(years[i].ToString());
+                while (reconnectionRequired);
+            });
         }
 
         private async Task LoadOrdersFromBase()
+        {
+            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1)
+            {
+                cancelTokenSource?.Cancel();
+                cancelTokenSource = new CancellationTokenSource();
+
+                await LoadOrders(cancelTokenSource.Token);
+            }
+        }
+
+        private async Task LoadOrders(CancellationToken token)
         {
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             ValueUserBase usersBase = new ValueUserBase();
@@ -186,135 +306,217 @@ namespace OrderManager
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            listView1.Items.Clear();
-
-            string tmpNumberOrders = "";
-            int tmpShiftsID = -1;
-            int tmpAmountOrder = 0;
-            int index = 0;
-            int countOrders = 0;
-            int amountAllOrders = 0;
-
-            String year = "";
-            String month = "";
-            String machine = "";
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            await Task.Run(async () =>
             {
-                String commandLine;
-                //commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
-                commandLine = "shiftID IN (SELECT id FROM shifts WHERE ";
-                commandLine += "DATE_FORMAT(STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
-                commandLine += comboBox1.Text + "," + (comboBox2.SelectedIndex + 1).ToString("D2") + "')";
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
 
-                string commandText;
-                if (detailsLoad == true)
+                do
                 {
-                    commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
-                }
-                else
-                    commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(comboBox3.Text) + "'";
-
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
-                {
-                    Connection = Connect,
-                    CommandText = @commandText
-                    //CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + comboBox3.Text + "'"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read())
-                {
-                    string orderNumber = ordersBase.GetOrderNumber((int)sqlReader["orderID"]);
-
-                    if (orderNumber.Contains(textBox1.Text))
+                    if (token.IsCancellationRequested)
                     {
-                        int shiftID = (int)sqlReader["shiftID"];
-                        string shiftStart = shiftsBase.GetStartShiftFromID(shiftID);
-
-                        year = Convert.ToDateTime(shiftStart).ToString("yyyy");
-                        month = Convert.ToDateTime(shiftStart).ToString("MMMM");
-                        machine = sqlReader["machine"].ToString();
-
-                        //отображение имени исполнителя не в каждой строке, а только в начале смены
-                        //возможно сделать, как опцию
-                        String date, name;
-                        if (tmpShiftsID == shiftID)
-                        {
-                            date = "";
-                            name = "";
-                        }
-                        else
-                        {
-                            date = Convert.ToDateTime(shiftStart).ToString("d");
-                            date += ", " + getNumberShift.NumberShift(shiftStart);
-                            name = usersBase.GetNameUser(sqlReader["executor"].ToString());
-                        }
-
-                        //отображение общего количества тиража не в каждой строке, а только в первой
-                        String amountOrder;
-                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])) && tmpNumberOrders == sqlReader["orderID"].ToString())
-                        {
-                            amountOrder = "";
-                        }
-                        else
-                        {
-                            amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])).ToString("N0");
-                        }
-
-                        string modification = ordersBase.GetOrderModification((int)sqlReader["orderID"]);
-
-                        if (modification != "")
-                            modification = " (" + modification + ")";
-
-                        if (tmpNumberOrders != sqlReader["orderID"].ToString())
-                            countOrders++;
-
-                        tmpShiftsID = shiftID;
-                        tmpNumberOrders = sqlReader["orderID"].ToString();
-                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
-
-                        amountAllOrders += Convert.ToInt32(sqlReader["done"]);
-
-                        ListViewItem item = new ListViewItem();
-
-                        item.Name = sqlReader["orderID"].ToString();
-                        item.Text = (index + 1).ToString();
-                        item.SubItems.Add(date);
-                        item.SubItems.Add(name);
-                        item.SubItems.Add(ordersBase.GetOrderNumber((int)sqlReader["orderID"]) + modification);
-                        item.SubItems.Add(ordersBase.GetOrderName((int)sqlReader["orderID"]));
-                        item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()));
-                        item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()));
-                        item.SubItems.Add(amountOrder);
-                        item.SubItems.Add(Convert.ToInt32(sqlReader["done"]).ToString("N0"));
-                        item.SubItems.Add(sqlReader["note"].ToString());
-
-                        listView1.Items.Add(item);
-
-                        index++;
+                        break;
                     }
 
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                    {
+                        try
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                listView1.Items.Clear();
+                            }));
+
+                            string tmpNumberOrders = "";
+                            int tmpShiftsID = -1;
+                            int tmpAmountOrder = 0;
+                            int index = 0;
+                            int countOrders = 0;
+                            int amountAllOrders = 0;
+
+                            string year = "";
+                            string month = "";
+                            string machine = "";
+
+                            string selectYear = "2024";
+                            string selectMonth = "1";
+                            string machineName = "";
+                            string searchValue = "";
+
+                            Invoke(new Action(() =>
+                            {
+                                selectYear = comboBox1.Text;
+                                selectMonth = (comboBox2.SelectedIndex + 1).ToString("D2");
+                                machineName = comboBox3.Text;
+                                searchValue = textBox1.Text;
+                            }));
+
+                            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                            {
+                                string commandLine;
+                                //commandLine = "strftime('%Y,%m', date(substr(startOfShift, 7, 4) || '-' || substr(startOfShift, 4, 2) || '-' || substr(startOfShift, 1, 2))) = '";
+                                commandLine = "shiftID IN (SELECT id FROM shifts WHERE ";
+                                commandLine += "DATE_FORMAT(STR_TO_DATE(startShift,'%d.%m.%Y %H:%i:%S'), '%Y,%m') = '";
+                                commandLine += selectYear + "," + selectMonth + "')";
+
+                                string commandText;
+                                if (detailsLoad == true)
+                                {
+                                    commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
+                                }
+                                else
+                                    commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(machineName) + "'";
+
+                                await Connect.OpenAsync();
+
+                                MySqlCommand Command = new MySqlCommand
+                                {
+                                    Connection = Connect,
+                                    CommandText = @commandText
+                                    //CommandText = @"SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + comboBox3.Text + "'"
+                                };
+                                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                                while (await sqlReader.ReadAsync())
+                                {
+                                    if (token.IsCancellationRequested)
+                                    {
+                                        break;
+                                    }
+
+                                    string orderNumber = ordersBase.GetOrderNumber((int)sqlReader["orderID"]);
+
+                                    if (orderNumber.Contains(searchValue))
+                                    {
+                                        int shiftID = (int)sqlReader["shiftID"];
+                                        string shiftStart = shiftsBase.GetStartShiftFromID(shiftID);
+
+                                        year = Convert.ToDateTime(shiftStart).ToString("yyyy");
+                                        month = Convert.ToDateTime(shiftStart).ToString("MMMM");
+                                        machine = sqlReader["machine"].ToString();
+
+                                        //отображение имени исполнителя не в каждой строке, а только в начале смены
+                                        //возможно сделать, как опцию
+                                        String date, name;
+                                        if (tmpShiftsID == shiftID)
+                                        {
+                                            date = "";
+                                            name = "";
+                                        }
+                                        else
+                                        {
+                                            date = Convert.ToDateTime(shiftStart).ToString("d");
+                                            date += ", " + getNumberShift.NumberShift(shiftStart);
+                                            name = usersBase.GetNameUser(sqlReader["executor"].ToString());
+                                        }
+
+                                        //отображение общего количества тиража не в каждой строке, а только в первой
+                                        string amountOrder;
+                                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])) && tmpNumberOrders == sqlReader["orderID"].ToString())
+                                        {
+                                            amountOrder = "";
+                                        }
+                                        else
+                                        {
+                                            amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])).ToString("N0");
+                                        }
+
+                                        string modification = ordersBase.GetOrderModification((int)sqlReader["orderID"]);
+
+                                        if (modification != "")
+                                            modification = " (" + modification + ")";
+
+                                        if (tmpNumberOrders != sqlReader["orderID"].ToString())
+                                            countOrders++;
+
+                                        tmpShiftsID = shiftID;
+                                        tmpNumberOrders = sqlReader["orderID"].ToString();
+                                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
+
+                                        amountAllOrders += Convert.ToInt32(sqlReader["done"]);
+
+                                        ListViewItem item = new ListViewItem();
+
+                                        item.Name = sqlReader["orderID"].ToString();
+                                        item.Text = (index + 1).ToString();
+                                        item.SubItems.Add(date);
+                                        item.SubItems.Add(name);
+                                        item.SubItems.Add(ordersBase.GetOrderNumber((int)sqlReader["orderID"]) + modification);
+                                        item.SubItems.Add(ordersBase.GetOrderName((int)sqlReader["orderID"]));
+                                        item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()));
+                                        item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()));
+                                        item.SubItems.Add(amountOrder);
+                                        item.SubItems.Add(Convert.ToInt32(sqlReader["done"]).ToString("N0"));
+                                        item.SubItems.Add(sqlReader["note"].ToString());
+
+                                        if (token.IsCancellationRequested)
+                                        {
+                                            break;
+                                        }
+
+                                        Invoke(new Action(() =>
+                                        {
+                                            listView1?.Items?.Add(item);
+                                        }));
+
+                                        index++;
+                                    }
+
+                                }
+                                await Connect.CloseAsync();
+                            }
+
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
+
+                            Invoke(new Action(async () =>
+                            {
+                                if (detailsLoad == true)
+                                {
+                                    comboBox1.Text = year;
+                                    comboBox2.Text = month;
+                                    comboBox3.Text = await getInfo.GetMachineName(machine);
+                                }
+
+                                label7.Text = countOrders.ToString();
+                                label8.Text = amountAllOrders.ToString("N0");
+                            }));
+
+                            reconnectionRequired = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DialogResult.Retry;// DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
+                            }
+                        }
+                    }
                 }
-
-                Connect.Close();
-            }
-
-            if (detailsLoad == true)
-            {
-                comboBox1.Text = year;
-                comboBox2.Text = month;
-                comboBox3.Text = await getInfo.GetMachineName(machine);
-            }
-
-            label7.Text = countOrders.ToString();
-            label8.Text = amountAllOrders.ToString("N0");
+                while (reconnectionRequired);
+            });
         }
 
         private async void FormFullListOrders_Load(object sender, EventArgs e)
         {
             LoadParametersFromBase("fullListForm");
+
+            cancelTokenSourceYear?.Cancel();
+            cancelTokenSourceYear = new CancellationTokenSource();
+
+            cancelTokenSourceMachine?.Cancel();
+            cancelTokenSourceMachine = new CancellationTokenSource();
 
             if (detailsLoad == true)
             {
@@ -329,18 +531,17 @@ namespace OrderManager
                 label6.Visible = false;
                 textBox1.Visible = false;
 
-                LoadYears();
-                await LoadMachine();
+                await LoadYears(cancelTokenSourceYear.Token);
+                await LoadMachine(cancelTokenSourceMachine.Token);
 
                 //LoadOrdersFromBase();
             }
             else
             {
-                LoadYears();
-                await LoadMachine();
+                await LoadYears(cancelTokenSourceYear.Token);
+                await LoadMachine(cancelTokenSourceMachine.Token);
                 SetItemsComboBox();
             }
-
         }
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -365,6 +566,12 @@ namespace OrderManager
 
         private void FormFullListOrders_FormClosing(object sender, FormClosingEventArgs e)
         {
+            cancelTokenSource?.Cancel();
+            cancelTokenSourceYear?.Cancel();
+            cancelTokenSourceMachine?.Cancel();
+
+            Thread.Sleep(200);
+
             SaveParameterToBase("fullListForm");
         }
     }

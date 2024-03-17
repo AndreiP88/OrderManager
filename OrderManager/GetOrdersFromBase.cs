@@ -3,12 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using static OrderManager.DataBaseReconnect;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace OrderManager
 {

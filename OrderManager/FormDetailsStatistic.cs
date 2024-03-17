@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -21,7 +21,6 @@ namespace OrderManager
             this.adminMode = aMode;
         }
 
-        bool thJob = false;
         bool calculateNullShiftsFromUser = false;
 
         String GetParametersLine()
@@ -79,7 +78,6 @@ namespace OrderManager
             }
 
         }
-
         private void SaveParameterToBase(String nameForm)
         {
             ValueSettingsBase setting = new ValueSettingsBase();
@@ -148,41 +146,21 @@ namespace OrderManager
         CancellationTokenSource cancelTokenSource;
         private void StartLoading()
         {
-            if (cancelTokenSource != null)
-            {
-                cancelTokenSource.Cancel();
-                //Thread.Sleep(100);
-            }
-
             if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1)
             {
-                
-
+                cancelTokenSource?.Cancel();
                 cancelTokenSource = new CancellationTokenSource();
-                //CancellationToken token = cancelTokenSource.Token;
-
-                
 
                 ClearAll();
 
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1).AddMonths(comboBox2.SelectedIndex);
 
-                //Task task = new Task(() => LoadUsersFromBase(token, date));
                 Task task = new Task(() => LoadUsersFromBase(cancelTokenSource.Token, date), cancelTokenSource.Token);
                 //LoadUsersFromBase(cancelTokenSource.Token, date);
 
-                if (thJob == true)
-                {
-                    cancelTokenSource.Cancel();
-                }
-                else
-                {
-                    //thJob = true;
-                    task.Start();
-                }
+                task.Start();
             }
-
         }
 
         private async void LoadUsersFromBase(CancellationToken token, DateTime date)
@@ -191,168 +169,181 @@ namespace OrderManager
             ValueUserBase getUser = new ValueUserBase();
             ValueCategory categoryValue = new ValueCategory();
 
-            String cLine = " WHERE activeUser = 'True'";
+            string cLine = " WHERE activeUser = 'True'";
 
             string category = "";
 
-            Invoke(new Action(() =>
+            int fullCountShifts = 0;
+            int fullTimeShifts = 0;
+            int fullCountOrders = 0;
+            int fullCountMakeready = 0;
+            int fullAmountOrders = 0;
+            int fullTimeWorkingOut = 0;
+            float fullPercentWorkingOut = 0;
+            int countActiveUser = 0;
+
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
             {
-                comboBox1.Enabled = false;
-                comboBox2.Enabled = false;
-                comboBox3.Enabled = false;
-
-                category = categoryValue.GetCategoryFromName(comboBox3.Text);
-            }));
-
-            //while (!token.IsCancellationRequested)
-            while (true)
-            {
-                //token.ThrowIfCancellationRequested();
-
-                thJob = true;
-
-                int fullCountShifts = 0;
-                int fullTimeShifts = 0;
-                int fullCountOrders = 0;
-                int fullCountMakeready = 0;
-                int fullAmountOrders = 0;
-                int fullTimeWorkingOut = 0;
-                float fullPercentWorkingOut = 0;
-                int countActiveUser = 0;
-
-                Invoke(new Action(() =>
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    listView1.Items.Clear();
-                }));
-
-                using (MySqlConnection Connect = DBConnection.GetDBConnection())
-                {
-                    Connect.Open();
-                    MySqlCommand Command = new MySqlCommand
+                    try
                     {
-                        Connection = Connect,
-                        CommandText = @"SELECT * FROM users" + cLine
-                    };
-                    DbDataReader sqlReader = Command.ExecuteReader();
-
-                    while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
-                    {
-                        if (getUser.CategoryForUser(sqlReader["id"].ToString(), category))
+                        Invoke(new Action(() =>
                         {
-                            ListViewItem item = new ListViewItem();
+                            category = categoryValue.GetCategoryFromName(comboBox3.Text);
 
-                            item.Name = sqlReader["id"].ToString();
-                            item.Text = (listView1.Items.Count + 1).ToString();
-                            item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
-                            item.SubItems.Add("");
+                            listView1.Items.Clear();
+                        }));
 
-                            Invoke(new Action(() =>
-                            {
-                                listView1.Items.Add(item);
-                            }));
-                        }
-                    }
-                    Connect.Close();
-                }
-
-                using (MySqlConnection Connect = DBConnection.GetDBConnection())
-                {
-                    Connect.Open();
-                    MySqlCommand Command = new MySqlCommand
-                    {
-                        Connection = Connect,
-                        CommandText = @"SELECT * FROM users" + cLine
-                    };
-                    DbDataReader sqlReader = Command.ExecuteReader();
-
-                    while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
-                    {
-                        if (getUser.CategoryForUser(sqlReader["id"].ToString(), category))
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
                         {
-                            GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
-
-                            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, category, token);
-
-                            fullCountShifts += shiftsDetails.countShifts;
-                            fullTimeShifts += shiftsDetails.allTimeShift;
-                            fullCountOrders += shiftsDetails.countOrdersShift;
-                            fullCountMakeready += shiftsDetails.countMakereadyShift;
-                            fullAmountOrders += shiftsDetails.amountAllOrdersShift;
-                            fullTimeWorkingOut += shiftsDetails.allTimeWorkingOutShift;
-                            fullPercentWorkingOut += shiftsDetails.percentWorkingOutShift;
-
-                            if (calculateNullShiftsFromUser)
-                                countActiveUser++;
-                            else
-                                if (shiftsDetails.countShifts != 0)
-                                countActiveUser++;
-
-                            Invoke(new Action(() =>
+                            Connect.Open();
+                            MySqlCommand Command = new MySqlCommand
                             {
-                                int index = listView1.Items.IndexOfKey(sqlReader["id"].ToString());
+                                Connection = Connect,
+                                CommandText = @"SELECT * FROM users" + cLine
+                            };
+                            DbDataReader sqlReader = Command.ExecuteReader();
 
-                                if (index >= 0)
+                            while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                            {
+                                if (token.IsCancellationRequested)
                                 {
-                                    ListViewItem item = listView1.Items[index];
-                                    if (item != null)
-                                    {
-                                        item.SubItems[2].Text = shiftsDetails.countShifts.ToString();
-                                        item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
-                                        item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
-                                        item.SubItems[5].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
-                                        item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
-                                        item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
-                                        item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("P1");
-
-                                        if (shiftsDetails.percentWorkingOutShift >= 0.8)
-                                        {
-                                            item.ForeColor = Color.SeaGreen;
-                                        }
-                                        else
-                                        {
-                                            item.ForeColor = Color.DarkRed;
-                                        }
-                                    }
+                                    break;
                                 }
-                            }));
 
-                            Invoke(new Action(() =>
-                            {
-                                label7.Text = fullCountShifts.ToString("N0");
-                                label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(fullTimeShifts);
-                                label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(fullTimeWorkingOut);
+                                if (getUser.CategoryForUser(sqlReader["id"].ToString(), category))
+                                {
+                                    ListViewItem item = new ListViewItem();
 
-                                label13.Text = fullCountOrders.ToString() + "/" + fullCountMakeready.ToString();
-                                label14.Text = fullAmountOrders.ToString("N0");
-                                label15.Text = (fullPercentWorkingOut / countActiveUser).ToString("P1");
-                            }));
+                                    item.Name = sqlReader["id"].ToString();
+                                    item.Text = (listView1.Items.Count + 1).ToString();
+                                    item.SubItems.Add(getUser.GetNameUser(sqlReader["id"].ToString()));
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
 
-                            if (token.IsCancellationRequested)
-                            {
-                                break;
+                                    Invoke(new Action(() =>
+                                    {
+                                        listView1.Items.Add(item);
+                                    }));
+                                }
                             }
+                            Connect.Close();
+                        }
+
+                        using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                        {
+                            Connect.Open();
+                            MySqlCommand Command = new MySqlCommand
+                            {
+                                Connection = Connect,
+                                CommandText = @"SELECT * FROM users" + cLine
+                            };
+                            DbDataReader sqlReader = Command.ExecuteReader();
+
+                            while (sqlReader.Read()) // считываем и вносим в комбобокс список заголовков
+                            {
+                                if (token.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+
+                                if (getUser.CategoryForUser(sqlReader["id"].ToString(), category))
+                                {
+                                    GetShiftsFromBase getShifts = new GetShiftsFromBase(sqlReader["id"].ToString());
+
+                                    ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(date, category, token);
+
+                                    fullCountShifts += shiftsDetails.countShifts;
+                                    fullTimeShifts += shiftsDetails.allTimeShift;
+                                    fullCountOrders += shiftsDetails.countOrdersShift;
+                                    fullCountMakeready += shiftsDetails.countMakereadyShift;
+                                    fullAmountOrders += shiftsDetails.amountAllOrdersShift;
+                                    fullTimeWorkingOut += shiftsDetails.allTimeWorkingOutShift;
+                                    fullPercentWorkingOut += shiftsDetails.percentWorkingOutShift;
+
+                                    if (calculateNullShiftsFromUser)
+                                        countActiveUser++;
+                                    else
+                                        if (shiftsDetails.countShifts != 0)
+                                        countActiveUser++;
+
+                                    if (token.IsCancellationRequested)
+                                    {
+                                        break;
+                                    }
+
+                                    Invoke(new Action(() =>
+                                    {
+                                        int index = listView1.Items.IndexOfKey(sqlReader["id"].ToString());
+
+                                        if (index >= 0)
+                                        {
+                                            ListViewItem item = listView1.Items[index];
+                                            if (item != null)
+                                            {
+                                                item.SubItems[2].Text = shiftsDetails.countShifts.ToString();
+                                                item.SubItems[3].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.shiftsWorkingTime);
+                                                item.SubItems[4].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeShift);
+                                                item.SubItems[5].Text = shiftsDetails.countOrdersShift.ToString() + "/" + shiftsDetails.countMakereadyShift.ToString();
+                                                item.SubItems[6].Text = shiftsDetails.amountAllOrdersShift.ToString("N0");
+                                                item.SubItems[7].Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(shiftsDetails.allTimeWorkingOutShift);
+                                                item.SubItems[8].Text = shiftsDetails.percentWorkingOutShift.ToString("P1");
+
+                                                if (shiftsDetails.percentWorkingOutShift >= 0.8)
+                                                {
+                                                    item.ForeColor = Color.SeaGreen;
+                                                }
+                                                else
+                                                {
+                                                    item.ForeColor = Color.DarkRed;
+                                                }
+                                            }
+                                        }
+
+                                        label7.Text = fullCountShifts.ToString("N0");
+                                        label8.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(fullTimeShifts);
+                                        label9.Text = dateTimeOperations.TotalMinutesToHoursAndMinutesStr(fullTimeWorkingOut);
+
+                                        label13.Text = fullCountOrders.ToString() + "/" + fullCountMakeready.ToString();
+                                        label14.Text = fullAmountOrders.ToString("N0");
+                                        label15.Text = (fullPercentWorkingOut / countActiveUser).ToString("P1");
+                                    }));
+                                }
+                            }
+
+                            Connect.Close();
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
                         }
                     }
-
-                    Connect.Close();
                 }
-
-                thJob = false;
-                break;
             }
-
-            Invoke(new Action(() =>
-            {
-                comboBox1.Enabled = true;
-                comboBox2.Enabled = true;
-                comboBox3.Enabled = true;
-            }));
+            while (reconnectionRequired);
         }
 
         private void LoadShiftdetails(String user, int yearCur, int monthCur)
@@ -392,12 +383,18 @@ namespace OrderManager
 
         private void FormShiftsDetails_FormClosing(object sender, FormClosingEventArgs e)
         {
+            cancelTokenSource?.Cancel();
             SaveParameterToBase("statisticForm");
         }
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
             StartLoading();
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
