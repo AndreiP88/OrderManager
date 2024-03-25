@@ -4,36 +4,34 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Drawing;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Globalization;
-using System.Reflection;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
     public partial class FormAllOrders : Form
     {
-        public FormAllOrders()
+        int DefaultMachine;
+
+        public FormAllOrders(int defaultMachine = -1)
         {
             InitializeComponent();
 
+            DefaultMachine = defaultMachine;
         }
 
         class Order
         {
-            public String numberOfOrder;
-            public String modificationOfOrder;
+            public string numberOfOrder;
+            public string modificationOfOrder;
 
             public Order(String number, string modification)
             {
                 numberOfOrder = number;
                 modificationOfOrder = modification;
             }
-
         }
 
         List<int> ordersIndexes = new List<int>();
@@ -139,7 +137,7 @@ namespace OrderManager
                 ApplyParameterLine(getSettings.GetParameterLine("0", "allOrdersForm"));
         }
 
-        private async Task LoadMachine()
+        private async Task LoadMachineOLD()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
@@ -163,6 +161,97 @@ namespace OrderManager
 
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedIndex = 0;
+        }
+
+        private async Task LoadMachine(CancellationToken token)
+        {
+            await Task.Run(async () =>
+            {
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
+
+                do
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                    {
+                        try
+                        {
+                            ValueInfoBase getInfo = new ValueInfoBase();
+
+                            int indexDeafaultMachineItem = -1;
+
+                            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                            {
+                                await Connect.OpenAsync();
+                                MySqlCommand Command = new MySqlCommand
+                                {
+                                    Connection = Connect,
+                                    CommandText = @"SELECT DISTINCT id FROM machines"
+                                };
+                                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                                while (await sqlReader.ReadAsync()) // считываем и вносим в комбобокс список заголовков
+                                {
+                                    if (token.IsCancellationRequested)
+                                    {
+                                        break;
+                                    }
+
+                                    int idMachine = (int)sqlReader["id"];
+
+                                    Invoke(new Action(async () =>
+                                    {
+                                        comboBox1.Items.Add(await getInfo.GetMachineName(idMachine.ToString()));
+
+                                        if (DefaultMachine == idMachine)
+                                            indexDeafaultMachineItem = comboBox1.Items.Count - 1;
+                                    }));
+                                }
+
+                                Connect.Close();
+                            }
+                            Invoke(new Action(() =>
+                            {
+                                if (comboBox1.Items.Count > 0)
+                                {
+                                    if (indexDeafaultMachineItem != -1 && indexDeafaultMachineItem < comboBox1.Items.Count)
+                                    {
+                                        comboBox1.SelectedIndex = indexDeafaultMachineItem;
+                                    }
+                                    else
+                                    {
+                                        comboBox1.SelectedIndex = 0;
+                                    }
+                                }
+                            }));
+
+                            reconnectionRequired = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
+                            }
+                        }
+                    }
+                }
+                while (reconnectionRequired);
+            }, token);
         }
 
         private void LoadOrdersFromBase()
@@ -228,7 +317,6 @@ namespace OrderManager
 
                         index++;
                     }
-
                 }
 
                 Connect.Close();
@@ -314,11 +402,6 @@ namespace OrderManager
                     Connect.Close();
                 }
             }
-
-            Invoke(new Action(() =>
-            {
-
-            }));
         }
 
         private void SetNewStatus(int orderIndex, string newStatus)
@@ -340,7 +423,10 @@ namespace OrderManager
 
         private async void FormFullListOrders_Load(object sender, EventArgs e)
         {
-            await LoadMachine();
+            cancelTokenSource?.Cancel();
+            cancelTokenSource = new CancellationTokenSource();
+
+            await LoadMachine(cancelTokenSource.Token);
             SetStartPeriodDTPicker();
             LoadParametersFromBase();
         }

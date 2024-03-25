@@ -1,13 +1,8 @@
-﻿using libData;
-using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
+﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -146,9 +141,9 @@ namespace OrderManager
             return GetMachinesArr(id).Any(x => category.Contains(x));
         }
 
-        public String GetLastMachineForUser(String id)
+        public int GetLastMachineForUser(string id)
         {
-            return GetValueInfo("user", id, "lastMachine");
+            return Convert.ToInt32(GetValueInfo("user", id, "lastMachine"));
         }
 
         public String GetActiveUser(String id)
@@ -167,20 +162,18 @@ namespace OrderManager
 
             if (id != "")
             {
-                string value = GetValueInfo("user", id, "currentShiftStartID");
-
-                if (value != "")
-                {
-                    result = Convert.ToInt32(value);
-                }
+                result = (int)GetValueInfo("user", id, "currentShiftStartID");
             }
 
             return result;
         }
 
-        public String GetLastUID(String id)
+        public string GetLastUID(String id)
         {
-            return GetValueInfo("user", id, "lastUID");
+            object load = GetValueInfo("user", id, "lastUID");
+
+            return load == DBNull.Value ? string.Empty : (string)load;
+            //return (string)GetValueInfo("user", id, "lastUID");
         }
 
         /// <summary>
@@ -188,9 +181,9 @@ namespace OrderManager
         /// </summary>
         /// <param name="shiftStart"></param>
         /// <returns></returns>
-        public String GetCurrentUserIDFromShiftStart(int shiftStart)
+        public int GetCurrentUserIDFromShiftStart(int shiftStart)
         {
-            return GetValueInfo("currentShiftStartID", shiftStart.ToString(), "user");
+            return (int)GetValueInfo("currentShiftStartID", shiftStart.ToString(), "user");
         }
 
         public List<String> GetUserList(bool activeUserOnly)
@@ -280,12 +273,15 @@ namespace OrderManager
             return result;
         }
 
-        public bool GetUserWorking(String id)
+        public bool GetUserWorking(string id)
         {
             bool result = false;
-            string val = GetValueInfo("user", id, "currentShiftStartID");
 
-            if (val != "-1")
+            object load = GetValueInfo("user", id, "currentShiftStartID");
+
+            int value = load == DBNull.Value ? -1 : (int)load;
+
+            if (value != -1)
                 result = true;
 
             return result;
@@ -554,9 +550,9 @@ namespace OrderManager
             return result;
         }
 
-        private String GetValueInfo(String findColomnName, String findParameter, String valueColomn)
+        private object GetValueInfo(string findColomnName, string findParameter, string valueColomn)
         {
-            String result = "";
+            object result = null;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -570,7 +566,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    result = sqlReader[valueColomn].ToString();
+                    result = sqlReader[valueColomn];
                 }
 
                 Connect.Close();

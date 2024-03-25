@@ -87,13 +87,25 @@ namespace OrderManager
                                 //item.SubItems.Add(machines);
                                 item.SubItems.Add("");
 
-                                Invoke(new Action(() =>
+                                try
                                 {
-                                    listView1.Items?.Add(item);
-                                }));
+                                    Invoke(new Action(() =>
+                                    {
+                                        listView1.Items?.Add(item);
+                                    }));
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogException.WriteLine(ex.Message);
+                                }
+
+                                
                             }
 
-                            await UpdateMachineFromUsers(token);
+                            if (!token.IsCancellationRequested)
+                            {
+                                await UpdateMachineFromUsers(token);
+                            }
 
                             reconnectionRequired = false;
                         }
@@ -116,7 +128,7 @@ namespace OrderManager
                     }
                 }
                 while (reconnectionRequired);
-            });
+            }, token);
         }
 
         private async Task UpdateMachineFromUsers(CancellationToken token)
@@ -185,7 +197,7 @@ namespace OrderManager
                     }
                 }
                 while (reconnectionRequired);
-            });
+            }, token);
         }
 
         private void UpdateCurrentDateTime()

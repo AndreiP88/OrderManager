@@ -557,7 +557,7 @@ namespace OrderManager
 
             if (!adminCloseOrder)
             {
-                machine = getMachine.GetLastMachineForUser(idUser);
+                machine = getMachine.GetLastMachineForUser(idUser).ToString();
             }
             else
             {

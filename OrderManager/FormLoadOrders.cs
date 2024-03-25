@@ -14,6 +14,7 @@ namespace OrderManager
         bool _loadForViewOrders;
         string loadMachine;
         string userID;
+        int DefaultMachine;
 
         public FormLoadOrders(string lMachine)
         {
@@ -25,12 +26,13 @@ namespace OrderManager
             _loadForViewOrders = false;
         }
 
-        public FormLoadOrders(bool loadForView, string lUser)
+        public FormLoadOrders(bool loadForView, string lUser, int defaultMachine = -1)
         {
             InitializeComponent();
 
             this.loadMachine = "0";
             this.userID = lUser;
+            DefaultMachine = defaultMachine;
 
             _loadForViewOrders = loadForView;
         }
@@ -80,6 +82,7 @@ namespace OrderManager
             string categoryesCurrentUser = getUser.GetCategoryesMachine(userID);
 
             string[] categoryes = categoryesCurrentUser.Split(';');
+            int indexDeafaultMachineItem = -1;
 
             for (int i = 0; i < categoryes.Length; i++)
             {
@@ -97,7 +100,12 @@ namespace OrderManager
 
                     while (sqlReader.Read())
                     {
+                        int idMachine = (int)sqlReader["id"];
+
                         comboBox1.Items.Add(sqlReader["name"].ToString());
+
+                        if (DefaultMachine == idMachine)
+                            indexDeafaultMachineItem = comboBox1.Items.Count - 1;
                     }
 
                     Connect.Close();
@@ -117,7 +125,14 @@ namespace OrderManager
                 //SelectLastMschineToComboBox(nameOfExecutor);
                 comboBox1.Enabled = true;
                 //comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
-                comboBox1.SelectedIndex = 0;
+                if (indexDeafaultMachineItem != -1 && indexDeafaultMachineItem < comboBox1.Items.Count)
+                {
+                    comboBox1.SelectedIndex = indexDeafaultMachineItem;
+                }
+                else
+                {
+                    comboBox1.SelectedIndex = 0;
+                }
             }
         }
 
@@ -486,7 +501,7 @@ namespace OrderManager
                             ));
 
                             int index = orders.Count - 1;
-                            AddOrderToListView(index, orders[index]);
+                            AddOrderToListView(index, orders[index], token);
                         }
                     }
 
@@ -520,7 +535,7 @@ namespace OrderManager
                                 ));
 
                                 int index = orders.Count - 1;
-                                AddOrderToListView(index, orders[index]);
+                                AddOrderToListView(index, orders[index], token);
                             }
                             else
                             {
@@ -536,7 +551,7 @@ namespace OrderManager
                                 ));
 
                                 int index = orders.Count - 1;
-                                AddOrderToListView(index, orders[index]);
+                                AddOrderToListView(index, orders[index], token);
                             }
 
 
@@ -573,7 +588,7 @@ namespace OrderManager
                                 ));
 
                                 int index = orders.Count - 1;
-                                AddOrderToListView(index, orders[index]);
+                                AddOrderToListView(index, orders[index], token);
                             }
                             else
                             {
@@ -589,7 +604,7 @@ namespace OrderManager
                                 ));
 
                                 int index = orders.Count - 1;
-                                AddOrderToListView(index, orders[index]);
+                                AddOrderToListView(index, orders[index], token);
                             }
                         }
                     }
@@ -844,7 +859,7 @@ namespace OrderManager
                         ));
 
                         int index = orders.Count - 1;
-                        AddOrderToListView(index, orders[index]);
+                        AddOrderToListView(index, orders[index], token);
                     }
                 }
 
@@ -871,7 +886,7 @@ namespace OrderManager
                             ));
 
                             int index = orders.Count - 1;
-                            AddOrderToListView(index, orders[index]);
+                            AddOrderToListView(index, orders[index], token);
                         }
                         else
                         {
@@ -887,7 +902,7 @@ namespace OrderManager
                             ));
 
                             int index = orders.Count - 1;
-                            AddOrderToListView(index, orders[index]);
+                            AddOrderToListView(index, orders[index], token);
                         }
                     }
                 }
@@ -915,7 +930,7 @@ namespace OrderManager
                             ));
 
                             int index = orders.Count - 1;
-                            AddOrderToListView(index, orders[index]);
+                            AddOrderToListView(index, orders[index], token);
                         }
                         else
                         {
@@ -931,7 +946,7 @@ namespace OrderManager
                             ));
 
                             int index = orders.Count - 1;
-                            AddOrderToListView(index, orders[index]);
+                            AddOrderToListView(index, orders[index], token);
                         }
                     }
                 }
@@ -965,7 +980,7 @@ namespace OrderManager
             }
         }
 
-        private void AddOrderToListView(int index, OrdersLoad order)
+        private void AddOrderToListView(int index, OrdersLoad order, CancellationToken token)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
 
@@ -981,15 +996,24 @@ namespace OrderManager
             item.SubItems.Add(order.amountOfOrder.ToString("N0"));
             item.SubItems.Add(order.stamp.ToString());
 
-            Invoke(new Action(() =>
+            try
             {
-                listView1.Items.Add(item);
-            }));
+                Invoke(new Action(() =>
+                {
+                    if (!token.IsCancellationRequested)
+                    {
+                        listView1.Items.Add(item);
 
-            Invoke(new Action(() =>
+                        label1.Text = $"Загружено заказов: {index + 1}";
+                    }
+                }));
+            }
+            catch (Exception ex)
             {
-                label1.Text = $"Загружено заказов: {index + 1}";
-            }));
+                LogException.WriteLine(ex.Message);
+            }
+            
+            
         }
 
         private void calculateCountProductionFromPreviousOperations(int idManPlanjobList)
@@ -1195,6 +1219,7 @@ namespace OrderManager
         private void FormLoadOrders_FormClosing(object sender, FormClosingEventArgs e)
         {
             cancelTokenSource?.Cancel();
+            Thread.Sleep(200);
         }
     }
 }

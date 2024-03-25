@@ -167,13 +167,21 @@ namespace OrderManager
 
         private void ShowFullOrdersForm()
         {
-            FormFullListOrders form = new FormFullListOrders(false, -1);
+            ValueUserBase valueUser = new ValueUserBase();
+
+            int lastMachine = valueUser.GetLastMachineForUser(Form1.Info.nameOfExecutor);
+
+            FormFullListOrders form = new FormFullListOrders(false, -1, lastMachine);
             form.ShowDialog();
         }
 
         private void ShowAllOrdersForm()
         {
-            FormAllOrders form = new FormAllOrders();
+            ValueUserBase valueUser = new ValueUserBase();
+
+            int lastMachine = valueUser.GetLastMachineForUser(Form1.Info.nameOfExecutor);
+
+            FormAllOrders form = new FormAllOrders(lastMachine);
             form.ShowDialog();
         }
 
@@ -1005,14 +1013,13 @@ namespace OrderManager
 
             if (machines.Count > 0)
             {
-                int index = machines.IndexOf(userBase.GetLastMachineForUser(Form1.Info.nameOfExecutor));
+                int index = machines.IndexOf(userBase.GetLastMachineForUser(Form1.Info.nameOfExecutor).ToString());
 
                 LoadParametersForTheSelectedUserFromBase();
                 //LoadOrdersFromBase();
             }
 
             await LoadOrdersFromBase();
-
         }
 
         private async Task LoadMachinesDetailsForUser()
@@ -2235,7 +2242,11 @@ namespace OrderManager
 
         private void planToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FormLoadOrders fm = new FormLoadOrders(true, Info.nameOfExecutor);
+            ValueUserBase valueUser = new ValueUserBase();
+
+            int lastMachine = valueUser.GetLastMachineForUser(Form1.Info.nameOfExecutor);
+
+            FormLoadOrders fm = new FormLoadOrders(true, Info.nameOfExecutor, lastMachine);
             fm.ShowDialog();
         }
 

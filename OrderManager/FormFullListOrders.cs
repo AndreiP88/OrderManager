@@ -14,6 +14,7 @@ namespace OrderManager
     {
         bool detailsLoad;
         int orderID;
+        int DefaultMachine;
 
         CancellationTokenSource cancelTokenSource;
         CancellationTokenSource cancelTokenSourceYear;
@@ -32,12 +33,13 @@ namespace OrderManager
             this.orderModificationLoad = orderModification;
         }*/
 
-        public FormFullListOrders(bool details, int orderIDFromOrdersBase)
+        public FormFullListOrders(bool details, int orderIDFromOrdersBase, int defaultMachine = -1)
         {
             InitializeComponent();
 
             this.detailsLoad = details;
             this.orderID = orderIDFromOrdersBase;
+            this.DefaultMachine = defaultMachine;
         }
 
         String GetParametersLine()
@@ -145,6 +147,8 @@ namespace OrderManager
                         {
                             ValueInfoBase getInfo = new ValueInfoBase();
 
+                            int indexDeafaultMachineItem = -1;
+
                             using (MySqlConnection Connect = DBConnection.GetDBConnection())
                             {
                                 await Connect.OpenAsync();
@@ -162,9 +166,14 @@ namespace OrderManager
                                         break;
                                     }
 
+                                    int idMachine = (int)sqlReader["id"];
+
                                     Invoke(new Action(async () =>
                                     {
-                                        comboBox3.Items.Add(await getInfo.GetMachineName(sqlReader["id"].ToString()));
+                                        comboBox3.Items.Add(await getInfo.GetMachineName(idMachine.ToString()));
+
+                                        if (DefaultMachine == idMachine)
+                                            indexDeafaultMachineItem = comboBox3.Items.Count - 1;
                                     }));
                                 }
 
@@ -173,7 +182,16 @@ namespace OrderManager
                             Invoke(new Action(() =>
                             {
                                 if (comboBox3.Items.Count > 0)
-                                    comboBox3.SelectedIndex = 0;
+                                {
+                                    if (indexDeafaultMachineItem != -1 && indexDeafaultMachineItem < comboBox3.Items.Count)
+                                    {
+                                        comboBox3.SelectedIndex = indexDeafaultMachineItem;
+                                    }
+                                    else
+                                    {
+                                        comboBox3.SelectedIndex = 0;
+                                    }
+                                }
                             }));
 
                             reconnectionRequired = false;
@@ -197,7 +215,7 @@ namespace OrderManager
                     }
                 }
                 while (reconnectionRequired);
-            });
+            }, token);
         }
 
         private async Task LoadYears(CancellationToken token)
@@ -505,7 +523,7 @@ namespace OrderManager
                     }
                 }
                 while (reconnectionRequired);
-            });
+            }, token);
         }
 
         private async void FormFullListOrders_Load(object sender, EventArgs e)

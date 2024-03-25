@@ -3234,7 +3234,7 @@ namespace OrderManager
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
             int shiftID = Convert.ToInt32(listV.SelectedItems[0].Name);
-            String userId = getUser.GetCurrentUserIDFromShiftStart(shiftID);
+            string userId = getUser.GetCurrentUserIDFromShiftStart(shiftID).ToString();
 
             List<String> machines = await getInfo.GetMachines(userId);
 

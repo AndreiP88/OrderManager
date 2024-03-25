@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Data.SqlClient;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.Form1;
@@ -9,79 +10,6 @@ namespace OrderManager
 {
     internal class DBConnection
     {
-        //static ManualResetEvent _pauseEvent = new ManualResetEvent(false);
-
-        /*public static MySqlConnection GetDBConnection()
-        {
-            *//*string host = "25.21.38.172";
-            int port = 3309;
-            string database = "order_manager";
-            string username = "oxyfox";
-            string password = "root";*//*
-
-            _pauseEvent.WaitOne(Timeout.Infinite);
-
-        NewConnect:
-
-            string host = Form1.BaseConnectionParameters.host;
-            int port = Form1.BaseConnectionParameters.port;
-            string database = Form1.BaseConnectionParameters.database;
-            string username = Form1.BaseConnectionParameters.username;
-            string password = Form1.BaseConnectionParameters.password;
-
-            MySqlConnection connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password);
-
-            //_pauseEvent.WaitOne(Timeout.Infinite);
-
-            string exception;
-
-            using (connect)
-            {
-                try
-                {
-                    connect.Open();
-                    connect.Close();
-                    exception = "";
-                }
-                catch (Exception ex)
-                {
-                    exception = ex.Message;
-
-                    bool reconectionRequest = DataBaseReconnectionRequest(exception);
-
-                    //_pauseEvent.WaitOne(Timeout.Infinite);
-
-                    if (reconectionRequest)
-                    {
-                        goto NewConnect;
-                    }
-                    else
-                    {
-                        Application.Exit();
-                    }
-                }
-            }
-
-            if (exception != "")
-            {
-                *//*bool reconectionRequest = DataBaseReconnectionRequest(exception);
-
-                _pauseEvent.WaitOne(Timeout.Infinite);
-
-                if (reconectionRequest)
-                {
-                    goto NewConnect;
-                }
-                else
-                {
-                    Application.Exit();
-                }*//*
-            }
-
-            return connect;
-        }*/
-
-        //сделать потом асинхронным
         public static MySqlConnection GetDBConnection()
         {
             /*string host = "25.21.38.172";
@@ -98,7 +26,38 @@ namespace OrderManager
             string username = Form1.BaseConnectionParameters.username;
             string password = Form1.BaseConnectionParameters.password;
 
-            MySqlConnection connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password);
+            MySqlConnection connect = null;
+
+            bool reconnectionRequired = false;
+            int reconnectCount = 0;
+            int reconnectLimit = 5;
+
+            do
+            {
+                try
+                {
+                    connect = DBMySQLUtils.GetDBConnection(host, port, database, username, password);
+
+                    reconnectionRequired = false;
+                }
+                catch (Exception ex)
+                {
+                    reconectionCount++;
+
+                    LogException.WriteLine("GetDBConnection " + reconnectCount + " of " + reconnectLimit + "\n" + ex.Message + "; " + ex.StackTrace);
+
+                    if (reconectionCount <= reconnectLimit)
+                    {
+                        reconnectionRequired = true;
+                        Thread.Sleep(500);
+                    }
+                    else
+                    {
+                        //Application.Exit();
+                    } 
+                }
+            }
+            while (reconnectionRequired);
 
             return connect;
         }
