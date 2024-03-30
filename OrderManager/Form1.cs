@@ -738,8 +738,6 @@ namespace OrderManager
                     comboBox7.SelectedIndex = selectedIndexPreviewWOut2;
                 else
                     comboBox7.SelectedIndex = 0;
-
-                comboBox8.SelectedIndex = 0;
             }
 
             //WOut
@@ -1846,6 +1844,8 @@ namespace OrderManager
                 LoadParametersForTheSelectedUserFromBase();
 
             await LoadOrdersFromBase();
+
+            comboBox8.SelectedIndex = 0;
         }
 
         private async void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)

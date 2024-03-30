@@ -169,7 +169,7 @@ namespace OrderManager
                                 {
                                     ListViewItem item = listView1.Items[i];
 
-                                    if (item != null)
+                                    if (item != null && !token.IsCancellationRequested)
                                     {
                                         item.SubItems[2].Text = machines;
                                     }
@@ -212,6 +212,9 @@ namespace OrderManager
             Cryption pass = new Cryption();
             ValueUserBase userValue = new ValueUserBase();
             ValueSettingsBase settingsValue = new ValueSettingsBase();
+
+            cancelTokenSourceLoadUsers?.Cancel();
+            cancelTokenSourceLoadMachines?.Cancel();
 
             bool reconnectionRequired = false;
             DialogResult dialog = DialogResult.Retry;

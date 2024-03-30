@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static OrderManager.Form1;
+using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
@@ -19,6 +19,8 @@ namespace OrderManager
         }
 
         List<CheckBox> checkBoxesMachines = new List<CheckBox>();
+
+        CancellationTokenSource cancelTokenSource;
 
         private void ChangeCaptionButton()
         {
@@ -95,66 +97,139 @@ namespace OrderManager
             return categoryes.Contains(categoryCurrentMachine);
         }
 
-        private async Task LoadMachine()
+        private async Task LoadMachine(CancellationToken token)
         {
-            checkBoxesMachines.Clear();
-
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            await Task.Run(async () =>
             {
-                ValueOrdersBase order = new ValueOrdersBase();
-                ValueInfoBase getInfo = new ValueInfoBase();
-                ValueUserBase user = new ValueUserBase();
+                bool reconnectionRequired = false;
+                DialogResult dialog = DialogResult.Retry;
 
-                Connect.Open();
-                MySqlCommand Command = new MySqlCommand
+                do
                 {
-                    Connection = Connect,
-                    CommandText = @"SELECT DISTINCT id FROM machines"
-                };
-                DbDataReader sqlReader = Command.ExecuteReader();
-
-                while (sqlReader.Read())
-                {
-                    String machine = sqlReader["id"].ToString();
-
-                    int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
-                    string orderName = order.GetOrderNumber(currentOrderID);
-
-                    if (orderName != "-1")
-                        orderName += ", " + order.GetOrderName(currentOrderID);
-                    else
-                        orderName = "";
-
-                    if (await CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
+                    if (token.IsCancellationRequested)
                     {
-                        if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
-                        {
-                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, true);
-                        }
-                        else if (CheckFreeMachine(machine) == true || CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
-                        {
-                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, false);
-                        }
-                        else
-                        {
-                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
-                        }
+                        break;
                     }
 
-                }
+                    if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                    {
+                        try
+                        {
+                            checkBoxesMachines.Clear();
 
-                Connect.Close();
-            }
+                            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                            {
+                                ValueOrdersBase order = new ValueOrdersBase();
+                                ValueInfoBase getInfo = new ValueInfoBase();
+                                ValueUserBase user = new ValueUserBase();
+
+                                await Connect.OpenAsync();
+                                MySqlCommand Command = new MySqlCommand
+                                {
+                                    Connection = Connect,
+                                    CommandText = @"SELECT DISTINCT id FROM machines"
+                                };
+                                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                                while (await sqlReader.ReadAsync())
+                                {
+                                    if (token.IsCancellationRequested)
+                                    {
+                                        break;
+                                    }
+
+                                    string machine = sqlReader["id"].ToString();
+
+                                    int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
+                                    string orderName = order.GetOrderNumber(currentOrderID);
+
+                                    if (orderName != "-1")
+                                        orderName += ", " + order.GetOrderName(currentOrderID);
+                                    else
+                                        orderName = "";
+
+                                    if (await CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
+                                    {
+                                        if (token.IsCancellationRequested)
+                                        {
+                                            break;
+                                        }
+
+                                        if (CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
+                                        {
+                                            if (token.IsCancellationRequested)
+                                            {
+                                                break;
+                                            }
+
+                                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, true);
+                                        }
+                                        else if (CheckFreeMachine(machine) == true || CheckUserToSelectedMachine(machine, Form1.Info.nameOfExecutor) == true)
+                                        {
+                                            if (token.IsCancellationRequested)
+                                            {
+                                                break;
+                                            }
+
+                                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, false);
+                                        }
+                                        else
+                                        {
+                                            if (token.IsCancellationRequested)
+                                            {
+                                                break;
+                                            }
+
+                                            await AddControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, false, false);
+                                        }
+                                    }
+                                }
+
+                                if (token.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+
+                                await Connect.CloseAsync();
+                            }
+
+                            reconnectionRequired = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                            dialog = DataBaseReconnectionRequest(ex.Message);
+
+                            if (dialog == DialogResult.Retry)
+                            {
+                                reconnectionRequired = true;
+                            }
+                            if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                            {
+                                reconnectionRequired = false;
+                                Application.Exit();
+                            }
+                        }
+                    }
+                }
+                while (reconnectionRequired);
+            }, token);
         }
 
         private async void FolrmSelectMachine_Load(object sender, EventArgs e)
         {
-            await LoadMachine();
+            cancelTokenSource?.Cancel();
+            cancelTokenSource = new CancellationTokenSource();
+
+            await LoadMachine(cancelTokenSource.Token);
             ChangeCaptionButton();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            cancelTokenSource?.Cancel();
+
             if (Form1.Info.shiftIndex != -1)
             {
                 ActivateDeactivateMachines(Form1.Info.nameOfExecutor);
@@ -184,74 +259,133 @@ namespace OrderManager
 
         private void ShiftStart(string currentUser, string startOfShift)
         {
-            ValueUserBase usersBase = new ValueUserBase();
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
 
-            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            do
             {
-                string commandText = "INSERT INTO shifts (nameUser, startShift) " +
-                    "SELECT * FROM (SELECT @nameUser, @startShift) " +
-                    "AS tmp WHERE NOT EXISTS(SELECT startShift FROM shifts WHERE startShift = @startShift) LIMIT 1";
-
-                MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@nameUser", currentUser);
-                Command.Parameters.AddWithValue("@startShift", startOfShift);
-
-                Connect.Open();
-                Command.ExecuteNonQuery();
-                Connect.Close();
-            }
-
-            int shiftID = shiftsBase.GetIDFromStartShift(startOfShift);
-
-            usersBase.UpdateCurrentShiftStart(currentUser, shiftID.ToString());
-
-            Form1.Info.shiftIndex = shiftID;
-        }
-
-        private void ActivateDeactivateMachines(String currentUser)
-        {
-            ValueInfoBase getInfo = new ValueInfoBase();
-
-            for (int i = 0; i < checkBoxesMachines.Count; i++)
-            {
-                if (CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
-                    CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
-                    checkBoxesMachines[i].Checked == false)
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
                 {
-                    MessageBox.Show("Прежде чем убрать какое либо оборудование из активного, завершите текущий заказ.", "Изменение активного оборудования", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                else
-                {
-                    if (CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true || CheckFreeMachine(checkBoxesMachines[i].Name) == true)
+                    try
                     {
-                        String user;
-
-                        if (checkBoxesMachines[i].Checked == true)
-                            user = currentUser;
-                        else
-                            user = "";
+                        ValueUserBase usersBase = new ValueUserBase();
+                        ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
                         using (MySqlConnection Connect = DBConnection.GetDBConnection())
                         {
-                            string commandText = "UPDATE machinesInfo SET nameOfExecutor = @currentUser " +
-                                "WHERE (machine = @machine)";
+                            string commandText = "INSERT INTO shifts (nameUser, startShift) " +
+                                "SELECT * FROM (SELECT @nameUser, @startShift) " +
+                                "AS tmp WHERE NOT EXISTS(SELECT startShift FROM shifts WHERE startShift = @startShift) LIMIT 1";
 
                             MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                            Command.Parameters.AddWithValue("@machine", checkBoxesMachines[i].Name);
-                            Command.Parameters.AddWithValue("@currentUser", user);
+                            Command.Parameters.AddWithValue("@nameUser", currentUser);
+                            Command.Parameters.AddWithValue("@startShift", startOfShift);
 
                             Connect.Open();
                             Command.ExecuteNonQuery();
                             Connect.Close();
+                        }
 
+                        int shiftID = shiftsBase.GetIDFromStartShift(startOfShift);
+
+                        usersBase.UpdateCurrentShiftStart(currentUser, shiftID.ToString());
+
+                        Form1.Info.shiftIndex = shiftID;
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
                         }
                     }
-
-                    Close();
                 }
             }
+            while (reconnectionRequired);
+        }
+
+        private void ActivateDeactivateMachines(String currentUser)
+        {
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        for (int i = 0; i < checkBoxesMachines.Count; i++)
+                        {
+                            if (CheckIsActyveSelectedMachine(checkBoxesMachines[i].Name) == true &&
+                                CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true &&
+                                checkBoxesMachines[i].Checked == false)
+                            {
+                                MessageBox.Show("Прежде чем убрать какое либо оборудование из активного, завершите текущий заказ.", "Изменение активного оборудования", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
+                            }
+                            else
+                            {
+                                if (CheckUserToSelectedMachine(checkBoxesMachines[i].Name, currentUser) == true || CheckFreeMachine(checkBoxesMachines[i].Name) == true)
+                                {
+                                    String user;
+
+                                    if (checkBoxesMachines[i].Checked == true)
+                                        user = currentUser;
+                                    else
+                                        user = "";
+
+                                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                                    {
+                                        string commandText = "UPDATE machinesInfo SET nameOfExecutor = @currentUser " +
+                                            "WHERE (machine = @machine)";
+
+                                        MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                                        Command.Parameters.AddWithValue("@machine", checkBoxesMachines[i].Name);
+                                        Command.Parameters.AddWithValue("@currentUser", user);
+
+                                        Connect.Open();
+                                        Command.ExecuteNonQuery();
+                                        Connect.Close();
+                                    }
+                                }
+
+                                Close();
+                            }
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
+            }
+            while (reconnectionRequired);
         }
 
         public void DrawLinePoint(Point p1, Point p2)
@@ -283,9 +417,12 @@ namespace OrderManager
                 labelCaption.TextAlign = ContentAlignment.MiddleLeft;
                 //labelCaption.Font = new Font(labelCaption.Font, FontStyle.Underline);
                 labelCaption.Visible = true;
-                Controls.Add(labelCaption);
-            }
 
+                Invoke(new Action(() =>
+                {
+                    Controls.Add(labelCaption);
+                }));
+            }
 
             checkBoxesMachines.Add(new CheckBox());
 
@@ -299,7 +436,11 @@ namespace OrderManager
             checkBoxesMachines[checkBoxesMachines.Count - 1].Font = new Font("Consolas", 9);
             checkBoxesMachines[checkBoxesMachines.Count - 1].Font = new Font(checkBoxesMachines[checkBoxesMachines.Count - 1].Font, FontStyle.Underline);
 
-            Controls.Add(checkBoxesMachines[checkBoxesMachines.Count - 1]);
+            Invoke(new Action(() =>
+            {
+                Controls.Add(checkBoxesMachines[checkBoxesMachines.Count - 1]);
+            }));
+            
             checkBoxesMachines[checkBoxesMachines.Count - 1].CheckedChanged += new EventHandler(checkBoxMachine_CheckedChanged);
 
             /*
@@ -400,28 +541,9 @@ namespace OrderManager
 
         private void button2_Click(object sender, EventArgs e)
         {
+            cancelTokenSource?.Cancel();
+
             Close();
-        }
-
-        private async void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            await LoadMachine();
-            ChangeCaptionButton();
-        }
-
-        private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
-        {
-            ChangeCaptionButton();
-        }
-
-        private async void button3_Click(object sender, EventArgs e)
-        {
-            await LoadMachine();
-        }
-
-        private async void checkBox1_CheckedChanged_1(object sender, EventArgs e)
-        {
-            await LoadMachine();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
