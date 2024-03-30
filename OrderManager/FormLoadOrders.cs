@@ -826,7 +826,7 @@ namespace OrderManager
 
                         if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
                         {
-                            mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
+                            mkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]) / Convert.ToInt32(sqlReader["plan_out_qty"]));
                         }
 
                         if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
