@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 
 namespace OrderManager
 {
@@ -16,7 +15,6 @@ namespace OrderManager
         {
 
         }
-
 
         /// <summary>
         /// Получить индекс заказа в базе по номеру, модификации и оборудованию

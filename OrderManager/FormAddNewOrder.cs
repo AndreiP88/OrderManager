@@ -274,7 +274,7 @@ namespace OrderManager
             String number = textBox1.Text;
             String modification = textBox5.Text;
 
-            if (getInfo.GetCurrentOrderID(machine) == orderIDLoad.ToString())
+            if (getInfo.GetCurrentOrderID(machine) == orderIDLoad)
             {
                 setInfo.UpdateCurrentOrder(machine, orderIDLoad);
             }

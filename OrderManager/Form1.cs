@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolTip = System.Windows.Forms.ToolTip;
 using static OrderManager.DataBaseReconnect;
+using System.Runtime.InteropServices;
 
 namespace OrderManager
 {
@@ -1290,6 +1291,8 @@ namespace OrderManager
 
         private async void Form1_Shown(object sender, EventArgs e)
         {
+            comboBox8.SelectedIndex = 0;
+
             StartTaskUpdateApplication();
 
             LoadBaseConnectionParameters();
@@ -1844,8 +1847,6 @@ namespace OrderManager
                 LoadParametersForTheSelectedUserFromBase();
 
             await LoadOrdersFromBase();
-
-            comboBox8.SelectedIndex = 0;
         }
 
         private async void базаДанныхToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1942,6 +1943,129 @@ namespace OrderManager
         }
 
         private async void UpdateWorkingOut()
+        {
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            ValueInfoBase infoBase = new ValueInfoBase();
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+
+            int percentOverAmount = 5;
+
+            string[] captions = { "10:00", "10:30", "11:00", "12:00" };
+            string[] values = { "", "", "", "" };
+
+            int wOut, wOutAllOrders;
+            //int norm;
+            int idLastOrder = await GetIDLastOrderFromSelectedMachine(comboBox3.Text);
+            string machine = await infoBase.GetMachineFromName(comboBox3.Text);
+
+            if (idLastOrder >= 0)
+            {
+                if (comboBox2.SelectedIndex == 0)
+                {
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, "", false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, "");
+                }
+                else
+                {
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine, false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
+                }
+
+                string status = ordersBase.GetOrderStatus(ordersCurrentShift[idLastOrder].orderIndex);
+                int currentOrderForSelectedMachine = infoBase.GetCurrentOrderID(machine);
+                bool isCurrentOrderForSelectedMachineActive = infoBase.GetActiveOrder(machine);
+
+                //MessageBox.Show("Order: " + ordersCurrentShift[idLastOrder].orderIndex + " Current order: " + currentOrderForSelectedMachine + " Active: " + isCurrentOrderForSelectedMachineActive);
+
+                int norm = ordersCurrentShift[idLastOrder].norm;
+                int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
+                int lastCount = ordersCurrentShift[idLastOrder].lastCount;
+                int done = amount - lastCount;// + ordersCurrentShift[idLastOrder].done;
+                int mkTime = ordersCurrentShift[idLastOrder].plannedTimeMakeready;
+                int currentMakereadyPart = getOrders.GetMakereadyPart(Info.shiftIndex, ordersCurrentShift[idLastOrder].orderIndex, ordersCurrentShift[idLastOrder].counterRepeat, Convert.ToInt32(machine)) *
+                    getOrders.GetMakereadyConsider(Info.shiftIndex, ordersCurrentShift[idLastOrder].orderIndex, ordersCurrentShift[idLastOrder].counterRepeat, Convert.ToInt32(machine));
+                //bool isOrderActive
+
+                for (int i = 0; i < captions.Length; i++)
+                {
+                    int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
+                    int lastTimeToWork;
+
+                    if (currentOrderForSelectedMachine == ordersCurrentShift[idLastOrder].orderIndex && isCurrentOrderForSelectedMachineActive)
+                    {
+                        lastTimeToWork = targetTime - wOut;
+                        int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+                        int targetAmount = done + targetCount;
+                        int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
+
+                        if (lastTimeToWork > 0)
+                        {
+                            if (lastTimeToWork < mkTime)
+                            {
+                                values[i] = "Необходима часть приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
+                            }
+                            else
+                            {
+                                if (targetAmount <= amount * (1 + percentOverAmount / 100))
+                                {
+                                    values[i] = "Необходима вся приладка";
+
+                                    if (targetCount > 0)
+                                        values[i] += " и сделать: " + targetCount.ToString("N0") + " шт.";
+                                }
+                                else
+                                {
+                                    values[i] = "Не хватит " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                }
+                            }
+                        }
+                        else
+                        {
+                            values[i] = "Выполнено";
+                        }
+                    }
+                    else
+                    {
+                        lastTimeToWork = targetTime - wOutAllOrders;
+                        int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+                        int targetAmount = done + targetCount;
+                        int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
+
+                        if (lastTimeToWork > 0)
+                        {
+                            if (lastTimeToWork < (mkTime - currentMakereadyPart))
+                            {
+                                values[i] = "Не хватило части приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
+                            }
+                            else
+                            {
+
+                            }
+
+                            values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork) + "";
+                        }
+                        else
+                        {
+                            values[i] = "Выполнено";
+                        }
+                    }
+                }
+            }
+
+            label32.Text = captions[0] + ":";
+            label33.Text = captions[1] + ":";
+            label36.Text = captions[2] + ":";
+            label37.Text = captions[3] + ":";
+
+            label34.Text = values[0];
+            label35.Text = values[1];
+            label38.Text = values[2];
+            label39.Text = values[3];
+        }
+
+        //OOOLLLDDD
+        private async void UpdateWorkingOutOLD()
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase infoBase = new ValueInfoBase();
@@ -2319,7 +2443,7 @@ namespace OrderManager
                     wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
                 }
 
-                string status = ordersBase.GetOrderStatus(ordersCurrentShift[idLastOrder].orderIndex);
+                string previewValue = "";
 
                 int norm = ordersCurrentShift[idLastOrder].norm;
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
@@ -2342,10 +2466,21 @@ namespace OrderManager
                         int timeForCurentOrderWitchoutMakeready = timeForCurrentOrder - mkTime;
 
                         previewCountValue = timeForCurentOrderWitchoutMakeready * norm / 60;
+                        previewValue = previewCountValue.ToString("N0") + " шт.";
+                        label46.Text = "Количество:";
+                    }
+                    else
+                    {
+                        previewValue = timeOperations.MinuteToTimeString(mkTime - timeForCurrentOrder) + " ч.";
+                        label46.Text = "Приладка:";
                     }
                 }
+                else
+                {
+                    label46.Text = "Выполнено";
+                }
 
-                label47.Text = previewCountValue.ToString("N0") + " шт.";
+                label47.Text = previewValue;
                 label48.Text = getPercent.PercentString(previewTimeValue);
             }
         }

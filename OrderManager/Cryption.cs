@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -98,18 +97,35 @@ namespace OrderManager
         {
             string result = string.Empty;
             string MotherBoardID = string.Empty;
-            SelectQuery query = new SelectQuery("Win32_BaseBoard");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
 
-
-            ManagementObjectCollection.ManagementObjectEnumerator enumerator = searcher.Get().GetEnumerator();
-            while (enumerator.MoveNext())
+            try
             {
-                ManagementObject info = (ManagementObject)enumerator.Current;
-                MotherBoardID = info["SerialNumber"].ToString().Trim();
+                result = "USER:" + Environment.UserName;
+            }
+            catch (Exception ex)
+            {
+                LogException.WriteLine(ex.Message);
             }
 
-            result = "USER:" + Environment.UserName + ";MB:" + MotherBoardID;
+            try
+            {
+                SelectQuery query = new SelectQuery("Win32_BaseBoard");
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+
+                ManagementObjectCollection.ManagementObjectEnumerator enumerator = searcher.Get().GetEnumerator();
+
+                while (enumerator.MoveNext())
+                {
+                    ManagementObject info = (ManagementObject)enumerator.Current;
+                    MotherBoardID = info["SerialNumber"].ToString().Trim();
+                }
+
+                result += ";MB:" + MotherBoardID;
+            }
+            catch (Exception ex)
+            {
+                LogException.WriteLine(ex.Message);
+            }
 
             return result;
         }

@@ -126,14 +126,14 @@ namespace OrderManager
             return result; 
         }
 
-        public string GetCurrentOrderID(string machine)
+        public int GetCurrentOrderID(string machine)
         {
-            string result = "-1";
+            int result = -1;
             string val = GetValue("machine", machine, "currentOrderID");
 
             if (val != "")
             {
-                result = val;
+                result = Convert.ToInt32(val);
             }
 
             return result;

@@ -1045,7 +1045,7 @@ namespace OrderManager
 
             string status = orders.GetOrderStatus(orderID);
             int counterRepeat = orders.GetCounterRepeat(orderID);
-            string currentOrderID = infoBase.GetCurrentOrderID(await infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
+            int currentOrderID = infoBase.GetCurrentOrderID(await infoBase.GetMachineFromName(comboBox3.Text));// сделать загрузку из базы в соответствии с выбранным оборудованием
             string lastOrderID = infoBase.GetLastOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
 
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
@@ -1089,7 +1089,7 @@ namespace OrderManager
 
             if (status == "1") // начата приладка
             {
-                if (currentOrderID == "-1")
+                if (currentOrderID == -1)
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyConsider, makereadyPart, done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
@@ -1153,7 +1153,7 @@ namespace OrderManager
 
             if (status == "2") // приладка завершена
             {
-                if (currentOrderID == "-1")
+                if (currentOrderID == -1)
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", 0, -1, done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
@@ -1173,7 +1173,7 @@ namespace OrderManager
 
             if (status == "3") // начата работа
             {
-                if (currentOrderID == "-1")
+                if (currentOrderID == -1)
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", 0, -1, done.ToString(), counterRepeat, note);
                     infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
@@ -1219,7 +1219,7 @@ namespace OrderManager
 
             string status = getValue.GetOrderStatus(orderID);
             int counterRepeat = getValue.GetCounterRepeat(orderID);
-            string currentOrderID = infoBase.GetCurrentOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
+            int currentOrderID = infoBase.GetCurrentOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
             string lastOrderID = infoBase.GetLastOrderID(await infoBase.GetMachineFromName(comboBox3.Text));
 
             //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
@@ -1242,7 +1242,7 @@ namespace OrderManager
 
             if (status == "1") // начата приладка
             {
-                if (currentOrderID != "-1")
+                if (currentOrderID != -1)
                 {
                     if (orderRegistrationType == 0)
                     {
@@ -1315,7 +1315,7 @@ namespace OrderManager
             }
             if (status == "3") // начата склейка
             {
-                if (currentOrderID != "-1")
+                if (currentOrderID != -1)
                 {
                     GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
@@ -1353,7 +1353,7 @@ namespace OrderManager
 
             string status = getValue.GetOrderStatus(orderID);
             int counterRepeat = getValue.GetCounterRepeat(orderID);
-            string currentOrderID = getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text));
+            int currentOrderID = getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text));
             string lastOrderID = getInfo.GetLastOrderID(await getInfo.GetMachineFromName(comboBox3.Text));
 
             //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
@@ -1381,7 +1381,7 @@ namespace OrderManager
 
             if (status == "1") // начата приладка
             {
-                if (currentOrderID != "-1")
+                if (currentOrderID != -1)
                 {
                     if (orderRegistrationType == 0)
                     {
@@ -1439,7 +1439,7 @@ namespace OrderManager
 
             if (status == "3") // начата склейка
             {
-                if (currentOrderID != "-1")
+                if (currentOrderID != -1)
                 {
                     GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
                     done += orderCalc.OrderCalculate(false, true);
@@ -1543,12 +1543,12 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            if (getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != "-1")
+            if (getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != -1)
             {
                 int index = 0;
                 for (int i = 0; i < ordersIndexes.Count; i++)
                 {
-                    if (ordersIndexes[i].ToString() == getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)))
+                    if (ordersIndexes[i] == getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)))
                     {
                         index = i;
                         break;
@@ -2228,7 +2228,7 @@ namespace OrderManager
                 ClearAllValue();
 
                 LoadOrderFromDB(orderIndex);
-                SetVisibleElements(getValue.GetOrderStatus(orderIndex), getInfo.GetCurrentOrderID(machine.ToString()));
+                SetVisibleElements(getValue.GetOrderStatus(orderIndex), getInfo.GetCurrentOrderID(machine.ToString()).ToString());
 
                 if (comboBox1.SelectedIndex != 0)
                 {
@@ -2318,7 +2318,7 @@ namespace OrderManager
                         }
 
                     }
-                    else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != "")
+                    else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != -1)
                     {
                         if (status == "1" || status == "3")
                         {
