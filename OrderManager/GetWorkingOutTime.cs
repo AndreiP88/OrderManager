@@ -224,10 +224,18 @@ namespace OrderManager
                     orderStatus.color = Color.Goldenrod;
                 }
 
-                orderStatus.caption_2 = "Плановая выработка: ";
-                orderStatus.value_2 = planedCoutOrder.ToString("N0") + " (" + (doneFromPreviewShifts + planedCoutOrder).ToString("N0") + ")";
+                if (currentLastTimeForMakeready > 0)
+                {
+                    orderStatus.caption_2 = "Приладка заказа. Осталось: ";
+                    orderStatus.value_2 = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
+                }
+                else
+                {
+                    orderStatus.caption_2 = "Плановая выработка: ";
+                    orderStatus.value_2 = planedCoutOrder.ToString("N0") + " (" + (doneFromPreviewShifts + planedCoutOrder).ToString("N0") + ")";
+                }
 
-                orderStatus.caption_3 = "Планирумое время завершения: ";
+                orderStatus.caption_3 = "Планирумое время завершения заказа: ";
                 orderStatus.value_3 = timeToEndWork;
 
                 orderStatus.caption_4 = "Планирумое время завершения заказа: ";

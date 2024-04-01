@@ -1564,13 +1564,13 @@ namespace OrderManager
 
                     string status = orders.GetOrderStatus(ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex);
 
-                    if (status == "1")// || status == "2")
+                    //if (status == "1")// || status == "2")
                     {
                         makereadyPartToolStripMenuItem.Visible = true;
                     }
-                    else
+                    //else
                     {
-                        makereadyPartToolStripMenuItem.Visible = false;
+                        //makereadyPartToolStripMenuItem.Visible = false;
                     }
                 }
             }
@@ -2080,13 +2080,12 @@ namespace OrderManager
                                         {
                                             if (remainingTargetCount > 0)
                                             {
-                                                values[i] = "Не хватило " + remainingTargetCount.ToString("N0") + " шт. Всего: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
+                                                values[i] = "Не хватило " + timeOperations.TotalMinutesToHoursAndMinutesStr(targetTime - wOutAllOrders) + " - " + remainingTargetCount.ToString("N0") + " шт. Всего: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
                                             }
                                             else
                                             {
                                                 values[i] = "Не хватило всей приладки";
                                             }
-                                                
                                         }
                                         else
                                         {
@@ -2108,7 +2107,7 @@ namespace OrderManager
 
                                     if (isNotMorePercentOverAmount)
                                     {
-                                        values[i] = "Не хватило " + remainingTargetCount.ToString("N0") + " шт. Всего: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
+                                        values[i] = "Не хватило " + timeOperations.TotalMinutesToHoursAndMinutesStr(targetTime - wOutAllOrders) + " - " + remainingTargetCount.ToString("N0") + " шт. Всего: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
                                     }
                                     else
                                     {
