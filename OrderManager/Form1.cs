@@ -1987,70 +1987,150 @@ namespace OrderManager
                     getOrders.GetMakereadyConsider(Info.shiftIndex, ordersCurrentShift[idLastOrder].orderIndex, ordersCurrentShift[idLastOrder].counterRepeat, Convert.ToInt32(machine));
                 //bool isOrderActive
 
-                for (int i = 0; i < captions.Length; i++)
+                //if (currentOrderForSelectedMachine == ordersCurrentShift[idLastOrder].orderIndex)
                 {
-                    int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
-                    int lastTimeToWork;
-
-                    if (currentOrderForSelectedMachine == ordersCurrentShift[idLastOrder].orderIndex && isCurrentOrderForSelectedMachineActive)
+                    for (int i = 0; i < captions.Length; i++)
                     {
-                        lastTimeToWork = targetTime - wOut;
-                        int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+                        int targetTime = timeOperations.totallTimeHHMMToMinutes(captions[i]);
+                        int targetCount = (targetTime - wOut - mkTime) * norm / 60;
                         int targetAmount = done + targetCount;
-                        int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
+                        int lastTimeToWork;
+                        bool isNotMorePercentOverAmount = false;
 
-                        if (lastTimeToWork > 0)
+                        if (targetAmount <= amount * (1 + percentOverAmount / 100))
                         {
-                            if (lastTimeToWork < mkTime)
-                            {
-                                values[i] = "Необходима часть приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
-                            }
-                            else
-                            {
-                                if (targetAmount <= amount * (1 + percentOverAmount / 100))
-                                {
-                                    values[i] = "Необходима вся приладка";
+                            isNotMorePercentOverAmount = true;
+                        }
 
-                                    if (targetCount > 0)
-                                        values[i] += " и сделать: " + targetCount.ToString("N0") + " шт.";
+                        if (isCurrentOrderForSelectedMachineActive)
+                        {
+                            lastTimeToWork = targetTime - wOut;
+                            //int targetCount = (lastTimeToWork - mkTime) * norm / 60;
+                            //int targetAmount = done + targetCount;
+                            int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
+
+                            if (lastTimeToWork > 0)
+                            {
+                                if (mkTime > 0)
+                                {
+                                    if (lastTimeToWork < mkTime)
+                                    {
+                                        values[i] = "Необходима часть приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
+                                    }
+                                    else
+                                    {
+                                        if (isNotMorePercentOverAmount)
+                                        {
+                                            values[i] = "Необходима вся приладка";
+
+                                            if (targetCount > 0)
+                                                values[i] += " и сделать: " + targetCount.ToString("N0") + " шт.";
+                                        }
+                                        else
+                                        {
+                                            values[i] = "Не хватит " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    values[i] = "Не хватит " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                    if (isNotMorePercentOverAmount)
+                                    {
+                                        values[i] = "Необходимо сделать: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
+                                    }
+                                    else
+                                    {
+                                        values[i] = "Не хватит " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                    }
                                 }
-                            }
-                        }
-                        else
-                        {
-                            values[i] = "Выполнено";
-                        }
-                    }
-                    else
-                    {
-                        lastTimeToWork = targetTime - wOutAllOrders;
-                        int targetCount = (lastTimeToWork - mkTime) * norm / 60;
-                        int targetAmount = done + targetCount;
-                        int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
-
-                        if (lastTimeToWork > 0)
-                        {
-                            if (lastTimeToWork < (mkTime - currentMakereadyPart))
-                            {
-                                values[i] = "Не хватило части приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
                             }
                             else
                             {
-
+                                values[i] = "Выполнено";
                             }
-
-                            values[i] = "Не хватает " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork) + "";
                         }
                         else
                         {
-                            values[i] = "Выполнено";
+                            lastTimeToWork = targetTime - wOutAllOrders;
+                            int remainingLastCount = lastCount - ordersCurrentShift[idLastOrder].done;
+                            int remainingTargetCount = targetCount - ordersCurrentShift[idLastOrder].done;
+
+                            if (lastTimeToWork > 0)
+                            {
+                                if (mkTime  > 0)
+                                {
+                                    int remainingMakereadyPart = mkTime;
+
+                                    if (currentMakereadyPart >= 0)
+                                    {
+                                        remainingMakereadyPart = mkTime - currentMakereadyPart;
+                                    }
+
+                                    if (lastTimeToWork < remainingMakereadyPart)
+                                    {
+                                        values[i] = "Не хватило части приладки: " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork);
+                                    }
+                                    else
+                                    {
+                                        //int targetCount = (lastTimeToWork - remainingMakereadyPart) * norm / 60;
+                                        //int targetAmount = done + targetCount;
+                                        int lackOfTime = lastTimeToWork - (60 * (remainingLastCount) / norm + remainingMakereadyPart);
+
+                                        if (isNotMorePercentOverAmount)
+                                        {
+                                            if (remainingTargetCount > 0)
+                                            {
+                                                values[i] = "Не хватило " + remainingTargetCount.ToString("N0") + " шт. Всего: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
+                                            }
+                                            else
+                                            {
+                                                values[i] = "Не хватило всей приладки";
+                                            }
+                                                
+                                        }
+                                        else
+                                        {
+                                            if (remainingLastCount > 0)
+                                            {
+                                                values[i] = "Не хватило " + remainingLastCount.ToString("N0") + " шт. и " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                            }
+                                            else
+                                            {
+                                                values[i] = "Не хватило " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //еще необходимо сделать
+                                    int lackOfTime = lastTimeToWork - (60 * (remainingLastCount) / norm);
+
+                                    if (isNotMorePercentOverAmount)
+                                    {
+                                        values[i] = "Не хватило " + remainingTargetCount.ToString("N0") + " шт. Всего: " + targetCount.ToString("N0") + " шт. Сумма: " + targetAmount.ToString("N0") + " шт.";
+                                    }
+                                    else
+                                    {
+                                        if (remainingLastCount > 0)
+                                        {
+                                            values[i] = "Не хватило " + remainingLastCount.ToString("N0") + " шт. и " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                        }
+                                        else
+                                        {
+                                            values[i] = "Не хватило " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                values[i] = "Выполнено";
+                            }
                         }
                     }
                 }
+                
             }
 
             label32.Text = captions[0] + ":";
