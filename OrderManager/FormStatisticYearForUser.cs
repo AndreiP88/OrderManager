@@ -1,10 +1,7 @@
-﻿using libData;
-using libSql;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -499,6 +496,11 @@ namespace OrderManager
                     if (countMonthEctive > 0)
                     {
                         averagePercent = summWorkingOutPercent / countMonthEctive;
+                    }
+
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
                     }
 
                     Invoke(new Action(() =>

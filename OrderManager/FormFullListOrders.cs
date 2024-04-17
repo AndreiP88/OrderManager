@@ -277,7 +277,6 @@ namespace OrderManager
                                 {
                                     comboBox1.Items.Add(years[i].ToString());
                                 }));
-
                             }
 
                             reconnectionRequired = false;
@@ -306,7 +305,7 @@ namespace OrderManager
 
         private async Task LoadOrdersFromBase()
         {
-            if (comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1)
+            if ((comboBox1.SelectedIndex != -1 && comboBox2.SelectedIndex != -1 && comboBox3.SelectedIndex != -1) || detailsLoad)
             {
                 cancelTokenSource?.Cancel();
                 cancelTokenSource = new CancellationTokenSource();
@@ -552,7 +551,7 @@ namespace OrderManager
                 await LoadYears(cancelTokenSourceYear.Token);
                 await LoadMachine(cancelTokenSourceMachine.Token);
 
-                //LoadOrdersFromBase();
+                await LoadOrdersFromBase();
             }
             else
             {
@@ -564,17 +563,20 @@ namespace OrderManager
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            await LoadOrdersFromBase();
+            if (!detailsLoad)
+                await LoadOrdersFromBase();
         }
 
         private async void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            await LoadOrdersFromBase();
+            if (!detailsLoad)
+                await LoadOrdersFromBase();
         }
 
         private async void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            await LoadOrdersFromBase();
+            if (!detailsLoad)
+                await LoadOrdersFromBase();
         }
 
         private async void textBox1_TextChanged(object sender, EventArgs e)

@@ -6,6 +6,9 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
+using libData;
+using MySqlX.XDevAPI.Common;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace OrderManager
 {
@@ -685,6 +688,193 @@ namespace OrderManager
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
             string idMachine = await valueInfo.GetIDEquipMachine(loadMachine);
 
+            int countRowsReaded = 0;
+
+            try
+            {
+                using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
+                {
+                    Connect.Open();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT
+	                                        man_planjob.id_man_planjob, 
+	                                        man_planjob.date_begin, 
+	                                        man_planjob.date_end, 
+	                                        man_planjob.status, 
+	                                        man_planjob.flags, 
+	                                        man_planjob.id_equip, 
+	                                        man_planjob_list.plan_out_qty, 
+	                                        man_planjob_list.normtime, 
+	                                        order_head.order_num, 
+	                                        order_head.order_name, 
+	                                        common_ul_directory.ul_name, 
+	                                        common_equip_directory.equip_name, 
+	                                        man_planjob_list.id_norm_operation, 
+	                                        man_idletime.idletime_type, 
+	                                        man_idletime.id_idletime, 
+	                                        idletime_directory.idletime_name, 
+	                                        man_idletime.id_man_idletime, 
+	                                        order_head.id_order_head
+                                        FROM
+	                                        dbo.man_planjob
+	                                        INNER JOIN
+	                                        dbo.man_planjob_list
+	                                        ON 
+		                                        man_planjob.id_man_order_job_item = man_planjob_list.id_man_order_job_item
+	                                        LEFT JOIN
+	                                        dbo.man_order_job_item
+	                                        ON 
+		                                        man_planjob.id_man_order_job_item = man_order_job_item.id_man_order_job_item
+	                                        LEFT JOIN
+	                                        dbo.man_order_job
+	                                        ON 
+		                                        man_order_job_item.id_man_order_job = man_order_job.id_man_order_job
+	                                        LEFT JOIN
+	                                        dbo.order_head
+	                                        ON 
+		                                        man_order_job.id_order_head = order_head.id_order_head
+	                                        LEFT JOIN
+	                                        dbo.common_ul_directory
+	                                        ON 
+		                                        order_head.id_customer = common_ul_directory.id_common_ul_directory
+	                                        LEFT JOIN
+	                                        dbo.common_equip_directory
+	                                        ON 
+		                                        man_order_job.id_equip = common_equip_directory.id_common_equip_directory
+	                                        LEFT JOIN
+	                                        dbo.man_idletime
+	                                        ON 
+		                                        man_order_job.id_man_order_job = man_idletime.id_man_order_job
+	                                        LEFT JOIN
+	                                        dbo.idletime_directory
+	                                        ON 
+		                                        man_idletime.id_idletime = idletime_directory.id_idletime_directory
+                                        WHERE
+	                                        man_planjob.status <> 2 AND
+	                                        man_planjob.flags <> 1 AND
+	                                        man_planjob.id_equip = @idMachine
+                                        ORDER BY
+	                                        man_planjob.date_begin ASC"
+                    };
+                    Command.Parameters.AddWithValue("@idMachine", idMachine);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        int idManPlanJob = Convert.ToInt32(sqlReader["id_man_planjob"]);
+
+                        if (!DBNull.Value.Equals(sqlReader["order_num"]))
+                        {
+                            int itemIndex = orders.FindIndex((v) => v.IDManPlanJob == idManPlanJob);
+
+                            if (itemIndex == -1)
+                            {
+                                orders.Add(new OrdersLoad(
+                                        0,
+                                        idManPlanJob,
+                                        sqlReader["date_begin"].ToString(),
+                                        sqlReader["date_end"].ToString(),
+                                        sqlReader["order_num"].ToString(),
+                                        sqlReader["ul_name"].ToString(),
+                                        sqlReader["order_name"].ToString(),
+                                        0,
+                                        0,
+                                        0,
+                                        await GetStampFromOrderNumber(sqlReader["order_num"].ToString()),
+                                        sqlReader["id_order_head"].ToString()
+                                    ));
+
+                                itemIndex = orders.Count - 1;
+                            }
+
+                            if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
+                            {
+                                orders[itemIndex].makereadyTime = Convert.ToInt32(sqlReader["normtime"]) / Convert.ToInt32(sqlReader["plan_out_qty"]);
+                                countRowsReaded++;
+                            }
+
+                            if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
+                            {
+                                orders[itemIndex].workTime = Convert.ToInt32(sqlReader["normtime"]);
+                                orders[itemIndex].amountOfOrder = Convert.ToInt32(sqlReader["plan_out_qty"]);
+                                countRowsReaded++;
+                            }
+
+                            if (countRowsReaded >= 2)
+                            {
+                                AddOrderToListView(itemIndex, orders[itemIndex], token);
+                                countRowsReaded = 0;
+                            }
+                        }
+                        else
+                        {
+                            int itemIndex = orders.FindIndex((v) => v.IDManPlanJob == idManPlanJob);
+
+                            if (itemIndex == -1)
+                            {
+                                orders.Add(new OrdersLoad(
+                                        1,
+                                        idManPlanJob,
+                                        sqlReader["date_begin"].ToString(),
+                                        sqlReader["date_end"].ToString(),
+                                        "",
+                                        "",
+                                        sqlReader["idletime_name"].ToString(),
+                                        0,
+                                        Convert.ToInt32(sqlReader["normtime"]),
+                                        0,
+                                        "",
+                                        ""
+                                    ));
+
+                                itemIndex = orders.Count - 1;
+                            }
+
+                            AddOrderToListView(itemIndex, orders[itemIndex], token);
+                        }
+
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка: " + ex.Message);
+                LogException.WriteLine(ex.Message);
+            }
+        }
+
+        /*private async void LoadPlanOLD(CancellationToken token)
+        {
+            ValueCategory valueCategory = new ValueCategory();
+            ValueInfoBase valueInfo = new ValueInfoBase();
+
+            Invoke(new Action(() =>
+            {
+                orders.Clear();
+                orderNumbers.Clear();
+                listView1.Items.Clear();
+            }));
+
+            string category = await valueInfo.GetCategoryMachine(loadMachine);
+
+            string idNormOperationMakeReady = valueCategory.GetMKIDNormOperation(category);
+            string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
+            string idMachine = await valueInfo.GetIDEquipMachine(loadMachine);
+
             string endDate = DateTime.Now.AddMonths(-6).ToString();
 
             List<string> orderItemsList = new List<string>();
@@ -959,7 +1149,7 @@ namespace OrderManager
                     break;
                 }
 
-                /*ListViewItem item = new ListViewItem();
+                *//*ListViewItem item = new ListViewItem();
 
                 item.Name = i.ToString();
                 item.Text = (i + 1).ToString();
@@ -975,10 +1165,10 @@ namespace OrderManager
                 Invoke(new Action(() =>
                 {
                     listView1.Items.Add(item);
-                }));*/
+                }));*//*
 
             }
-        }
+        }*/
 
         private void AddOrderToListView(int index, OrdersLoad order, CancellationToken token)
         {
@@ -988,6 +1178,8 @@ namespace OrderManager
 
             item.Name = index.ToString();
             item.Text = (index + 1).ToString();
+            item.SubItems.Add(order.TimeStartOrder.ToString());
+            item.SubItems.Add(order.TimeEndOrder.ToString());
             item.SubItems.Add(order.numberOfOrder.ToString());
             item.SubItems.Add(order.nameCustomer.ToString());
             item.SubItems.Add(order.nameItem.ToString());
@@ -1012,8 +1204,6 @@ namespace OrderManager
             {
                 LogException.WriteLine(ex.Message);
             }
-            
-            
         }
 
         private void calculateCountProductionFromPreviousOperations(int idManPlanjobList)
@@ -1101,10 +1291,21 @@ namespace OrderManager
 
         private void SendSelectedOrder(int index)
         {
-            NewValue = true;
+            if (orders[index].TypeJob == 0)
+            {
+                NewValue = true;
 
-            SetValue = orders[index];
-            Types = LoadItemsFromOrder(orders[index].headOrder);
+                SetValue = orders[index];
+                Types = LoadItemsFromOrder(orders[index].headOrder);
+            }
+            else
+            {
+                NewValue = false;
+
+                MessageBox.Show("Данная функция пока не раеализована", "Внимание");
+            }
+
+            
             //сделать загрузку видов
         }
 

@@ -136,11 +136,12 @@ namespace OrderManager
 
             ViewBaseConnectionParameters();
 
-
             if (Form1.Info.shiftIndex == -1)
             {
                 await ShowUserSelectMachineForm();
             }
+
+            comboBox8.SelectedIndex = 0;
 
             if (Info.nameOfExecutor == "1")
             {
@@ -1291,8 +1292,6 @@ namespace OrderManager
 
         private async void Form1_Shown(object sender, EventArgs e)
         {
-            comboBox8.SelectedIndex = 0;
-
             StartTaskUpdateApplication();
 
             LoadBaseConnectionParameters();
@@ -2102,7 +2101,6 @@ namespace OrderManager
                                 }
                                 else
                                 {
-                                    //еще необходимо сделать
                                     int lackOfTime = lastTimeToWork - (60 * (remainingLastCount) / norm);
 
                                     if (isNotMorePercentOverAmount)
@@ -2365,18 +2363,25 @@ namespace OrderManager
 
         private void comboBox8_SelectedIndexChanged(object sender, EventArgs e)
         {
+            int hour = 0;
+            int minute = 0;
+
             if (comboBox8.SelectedIndex == 0)
             {
-                tableLayoutPanel13.ColumnStyles[1].Width = 100;
-                tableLayoutPanel13.ColumnStyles[2].Width = 40;
+                /*tableLayoutPanel13.ColumnStyles[1].Width = 100;
+                tableLayoutPanel13.ColumnStyles[2].Width = 40;*/
+                panel1.Visible = true;
+                button3.Visible = true;
+
+                hour = 0;
+                minute = 0;
             }
             else
             {
-                tableLayoutPanel13.ColumnStyles[1].Width = 0;
-                tableLayoutPanel13.ColumnStyles[2].Width = 0;
-
-                int hour = 0;
-                int minute = 0;
+                /*tableLayoutPanel13.ColumnStyles[1].Width = 0;
+                tableLayoutPanel13.ColumnStyles[2].Width = 0;*/
+                panel1.Visible = false;
+                button3.Visible = false;
 
                 switch (comboBox8.SelectedIndex)
                 {
@@ -2399,12 +2404,12 @@ namespace OrderManager
                     default:
                         break;
                 }
-
-                numericUpDown5.Value = hour;
-                numericUpDown6.Value = minute;
-
-                UpdatePreviewQuantityCalculationByTime();
             }
+
+            numericUpDown5.Value = hour;
+            numericUpDown6.Value = minute;
+
+            UpdatePreviewQuantityCalculationByTime();
         }
 
         private async void UpdatePreviewWorkingOut()
