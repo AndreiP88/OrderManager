@@ -2525,7 +2525,7 @@ namespace OrderManager
                 {
                     previewWOut = wOutAllOrders + (previewCountValue * 60 / norm);
                 }*/
-
+                label42.Text = "Выработка:";
                 label43.Text = timeOperations.MinuteToTimeString(previewWOut) + " ч.";
                 label44.Text = getPercent.PercentString(previewWOut);
             }
@@ -2603,7 +2603,7 @@ namespace OrderManager
                     }
                     else
                     {
-                        previewValueFirst = timeOperations.MinuteToTimeString(mkTime - timeForCurrentOrder) + " ч.";
+                        previewValueFirst = timeOperations.MinuteToTimeString(timeForCurrentOrder) + " ч.";
                         label42.Text = "Приладка:";
                     }
                 }
