@@ -1302,7 +1302,7 @@ namespace OrderManager
             {
                 NewValue = false;
 
-                MessageBox.Show("Данная функция пока не раеализована", "Внимание");
+                MessageBox.Show("Данная функция пока не реализована", "Внимание");
             }
 
             
