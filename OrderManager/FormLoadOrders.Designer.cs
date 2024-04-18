@@ -50,6 +50,8 @@
             this.button2 = new System.Windows.Forms.Button();
             this.listView1 = new OrderManager.FormLoadOrders.MyListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -57,8 +59,6 @@
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -265,48 +265,6 @@
             this.columnHeader1.Text = "№";
             this.columnHeader1.Width = 35;
             // 
-            // columnHeader4
-            // 
-            this.columnHeader4.DisplayIndex = 3;
-            this.columnHeader4.Text = "Номер заказа";
-            this.columnHeader4.Width = 90;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.DisplayIndex = 4;
-            this.columnHeader5.Text = "Заказчик";
-            this.columnHeader5.Width = 200;
-            // 
-            // columnHeader6
-            // 
-            this.columnHeader6.DisplayIndex = 5;
-            this.columnHeader6.Text = "Описание";
-            this.columnHeader6.Width = 249;
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.DisplayIndex = 6;
-            this.columnHeader7.Text = "Приладка";
-            this.columnHeader7.Width = 70;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.DisplayIndex = 7;
-            this.columnHeader8.Text = "Работа";
-            this.columnHeader8.Width = 70;
-            // 
-            // columnHeader9
-            // 
-            this.columnHeader9.DisplayIndex = 8;
-            this.columnHeader9.Text = "Тираж";
-            this.columnHeader9.Width = 70;
-            // 
-            // columnHeader10
-            // 
-            this.columnHeader10.DisplayIndex = 9;
-            this.columnHeader10.Text = "Штамп";
-            this.columnHeader10.Width = 198;
-            // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Начало выполнения";
@@ -316,6 +274,41 @@
             // 
             this.columnHeader3.Text = "Завершение выполнения";
             this.columnHeader3.Width = 150;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Номер заказа";
+            this.columnHeader4.Width = 90;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Заказчик";
+            this.columnHeader5.Width = 200;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "Описание";
+            this.columnHeader6.Width = 249;
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "Приладка";
+            this.columnHeader7.Width = 70;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "Работа";
+            this.columnHeader8.Width = 70;
+            // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "Тираж";
+            this.columnHeader9.Width = 70;
+            // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "Штамп";
+            this.columnHeader10.Width = 198;
             // 
             // FormLoadOrders
             // 

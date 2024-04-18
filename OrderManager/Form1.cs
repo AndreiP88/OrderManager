@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolTip = System.Windows.Forms.ToolTip;
 using static OrderManager.DataBaseReconnect;
-using System.Runtime.InteropServices;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
@@ -685,12 +685,6 @@ namespace OrderManager
 
             comboBox5.Items.Clear();
 
-            //Preview %
-            comboBox6.Items.Clear();
-            comboBox6.Items.Add("Общая выработка");
-
-            comboBox7.Items.Clear();
-
             for (int i = 0; i < machines.Count; i++)
             {
                 //WOut
@@ -700,10 +694,6 @@ namespace OrderManager
                 //Preview
                 comboBox4.Items.Add(await infoBase.GetMachineName(machines[i]));
                 comboBox5.Items.Add(await infoBase.GetMachineName(machines[i]));
-
-                //Preview %
-                comboBox6.Items.Add(await infoBase.GetMachineName(machines[i]));
-                comboBox7.Items.Add(await infoBase.GetMachineName(machines[i]));
             }
 
             if (machines.Count > 0)
@@ -729,17 +719,6 @@ namespace OrderManager
                     comboBox5.SelectedIndex = selectedIndexPreviewWOut2;
                 else
                     comboBox5.SelectedIndex = 0;
-
-                //Preview %
-                if (comboBox6.Items.Count > 0 && comboBox6.Items.Count > selectedIndexPreviewWOut1)
-                    comboBox6.SelectedIndex = selectedIndexPreviewWOut1;
-                else
-                    comboBox6.SelectedIndex = 1;
-
-                if (comboBox7.Items.Count > 0 && comboBox7.Items.Count > selectedIndexPreviewWOut2)
-                    comboBox7.SelectedIndex = selectedIndexPreviewWOut2;
-                else
-                    comboBox7.SelectedIndex = 0;
             }
 
             //WOut
@@ -761,17 +740,6 @@ namespace OrderManager
             else
             {
                 tableLayoutPanel8.ColumnStyles[0].Width = 280;
-                //tableLayoutPanel9.ColumnStyles[0].Width = 280;
-            }
-
-            //Preview %
-            if (comboBox6.Items.Count <= 2)
-            {
-                tableLayoutPanel11.ColumnStyles[0].Width = 0;
-            }
-            else
-            {
-                tableLayoutPanel11.ColumnStyles[0].Width = 280;
                 //tableLayoutPanel9.ColumnStyles[0].Width = 280;
             }
         }
@@ -950,11 +918,6 @@ namespace OrderManager
             label40.Text = "";
             label43.Text = "00:00 ч.";
             label44.Text = "0.0%";
-
-            label49.Text = "";
-            label45.Text = "";
-            label47.Text = "0 шт.";
-            label48.Text = "0.0%";
 
             selectedIndexPreviewWOut1 = 0;
             selectedIndexPreviewWOut2 = 0;
@@ -2094,7 +2057,7 @@ namespace OrderManager
                                             }
                                             else
                                             {
-                                                values[i] = "Не хватило " + timeOperations.TotalMinutesToHoursAndMinutesStr(lackOfTime) + "";
+                                                values[i] = "Не хватило " + timeOperations.TotalMinutesToHoursAndMinutesStr(lastTimeToWork) + "";
                                             }
                                         }
                                     }
@@ -2127,7 +2090,6 @@ namespace OrderManager
                         }
                     }
                 }
-                
             }
 
             label32.Text = captions[0] + ":";
@@ -2304,7 +2266,7 @@ namespace OrderManager
 
             if (comboBox5.SelectedIndex == selectedIndexPreviewWOut2)
             {
-                UpdatePreviewWorkingOut();
+                UpdatePreviewCalculate();
             }
             else
             {
@@ -2317,99 +2279,169 @@ namespace OrderManager
             selectedIndexPreviewWOut1 = comboBox4.SelectedIndex;
         }
 
-        private void comboBox6_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBox6.SelectedIndex == 0)
-            {
-                tableLayoutPanel12.ColumnStyles[1].Width = 50;
-
-                //comboBox3.SelectedIndex = selectedIndexWOut2;
-            }
-            else
-            {
-                tableLayoutPanel12.ColumnStyles[1].Width = 0;
-
-                selectedIndexPreviewWOut2 = comboBox6.SelectedIndex - 1;
-            }
-
-            if (comboBox7.SelectedIndex == selectedIndexPreviewWOut2)
-            {
-                UpdatePreviewQuantityCalculationByTime();
-            }
-            else
-            {
-                if (comboBox7.Items.Count > selectedIndexPreviewWOut2)
-                    comboBox7.SelectedIndex = selectedIndexPreviewWOut2;
-                else
-                    comboBox7.SelectedIndex = 0;
-            }
-
-            selectedIndexPreviewWOut1 = comboBox6.SelectedIndex;
-        }
-
         private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectedIndexWOut2 = comboBox5.SelectedIndex;
 
-            UpdatePreviewWorkingOut();
-        }
-
-        private void comboBox7_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            selectedIndexWOut2 = comboBox7.SelectedIndex;
-
-            UpdatePreviewQuantityCalculationByTime();
+            UpdatePreviewCalculate();
         }
 
         private void comboBox8_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int hour = 0;
-            int minute = 0;
-
-            if (comboBox8.SelectedIndex == 0)
+            switch (comboBox8.SelectedIndex)
             {
-                /*tableLayoutPanel13.ColumnStyles[1].Width = 100;
-                tableLayoutPanel13.ColumnStyles[2].Width = 40;*/
-                panel1.Visible = true;
-                button3.Visible = true;
-
-                hour = 0;
-                minute = 0;
+                case 0:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 100;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 40;
+                    panel1.Visible = false;
+                    numericUpDown1.Visible = true;
+                    numericUpDown1.Enabled = true;
+                    numericUpDown1.Value = 0;
+                    button2.Visible = true;
+                    UpdatePreviewWorkingOut();
+                    break;
+                case 1:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 100;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = false;
+                    numericUpDown1.Visible = true;
+                    numericUpDown1.Enabled = false;
+                    numericUpDown1.Value = 0;
+                    button2.Visible = false;
+                    UpdatePreviewWorkingOut();
+                    break;
+                case 2:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 100;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 40;
+                    panel1.Visible = false;
+                    numericUpDown1.Visible = true;
+                    numericUpDown1.Enabled = true;
+                    numericUpDown1.Value = 0;
+                    button2.Visible = true;
+                    UpdatePreviewQuantityCalculationByTime(true);
+                    break;
+                case 3:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 100;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = false;
+                    numericUpDown1.Visible = true;
+                    numericUpDown1.Enabled = false;
+                    numericUpDown1.Value = 100;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime(true);
+                    break;
+                case 4:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 100;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = false;
+                    numericUpDown1.Visible = true;
+                    numericUpDown1.Enabled = false;
+                    numericUpDown1.Value = 110;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime(true);
+                    break;
+                case 5:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 100;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = false;
+                    numericUpDown1.Visible = true;
+                    numericUpDown1.Enabled = false;
+                    numericUpDown1.Value = 120;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime(true);
+                    break;
+                case 6:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 100;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = true;
+                    numericUpDown1.Visible = false;
+                    numericUpDown5.Enabled = true;
+                    numericUpDown6.Enabled = true;
+                    numericUpDown5.Value = 0;
+                    numericUpDown6.Value = 0;
+                    button2.Visible = true;
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                case 7:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 100;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = true;
+                    numericUpDown1.Visible = false;
+                    numericUpDown5.Enabled = false;
+                    numericUpDown6.Enabled = false;
+                    numericUpDown5.Value = 10;
+                    numericUpDown6.Value = 0;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                case 8:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 100;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = true;
+                    numericUpDown1.Visible = false;
+                    numericUpDown5.Enabled = false;
+                    numericUpDown6.Enabled = false;
+                    numericUpDown5.Value = 10;
+                    numericUpDown6.Value = 30;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                case 9:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 100;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = true;
+                    numericUpDown1.Visible = false;
+                    numericUpDown5.Enabled = false;
+                    numericUpDown6.Enabled = false;
+                    numericUpDown5.Value = 11;
+                    numericUpDown6.Value = 0;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                case 10:
+                    tableLayoutPanel10.ColumnStyles[1].Width = 100;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    //tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    panel1.Visible = true;
+                    numericUpDown1.Visible = false;
+                    numericUpDown5.Enabled = false;
+                    numericUpDown6.Enabled = false;
+                    numericUpDown5.Value = 12;
+                    numericUpDown6.Value = 0;
+                    button2.Visible = false;
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                default:
+                    break;
             }
-            else
+        }
+
+        private void UpdatePreviewCalculate()
+        {
+            switch (comboBox8.SelectedIndex)
             {
-                /*tableLayoutPanel13.ColumnStyles[1].Width = 0;
-                tableLayoutPanel13.ColumnStyles[2].Width = 0;*/
-                panel1.Visible = false;
-                button3.Visible = false;
-
-                switch (comboBox8.SelectedIndex)
-                {
-                    case 1:
-                        hour = 10;
-                        minute = 0;
-                        break;
-                    case 2:
-                        hour = 10;
-                        minute = 30;
-                        break;
-                    case 3:
-                        hour = 11;
-                        minute = 0;
-                        break;
-                    case 4:
-                        hour = 12;
-                        minute = 0;
-                        break;
-                    default:
-                        break;
-                }
+                case 0:
+                    UpdatePreviewWorkingOut();
+                    break;
+                case 2:
+                    UpdatePreviewQuantityCalculationByTime(true);
+                    break;
+                case 6:
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                default:
+                    break;
             }
-
-            numericUpDown5.Value = hour;
-            numericUpDown6.Value = minute;
-
-            UpdatePreviewQuantityCalculationByTime();
         }
 
         private async void UpdatePreviewWorkingOut()
@@ -2446,7 +2478,6 @@ namespace OrderManager
 
                 string status = ordersBase.GetOrderStatus(ordersCurrentShift[idLastOrder].orderIndex);
                 
-
                 int norm = ordersCurrentShift[idLastOrder].norm;
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
                 int lastCount = ordersCurrentShift[idLastOrder].lastCount;
@@ -2454,6 +2485,11 @@ namespace OrderManager
                 int mkTime = ordersCurrentShift[idLastOrder].plannedTimeMakeready;
 
                 int previewWOut = 0;
+
+                if (comboBox8.SelectedIndex == 1)
+                {
+                    numericUpDown1.Value = lastCount;
+                }
 
                 int previewCountValue = (int)numericUpDown1.Value;
                 int previewWOutCurrentOrder = previewCountValue * 60 / norm;
@@ -2495,7 +2531,7 @@ namespace OrderManager
             }
         }
 
-        private async void UpdatePreviewQuantityCalculationByTime()
+        private async void UpdatePreviewQuantityCalculationByTime(bool calculateFromPercent = false)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueInfoBase infoBase = new ValueInfoBase();
@@ -2509,10 +2545,10 @@ namespace OrderManager
 
             bool activeOrderFromMachine = infoBase.GetActiveOrder(machine);
 
-            label45.Text = "";
-            label47.Text = "";
-            label48.Text = "";
-            label49.Text = "";
+            label41.Text = "";
+            label40.Text = "";
+            label43.Text = "";
+            label44.Text = "";
 
             if (idLastOrder >= 0)
             {
@@ -2527,7 +2563,8 @@ namespace OrderManager
                     wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
                 }
 
-                string previewValue = "";
+                string previewValueFirst = "";
+                string previewValueSecond = "";
 
                 int norm = ordersCurrentShift[idLastOrder].norm;
                 int amount = ordersCurrentShift[idLastOrder].amountOfOrder;
@@ -2535,11 +2572,22 @@ namespace OrderManager
                 int done = amount - lastCount;// + ordersCurrentShift[idLastOrder].done;
                 int mkTime = ordersCurrentShift[idLastOrder].plannedTimeMakeready;
 
-                int previewTimeValue = (int)numericUpDown5.Value * 60 + (int)numericUpDown6.Value;
+                int previewTimeValue;
                 int previewCountValue = 0;
 
-                label45.Text = ordersCurrentShift[idLastOrder].numberOfOrder + ": " + ordersCurrentShift[idLastOrder].nameOfOrder;
-                label49.Text = "Текущая выработка: " + timeOperations.MinuteToTimeString(wOut) + " ч.";
+                if (calculateFromPercent)
+                {
+                    previewTimeValue = (int)numericUpDown1.Value * 650 / 100;
+                    previewValueSecond = timeOperations.MinuteToTimeString(previewTimeValue) + " ч.";
+                }
+                else
+                {
+                    previewTimeValue = (int)numericUpDown5.Value * 60 + (int)numericUpDown6.Value;
+                    previewValueSecond = getPercent.PercentString(previewTimeValue);
+                }
+
+                label41.Text = ordersCurrentShift[idLastOrder].numberOfOrder + ": " + ordersCurrentShift[idLastOrder].nameOfOrder;
+                label40.Text = "Текущая выработка: " + timeOperations.MinuteToTimeString(wOut) + " ч.";
 
                 if (previewTimeValue > wOut)
                 {
@@ -2550,22 +2598,22 @@ namespace OrderManager
                         int timeForCurentOrderWitchoutMakeready = timeForCurrentOrder - mkTime;
 
                         previewCountValue = timeForCurentOrderWitchoutMakeready * norm / 60;
-                        previewValue = previewCountValue.ToString("N0") + " шт.";
-                        label46.Text = "Количество:";
+                        previewValueFirst = previewCountValue.ToString("N0") + " шт.";
+                        label42.Text = "Количество:";
                     }
                     else
                     {
-                        previewValue = timeOperations.MinuteToTimeString(mkTime - timeForCurrentOrder) + " ч.";
-                        label46.Text = "Приладка:";
+                        previewValueFirst = timeOperations.MinuteToTimeString(mkTime - timeForCurrentOrder) + " ч.";
+                        label42.Text = "Приладка:";
                     }
                 }
                 else
                 {
-                    label46.Text = "Выполнено";
+                    label42.Text = "Выполнено";
                 }
 
-                label47.Text = previewValue;
-                label48.Text = getPercent.PercentString(previewTimeValue);
+                label43.Text = previewValueFirst;
+                label44.Text = previewValueSecond;
             }
         }
 
@@ -2656,7 +2704,7 @@ namespace OrderManager
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            UpdatePreviewWorkingOut();
+            UpdatePreviewCalculate();
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -2694,6 +2742,29 @@ namespace OrderManager
         private void numericUpDown6_Click(object sender, EventArgs e)
         {
             numericUpDown6.Select(0, numericUpDown6.Text.Length);
+        }
+        private void numericUpDown1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                UpdatePreviewCalculate();
+            }
+        }
+
+        private void numericUpDown5_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                UpdatePreviewCalculate();
+            }
+        }
+
+        private void numericUpDown6_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                UpdatePreviewCalculate();
+            }
         }
     }
 }
