@@ -688,7 +688,7 @@ namespace OrderManager
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
             string idMachine = await valueInfo.GetIDEquipMachine(loadMachine);
 
-            int countRowsReaded = 0;
+            int lastItemIndex = -1;
 
             try
             {
@@ -798,20 +798,18 @@ namespace OrderManager
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
                             {
                                 orders[itemIndex].makereadyTime = Convert.ToInt32(sqlReader["normtime"]) / Convert.ToInt32(sqlReader["plan_out_qty"]);
-                                countRowsReaded++;
                             }
 
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
                             {
                                 orders[itemIndex].workTime = Convert.ToInt32(sqlReader["normtime"]);
                                 orders[itemIndex].amountOfOrder = Convert.ToInt32(sqlReader["plan_out_qty"]);
-                                countRowsReaded++;
                             }
 
-                            if (countRowsReaded >= 2)
+                            if (orders[orders.Count - 1].IDManPlanJob != idManPlanJob)
                             {
-                                AddOrderToListView(itemIndex, orders[itemIndex], token);
-                                countRowsReaded = 0;
+                                //AddOrderToListView(itemIndex, orders[itemIndex], token);
+                                lastItemIndex = itemIndex;
                             }
                         }
                         else
@@ -838,13 +836,23 @@ namespace OrderManager
                                 itemIndex = orders.Count - 1;
                             }
 
-                            AddOrderToListView(itemIndex, orders[itemIndex], token);
+                            //AddOrderToListView(itemIndex, orders[itemIndex], token);
                         }
 
                         if (token.IsCancellationRequested)
                         {
                             break;
                         }
+                    }
+
+                    for (int i = 0; i < orders.Count; i++)
+                    {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        AddOrderToListView(i, orders[i], token);
                     }
 
                     Connect.Close();
