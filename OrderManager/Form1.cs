@@ -2598,7 +2598,7 @@ namespace OrderManager
                         int timeForCurentOrderWitchoutMakeready = timeForCurrentOrder - mkTime;
 
                         previewCountValue = timeForCurentOrderWitchoutMakeready * norm / 60;
-                        previewValueFirst = previewCountValue.ToString("N0") + " шт.";
+                        previewValueFirst = previewCountValue.ToString("N0") + " шт. Сумма: " + (done + previewCountValue).ToString("N0") + " шт.";
                         label42.Text = "Количество:";
                     }
                     else
