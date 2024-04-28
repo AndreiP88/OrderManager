@@ -124,6 +124,12 @@
     <Compile Include="DBConnection.cs" />
     <Compile Include="DBMySQLUtils.cs" />
     <Compile Include="FileDownloader.cs" />
+    <Compile Include="FormAddCloseEditOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddCloseEditOrder.Designer.cs">
+      <DependentUpon>FormAddCloseEditOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAddEditMachine.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -354,6 +360,9 @@
     <Compile Include="ValueCategory.cs" />
     <EmbeddedResource Include="DayBlank.resx">
       <DependentUpon>DayBlank.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormAddCloseEditOrder.resx">
+      <DependentUpon>FormAddCloseEditOrder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormAddEditMachine.resx">
       <DependentUpon>FormAddEditMachine.cs</DependentUpon>

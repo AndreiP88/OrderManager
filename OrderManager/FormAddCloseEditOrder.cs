@@ -9,15 +9,21 @@ using static OrderManager.DataBaseReconnect;
 
 namespace OrderManager
 {
-    public partial class FormAddCloseOrder : Form
+    public partial class FormAddCloseEditOrder : Form
     {
-        bool aMode;
+        int ShiftID;
+        int OrderID = -1;
+        int OrderInProgressID = -1;
+        bool AdminMode = false;
+        bool AdminCloseOrder = false;
+
+        /*bool aMode;
         bool adminCloseOrder;
         int shiftIndex;
         string nameOfExecutor;
         int loadOrderId;
         string loadMachine;
-        int loadCounterRepeat;
+        int loadCounterRepeat;*/
 
         int orderRegistrationType;
 
@@ -38,64 +44,16 @@ namespace OrderManager
             }
         }
 
-        /*public FormAddCloseOrder(String dBase, String lStartOfShift)
+        public FormAddCloseEditOrder(int loadShiftID)
         {
             InitializeComponent();
 
-            GetValueFromUserBase getUser = new GetValueFromUserBase(dBase);
-
-            this.aMode = false;
-            this. = dBase;
-            this.startOfShift = lStartOfShift;
-            this.nameOfExecutor = getUser.GetCurrentUserIDFromShiftStart(lStartOfShift);
-            this.loadOrderNumber = "";
-            this.loadOrderModification = "";
-            this.loadMachine = "";
-            this.loadCounterRepeat = "";
-
-        }*/
-
-        public FormAddCloseOrder(int lShiftID, string lNameOfExecutor)
-        {
-            InitializeComponent();
-
-            this.aMode = false;
-            this.adminCloseOrder = false;
-
-            this.shiftIndex = lShiftID;
-            this.nameOfExecutor = lNameOfExecutor;
-            this.loadOrderId = -1;
-            this.loadMachine = "";
-            this.loadCounterRepeat = 0;
-
+            this.ShiftID = loadShiftID;
         }
 
-        public FormAddCloseOrder(int lShiftID, string lNameOfExecutor, string lMachine)
+        public FormAddCloseEditOrder(bool adminMode, int lShiftID, int lOrderID, string lMachine, int lCounterRepeat)
         {
             InitializeComponent();
-
-            this.aMode = false;
-            this.adminCloseOrder = true;
-
-            this.shiftIndex = lShiftID;
-            this.nameOfExecutor = lNameOfExecutor;
-            this.loadOrderId = -1;
-            this.loadMachine = lMachine;
-            this.loadCounterRepeat = 0;
-
-        }
-
-        public FormAddCloseOrder(bool adminMode, int lShiftID, int lOrderID, string lMachine, int lCounterRepeat)
-        {
-            InitializeComponent();
-
-            this.aMode = adminMode;
-            this.adminCloseOrder = false;
-
-            this.shiftIndex = lShiftID;
-            this.loadOrderId = lOrderID;
-            this.loadMachine = lMachine;
-            this.loadCounterRepeat = lCounterRepeat;
 
             if (adminMode)
             {
@@ -103,19 +61,11 @@ namespace OrderManager
             }
         }
 
-        public FormAddCloseOrder(int lShiftID, int lOrderID, string lMachine, int lCounterRepeat)
+        public FormAddCloseEditOrder(int lShiftID, int lOrderID, string lMachine, int lCounterRepeat)
         {
             InitializeComponent();
 
-            this.aMode = false;
-            this.adminCloseOrder = false;
-
-            this.shiftIndex = lShiftID;
-            this.loadOrderId = lOrderID;
-            this.loadMachine = lMachine;
-            this.loadCounterRepeat = lCounterRepeat;
-
-            if (lShiftID == Form1.Info.shiftIndex && loadOrderId != -1)
+            if (lShiftID == Form1.Info.shiftIndex && OrderID != -1)
             {
                 CreateTransparentPannels();
             }
@@ -123,9 +73,10 @@ namespace OrderManager
 
         class Order
         {
-            public String numberOfOrder;
-            public String modificationOfOrder;
-            public Order(String number, string modification)
+            public string numberOfOrder;
+            public string modificationOfOrder;
+
+            public Order(string number, string modification)
             {
                 numberOfOrder = number;
                 modificationOfOrder = modification;
@@ -191,6 +142,115 @@ namespace OrderManager
             panel5.DoubleClick += panel5_DoubleClick;
             panel5.BringToFront();
         }
+
+        private void HideNumericUpDownControls()
+        {
+            numericUpDown2.Controls[0].Enabled = false;
+            numericUpDown2.Controls[0].Visible = false;
+            numericUpDown2.Controls.Remove(Controls[0]);
+            numericUpDown2.BackColor = Color.White;
+            numericUpDown2.Enabled = false;
+
+            numericUpDown3.Controls[0].Enabled = false;
+            numericUpDown3.Controls[0].Visible = false;
+            numericUpDown3.Controls.Remove(Controls[0]);
+            numericUpDown3.BackColor = Color.White;
+            numericUpDown3.Enabled = false;
+        }
+
+        private async void AddEditCloseOrder_Load(object sender, EventArgs e)
+        {
+            ValueShiftsBase shiftsValue = new ValueShiftsBase();
+            ValueSettingsBase valueSettings = new ValueSettingsBase();
+
+            HideNumericUpDownControls();
+
+            bool reconnectionRequired = false;
+            DialogResult dialog = DialogResult.Retry;
+
+            do
+            {
+                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
+                {
+                    try
+                    {
+                        orderRegistrationType = valueSettings.GetOrderRegistrationType(shiftsValue.GetNameUserFromStartShift(ShiftID));
+
+                        if (OrderID != -1)
+                        {
+                            await LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
+                            LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
+
+                            timer1.Enabled = false;
+                        }
+                        else
+                        {
+                            await LoadMachine();
+
+                            //LoadOrdersToComboBox();
+
+                            timer1.Enabled = true;
+                        }
+
+                        reconnectionRequired = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
+
+                        dialog = DataBaseReconnectionRequest(ex.Message);
+
+                        if (dialog == DialogResult.Retry)
+                        {
+                            reconnectionRequired = true;
+                        }
+                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
+                        {
+                            reconnectionRequired = false;
+                            Application.Exit();
+                        }
+                    }
+                }
+            }
+            while (reconnectionRequired);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         private void SetVisibleElements(string status, string currentOrder)
         {
@@ -1737,7 +1797,7 @@ namespace OrderManager
                         button2.Visible = false;
                         button3.Visible = false;
 
-                        if (shiftID == Form1.Info.shiftIndex || aMode)
+                        if (shiftID == Form1.Info.shiftIndex || AdminMode)
                         {
                             button1.Visible = true;
                             textBox6.Enabled = true;
@@ -1805,73 +1865,6 @@ namespace OrderManager
             UpdateData("done", machine, shiftID, orderIndex, counterRepeat, numericUpDown4.Value.ToString());
 
             UpdateData("makereadyConsider", machine, shiftID, orderIndex, counterRepeat, Convert.ToInt32(checkBox1.Checked));
-        }
-
-        private async void AddEditCloseOrder_Load(object sender, EventArgs e)
-        {
-            ValueShiftsBase shiftsValue = new ValueShiftsBase();
-            ValueSettingsBase valueSettings = new ValueSettingsBase();
-
-            numericUpDown2.Controls[0].Enabled = false;
-            numericUpDown2.Controls[0].Visible = false;
-            numericUpDown2.Controls.Remove(Controls[0]);
-            numericUpDown2.BackColor = Color.White;
-            numericUpDown2.Enabled = false;
-
-            numericUpDown3.Controls[0].Enabled = false;
-            numericUpDown3.Controls[0].Visible = false;
-            numericUpDown3.Controls.Remove(Controls[0]);
-            numericUpDown3.BackColor = Color.White;
-            numericUpDown3.Enabled = false;
-
-            bool reconnectionRequired = false;
-            DialogResult dialog = DialogResult.Retry;
-
-            do
-            {
-                if (!Form1._viewDatabaseRequestForm && dialog == DialogResult.Retry)
-                {
-                    try
-                    {
-                        orderRegistrationType = valueSettings.GetOrderRegistrationType(nameOfExecutor);
-
-                        if (loadOrderId != -1)
-                        {
-                            await LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
-                            LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
-
-                            timer1.Enabled = false;
-                        }
-                        else
-                        {
-                            await LoadMachine();
-
-                            //LoadOrdersToComboBox();
-
-                            timer1.Enabled = true;
-                        }
-
-                        reconnectionRequired = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        LogException.WriteLine(ex.StackTrace + "; " + ex.Message);
-
-                        dialog = DataBaseReconnectionRequest(ex.Message);
-
-                        if (dialog == DialogResult.Retry)
-                        {
-                            reconnectionRequired = true;
-                        }
-                        if (dialog == DialogResult.Abort || dialog == DialogResult.Cancel)
-                        {
-                            reconnectionRequired = false;
-                            Application.Exit();
-                        }
-                    }
-                }
-            }
-            while (reconnectionRequired);
         }
 
         private void SetNewValue(decimal amountOrder, string stampOrder, int makereadyOrder, int workOrder)
@@ -1976,9 +1969,9 @@ namespace OrderManager
 
             int orderIndex = -1;
 
-            if (loadOrderId != -1)
+            if (OrderID != -1)
             {
-                orderIndex = loadOrderId;
+                orderIndex = OrderID;
             }
             else
             {
@@ -1991,11 +1984,11 @@ namespace OrderManager
 
             FormTypesInTheOrder form;
 
-            form = new FormTypesInTheOrder(shiftIndex,
+            form = new FormTypesInTheOrder(ShiftID,
                 orderIndex,
                 counterRepeat,
                 machine.ToString(),
-                shiftsBase.GetNameUserFromStartShift(shiftIndex));
+                shiftsBase.GetNameUserFromStartShift(ShiftID));
 
             form.ShowDialog();
 
@@ -2025,7 +2018,7 @@ namespace OrderManager
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (loadOrderId == -1)
+            if (OrderID == -1)
             {
                 ValueInfoBase getInfo = new ValueInfoBase();
                 ValueOrdersBase getValue = new ValueOrdersBase();
@@ -2042,13 +2035,13 @@ namespace OrderManager
 
                 if (comboBox1.SelectedIndex != 0)
                 {
-                    LoadCurrentOrderInProgressFromDB(shiftIndex, machine, orderIndex, counterRepeat);
+                    LoadCurrentOrderInProgressFromDB(ShiftID, machine, orderIndex, counterRepeat);
 
                     LoadTypesFromCurrentOrder(orderIndex, counterRepeat, machine, getInfo.GetIDUser(machine.ToString()));
 
                     GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase();
 
-                    textBox6.Text = getOrdersInProgressValue.GetNote(shiftIndex, orderIndex, counterRepeat, machine);
+                    textBox6.Text = getOrdersInProgressValue.GetNote(ShiftID, counterRepeat, machine);
 
                     ChangeTheStateOfTheMakereadySwitch(shiftIndex, machine, orderIndex, counterRepeat);
 

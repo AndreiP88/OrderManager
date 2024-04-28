@@ -84,7 +84,8 @@ namespace OrderManager
             await CheckCurrentShiftActivity();
 
             Info.active = false;
-            FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
+            //FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
+            FormAddCloseEditOrder form = new FormAddCloseEditOrder(Info.shiftIndex);
             form.ShowDialog();
             await LoadOrdersFromBase();
             Info.active = true;

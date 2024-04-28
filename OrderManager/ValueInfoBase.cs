@@ -125,6 +125,18 @@ namespace OrderManager
 
             return result; 
         }
+        public int GetCurrentTypeJob(string machine)
+        {
+            int result = -1;
+            string val = GetValue("machine", machine, "currentOrderID");
+
+            if (val != "")
+            {
+                result = Convert.ToInt32(val);
+            }
+
+            return result;
+        }
 
         public int GetCurrentOrderID(string machine)
         {
@@ -144,14 +156,14 @@ namespace OrderManager
             return GetValue("machine", machine, "currentCounterRepeat");
         }
 
-        public string GetLastOrderID(string machine)
+        public int GetLastOrderID(string machine)
         {
-            string result = "-1";
+            int result = -1;
             string val = GetValue("machine", machine, "lastOrderID");
 
             if (val != "")
             {
-                result = val;
+                result = Convert.ToInt32(val);
             }
 
             return result;

@@ -77,6 +77,20 @@ namespace OrderManager
             return result;
         }
 
+        public int GetMakereadyPart(int orderInProgressID)
+        {
+            int result = -1;
+
+            string value = (string)GetValueFromIndex(orderInProgressID, "makereadyComplete");
+
+            if (Int32.TryParse(value, out int res))
+            {
+                result = res;
+            }
+
+            return result;
+        }
+
         public String GetNote(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
             return GetValue("note", shiftID, orderIndex, counterRepeat, machine);

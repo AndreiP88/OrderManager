@@ -773,6 +773,8 @@ namespace OrderManager
 
                         if (!DBNull.Value.Equals(sqlReader["order_num"]))
                         {
+                            //подумать над реализацией
+                            int lastIutemIndex = orders.Count - 1;
                             int itemIndex = orders.FindIndex((v) => v.IDManPlanJob == idManPlanJob);
 
                             if (itemIndex == -1)
@@ -1308,9 +1310,9 @@ namespace OrderManager
             }
             else
             {
-                NewValue = false;
+                NewValue = true;
 
-                MessageBox.Show("Данная функция пока не реализована", "Внимание");
+                SetValue = orders[index];
             }
 
             
