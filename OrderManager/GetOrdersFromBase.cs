@@ -32,21 +32,35 @@ namespace OrderManager
 
         public int GetOrderInProgressID(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
-            int result = -1;
+            int result = 1;
 
-            string load = GetValue("count", shiftID, orderIndex, counterRepeat, machine);
+            string value = GetValue("count", shiftID, orderIndex, counterRepeat, machine);
 
-            if (load != "")
+            if (Int32.TryParse(value, out int res))
             {
-                result = Convert.ToInt32(load);
+                result = res;
             }
 
             return result;
         }
 
-        public string GetIndex(int shiftID, int orderIndex, int counterRepeat, int machine)
+        /// <summary>
+        /// Получить тип выполняемой операции
+        /// </summary>
+        /// <param name="orderInProgressID"></param>
+        /// <returns>-1 - индекс не найден, 0 - выполнение заказа, 1 - простой</returns>
+        public int GetJobType(int orderInProgressID)
         {
-            return GetValue("count", shiftID, orderIndex, counterRepeat, machine);
+            int result = -1;
+
+            string value = (string)GetValueFromIndex(orderInProgressID, "typeJob");
+
+            if (Int32.TryParse(value, out int res))
+            {
+                result = res;
+            }
+
+            return result;
         }
 
         public int GetMakereadyConsider(int shiftID, int orderIndex, int counterRepeat, int machine)
@@ -146,7 +160,7 @@ namespace OrderManager
         }
 
         /// <summary>
-        /// получить индекс заказа из базы данных "orders"
+        /// получить индекс заказа из базы данных "orders" по индексу выполняемого заказа
         /// </summary>
         /// <param name="id">Индекс операции в БД "orderInProgress"</param>
         /// <returns>Индекс заказа</returns>

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolTip = System.Windows.Forms.ToolTip;
 using static OrderManager.DataBaseReconnect;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {

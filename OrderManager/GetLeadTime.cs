@@ -130,7 +130,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND (counterRepeat = @counterRepeat AND machine = @machine)"
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND (counterRepeat = @counterRepeat AND machine = @machine AND typeJob = 0)"
                 };
                 Command.Parameters.AddWithValue("@id", orderIndex);
                 Command.Parameters.AddWithValue("@counterRepeat", repeatCounter);

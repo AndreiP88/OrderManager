@@ -58,7 +58,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id" + cLine
+                    CommandText = @"SELECT * FROM ordersInProgress WHERE orderID = @id AND typeJob = 0" + cLine
                 };
                 Command.Parameters.AddWithValue("@machine", Machine);
                 Command.Parameters.AddWithValue("@id", orderIndex);

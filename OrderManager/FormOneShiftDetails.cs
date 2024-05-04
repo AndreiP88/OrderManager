@@ -109,7 +109,7 @@ namespace OrderManager
 
             ValueShiftsBase getUserShift = new ValueShiftsBase();
 
-            if (getUserShift.GetNameUserFromStartShift(timeShiftID) == userID)
+            if (getUserShift.GetNameUserFromStartShift(timeShiftID).ToString() == userID)
             {
                 result = true;
             }
@@ -354,7 +354,7 @@ namespace OrderManager
                             {
                                 Invoke(new Action(() =>
                                 {
-                                    label4.Text = getUser.GetNameUser(getShift.GetNameUserFromStartShift(timeShiftID));
+                                    label4.Text = getUser.GetNameUser(getShift.GetNameUserFromStartShift(timeShiftID).ToString());
                                     label5.Text = getShift.GetStartShiftFromID(timeShiftID);
                                     label6.Text = getShift.GetStopShiftFromID(timeShiftID);
 

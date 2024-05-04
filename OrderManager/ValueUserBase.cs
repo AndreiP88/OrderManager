@@ -143,7 +143,7 @@ namespace OrderManager
 
         public int GetLastMachineForUser(string id)
         {
-            return Convert.ToInt32(GetValueInfo("user", id, "lastMachine"));
+            return Convert.ToInt32(GetValueInfo("user", id.ToString(), "lastMachine"));
         }
 
         public String GetActiveUser(String id)
@@ -367,12 +367,12 @@ namespace OrderManager
             return userInfos;
         }
 
-        public void UpdateLastMachine(String idUser, String newValue)
+        public void UpdateLastMachine(string idUser, string newValue)
         {
             UpdateValueInfo("lastMachine", idUser, newValue);
         }
 
-        public void UpdatePassword(String idUser, String newValue)
+        public void UpdatePassword(string idUser, string newValue)
         {
             UpdateValue("passwordUser", idUser, newValue);
         }
@@ -382,7 +382,7 @@ namespace OrderManager
             UpdateValueInfo("currentShiftStartID", idUser, newValue);
         }
 
-        public void UpdateLastUID(String idUser, String newValue)
+        public void UpdateLastUID(string idUser, string newValue)
         {
             UpdateValueInfo("lastUID", idUser, newValue);
         }
@@ -434,7 +434,7 @@ namespace OrderManager
             }
         }
 
-        private void UpdateValue(String colomn, String id, String value)
+        private void UpdateValue(string colomn, string id, string value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

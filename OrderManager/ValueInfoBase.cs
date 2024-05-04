@@ -128,7 +128,7 @@ namespace OrderManager
         public int GetCurrentTypeJob(string machine)
         {
             int result = -1;
-            string val = GetValue("machine", machine, "currentOrderID");
+            string val = GetValue("machine", machine, "currentTypeJob");
 
             if (val != "")
             {

@@ -17,21 +17,30 @@ namespace OrderManager
         int orderID;
         int orderCounterRepeat;
         string machine;
-        string user;
-        string _orderInProgressID;
+        int _orderInProgressID;
 
-        public ValueTypesBase(int lShiftID, int lOrderID, int lOrderCounterRepeat, String lMachine, String lUser)
+        public ValueTypesBase(int lShiftID, int lOrderID, int lOrderCounterRepeat, string lMachine)
         {
             this.shiftID = lShiftID;
             this.orderID = lOrderID;
             this.orderCounterRepeat = lOrderCounterRepeat;
             this.machine = lMachine;
-            this.user = lUser;
 
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
-            _orderInProgressID = getOrders.GetIndex(shiftID, orderID, orderCounterRepeat,Convert.ToInt32(machine));
+            _orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, orderCounterRepeat, Convert.ToInt32(machine));
         }
+
+        public ValueTypesBase(int orderInProgressID)
+        {
+            this.shiftID = -1;
+            this.orderID = -1;
+            this.orderCounterRepeat = 0;
+            this.machine = "";
+            this.user = "";
+
+            _orderInProgressID = orderInProgressID;
+       }
 
         public ValueTypesBase()
         {
@@ -41,7 +50,7 @@ namespace OrderManager
             this.machine = "";
             this.user = "";
 
-            _orderInProgressID = "";
+            _orderInProgressID = -1;
         }
 
         public string GetNameItemFromID(int id)

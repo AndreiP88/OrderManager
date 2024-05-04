@@ -67,11 +67,18 @@ namespace OrderManager
             return result;
         }
 
-        public string GetNameUserFromStartShift(int shiftID)
+        public int GetNameUserFromStartShift(int shiftID)
         {
-            List<string> result = new List<String>(GetValue("id", shiftID.ToString(), "nameUser"));
+            int result = -1;
 
-            return result[result.Count - 1];
+            List<string> value = new List<string>(GetValue("id", shiftID.ToString(), "nameUser"));
+
+            if (Int32.TryParse(value.Last(), out int res))
+            {
+                result = res;
+            }
+
+            return result;
         }
 
         public string GetNoteShift(int shiftID)

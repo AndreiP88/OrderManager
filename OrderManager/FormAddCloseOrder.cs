@@ -1838,7 +1838,7 @@ namespace OrderManager
                         if (loadOrderId != -1)
                         {
                             await LoadOrderForEdit(shiftIndex, loadOrderId, Convert.ToInt32(loadMachine), loadCounterRepeat);
-                            LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex));
+                            LoadTypesFromCurrentOrder(loadOrderId, loadCounterRepeat, Convert.ToInt32(loadMachine), shiftsValue.GetNameUserFromStartShift(shiftIndex).ToString());
 
                             timer1.Enabled = false;
                         }
@@ -1995,7 +1995,7 @@ namespace OrderManager
                 orderIndex,
                 counterRepeat,
                 machine.ToString(),
-                shiftsBase.GetNameUserFromStartShift(shiftIndex));
+                shiftsBase.GetNameUserFromStartShift(shiftIndex).ToString());
 
             form.ShowDialog();
 
