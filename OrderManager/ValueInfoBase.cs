@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -232,6 +233,48 @@ namespace OrderManager
             }
 
             return machinesList;
+        }
+
+        public List<Equip> GetEquipsList(int category = -1, int typeBaseLoad = 0)
+        {
+            List<Equip> equipList = new List<Equip>();
+
+            string loadIndex;
+
+            if (typeBaseLoad == 0)
+            {
+                loadIndex = "id";
+            }
+            else
+            {
+                loadIndex = "idEquip";
+            }
+
+            string commLine = "";
+
+            if (category != -1)
+                commLine = " WHERE category = '" + category + "'";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machines" + commLine
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    equipList.Add(new Equip((int)sqlReader[loadIndex],
+                        sqlReader["name"].ToString()));
+                }
+
+                Connect.Close();
+            }
+
+            return equipList;
         }
 
         private List<int> GetAllMachines(int category)
@@ -501,12 +544,12 @@ namespace OrderManager
             }
         }
 
-        public void UpdateInfo(string machine, int currentCounterRepeat, int currentOrderID, int lastOrderID, bool activeOrder)
+        public void UpdateInfo(string machine, int currentTypeJob, int currentCounterRepeat, int currentOrderID, int lastOrderID, bool activeOrder)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText = "UPDATE machinesInfo SET " +
-                    "currentCounterRepeat = @currentCounterRepeat, currentOrderID = @currentOrderID, lastOrderID = @lastOrderID, activeOrder = @activeOrder " +
+                    "currentTypeJob = @currentTypeJob, currentCounterRepeat = @currentCounterRepeat, currentOrderID = @currentOrderID, lastOrderID = @lastOrderID, activeOrder = @activeOrder " +
                     "WHERE (machine = @machine)";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -514,6 +557,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@currentOrderID", currentOrderID);
                 Command.Parameters.AddWithValue("@lastOrderID", lastOrderID);
                 Command.Parameters.AddWithValue("@currentCounterRepeat", currentCounterRepeat);
+                Command.Parameters.AddWithValue("@currentTypeJob", currentTypeJob);
                 Command.Parameters.AddWithValue("@activeOrder", activeOrder.ToString());
 
                 Connect.Open();

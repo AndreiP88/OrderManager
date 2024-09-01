@@ -83,8 +83,8 @@ namespace OrderManager
             await CheckCurrentShiftActivity();
 
             Info.active = false;
-            //FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
-            FormAddCloseEditOrder form = new FormAddCloseEditOrder(Info.shiftIndex);
+            FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
+            //FormAddCloseEditOrder form = new FormAddCloseEditOrder(Info.shiftIndex);
             form.ShowDialog();
             await LoadOrdersFromBase();
             Info.active = true;
@@ -2765,6 +2765,18 @@ namespace OrderManager
             {
                 UpdatePreviewCalculate();
             }
+        }
+
+        private async void addEditorderNEWToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await CheckCurrentShiftActivity();
+
+            Info.active = false;
+            //FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
+            FormAddCloseEditOrder form = new FormAddCloseEditOrder(Info.shiftIndex);
+            form.ShowDialog();
+            await LoadOrdersFromBase();
+            Info.active = true;
         }
     }
 }

@@ -876,7 +876,7 @@ namespace OrderManager
             if (status == "0") //новая запись
             {
                 AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyConsider, makereadyPart, done.ToString(), counterRepeat, note);
-                infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, true);
                 newStatus = "1";
             }
 
@@ -885,7 +885,7 @@ namespace OrderManager
                 if (currentOrderID == -1)
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, makereadyStart, "", "", "", makereadyConsider, makereadyPart, done.ToString(), counterRepeat, note);
-                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, true);
                     newStatus = "1";
                 }
                 else
@@ -938,7 +938,7 @@ namespace OrderManager
 
                     UpdateData("makereadyConsider", machineCurrent, shiftID, orderID, counterRepeat, makereadyConsider);
                     UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
-                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, false);
+                    infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, false);
                     //убираем заказ из активных для возможности завершить смену
                 }
 
@@ -949,7 +949,7 @@ namespace OrderManager
                 if (currentOrderID == -1)
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", 0, -1, done.ToString(), counterRepeat, note);
-                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, true);
 
                     newStatus = "3";
                 }
@@ -958,7 +958,7 @@ namespace OrderManager
                     UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, workStart);
                     //UpdateData("makereadyConsider", machineCurrent, shiftID, orderID, counterRepeat, makereadyConsider);
                     UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
-                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, true);
 
                     newStatus = "3";
                 }
@@ -969,7 +969,7 @@ namespace OrderManager
                 if (currentOrderID == -1)
                 {
                     AddNewOrderInProgress(machineCurrent, executor, shiftID, orderID, "", "", workStart, "", 0, -1, done.ToString(), counterRepeat, note);
-                    infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                    infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, true);
 
                     newStatus = status;
                 }
@@ -981,7 +981,7 @@ namespace OrderManager
                     UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
                     UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
                     //infoBase.UpdateInfo(machineCurrent, counterRepeat, number, modification, number, modification, false);
-                    infoBase.UpdateInfo(machineCurrent, 0, -1, orderID, false);
+                    infoBase.UpdateInfo(machineCurrent, 0, 0, -1, orderID, false);
                     //убираем заказ из активных для возможности завершить смену
 
                     newStatus = status;
@@ -1057,14 +1057,14 @@ namespace OrderManager
                         {
                             UpdateData("timeToWorkStart", machineCurrent, shiftID, orderID, counterRepeat, workStart);
                             //UpdateData("note", machineCurrent, shiftStart, number, modification, counterRepeat, note);
-                            infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, true);
+                            infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, true);
                             //убираем заказ из активных для возможности завершить смену
                             newStatus = "3";
                         }
 
                         if (dialogResult == DialogResult.No || adminCloseOrder)
                         {
-                            infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, false);
+                            infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, false);
                             //убираем заказ из активных для возможности завершить смену
                             newStatus = "2";
                         }
@@ -1090,7 +1090,7 @@ namespace OrderManager
                             UpdateData("timeToWorkStop", machineCurrent, shiftID, orderID, counterRepeat, workStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyLastPart);
                             UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
-                            infoBase.UpdateInfo(machineCurrent, 0, -1, orderID, false);
+                            infoBase.UpdateInfo(machineCurrent, 0, 0, -1, orderID, false);
 
                             newStatus = "4";
                         }
@@ -1098,7 +1098,7 @@ namespace OrderManager
                         {
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyLastPart);
-                            infoBase.UpdateInfo(machineCurrent, counterRepeat, orderID, orderID, false);
+                            infoBase.UpdateInfo(machineCurrent, 0, counterRepeat, orderID, orderID, false);
                             newStatus = "2";
                         }
 
@@ -1116,7 +1116,7 @@ namespace OrderManager
                     UpdateData("note", machineCurrent, shiftID, orderID, counterRepeat, note);
                     UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());
                     newStatus = "4";
-                    infoBase.UpdateInfo(machineCurrent, 0, -1, -1, false);
+                    infoBase.UpdateInfo(machineCurrent, 0, 0, -1, -1, false);
                 }
             }
 
@@ -1246,7 +1246,7 @@ namespace OrderManager
 
             orders.IncrementCounterRepeat(orderID);
             orders.SetNewStatus(orderID, newStatus);
-            getInfo.UpdateInfo(machineCurrent, 0, -1, -1, false);
+            getInfo.UpdateInfo(machineCurrent, 0, 0, -1, -1, false);
         }
 
         private void UpdateData(string nameOfColomn, string machineCurrent, int shiftID, int orderIndex, int counterRepeat, object value)
@@ -1958,12 +1958,12 @@ namespace OrderManager
             }
             else if (order.TypeJob == 1)
             {
-                tabControl1.SelectTab(1);
+                /*tabControl1.SelectTab(1);
 
                 comboBox4.Text = order.nameItem;
 
                 idletimeNumericUpDownH.Value = order.workTime / 60;
-                idletimeNumericUpDownM.Value = order.workTime % 60;
+                idletimeNumericUpDownM.Value = order.workTime % 60;*/
             }
             
         }
@@ -2006,7 +2006,7 @@ namespace OrderManager
         {
             listView1.Items.Clear();
 
-            ValueTypesBase typeBase = new ValueTypesBase(shiftIndex, orderIndex, counterRepeat, machine.ToString(), user);
+            ValueTypesBase typeBase = new ValueTypesBase(shiftIndex, orderIndex, counterRepeat, machine.ToString());
             
             List<TypeInTheOrder> typesCurrent = typeBase.GetData();
 

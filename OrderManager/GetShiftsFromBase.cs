@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -175,6 +173,123 @@ namespace OrderManager
                 }
 
                 List<Order> ordersCurrentShift = (List<Order>) await ordersFromBase.LoadAllOrdersFromBase(shifts[i], category);
+
+                int fullDone = 0;
+                int fullTimeWorkingOut = 0;
+
+                for (int j = 0; j < ordersCurrentShift.Count; j++)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    GetLeadTime leadTime = new GetLeadTime(shifts[i], Convert.ToInt32(ordersCurrentShift[j].machineOfOrder), ordersCurrentShift[j].orderIndex, getOrder.GetCounterRepeat(ordersCurrentShift[j].orderIndex));
+
+                    if (leadTime.GetCurrentDateTime("timeMakereadyStop") != "" && leadTime.GetNextDateTime("timeMakereadyStart") == "")
+                    {
+                        countMakeready++;
+                    }
+
+                    fullDone += ordersCurrentShift[j].done;
+                    fullTimeWorkingOut += ordersCurrentShift[j].workingOut;
+                    countOrders++;
+                }
+
+                int fullTimeWorking = dateTimeOperations.DateDifferentToMinutes(getValueFromShiftsBase.GetStopShiftFromID(shifts[i]), getValueFromShiftsBase.GetStartShiftFromID(shifts[i]));
+
+                if (fullTimeWorkingOut > 0)
+                {
+                    countEffectiveShift++;
+                }
+
+                if (getValueFromShiftsBase.GetCheckFullShift(shifts[i]))
+                {
+                    workingTime += _wTime;
+                }
+                else
+                {
+                    workingTime += fullTimeWorking;
+                }
+
+                amountAllOrders += fullDone;
+                allTimeWorkingOut += fullTimeWorkingOut;
+                allTime += fullTimeWorking;
+                allPercentWorkingOut += getPercent.Percent(fullTimeWorkingOut);
+                fullPercentBonus += getPercent.GetBonusWorkingOutF(fullTimeWorkingOut);
+
+                countShifts++;
+
+                //token.ThrowIfCancellationRequested();
+            }
+
+            int countShiftForPercent;
+
+            if (_calculateAllPercent)
+                countShiftForPercent = countShifts;
+            else
+                countShiftForPercent = countEffectiveShift;
+
+            if (countShiftForPercent == 0)
+            {
+                percent = 0;
+            }
+            else
+            {
+                percent = allPercentWorkingOut / countShiftForPercent;
+            }
+
+            shiftsDetails = new ShiftsDetails(
+                countShifts,
+                workingTime,
+                allTime,
+                allTimeWorkingOut,
+                countOrders,
+                countMakeready,
+                amountAllOrders,
+                percent,
+                fullPercentBonus
+                );
+
+            return shiftsDetails;
+        }
+
+        public async Task<ShiftsDetails> LoadCurrentDateShiftsLight(DateTime selectDate, string category, CancellationToken token)
+        {
+            ShiftsDetails shiftsDetails = null;
+
+            GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
+            GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
+            GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
+            ValueOrdersBase getOrder = new ValueOrdersBase();
+            ValueShiftsBase getValueFromShiftsBase = new ValueShiftsBase();
+
+            int countShifts = 0;
+            int workingTime = 0;
+            int countEffectiveShift = 0;
+            int countOrders = 0;
+            int countMakeready = 0;
+            int amountAllOrders = 0;
+            int allTimeWorkingOut = 0;
+            int allTime = 0;
+            float allPercentWorkingOut = 0;
+            float percent = 0;
+            float fullPercentBonus = 0;
+
+            List<int> shifts = new List<int>(LoadShiftsList(selectDate));
+
+            for (int i = 0; i < shifts.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    //MessageBox.Show("Отмена");
+                    break;
+                }
+
+
+
+
+                List<Order> ordersCurrentShift = (List<Order>)await ordersFromBase.LoadAllOrdersFromBase(shifts[i], category);
 
                 int fullDone = 0;
                 int fullTimeWorkingOut = 0;

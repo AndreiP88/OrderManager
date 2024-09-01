@@ -461,7 +461,7 @@ namespace OrderManager
             {
                 orders.SetNewStatus(orderIndex, "0");
                 orders.IncrementCounterRepeat(orderIndex);
-                infoBase.UpdateInfo(await getInfo.GetMachineFromName(comboBoxMachine.Text), 0, -1, -1, false);
+                infoBase.UpdateInfo(await getInfo.GetMachineFromName(comboBoxMachine.Text), 0, 0, -1, -1, false);
             }
         }
 

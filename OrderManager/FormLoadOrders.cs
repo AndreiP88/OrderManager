@@ -6,9 +6,6 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
-using libData;
-using MySqlX.XDevAPI.Common;
-using System.Windows.Forms.DataVisualization.Charting;
 
 namespace OrderManager
 {
@@ -678,7 +675,7 @@ namespace OrderManager
             Invoke(new Action(() =>
             {
                 orders.Clear();
-                orderNumbers.Clear();
+                //orderNumbers.Clear();
                 listView1.Items.Clear();
             }));
 

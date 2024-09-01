@@ -35,3 +35,13 @@ Dsn=ASystem;uid=ds;pwd=1;app=Microsoft® Visual Studio®;wsid=PR8;database=asyst
 Dsn=ASystem;uid=ds;pwd=1
 
 System.Data.Odbc.OdbcException: "ERROR [IM002] [Microsoft][Диспетчер драйверов ODBC] Источник данных не найден и не указан драйвер, используемый по умолчанию"
+
+
+
+
+norm_operation_table.ord "operationType"
+
+LEFT JOIN
+	dbo.norm_operation_table
+	ON 
+		man_planjob_list.id_norm_operation = norm_operation_table.id_norm_operation

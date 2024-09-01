@@ -194,6 +194,36 @@ namespace OrderManager
             return result;
         }
 
+
+
+
+
+
+
+
+        public async Task<UserWorkingOutput> FullWorkingOutputOMAsync(int userID, DateTime selectMonth, CancellationToken token, int category)
+        {
+            UserWorkingOutput userWorkingOutput = new UserWorkingOutput();
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
+
+            //List<int> userIndexFromAS = new List<int> { userID };
+
+            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsLight(selectMonth, category.ToString(), token);
+
+            if (shiftsDetails != null)
+            {
+                userWorkingOutput.Worktime = shiftsDetails.allTimeWorkingOutShift;
+                userWorkingOutput.Amount = shiftsDetails.amountAllOrdersShift;
+                userWorkingOutput.Percent = shiftsDetails.percentWorkingOutShift;
+                userWorkingOutput.Makeready = shiftsDetails.countMakereadyShift;
+                userWorkingOutput.Bonus = shiftsDetails.percentBonusShift;
+                userWorkingOutput.CountShifts = shiftsDetails?.countShifts ?? 0;
+            }
+
+            return userWorkingOutput;
+        }
+
+
         public async Task<float> CalculatePercentWorkingOutOM(int userID, DateTime selectMonth, CancellationToken token, int category)
         {
             float result = 0;

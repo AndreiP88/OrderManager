@@ -87,8 +87,6 @@ namespace OrderManager
             this.tableLayoutPanel10 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label50 = new System.Windows.Forms.Label();
-            this.numericUpDown6 = new OrderManager.FormattedNumericUpDown();
-            this.numericUpDown5 = new OrderManager.FormattedNumericUpDown();
             this.comboBox8 = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -169,6 +167,9 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.addEditorderNEWToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.numericUpDown6 = new OrderManager.FormattedNumericUpDown();
+            this.numericUpDown5 = new OrderManager.FormattedNumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -183,14 +184,14 @@ namespace OrderManager
             this.tableLayoutPanel9.SuspendLayout();
             this.tableLayoutPanel10.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -892,38 +893,6 @@ namespace OrderManager
             this.label50.TabIndex = 23;
             this.label50.Text = ":";
             // 
-            // numericUpDown6
-            // 
-            this.numericUpDown6.Format = "00";
-            this.numericUpDown6.Location = new System.Drawing.Point(55, 0);
-            this.numericUpDown6.Maximum = new decimal(new int[] {
-            60,
-            0,
-            0,
-            0});
-            this.numericUpDown6.Name = "numericUpDown6";
-            this.numericUpDown6.Size = new System.Drawing.Size(39, 20);
-            this.numericUpDown6.TabIndex = 22;
-            this.numericUpDown6.Click += new System.EventHandler(this.numericUpDown6_Click);
-            this.numericUpDown6.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numericUpDown6_KeyPress);
-            // 
-            // numericUpDown5
-            // 
-            this.numericUpDown5.Format = "000";
-            this.numericUpDown5.Location = new System.Drawing.Point(4, 0);
-            this.numericUpDown5.Maximum = new decimal(new int[] {
-            999,
-            0,
-            0,
-            0});
-            this.numericUpDown5.Name = "numericUpDown5";
-            this.numericUpDown5.Size = new System.Drawing.Size(39, 20);
-            this.numericUpDown5.TabIndex = 21;
-            this.numericUpDown5.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.numericUpDown5.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
-            this.numericUpDown5.Click += new System.EventHandler(this.numericUpDown5_Click);
-            this.numericUpDown5.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numericUpDown5_KeyPress);
-            // 
             // comboBox8
             // 
             this.comboBox8.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1456,7 +1425,8 @@ namespace OrderManager
             this.paramToolStripMenuItem,
             this.testToolStripMenuItem,
             this.базаДанныхToolStripMenuItem,
-            this.downloadUpadaterToolStripMenuItem});
+            this.downloadUpadaterToolStripMenuItem,
+            this.addEditorderNEWToolStripMenuItem});
             this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
             this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton1.Name = "toolStripButton1";
@@ -1494,6 +1464,7 @@ namespace OrderManager
             // 
             // testToolStripMenuItem
             // 
+            this.testToolStripMenuItem.Enabled = false;
             this.testToolStripMenuItem.Name = "testToolStripMenuItem";
             this.testToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.testToolStripMenuItem.Text = "Test";
@@ -1705,6 +1676,45 @@ namespace OrderManager
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
             // 
+            // addEditorderNEWToolStripMenuItem
+            // 
+            this.addEditorderNEWToolStripMenuItem.Name = "addEditorderNEWToolStripMenuItem";
+            this.addEditorderNEWToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.addEditorderNEWToolStripMenuItem.Text = "[NEW] Операции";
+            this.addEditorderNEWToolStripMenuItem.Click += new System.EventHandler(this.addEditorderNEWToolStripMenuItem_Click);
+            // 
+            // numericUpDown6
+            // 
+            this.numericUpDown6.Format = "00";
+            this.numericUpDown6.Location = new System.Drawing.Point(55, 0);
+            this.numericUpDown6.Maximum = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.numericUpDown6.Name = "numericUpDown6";
+            this.numericUpDown6.Size = new System.Drawing.Size(39, 20);
+            this.numericUpDown6.TabIndex = 22;
+            this.numericUpDown6.Click += new System.EventHandler(this.numericUpDown6_Click);
+            this.numericUpDown6.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numericUpDown6_KeyPress);
+            // 
+            // numericUpDown5
+            // 
+            this.numericUpDown5.Format = "000";
+            this.numericUpDown5.Location = new System.Drawing.Point(4, 0);
+            this.numericUpDown5.Maximum = new decimal(new int[] {
+            999,
+            0,
+            0,
+            0});
+            this.numericUpDown5.Name = "numericUpDown5";
+            this.numericUpDown5.Size = new System.Drawing.Size(39, 20);
+            this.numericUpDown5.TabIndex = 21;
+            this.numericUpDown5.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.numericUpDown5.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
+            this.numericUpDown5.Click += new System.EventHandler(this.numericUpDown5_Click);
+            this.numericUpDown5.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numericUpDown5_KeyPress);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1741,8 +1751,6 @@ namespace OrderManager
             this.tableLayoutPanel10.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
@@ -1752,6 +1760,8 @@ namespace OrderManager
             this.toolStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1894,6 +1904,7 @@ namespace OrderManager
         private FormattedNumericUpDown numericUpDown6;
         private FormattedNumericUpDown numericUpDown5;
         private ComboBox comboBox8;
+        private ToolStripMenuItem addEditorderNEWToolStripMenuItem;
     }
 }
 

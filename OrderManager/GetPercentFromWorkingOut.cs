@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OrderManager
+﻿namespace OrderManager
 {
     internal class GetPercentFromWorkingOut
     {

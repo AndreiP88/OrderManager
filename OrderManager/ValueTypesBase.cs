@@ -2,12 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Xml.Linq;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -37,7 +31,6 @@ namespace OrderManager
             this.orderID = -1;
             this.orderCounterRepeat = 0;
             this.machine = "";
-            this.user = "";
 
             _orderInProgressID = orderInProgressID;
        }
@@ -48,7 +41,6 @@ namespace OrderManager
             this.orderID = -1;
             this.orderCounterRepeat = 0;
             this.machine = "";
-            this.user = "";
 
             _orderInProgressID = -1;
         }

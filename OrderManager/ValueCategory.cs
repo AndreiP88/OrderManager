@@ -1,7 +1,11 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Globalization;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -80,6 +84,40 @@ namespace OrderManager
             }
 
             return categoryList;
+        }
+
+        public List<Category> GetCategoriesList(int typebaseLoad = 0)
+        {
+            List<Category> categories = new List<Category>();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machinesCategoryes"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    int id = (int)sqlReader["id"];
+
+                    categories.Add(new Category(
+                        id,
+                        sqlReader["category"].ToString(),
+                        true,
+                        new List<Equip>()
+                        ));
+                }
+
+                Connect.Close();
+            }
+
+            //categories.Sort((v, s) => v.Id.CompareTo(s.Id));
+
+            return categories;
         }
 
         private object GetValue(string findColomnName, string findParameter, string valueColomn)

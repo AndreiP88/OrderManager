@@ -103,24 +103,7 @@ namespace OrderManager
             this.button7 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.comboBox4 = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.idletimeNumericUpDownM = new OrderManager.FormattedNumericUpDown();
-            this.idletimeNumericUpDownH = new OrderManager.FormattedNumericUpDown();
-            this.label11 = new System.Windows.Forms.Label();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
-            this.dateTimePicker5 = new System.Windows.Forms.DateTimePicker();
-            this.dateTimePicker6 = new System.Windows.Forms.DateTimePicker();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.groupBox11 = new System.Windows.Forms.GroupBox();
-            this.textBox8 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -138,13 +121,7 @@ namespace OrderManager
             this.groupBox7.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
             this.groupBox8.SuspendLayout();
-            this.groupBox9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.idletimeNumericUpDownM)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.idletimeNumericUpDownH)).BeginInit();
-            this.groupBox10.SuspendLayout();
-            this.groupBox11.SuspendLayout();
             this.SuspendLayout();
             // 
             // comboBox1
@@ -747,7 +724,6 @@ namespace OrderManager
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tabControl1.Location = new System.Drawing.Point(13, 118);
             this.tabControl1.Name = "tabControl1";
@@ -772,20 +748,6 @@ namespace OrderManager
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Заказ";
             // 
-            // tabPage2
-            // 
-            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage2.Controls.Add(this.groupBox11);
-            this.tabPage2.Controls.Add(this.groupBox10);
-            this.tabPage2.Controls.Add(this.groupBox9);
-            this.tabPage2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(456, 448);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Простой";
-            // 
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.comboBox1);
@@ -796,182 +758,6 @@ namespace OrderManager
             this.groupBox8.TabIndex = 40;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Операция";
-            // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.checkBox2);
-            this.groupBox9.Controls.Add(this.label10);
-            this.groupBox9.Controls.Add(this.idletimeNumericUpDownM);
-            this.groupBox9.Controls.Add(this.idletimeNumericUpDownH);
-            this.groupBox9.Controls.Add(this.label11);
-            this.groupBox9.Controls.Add(this.comboBox4);
-            this.groupBox9.Controls.Add(this.label5);
-            this.groupBox9.Location = new System.Drawing.Point(6, 6);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(442, 102);
-            this.groupBox9.TabIndex = 0;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "Детали простоя";
-            // 
-            // comboBox4
-            // 
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Location = new System.Drawing.Point(6, 31);
-            this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(425, 21);
-            this.comboBox4.TabIndex = 13;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 18);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(83, 13);
-            this.label5.TabIndex = 14;
-            this.label5.Text = "Наименование";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Nirmala UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(45, 70);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(12, 17);
-            this.label10.TabIndex = 25;
-            this.label10.Text = ":";
-            // 
-            // idletimeNumericUpDownM
-            // 
-            this.idletimeNumericUpDownM.Format = "00";
-            this.idletimeNumericUpDownM.Location = new System.Drawing.Point(57, 72);
-            this.idletimeNumericUpDownM.Maximum = new decimal(new int[] {
-            60,
-            0,
-            0,
-            0});
-            this.idletimeNumericUpDownM.Name = "idletimeNumericUpDownM";
-            this.idletimeNumericUpDownM.Size = new System.Drawing.Size(39, 20);
-            this.idletimeNumericUpDownM.TabIndex = 23;
-            // 
-            // idletimeNumericUpDownH
-            // 
-            this.idletimeNumericUpDownH.Format = "000";
-            this.idletimeNumericUpDownH.Location = new System.Drawing.Point(6, 72);
-            this.idletimeNumericUpDownH.Maximum = new decimal(new int[] {
-            999,
-            0,
-            0,
-            0});
-            this.idletimeNumericUpDownH.Name = "idletimeNumericUpDownH";
-            this.idletimeNumericUpDownH.Size = new System.Drawing.Size(39, 20);
-            this.idletimeNumericUpDownH.TabIndex = 22;
-            this.idletimeNumericUpDownH.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.idletimeNumericUpDownH.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(3, 59);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(40, 13);
-            this.label11.TabIndex = 24;
-            this.label11.Text = "Время";
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(119, 74);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(227, 17);
-            this.checkBox2.TabIndex = 26;
-            this.checkBox2.Text = "Учитывать время простоя в выработке";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // groupBox10
-            // 
-            this.groupBox10.Controls.Add(this.label13);
-            this.groupBox10.Controls.Add(this.label12);
-            this.groupBox10.Controls.Add(this.dateTimePicker5);
-            this.groupBox10.Controls.Add(this.dateTimePicker6);
-            this.groupBox10.Controls.Add(this.textBox7);
-            this.groupBox10.Location = new System.Drawing.Point(6, 115);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(442, 55);
-            this.groupBox10.TabIndex = 35;
-            this.groupBox10.TabStop = false;
-            this.groupBox10.Text = "Время простоя";
-            // 
-            // dateTimePicker5
-            // 
-            this.dateTimePicker5.CustomFormat = "HH:mm dd.MM.yyyy";
-            this.dateTimePicker5.Enabled = false;
-            this.dateTimePicker5.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker5.Location = new System.Drawing.Point(6, 19);
-            this.dateTimePicker5.Name = "dateTimePicker5";
-            this.dateTimePicker5.ShowUpDown = true;
-            this.dateTimePicker5.Size = new System.Drawing.Size(110, 20);
-            this.dateTimePicker5.TabIndex = 9;
-            // 
-            // dateTimePicker6
-            // 
-            this.dateTimePicker6.CustomFormat = "HH:mm dd.MM.yyyy";
-            this.dateTimePicker6.Enabled = false;
-            this.dateTimePicker6.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker6.Location = new System.Drawing.Point(143, 19);
-            this.dateTimePicker6.Name = "dateTimePicker6";
-            this.dateTimePicker6.ShowUpDown = true;
-            this.dateTimePicker6.Size = new System.Drawing.Size(110, 20);
-            this.dateTimePicker6.TabIndex = 9;
-            // 
-            // textBox7
-            // 
-            this.textBox7.Enabled = false;
-            this.textBox7.Location = new System.Drawing.Point(274, 19);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.ReadOnly = true;
-            this.textBox7.Size = new System.Drawing.Size(157, 20);
-            this.textBox7.TabIndex = 21;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(123, 22);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(13, 13);
-            this.label12.TabIndex = 22;
-            this.label12.Text = "--";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label13.Location = new System.Drawing.Point(257, 21);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(11, 16);
-            this.label13.TabIndex = 23;
-            this.label13.Text = ":";
-            // 
-            // groupBox11
-            // 
-            this.groupBox11.Controls.Add(this.textBox8);
-            this.groupBox11.Location = new System.Drawing.Point(6, 175);
-            this.groupBox11.Margin = new System.Windows.Forms.Padding(2);
-            this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox11.Size = new System.Drawing.Size(442, 67);
-            this.groupBox11.TabIndex = 37;
-            this.groupBox11.TabStop = false;
-            this.groupBox11.Text = "Примечание";
-            // 
-            // textBox8
-            // 
-            this.textBox8.Location = new System.Drawing.Point(6, 15);
-            this.textBox8.Margin = new System.Windows.Forms.Padding(2);
-            this.textBox8.Multiline = true;
-            this.textBox8.Name = "textBox8";
-            this.textBox8.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox8.Size = new System.Drawing.Size(426, 45);
-            this.textBox8.TabIndex = 0;
             // 
             // FormAddCloseOrder
             // 
@@ -1015,16 +801,7 @@ namespace OrderManager
             this.groupBox7.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.tabPage2.ResumeLayout(false);
             this.groupBox8.ResumeLayout(false);
-            this.groupBox9.ResumeLayout(false);
-            this.groupBox9.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.idletimeNumericUpDownM)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.idletimeNumericUpDownH)).EndInit();
-            this.groupBox10.ResumeLayout(false);
-            this.groupBox10.PerformLayout();
-            this.groupBox11.ResumeLayout(false);
-            this.groupBox11.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1085,23 +862,6 @@ namespace OrderManager
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.GroupBox groupBox9;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.Label label10;
-        private FormattedNumericUpDown idletimeNumericUpDownM;
-        private FormattedNumericUpDown idletimeNumericUpDownH;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.ComboBox comboBox4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.GroupBox groupBox10;
-        private System.Windows.Forms.DateTimePicker dateTimePicker5;
-        private System.Windows.Forms.DateTimePicker dateTimePicker6;
-        private System.Windows.Forms.TextBox textBox7;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.GroupBox groupBox11;
-        private System.Windows.Forms.TextBox textBox8;
     }
 }

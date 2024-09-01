@@ -78,7 +78,7 @@ namespace OrderManager
         
         private void LoadTypes()
         {
-            ValueTypesBase typeBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typeBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine);
 
             typesCurrent = typeBase.GetData();
 
@@ -94,7 +94,7 @@ namespace OrderManager
 
         private void SaveTypes()
         {
-            ValueTypesBase typeBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typeBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine);
 
             for (int i = 0; i < typesForAdded.Count; i++)
             {
@@ -126,7 +126,7 @@ namespace OrderManager
 
         private void AddTypesToListView()
         {
-            ValueTypesBase typesBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine, loadUser);
+            ValueTypesBase typesBase = new ValueTypesBase(loadShiftID, loadOrderID, loadOrderCounterRepeat, loadMachine);
 
             int count = 0;
 

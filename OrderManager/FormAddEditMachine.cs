@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -87,14 +88,14 @@ namespace OrderManager
 
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(await getMachine.GetCategoryMachine(machineIDLoad)));
 
-            SelectMainNormOperationIndex(machineIDLoad);
+            await SelectMainNormOperationIndexAsync(machineIDLoad);
         }
 
-        private void SelectMainNormOperationIndex(string machine)
+        private async Task SelectMainNormOperationIndexAsync(string machine)
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
-            int mainID = Convert.ToInt32(infoBase.GetIDEquipMachine(machine));
+            int mainID = Convert.ToInt32(await infoBase.GetIDEquipMachine(machine));
 
             int mainIndex = eNames.FindIndex(v => v.id == mainID);
 
