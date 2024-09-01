@@ -537,10 +537,20 @@ namespace OrderManager
                     userWorkingOutput.CountShifts
                     ));
 
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 Invoke(new Action(() =>
                 {
                     progressBar1.Value++;
                 }));
+            }
+
+            if (token.IsCancellationRequested)
+            {
+                return;
             }
 
             Invoke(new Action(() =>

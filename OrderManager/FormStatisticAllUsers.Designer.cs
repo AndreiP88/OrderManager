@@ -36,9 +36,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
@@ -238,20 +238,20 @@
             this.chart1.BackSecondaryColor = System.Drawing.Color.Transparent;
             this.chart1.BorderlineColor = System.Drawing.Color.Transparent;
             this.chart1.BorderSkin.BackColor = System.Drawing.Color.Transparent;
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
+            chartArea5.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea5);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend4.BackColor = System.Drawing.Color.Transparent;
-            legend4.Name = "Legend1";
-            this.chart1.Legends.Add(legend4);
+            legend5.BackColor = System.Drawing.Color.Transparent;
+            legend5.Name = "Legend1";
+            this.chart1.Legends.Add(legend5);
             this.chart1.Location = new System.Drawing.Point(3, 3);
             this.chart1.Name = "chart1";
-            series4.ChartArea = "ChartArea1";
-            series4.EmptyPointStyle.LabelAngle = -90;
-            series4.LabelAngle = 60;
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            this.chart1.Series.Add(series4);
+            series5.ChartArea = "ChartArea1";
+            series5.EmptyPointStyle.LabelAngle = -90;
+            series5.LabelAngle = 60;
+            series5.Legend = "Legend1";
+            series5.Name = "Series1";
+            this.chart1.Series.Add(series5);
             this.chart1.Size = new System.Drawing.Size(708, 534);
             this.chart1.TabIndex = 2;
             this.chart1.Text = "chart1";

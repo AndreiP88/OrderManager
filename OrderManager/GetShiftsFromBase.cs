@@ -254,6 +254,7 @@ namespace OrderManager
             return shiftsDetails;
         }
 
+        //потом сделать не полную загрузку всех заказов, а рассчитанные значения
         public async Task<ShiftsDetails> LoadCurrentDateShiftsLight(DateTime selectDate, string category, CancellationToken token)
         {
             ShiftsDetails shiftsDetails = null;
