@@ -1350,7 +1350,11 @@ namespace OrderManager
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            timer1.Enabled = false;
+
             cancelTokenSource?.Cancel();
+
+            Thread.Sleep(100);
 
             DBConnection connection = new DBConnection();
 

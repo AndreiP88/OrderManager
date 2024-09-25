@@ -98,13 +98,11 @@ namespace OrderManager
                                 {
                                     LogException.WriteLine(ex.Message);
                                 }
-
-                                
                             }
 
                             if (!token.IsCancellationRequested)
                             {
-                                await UpdateMachineFromUsers(token);
+                                //await UpdateMachineFromUsers(token);
                             }
 
                             reconnectionRequired = false;
