@@ -57,7 +57,6 @@
             // 
             // timer1
             // 
-            this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
@@ -75,6 +74,7 @@
             this.Name = "FormSelectMachine";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Выбор оборудования";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSelectMachine_FormClosing);
             this.Load += new System.EventHandler(this.FolrmSelectMachine_Load);
             this.ResumeLayout(false);
 

@@ -223,6 +223,7 @@ namespace OrderManager
             cancelTokenSource = new CancellationTokenSource();
 
             await LoadMachine(cancelTokenSource.Token);
+            timer1.Enabled = true;
             ChangeCaptionButton();
         }
 
@@ -510,8 +511,6 @@ namespace OrderManager
                     await EditControl(machine, user.GetNameUser(getInfo.GetIDUser(machine)), orderName, true, check);
                 }
 
-
-
                 if (await CheckCategoryForUser(Form1.Info.nameOfExecutor, machine) == true)
                 {
 
@@ -549,6 +548,13 @@ namespace OrderManager
         private void timer1_Tick(object sender, EventArgs e)
         {
             UpdateMachinesStatus();
+        }
+
+        private void FormSelectMachine_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            timer1.Enabled = false;
+            cancelTokenSource?.Cancel();
+            Thread.Sleep(100);
         }
     }
 }
