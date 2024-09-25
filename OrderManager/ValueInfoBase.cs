@@ -205,6 +205,13 @@ namespace OrderManager
             return machinesList;
         }
 
+        public List<int> GetEquipsASBaseList(int category)
+        {
+            List<int> machinesList = GetAllEquipsASBase(category);
+
+            return machinesList;
+        }
+
         private List<String> GetAllMachines(String category)
         {
             List<String> machinesList = new List<String>();
@@ -299,6 +306,36 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     machinesList.Add((int)sqlReader["id"]);
+                }
+
+                Connect.Close();
+            }
+
+            return machinesList;
+        }
+
+        private List<int> GetAllEquipsASBase(int category)
+        {
+            List<int> machinesList = new List<int>();
+
+            string commLine = "";
+
+            if (category != -1)
+                commLine = " WHERE category = '" + category + "'";
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machines" + commLine
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    machinesList.Add((int)sqlReader["idEquip"]);
                 }
 
                 Connect.Close();

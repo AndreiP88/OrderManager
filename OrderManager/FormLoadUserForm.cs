@@ -409,6 +409,7 @@ namespace OrderManager
         private void FormLoadUserForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             timer1.Enabled = false;
+            Thread.Sleep(100);
             cancelTokenSourceLoadUsers?.Cancel();
             cancelTokenSourceLoadMachines?.Cancel();
         }

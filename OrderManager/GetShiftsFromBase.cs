@@ -155,6 +155,7 @@ namespace OrderManager
             int countEffectiveShift = 0;
             int countOrders = 0;
             int countMakeready = 0;
+            float allMakereadyTime = 0;
             int amountAllOrders = 0;
             int allTimeWorkingOut = 0;
             int allTime = 0;
@@ -194,6 +195,8 @@ namespace OrderManager
                     fullDone += ordersCurrentShift[j].done;
                     fullTimeWorkingOut += ordersCurrentShift[j].workingOut;
                     countOrders++;
+
+                    allMakereadyTime += leadTime.CalculateMakereadyParts(false, true, false);
                 }
 
                 int fullTimeWorking = dateTimeOperations.DateDifferentToMinutes(getValueFromShiftsBase.GetStopShiftFromID(shifts[i]), getValueFromShiftsBase.GetStartShiftFromID(shifts[i]));
@@ -246,6 +249,7 @@ namespace OrderManager
                 allTimeWorkingOut,
                 countOrders,
                 countMakeready,
+                allMakereadyTime,
                 amountAllOrders,
                 percent,
                 fullPercentBonus
@@ -270,6 +274,7 @@ namespace OrderManager
             int countEffectiveShift = 0;
             int countOrders = 0;
             int countMakeready = 0;
+            float allMakereadyTime = 0;
             int amountAllOrders = 0;
             int allTimeWorkingOut = 0;
             int allTime = 0;
@@ -312,6 +317,8 @@ namespace OrderManager
                     fullDone += ordersCurrentShift[j].done;
                     fullTimeWorkingOut += ordersCurrentShift[j].workingOut;
                     countOrders++;
+
+                    allMakereadyTime += leadTime.CalculateMakereadyParts(false, true, false);
                 }
 
                 int fullTimeWorking = dateTimeOperations.DateDifferentToMinutes(getValueFromShiftsBase.GetStopShiftFromID(shifts[i]), getValueFromShiftsBase.GetStartShiftFromID(shifts[i]));
@@ -364,6 +371,7 @@ namespace OrderManager
                 allTimeWorkingOut,
                 countOrders,
                 countMakeready,
+                allMakereadyTime,
                 amountAllOrders,
                 percent,
                 fullPercentBonus

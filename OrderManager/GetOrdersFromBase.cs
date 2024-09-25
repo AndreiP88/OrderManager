@@ -566,7 +566,7 @@ namespace OrderManager
 
                     while (await sqlReader.ReadAsync())
                     {
-                        if (category == await getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "")
+                        if (category == await getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "" || category == "-1")
                         {
                             //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
                             GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был

@@ -111,6 +111,22 @@ namespace OrderManager
             return result;
         }
 
+        public List<int> GetEquipsListASBaseForSelectedUser(int userId)
+        {
+            List<int> result = new List<int>();
+
+            ValueInfoBase infoBase = new ValueInfoBase();
+
+            List<int> categoryes = GetCategoryesList(userId);
+
+            for (int i = 0; i < categoryes.Count; i++)
+            {
+                result.AddRange(infoBase.GetEquipsASBaseList(categoryes[i]));
+            }
+
+            return result;
+        }
+
         public string GetCategoryesMachine(string id)
         {
             return (string)GetValue("id", id, "categoryesMachine");

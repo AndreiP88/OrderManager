@@ -201,7 +201,7 @@ namespace OrderManager
 
 
 
-        public async Task<UserWorkingOutput> FullWorkingOutputOMAsync(int userID, DateTime selectMonth, CancellationToken token, int category)
+        public async Task<UserWorkingOutput> FullWorkingOutputOMAsync(int userID, DateTime selectMonth, CancellationToken token, int category = -1)
         {
             UserWorkingOutput userWorkingOutput = new UserWorkingOutput();
             GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
@@ -216,38 +216,12 @@ namespace OrderManager
                 userWorkingOutput.Amount = shiftsDetails.amountAllOrdersShift;
                 userWorkingOutput.Percent = shiftsDetails.percentWorkingOutShift;
                 userWorkingOutput.Makeready = shiftsDetails.countMakereadyShift;
+                userWorkingOutput.MakereadyTime = shiftsDetails.MakereadyWorkTime;
                 userWorkingOutput.Bonus = shiftsDetails.percentBonusShift;
                 userWorkingOutput.CountShifts = shiftsDetails?.countShifts ?? 0;
             }
 
             return userWorkingOutput;
-        }
-
-
-        public async Task<float> CalculatePercentWorkingOutOM(int userID, DateTime selectMonth, CancellationToken token, int category)
-        {
-            float result = 0;
-
-            GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
-
-            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
-
-            result = shiftsDetails.percentWorkingOutShift;
-
-            return result;
-        }
-
-        public async Task<float> CalculateCountMakeReadyOM(int userID, DateTime selectMonth, CancellationToken token, int category)
-        {
-            float result = 0;
-
-            GetShiftsFromBase getShifts = new GetShiftsFromBase(userID.ToString());
-
-            ShiftsDetails shiftsDetails = await getShifts.LoadCurrentDateShiftsDetails(selectMonth, category.ToString(), token);
-
-            result = shiftsDetails.countMakereadyShift;
-
-            return result;
         }
 
         private async Task<List<int>> GetEquipsListASFromEquipsListOM(List<int> equipsListOM)
@@ -273,40 +247,6 @@ namespace OrderManager
             ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token);
 
             return shiftsDetails;
-        }
-
-        public async Task<float> CalculatePercentWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
-        {
-            float result = 0;
-
-            List<int> userIndexAS = new List<int> { userID };
-            List<int> equipListAS = await GetEquipsListASFromEquipsListOM(equipListOM);
-
-            ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
-
-            if (shiftsDetails != null)
-            {
-                result = shiftsDetails.percentWorkingOutShift;
-            }
-
-            return result;
-        }
-
-        public async Task<float> CalculateCountMakeReadyAS(int userID, DateTime selectMonth, CancellationToken token, List<int> equipListOM)
-        {
-            float result = 0;
-
-            List<int> userIndexAS = new List<int> { userID };
-            List<int> equipListAS = await GetEquipsListASFromEquipsListOM(equipListOM);
-
-            ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token, equipListAS);
-
-            if (shiftsDetails != null)
-            {
-                result = shiftsDetails.countMakereadyShift;
-            }
-            
-            return result;
         }
 
         private ShiftsDetails WorkingOutDetailsAS(List<int> userIndexFromAS, DateTime selectMonth, CancellationToken token, List<int> equipListAS = null)
@@ -337,6 +277,7 @@ namespace OrderManager
             }
 
             int totalCountMakeReady = 0;
+            float totalMakereadyTime = 0;
             float totalTimeWorkigOut = 0;
             //float totalPercentWorkingOut = 0;
             float totalBonusWorkingOut = 0;
@@ -373,6 +314,8 @@ namespace OrderManager
                     {
                         totalCountMakeReady += CalculateCountMakeready(shift.Orders, equipListAS);
 
+
+
                         float timeWorkigOut = CalculateWorkTime(shift.Orders, equipListAS);
 
                         totalTimeWorkigOut += timeWorkigOut;
@@ -399,6 +342,7 @@ namespace OrderManager
                 (int)totalTimeWorkigOut,
                 -1,
                 totalCountMakeReady,
+                -5,
                 -1,
                 percentWorkingOutAverage,
                 totalBonusWorkingOut
@@ -517,7 +461,8 @@ namespace OrderManager
                 {
                     if (equipListAS.Contains(order[i].IdEquip))
                     {
-                        if (order[i].Flags == 576)
+                        //if (order[i].Flags == 576)
+                        if (order[i].OperationType == 0)
                         {
                             countMakeReady++;
                         }
@@ -525,7 +470,8 @@ namespace OrderManager
                 }
                 else
                 {
-                    if (order[i].Flags == 576)
+                    //if (order[i].Flags == 576)
+                    if (order[i].OperationType == 0)
                     {
                         countMakeReady++;
                     }

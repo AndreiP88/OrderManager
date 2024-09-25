@@ -1,9 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using System.IO;
 
 namespace OrderManager
 {
@@ -69,6 +67,8 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
+                    //Сделать потом расчет времени для приладки заказов с makereadyComplete == -2
+                    //GetOrdersFromBase.LastTimeForMakeready
                     if ((int)sqlReader["makereadyComplete"] >= 0)
                     {
                         parts.Add((int)sqlReader["makereadyComplete"] * (int)sqlReader["makereadyConsider"]);

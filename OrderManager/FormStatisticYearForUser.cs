@@ -1,11 +1,16 @@
-﻿using System;
+﻿using libData;
+using libSql;
+using libTime;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using ListView = System.Windows.Forms.ListView;
 
 namespace OrderManager
 {
@@ -22,7 +27,9 @@ namespace OrderManager
 
         bool thJob = false;
         bool calculateNullShiftsFromUser = false;
+        bool loadValueInProgress = false;
 
+        List<UserWorkingOutput> userWorkingOutputs = new List<UserWorkingOutput>();
         string GetParametersLine()
         {
             String pLine = "";
@@ -221,6 +228,8 @@ namespace OrderManager
                 cancelTokenSource?.Cancel();
                 cancelTokenSource = new CancellationTokenSource();
 
+                loadValueInProgress = true;
+
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBox1.Text) - 1);
 
@@ -229,16 +238,25 @@ namespace OrderManager
                 AddMonthToListView();
 
                 //Task task = new Task(() => LoadUsersFromBase(token, date));
-                Task task = new Task(async () => await LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
+
+
+
+                /*Task task = new Task(async () => await LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
                 Task taskWorkingOut = new Task(() => LoadWorkingOut(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
+                task.Start();
+                taskWorkingOut.Start();*/
+
+                Task taskFullWorkingOut = new Task(() => LoadFullWorkingOut(cancelTokenSource.Token, date, selectLoadBase), cancelTokenSource.Token);
+                taskFullWorkingOut.Start();
+
+
                 //LoadUsersFromBase(cancelTokenSource.Token, date, selectLoadBase);
                 //LoadWorkingOut(cancelTokenSource.Token, date, selectLoadBase);
-                  
+
                 //await Task.WhenAny(task);
                 //await Task.WhenAny(taskWorkingOut);
 
-                task.Start();
-                taskWorkingOut.Start();
+                
             }
         }
 
@@ -258,6 +276,7 @@ namespace OrderManager
                 item.SubItems.Add("");
                 item.SubItems.Add("");
                 item.SubItems.Add("");
+                item.SubItems.Add("");
 
                 listView1.Items.Add(item);
             }
@@ -272,11 +291,320 @@ namespace OrderManager
             itemSum.SubItems.Add("");
             itemSum.SubItems.Add("");
             itemSum.SubItems.Add("");
+            itemSum.SubItems.Add("");
 
             itemSum.Font = new Font(ListView.DefaultFont, FontStyle.Bold);
 
             listView1.Items.Add(itemSum);
         }
+
+        private async void LoadFullWorkingOut(CancellationToken token, DateTime date, int selectLoadBase)
+        {
+            CalculateWorkingOutput workingOutSum = new CalculateWorkingOutput();
+            GetWorkingOutSum workingOutSumOM = new GetWorkingOutSum();
+            ValueUsers valueUsers = new ValueUsers();
+            ValueUserBase getUser = new ValueUserBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
+            ValueDateTime time = new ValueDateTime();
+
+            userWorkingOutputs?.Clear();
+
+            List<int> countsShifts = new List<int>();
+            List<float> worktimes = new List<float>();
+            List<float> percents = new List<float>();
+            List<int> amounts = new List<int>();
+            List<int> makereadys = new List<int>();
+            List<float> makereadysTimes = new List<float>();
+            List<float> bonuses = new List<float>();
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                DateTime currentDateTime = date.AddMonths(i);
+
+                UserWorkingOutput userWorkingOutput;
+
+                string name = CultureInfo.GetCultureInfoByIetfLanguageTag("ru-RU").DateTimeFormat.GetMonthName(i + 1);
+
+                if (selectLoadBase == 0)
+                {
+                    userWorkingOutput = await workingOutSumOM.FullWorkingOutputOMAsync(UserID, currentDateTime, token);
+                }
+                else
+                {
+                    userWorkingOutput = workingOutSum.FullWorkingOutput(getUser.GetIndexUserFromASBase(UserID), currentDateTime, token);
+                }
+
+                userWorkingOutputs.Add(new UserWorkingOutput(
+                    i,
+                    name,
+                    userWorkingOutput.Amount,
+                    userWorkingOutput.Worktime,
+                    userWorkingOutput.Percent,
+                    userWorkingOutput.Makeready,
+                    userWorkingOutput.MakereadyTime,
+                    userWorkingOutput.Bonus,
+                    userWorkingOutput.CountShifts
+                    ));
+
+                countsShifts.Add(userWorkingOutput.CountShifts);
+                worktimes.Add(userWorkingOutput.Worktime);
+                amounts.Add(userWorkingOutput.Amount);
+                makereadys.Add(userWorkingOutput.Makeready);
+                makereadysTimes.Add(userWorkingOutput.MakereadyTime);
+                bonuses.Add(userWorkingOutput.Bonus);
+
+                if (userWorkingOutput.CountShifts > 0)
+                {
+                    percents.Add(userWorkingOutput.Percent);
+                }
+
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                try
+                {
+                    Invoke(new Action(() =>
+                    {
+                        int index = listView1.Items.IndexOfKey((i + 1).ToString());
+
+                        if (index >= 0)
+                        {
+                            ListViewItem item = listView1.Items[index];
+
+                            if (item != null)
+                            {
+                                item.SubItems[2].Text = userWorkingOutput.CountShifts.ToString("N0");
+                                item.SubItems[3].Text = time.MinuteToTimeString((int)userWorkingOutput.Worktime);
+                                item.SubItems[4].Text = userWorkingOutput.Percent.ToString("P2");
+                                item.SubItems[5].Text = userWorkingOutput.Amount.ToString("N0");
+                                item.SubItems[6].Text = userWorkingOutput.Makeready.ToString("N0") + " (" + time.MinuteToTimeString((int)userWorkingOutput.MakereadyTime) + ")";
+                                item.SubItems[7].Text = userWorkingOutput.Bonus.ToString("P0");
+                            }
+                        }
+
+                        int indexSum = listView1.Items.IndexOfKey("sum");
+
+                        if (indexSum >= 0)
+                        {
+                            ListViewItem item = listView1.Items[indexSum];
+
+                            if (item != null)
+                            {
+                                item.SubItems[2].Text = countsShifts.Sum().ToString("N0");
+                                item.SubItems[3].Text = time.MinuteToTimeString((int)worktimes.Sum());
+                                item.SubItems[4].Text = (percents.Sum() / percents.Count).ToString("P2");
+                                item.SubItems[5].Text = amounts.Sum().ToString("N0");
+                                item.SubItems[6].Text = makereadys.Sum().ToString("N0") + " (" + time.MinuteToTimeString((int)makereadysTimes.Sum()) + ")";
+                                item.SubItems[7].Text = bonuses.Sum().ToString("P0");
+                            }
+                        }
+
+                    }));
+
+                    Invoke(new Action(() =>
+                    {
+                        ChangeTypeWorkingOutput();
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    LogException.WriteLine("LoadUsersFromBase: " + ex.Message);
+                }
+            }
+
+            loadValueInProgress  = false;
+
+            if (token.IsCancellationRequested)
+            {
+                userWorkingOutputs?.Clear();
+                return;
+            }
+
+            /*Invoke(new Action(() =>
+            {
+                ChangeTypeWorkingOutput();
+            }));*/
+        }
+
+        private void ChangeTypeWorkingOutput()
+        {
+            /*cancelTokenSource?.Cancel();
+
+            cancelTokenSource = new CancellationTokenSource();*/
+
+            if (comboBoxTypeViewGraf.SelectedIndex == -1)
+            {
+                comboBoxTypeViewGraf.SelectedIndex = 0;
+            }
+            else
+            {
+                if (!loadValueInProgress)
+                {
+                    AddUserWorkingOutputValues(cancelTokenSource.Token, comboBoxTypeViewGraf.SelectedIndex);
+                }
+            }
+        }
+
+        private void AddUserWorkingOutputValues(CancellationToken token, int typeValueLoad)
+        {
+            ValueDateTime time = new ValueDateTime();
+
+            List<UserWorkingOutput> userOutputs = userWorkingOutputs;
+            List<string> names = new List<string>();
+            List<float> values = new List<float>();
+            string diagramName = "";
+            bool hourValue = false;
+
+            switch (typeValueLoad)
+            {
+                case 0:
+                    diagramName = "Всего сделано продукции:";
+                    hourValue = false;
+                    break;
+                case 1:
+                    diagramName = "Средняя выработка:";
+                    hourValue = false;
+                    break;
+                case 2:
+                    diagramName = "Всего сделано приладок:";
+                    hourValue = false;
+                    break;
+                case 3:
+                    diagramName = "Сумма времени приладок:";
+                    hourValue = true;
+                    break;
+                default:
+                    break;
+            }
+
+            for (int i = 0; i < userOutputs.Count; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                float wOutValue = 0;
+
+                switch (typeValueLoad)
+                {
+                    case 0:
+                        wOutValue = userOutputs[i].Amount;
+                        break;
+                    case 1:
+                        wOutValue = userOutputs[i].Percent * 100;
+                        break;
+                    case 2:
+                        wOutValue = userOutputs[i].Makeready;
+                        break;
+                    case 3:
+                        wOutValue = userOutputs[i].MakereadyTime;
+                        break;
+                    default:
+                        break;
+                }
+
+                values.Add(wOutValue);
+
+                string add = "";
+
+                if (names.Contains(userOutputs[i].UserName))
+                {
+                    add += " ";
+                }
+
+                names.Add(userOutputs[i].UserName + add);
+            }
+
+            if (!token.IsCancellationRequested)
+            {
+                Invoke(new Action(() =>
+                {
+                    DrawDiagram(values, names, hourValue, diagramName);
+                }));
+            }
+        }
+
+        private void DrawDiagram(List<float> yValues, List<string> xValues, bool hourValue, string diagramName = null)
+        {
+            chart1.Series.Clear();
+            chart1.Titles.Clear();
+            // Форматировать диаграмму
+            //chart1.BackColor = Color.Gray;
+            //chart1.BackSecondaryColor = Color.WhiteSmoke;
+            chart1.BackGradientStyle = GradientStyle.DiagonalRight;
+
+            chart1.BorderlineDashStyle = ChartDashStyle.Solid;
+            //chart1.BorderlineColor = Color.Gray;
+            chart1.BorderSkin.SkinStyle = BorderSkinStyle.None;
+
+            // Форматировать область диаграммы
+            chart1.ChartAreas[0].BackColor = Color.Transparent;
+
+            // Добавить и форматировать заголовок
+            if (diagramName != null)
+            {
+                chart1.Titles.Add(diagramName);
+                chart1.Titles[0].Font = new Font("Consolas", 12);
+            }
+
+            chart1.Series.Add(new Series("ColumnSeries")
+            {
+                ChartType = SeriesChartType.Column,
+                //ChartType = SeriesChartType.Pie,
+                LabelBackColor = Color.Transparent,
+                IsVisibleInLegend = false
+
+            });
+
+            chart1.Series["ColumnSeries"].Points.DataBindXY(xValues, yValues);
+
+            chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -30;
+            //chart1.ChartAreas[0].AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
+            //chart1.ChartAreas[0].AxisX.IsLabelAutoFit = false;
+            chart1.ChartAreas[0].AxisX.Interval = 1;
+
+            chart1.ChartAreas[0].AxisY.LabelStyle.Format = "{N0}";
+
+            chart1.ChartAreas[0].AxisY.LabelStyle.Enabled = !hourValue;
+
+            //chart1.ChartAreas[0].Area3DStyle.Enable3D = true;
+            chart1.AlignDataPointsByAxisLabel();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         private async Task LoadUsersFromBase(CancellationToken token, DateTime date, int selectLoadBase)
         {
@@ -713,6 +1041,7 @@ namespace OrderManager
         private void FormShiftsDetails_FormClosing(object sender, FormClosingEventArgs e)
         {
             //SaveParameterToBase("statisticForm");
+            Thread.Sleep(200);
             cancelTokenSource?.Cancel();
         }
 
@@ -724,6 +1053,11 @@ namespace OrderManager
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
             StartLoading();
+        }
+
+        private void comboBoxTypeViewGraf_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ChangeTypeWorkingOutput();
         }
     }
 }

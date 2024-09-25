@@ -1,11 +1,11 @@
 ﻿using libData;
 using libSql;
+using libTime;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -28,6 +28,7 @@ namespace OrderManager
         List<UserWorkingOutput> userWorkingOutputs = new List<UserWorkingOutput>();
         List<Category> categoriesList;
 
+        bool closeForm = false;
         bool loadCategoryStatistic = false;
         bool loadCategoryList = false;
 
@@ -107,7 +108,7 @@ namespace OrderManager
                 ApplyParameterLine(getSettings.GetParameterLine("0", nameForm));
         }
 
-        private void DrawDiagram(List<float> yValues, List<string> xValues)
+        private void DrawDiagram(List<float> yValues, List<string> xValues, bool hourValue)
         {
             chart1.Series.Clear();
             // Форматировать диаграмму
@@ -142,6 +143,9 @@ namespace OrderManager
             //chart1.ChartAreas[0].AxisX.IsLabelAutoFit = false;
             chart1.ChartAreas[0].AxisX.Interval = 1;
 
+            chart1.ChartAreas[0].AxisY.LabelStyle.Format = "{N0}";
+
+            chart1.ChartAreas[0].AxisY.LabelStyle.Enabled = !hourValue;
 
             //chart1.ChartAreas[0].Area3DStyle.Enable3D = true;
             chart1.AlignDataPointsByAxisLabel();
@@ -533,6 +537,7 @@ namespace OrderManager
                     userWorkingOutput.Worktime,
                     userWorkingOutput.Percent,
                     userWorkingOutput.Makeready,
+                    userWorkingOutput.MakereadyTime,
                     userWorkingOutput.Bonus,
                     userWorkingOutput.CountShifts
                     ));
@@ -548,7 +553,7 @@ namespace OrderManager
                 }));
             }
 
-            if (token.IsCancellationRequested)
+            if (closeForm)
             {
                 return;
             }
@@ -587,6 +592,8 @@ namespace OrderManager
 
         private void AddUserWorkingOutputValues(CancellationToken token, int typeValueLoad)
         {
+            ValueDateTime time = new ValueDateTime();
+
             List<UserWorkingOutput> userOutputs = userWorkingOutputs;
             List<string> names = new List<string>();
             List<float> values = new List<float>();
@@ -597,20 +604,26 @@ namespace OrderManager
                 ClearAll();
             }));
 
-            if (typeValueLoad == 0)
+            switch (typeValueLoad)
             {
-                userOutputs.Sort((b1, b2) => b2.Amount.CompareTo(b1.Amount));
-                label1.Text = "Всего сделано продукции:";
-            }
-            else if (typeValueLoad == 1)
-            {
-                userOutputs.Sort((b1, b2) => b2.Percent.CompareTo(b1.Percent));
-                label1.Text = "Средняя выработка:";
-            }
-            else
-            {
-                userOutputs.Sort((b1, b2) => b2.Makeready.CompareTo(b1.Makeready));
-                label1.Text = "Всего сделано приладок:";
+                case 0:
+                    userOutputs.Sort((b1, b2) => b2.Amount.CompareTo(b1.Amount));
+                    label1.Text = "Всего сделано продукции:";
+                    break;
+                case 1:
+                    userOutputs.Sort((b1, b2) => b2.Percent.CompareTo(b1.Percent));
+                    label1.Text = "Средняя выработка:";
+                    break;
+                case 2:
+                    userOutputs.Sort((b1, b2) => b2.Makeready.CompareTo(b1.Makeready));
+                    label1.Text = "Всего сделано приладок:";
+                    break;
+                case 3:
+                    userOutputs.Sort((b1, b2) => b2.MakereadyTime.CompareTo(b1.MakereadyTime));
+                    label1.Text = "Сумма времени приладок:";
+                    break;
+                default:
+                    break;
             }
 
             for (int i = 0; i < userOutputs.Count; i++)
@@ -622,20 +635,26 @@ namespace OrderManager
 
                 float wOutValue = 0;
 
-                if (typeValueLoad == 0)
+                switch (typeValueLoad)
                 {
-                    wOutValue = userOutputs[i].Amount;
-                    values.Add(wOutValue);
-                }
-                else if (typeValueLoad == 1)
-                {
-                    wOutValue = userOutputs[i].Percent;
-                    values.Add(wOutValue * 100);
-                }
-                else
-                {
-                    wOutValue = userOutputs[i].Makeready;
-                    values.Add(wOutValue);
+                    case 0:
+                        wOutValue = userOutputs[i].Amount;
+                        values.Add(wOutValue);
+                        break;
+                    case 1:
+                        wOutValue = userOutputs[i].Percent;
+                        values.Add(wOutValue * 100);
+                        break;
+                    case 2:
+                        wOutValue = userOutputs[i].Makeready;
+                        values.Add(wOutValue);
+                        break;
+                    case 3:
+                        wOutValue = userOutputs[i].MakereadyTime;
+                        values.Add(wOutValue);
+                        break;
+                    default:
+                        break;
                 }
 
                 ListViewItem item = new ListViewItem();
@@ -650,6 +669,10 @@ namespace OrderManager
                 if (typeValueLoad == 1)
                 {
                     item.SubItems.Add(wOutValue.ToString("P1"));
+                }
+                else if (typeValueLoad == 3)
+                {
+                    item.SubItems.Add(time.MinuteToTimeString((int)wOutValue));
                 }
                 else
                 {
@@ -685,17 +708,22 @@ namespace OrderManager
 
                 float wOutValue = 0;
 
-                if (typeValueLoad == 0)
+                switch (typeValueLoad)
                 {
-                    wOutValue = userOutputs[i].Amount;
-                }
-                else if (typeValueLoad == 1)
-                {
-                    wOutValue = userOutputs[i].Percent;
-                }
-                else
-                {
-                    wOutValue = userOutputs[i].Makeready;
+                    case 0:
+                        wOutValue = userOutputs[i].Amount;
+                        break;
+                    case 1:
+                        wOutValue = userOutputs[i].Percent;
+                        break;
+                    case 2:
+                        wOutValue = userOutputs[i].Makeready;
+                        break;
+                    case 3:
+                        wOutValue = userOutputs[i].MakereadyTime;
+                        break;
+                    default:
+                        break;
                 }
 
                 Invoke(new Action(() =>
@@ -716,22 +744,33 @@ namespace OrderManager
 
             if (!token.IsCancellationRequested)
             {
-                if (typeValueLoad == 0)
+                bool hourValue = false;
+
+                switch (typeValueLoad)
                 {
-                    label2.Text = summWorkingOut.ToString("N0");
-                }
-                else if (typeValueLoad == 1)
-                {
-                    label2.Text = (summWorkingOut / userOutputs.Count).ToString("P1");
-                }
-                else
-                {
-                    label2.Text = summWorkingOut.ToString("N0");
+                    case 0:
+                        label2.Text = summWorkingOut.ToString("N0");
+                        hourValue = false;
+                        break;
+                    case 1:
+                        label2.Text = (summWorkingOut / userOutputs.Count).ToString("P1");
+                        hourValue = false;
+                        break;
+                    case 2:
+                        label2.Text = summWorkingOut.ToString("N0");
+                        hourValue = false;
+                        break;
+                    case 3:
+                        label2.Text = time.MinuteToTimeString((int)summWorkingOut);
+                        hourValue = true;
+                        break;
+                    default:
+                        break;
                 }
 
                 Invoke(new Action(() =>
                 {
-                    DrawDiagram(values, names);
+                    DrawDiagram(values, names, hourValue);
 
                     //label2.Text = summWorkingOut.ToString("N0");
                 }));
@@ -1007,6 +1046,8 @@ namespace OrderManager
 
             if (loadCategoryStatistic)
             {
+                closeForm = true;
+
                 cancelTokenSource?.Cancel();
 
                 Thread.Sleep(100);
