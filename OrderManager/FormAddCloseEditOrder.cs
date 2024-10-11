@@ -1463,7 +1463,15 @@ namespace OrderManager
 
                         UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                         UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
-                        newStatus = status;
+
+                        if (makereadyPart == makereadyLastPart)
+                        {
+                            newStatus = "2";
+                        }
+                        else
+                        {
+                            newStatus = status;
+                        }
                     }
                     else
                     {
