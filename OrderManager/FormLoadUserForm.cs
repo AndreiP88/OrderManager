@@ -102,7 +102,7 @@ namespace OrderManager
 
                             if (!token.IsCancellationRequested)
                             {
-                                //await UpdateMachineFromUsers(token);
+                                await UpdateMachineFromUsers(token);
                             }
 
                             reconnectionRequired = false;

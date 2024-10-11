@@ -1,16 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.Common;
 using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.Form1;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -537,6 +529,33 @@ namespace OrderManager
 
 
 
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            int startIndex = Convert.ToInt32(textBox1.Text);
+            int stopIndex = Convert.ToInt32(textBox2.Text);
+            int newIndexStart = Convert.ToInt32(textBox3.Text);
+
+            for (int i = 0; i <= (stopIndex - startIndex); i++)
+            {
+                int currentIndex = startIndex + i;
+                int newIndex = newIndexStart + i;
+
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    string commandText = "UPDATE ordersInProgress SET count = @newIndex " +
+                        "WHERE count = @currentIndex";
+
+                    MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@currentIndex", currentIndex);
+                    Command.Parameters.AddWithValue("@newIndex", newIndex);
+
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
+                }
+            }
         }
     }
 }

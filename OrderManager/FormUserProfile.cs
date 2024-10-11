@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Globalization;
 using System.Runtime.ConstrainedExecution;
+using System.Linq;
 
 namespace OrderManager
 {
@@ -68,15 +69,15 @@ namespace OrderManager
             if (detailsSalary)
             {
                 //tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Percent;
-                tableLayoutPanel1.ColumnStyles[0].Width = 52;
-                tableLayoutPanel1.ColumnStyles[1].Width = 48;
-                this.Width = 1050;
+                tableLayoutPanel1.ColumnStyles[0].Width = 60;
+                tableLayoutPanel1.ColumnStyles[1].Width = 40;
+                this.Width = 1280;
             }
             else
             {
                 tableLayoutPanel1.ColumnStyles[0].Width = 100;
                 tableLayoutPanel1.ColumnStyles[1].Width = 0;
-                this.Width = 570;
+                this.Width = 840;
             }
         }
 
@@ -95,8 +96,6 @@ namespace OrderManager
                 comboBox1.SelectedIndex = comboBox1.Items.IndexOf(year.ToString());
                 comboBox2.SelectedIndex = month - 1;
             }
-
-
         }
 
         void LoadUser()
@@ -118,7 +117,7 @@ namespace OrderManager
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
-            List<int> shifts = (List<int>)getShifts.LoadShiftsList(date);
+            List<int> shifts = getShifts.LoadShiftsList(date);
             List<int> shiftsDays = new List<int>();
 
             int fullWorkTime = 0;
@@ -158,55 +157,72 @@ namespace OrderManager
             {
                 string nShift = "";
                 int workTimeShift = 0;
-                
-                int index = shiftsDays.IndexOf(i);
+                int workTimeFirstShift = 0;
+                int workTimeSecondShift = 0;
 
-                if (index != -1)
+                bool shiftOvertime = false;
+                bool firstShiftOvertime = false;
+                bool secondShiftOvertime = false;
+
+                //List<int> indexes = shiftsDays.FindAll(x => x == i);
+                List<int> indexes = Enumerable.Range(0, shiftsDays.Count).Where(x => shiftsDays[x] == i).ToList();
+                //int ii = shiftsDays.Count(p => p == i);
+
+                for (int j = 0; j < indexes.Count; j++)
                 {
-                    nShift = getNumberShift.NumberShift(shiftsBase.GetStartShiftFromID(shifts[index]));
+                    string shift = getNumberShift.NumberShift(shiftsBase.GetStartShiftFromID(shifts[indexes[j]]));
 
-                    if (nShift == "II")
+                    if (nShift == "")
                     {
-                        countNightShifts++;
+                        nShift = shift;
+                    }
+                    else
+                    {
+                        nShift += " / " + shift;
                     }
 
-                    if (shiftsBase.GetCheckFullShift(shifts[index]))
+                    if (shiftsBase.GetCheckFullShift(shifts[indexes[j]]))
                     {
                         workTimeShift = _wTime;
                         countFullShifts++;
                     }
                     else
                     {
-                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShiftFromID(shifts[index]), shiftsBase.GetStartShiftFromID(shifts[index])));
+                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShiftFromID(shifts[indexes[j]]), shiftsBase.GetStartShiftFromID(shifts[indexes[j]])));
                         countPartialShifts++;
                     }
 
-                    if (shiftsBase.GetCheckOvertimeShift(shifts[index]))
+                    if (shiftsBase.GetCheckOvertimeShift(shifts[indexes[j]]))
                     {
                         fullOverTime += workTimeShift;
                         countOvertimeShifts++;
+                        shiftOvertime = true;
+                    }
+                    else
+                    {
+                        shiftOvertime = false;
+                    }
+
+                    if (shift == "I")
+                    {
+                        workTimeFirstShift = workTimeShift;
+                        firstShiftOvertime = shiftOvertime;
+                    }
+                    else if (shift == "II")
+                    {
+                        workTimeSecondShift = workTimeShift;
+                        secondShiftOvertime = shiftOvertime;
+                        countNightShifts++;
                     }
 
                     fullWorkTime += workTimeShift;
-                    
                 }
 
-                label11.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullWorkTime);
-                label13.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullOverTime);
-                label15.Text = countFullShifts.ToString();
-                label17.Text = countOvertimeShifts.ToString();
-                label19.Text = countPartialShifts.ToString();
-
-                workTime = fullWorkTime;
-                overTime = fullOverTime;
-
-                string timeStr = timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeShift);
-
-                if (timeStr == "00:00")
-                    timeStr = "";
+                string firstTimeStr = timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeFirstShift, true);
+                string secondTimeStr = timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeSecondShift, true);
 
                 DayBlank currDay = new DayBlank();
-                currDay.Refresh(i, nShift, timeStr);
+                currDay.Refresh(i, nShift, firstTimeStr, secondTimeStr, firstShiftOvertime, secondShiftOvertime);
 
                 if (dayCurrWeek == 8)
                 {
@@ -227,6 +243,15 @@ namespace OrderManager
 
                 dayCurrWeek++;
             }
+
+            label11.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullWorkTime);
+            label13.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullOverTime);
+            label15.Text = countFullShifts.ToString();
+            label17.Text = countOvertimeShifts.ToString();
+            label19.Text = countPartialShifts.ToString();
+
+            workTime = fullWorkTime;
+            overTime = fullOverTime;
         }
 
         private void AddDaysNames()
@@ -420,9 +445,9 @@ namespace OrderManager
             if (tableLayoutPanel1.ColumnStyles[1].Width == 0)
             {
                 //tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Percent;
-                tableLayoutPanel1.ColumnStyles[0].Width = 52;
-                tableLayoutPanel1.ColumnStyles[1].Width = 48;
-                this.Width = 1050;
+                tableLayoutPanel1.ColumnStyles[0].Width = 60;
+                tableLayoutPanel1.ColumnStyles[1].Width = 40;
+                this.Width = 1280;
 
                 settingsBase.UpdateDeteilsSalary(idUser, "True");
             }
@@ -430,7 +455,7 @@ namespace OrderManager
             {
                 tableLayoutPanel1.ColumnStyles[0].Width = 100;
                 tableLayoutPanel1.ColumnStyles[1].Width = 0;
-                this.Width = 570;
+                this.Width = 740;
 
                 settingsBase.UpdateDeteilsSalary(idUser, "False");
             }

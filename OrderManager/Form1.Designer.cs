@@ -144,6 +144,7 @@ namespace OrderManager
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.базаДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadUpadaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addEditorderNEWToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.planToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewAllOrdersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -167,7 +168,6 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.addEditorderNEWToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.numericUpDown6 = new OrderManager.FormattedNumericUpDown();
             this.numericUpDown5 = new OrderManager.FormattedNumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
@@ -1487,6 +1487,13 @@ namespace OrderManager
             this.downloadUpadaterToolStripMenuItem.Visible = false;
             this.downloadUpadaterToolStripMenuItem.Click += new System.EventHandler(this.downloadUpadaterToolStripMenuItem_Click);
             // 
+            // addEditorderNEWToolStripMenuItem
+            // 
+            this.addEditorderNEWToolStripMenuItem.Name = "addEditorderNEWToolStripMenuItem";
+            this.addEditorderNEWToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.addEditorderNEWToolStripMenuItem.Text = "[NEW] Операции";
+            this.addEditorderNEWToolStripMenuItem.Click += new System.EventHandler(this.addEditorderNEWToolStripMenuItem_Click);
+            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1675,13 +1682,6 @@ namespace OrderManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
-            // 
-            // addEditorderNEWToolStripMenuItem
-            // 
-            this.addEditorderNEWToolStripMenuItem.Name = "addEditorderNEWToolStripMenuItem";
-            this.addEditorderNEWToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.addEditorderNEWToolStripMenuItem.Text = "[NEW] Операции";
-            this.addEditorderNEWToolStripMenuItem.Click += new System.EventHandler(this.addEditorderNEWToolStripMenuItem_Click);
             // 
             // numericUpDown6
             // 

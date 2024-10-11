@@ -692,7 +692,7 @@ namespace OrderManager
             return (hours, minutes);
         }
 
-        public String TotalMinutesToHoursAndMinutesStr(int totalMinutes)
+        public String TotalMinutesToHoursAndMinutesStr(int totalMinutes, bool emptyString = false)
         {
             int hours = TotalMinutesToHoursAndMinutes(totalMinutes).Item1;
             int minutes = Math.Abs(TotalMinutesToHoursAndMinutes(totalMinutes).Item2);
@@ -702,8 +702,15 @@ namespace OrderManager
             tTime += TimeSpan.FromHours(hours) + TimeSpan.FromMinutes(minutes);
 
             //MessageBox.Show(hours.ToString() + ":" + minutes.ToString() + " --- " + tTime.ToString());
-
-            return TimeToSting(tTime);
+            if (emptyString && tTime == TimeSpan.Zero)
+            {
+                return "";
+            }
+            else
+            {
+                return TimeToSting(tTime);
+            }
+            
             //return tTime.ToString(@"hh\:mm");
         }
 

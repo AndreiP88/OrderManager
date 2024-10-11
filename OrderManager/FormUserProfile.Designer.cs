@@ -165,8 +165,8 @@
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 52.07921F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 47.92079F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -175,7 +175,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1010, 638);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1264, 641);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel4
@@ -190,9 +190,9 @@
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 3;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60.76759F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 39.23241F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(520, 611);
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 81.86529F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18.13471F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(752, 614);
             this.tableLayoutPanel4.TabIndex = 2;
             // 
             // tableLayoutPanel5
@@ -224,7 +224,7 @@
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(514, 345);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(746, 469);
             this.tableLayoutPanel5.TabIndex = 0;
             // 
             // label3
@@ -234,7 +234,7 @@
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label3.Location = new System.Drawing.Point(38, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 20);
+            this.label3.Size = new System.Drawing.Size(95, 20);
             this.label3.TabIndex = 42;
             this.label3.Text = "Пн";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -244,9 +244,9 @@
             this.label4.AutoSize = true;
             this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(106, 0);
+            this.label4.Location = new System.Drawing.Point(139, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(62, 20);
+            this.label4.Size = new System.Drawing.Size(95, 20);
             this.label4.TabIndex = 43;
             this.label4.Text = "Вт";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -256,9 +256,9 @@
             this.label5.AutoSize = true;
             this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(174, 0);
+            this.label5.Location = new System.Drawing.Point(240, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(62, 20);
+            this.label5.Size = new System.Drawing.Size(95, 20);
             this.label5.TabIndex = 44;
             this.label5.Text = "Ср";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -268,9 +268,9 @@
             this.label6.AutoSize = true;
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(242, 0);
+            this.label6.Location = new System.Drawing.Point(341, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(62, 20);
+            this.label6.Size = new System.Drawing.Size(95, 20);
             this.label6.TabIndex = 45;
             this.label6.Text = "Чт";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -280,9 +280,9 @@
             this.label7.AutoSize = true;
             this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label7.Location = new System.Drawing.Point(310, 0);
+            this.label7.Location = new System.Drawing.Point(442, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(62, 20);
+            this.label7.Size = new System.Drawing.Size(95, 20);
             this.label7.TabIndex = 46;
             this.label7.Text = "Пт";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -292,9 +292,9 @@
             this.label8.AutoSize = true;
             this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label8.Location = new System.Drawing.Point(378, 0);
+            this.label8.Location = new System.Drawing.Point(543, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(62, 20);
+            this.label8.Size = new System.Drawing.Size(95, 20);
             this.label8.TabIndex = 47;
             this.label8.Text = "Сб";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -304,9 +304,9 @@
             this.label9.AutoSize = true;
             this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label9.Location = new System.Drawing.Point(446, 0);
+            this.label9.Location = new System.Drawing.Point(644, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(65, 20);
+            this.label9.Size = new System.Drawing.Size(99, 20);
             this.label9.TabIndex = 48;
             this.label9.Text = "Вс";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -326,7 +326,7 @@
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 1;
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(514, 27);
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(746, 27);
             this.tableLayoutPanel6.TabIndex = 1;
             // 
             // comboBox2
@@ -334,9 +334,9 @@
             this.comboBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(174, 3);
+            this.comboBox2.Location = new System.Drawing.Point(251, 3);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(165, 21);
+            this.comboBox2.Size = new System.Drawing.Size(242, 21);
             this.comboBox2.TabIndex = 1;
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
@@ -347,16 +347,16 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(3, 3);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(165, 21);
+            this.comboBox1.Size = new System.Drawing.Size(242, 21);
             this.comboBox1.TabIndex = 0;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // button1
             // 
             this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.Location = new System.Drawing.Point(345, 3);
+            this.button1.Location = new System.Drawing.Point(499, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(166, 21);
+            this.button1.Size = new System.Drawing.Size(244, 21);
             this.button1.TabIndex = 2;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click_1);
@@ -379,14 +379,14 @@
             this.tableLayoutPanel7.Controls.Add(this.label18, 2, 2);
             this.tableLayoutPanel7.Controls.Add(this.label19, 3, 2);
             this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 387);
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 511);
             this.tableLayoutPanel7.Name = "tableLayoutPanel7";
             this.tableLayoutPanel7.RowCount = 4;
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel7.Size = new System.Drawing.Size(514, 221);
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(746, 100);
             this.tableLayoutPanel7.TabIndex = 2;
             // 
             // label10
@@ -395,7 +395,7 @@
             this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label10.Location = new System.Drawing.Point(3, 0);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(143, 30);
+            this.label10.Size = new System.Drawing.Size(210, 30);
             this.label10.TabIndex = 0;
             this.label10.Text = "Рабочие часы:";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -404,9 +404,9 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label11.Location = new System.Drawing.Point(152, 0);
+            this.label11.Location = new System.Drawing.Point(219, 0);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(68, 30);
+            this.label11.Size = new System.Drawing.Size(101, 30);
             this.label11.TabIndex = 1;
             this.label11.Text = "00:00";
             this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -417,7 +417,7 @@
             this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label12.Location = new System.Drawing.Point(3, 30);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(143, 30);
+            this.label12.Size = new System.Drawing.Size(210, 30);
             this.label12.TabIndex = 2;
             this.label12.Text = "Сверхурочные часы:";
             this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -426,9 +426,9 @@
             // 
             this.label13.AutoSize = true;
             this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label13.Location = new System.Drawing.Point(152, 30);
+            this.label13.Location = new System.Drawing.Point(219, 30);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(68, 30);
+            this.label13.Size = new System.Drawing.Size(101, 30);
             this.label13.TabIndex = 3;
             this.label13.Text = "00:00";
             this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -437,9 +437,9 @@
             // 
             this.label14.AutoSize = true;
             this.label14.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label14.Location = new System.Drawing.Point(226, 0);
+            this.label14.Location = new System.Drawing.Point(326, 0);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(156, 30);
+            this.label14.Size = new System.Drawing.Size(229, 30);
             this.label14.TabIndex = 4;
             this.label14.Text = "Полных смен:";
             this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -448,9 +448,9 @@
             // 
             this.label15.AutoSize = true;
             this.label15.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label15.Location = new System.Drawing.Point(388, 0);
+            this.label15.Location = new System.Drawing.Point(561, 0);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(123, 30);
+            this.label15.Size = new System.Drawing.Size(182, 30);
             this.label15.TabIndex = 5;
             this.label15.Text = "0";
             this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -459,9 +459,9 @@
             // 
             this.label16.AutoSize = true;
             this.label16.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label16.Location = new System.Drawing.Point(226, 30);
+            this.label16.Location = new System.Drawing.Point(326, 30);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(156, 30);
+            this.label16.Size = new System.Drawing.Size(229, 30);
             this.label16.TabIndex = 6;
             this.label16.Text = "Сверхурочных смен:";
             this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -470,9 +470,9 @@
             // 
             this.label17.AutoSize = true;
             this.label17.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label17.Location = new System.Drawing.Point(388, 30);
+            this.label17.Location = new System.Drawing.Point(561, 30);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(123, 30);
+            this.label17.Size = new System.Drawing.Size(182, 30);
             this.label17.TabIndex = 7;
             this.label17.Text = "0";
             this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -481,9 +481,9 @@
             // 
             this.label18.AutoSize = true;
             this.label18.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label18.Location = new System.Drawing.Point(226, 60);
+            this.label18.Location = new System.Drawing.Point(326, 60);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(156, 30);
+            this.label18.Size = new System.Drawing.Size(229, 30);
             this.label18.TabIndex = 8;
             this.label18.Text = "Неполных смен:";
             this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -492,9 +492,9 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label19.Location = new System.Drawing.Point(388, 60);
+            this.label19.Location = new System.Drawing.Point(561, 60);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(123, 30);
+            this.label19.Size = new System.Drawing.Size(182, 30);
             this.label19.TabIndex = 9;
             this.label19.Text = "0";
             this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -523,7 +523,7 @@
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel20, 0, 20);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel21, 0, 12);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(529, 3);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(761, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 22;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -548,7 +548,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(478, 611);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(500, 614);
             this.tableLayoutPanel2.TabIndex = 3;
             // 
             // tableLayoutPanel19
@@ -565,7 +565,7 @@
             this.tableLayoutPanel19.Name = "tableLayoutPanel19";
             this.tableLayoutPanel19.RowCount = 1;
             this.tableLayoutPanel19.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel19.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel19.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel19.TabIndex = 19;
             // 
             // label37
@@ -574,7 +574,7 @@
             this.label37.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label37.Location = new System.Drawing.Point(3, 0);
             this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(182, 24);
+            this.label37.Size = new System.Drawing.Size(191, 24);
             this.label37.TabIndex = 0;
             this.label37.Text = "Начислено:";
             this.label37.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -584,14 +584,14 @@
             this.numericUpDown20.DecimalPlaces = 2;
             this.numericUpDown20.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown20.Enabled = false;
-            this.numericUpDown20.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown20.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown20.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown20.Name = "numericUpDown20";
-            this.numericUpDown20.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown20.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown20.TabIndex = 1;
             this.numericUpDown20.ThousandsSeparator = true;
             // 
@@ -600,14 +600,14 @@
             this.numericUpDown21.DecimalPlaces = 2;
             this.numericUpDown21.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown21.Enabled = false;
-            this.numericUpDown21.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown21.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown21.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown21.Name = "numericUpDown21";
-            this.numericUpDown21.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown21.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown21.TabIndex = 2;
             this.numericUpDown21.ThousandsSeparator = true;
             // 
@@ -617,7 +617,7 @@
             this.label36.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label36.Location = new System.Drawing.Point(3, 465);
             this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(472, 20);
+            this.label36.Size = new System.Drawing.Size(494, 20);
             this.label36.TabIndex = 18;
             this.label36.Text = "Итоговая сумма";
             this.label36.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -636,7 +636,7 @@
             this.tableLayoutPanel18.Name = "tableLayoutPanel18";
             this.tableLayoutPanel18.RowCount = 1;
             this.tableLayoutPanel18.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel18.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel18.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel18.TabIndex = 17;
             // 
             // label35
@@ -645,7 +645,7 @@
             this.label35.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label35.Location = new System.Drawing.Point(3, 0);
             this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(182, 24);
+            this.label35.Size = new System.Drawing.Size(191, 24);
             this.label35.TabIndex = 0;
             this.label35.Text = "Пенсионный фонд:";
             this.label35.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -655,14 +655,14 @@
             this.numericUpDown18.DecimalPlaces = 2;
             this.numericUpDown18.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown18.Enabled = false;
-            this.numericUpDown18.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown18.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown18.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown18.Name = "numericUpDown18";
-            this.numericUpDown18.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown18.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown18.TabIndex = 1;
             this.numericUpDown18.ThousandsSeparator = true;
             // 
@@ -671,14 +671,14 @@
             this.numericUpDown19.DecimalPlaces = 2;
             this.numericUpDown19.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown19.Enabled = false;
-            this.numericUpDown19.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown19.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown19.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown19.Name = "numericUpDown19";
-            this.numericUpDown19.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown19.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown19.TabIndex = 2;
             this.numericUpDown19.ThousandsSeparator = true;
             // 
@@ -696,7 +696,7 @@
             this.tableLayoutPanel17.Name = "tableLayoutPanel17";
             this.tableLayoutPanel17.RowCount = 1;
             this.tableLayoutPanel17.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel17.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel17.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel17.TabIndex = 16;
             // 
             // label34
@@ -705,7 +705,7 @@
             this.label34.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label34.Location = new System.Drawing.Point(3, 0);
             this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(182, 24);
+            this.label34.Size = new System.Drawing.Size(191, 24);
             this.label34.TabIndex = 0;
             this.label34.Text = "Подоходный налог:";
             this.label34.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -715,14 +715,14 @@
             this.numericUpDown15.DecimalPlaces = 2;
             this.numericUpDown15.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown15.Enabled = false;
-            this.numericUpDown15.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown15.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown15.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown15.Name = "numericUpDown15";
-            this.numericUpDown15.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown15.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown15.TabIndex = 1;
             this.numericUpDown15.ThousandsSeparator = true;
             // 
@@ -731,14 +731,14 @@
             this.numericUpDown17.DecimalPlaces = 2;
             this.numericUpDown17.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown17.Enabled = false;
-            this.numericUpDown17.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown17.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown17.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown17.Name = "numericUpDown17";
-            this.numericUpDown17.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown17.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown17.TabIndex = 2;
             this.numericUpDown17.ThousandsSeparator = true;
             // 
@@ -754,7 +754,7 @@
             this.tableLayoutPanel15.Name = "tableLayoutPanel15";
             this.tableLayoutPanel15.RowCount = 1;
             this.tableLayoutPanel15.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel15.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel15.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel15.TabIndex = 13;
             // 
             // label31
@@ -763,7 +763,7 @@
             this.label31.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label31.Location = new System.Drawing.Point(3, 0);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(182, 24);
+            this.label31.Size = new System.Drawing.Size(191, 24);
             this.label31.TabIndex = 0;
             this.label31.Text = "Месячная премия по положению:";
             this.label31.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -772,14 +772,14 @@
             // 
             this.numericUpDown9.DecimalPlaces = 2;
             this.numericUpDown9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown9.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown9.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown9.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown9.Name = "numericUpDown9";
-            this.numericUpDown9.Size = new System.Drawing.Size(278, 20);
+            this.numericUpDown9.Size = new System.Drawing.Size(291, 20);
             this.numericUpDown9.TabIndex = 1;
             this.numericUpDown9.ThousandsSeparator = true;
             this.numericUpDown9.ValueChanged += new System.EventHandler(this.numericUpDown9_ValueChanged);
@@ -798,7 +798,7 @@
             this.tableLayoutPanel14.Name = "tableLayoutPanel14";
             this.tableLayoutPanel14.RowCount = 1;
             this.tableLayoutPanel14.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel14.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel14.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel14.TabIndex = 12;
             // 
             // label30
@@ -807,7 +807,7 @@
             this.label30.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label30.Location = new System.Drawing.Point(3, 0);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(182, 24);
+            this.label30.Size = new System.Drawing.Size(191, 24);
             this.label30.TabIndex = 0;
             this.label30.Text = "Доплата за праздничные дни:";
             this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -817,14 +817,14 @@
             this.numericUpDown8.DecimalPlaces = 2;
             this.numericUpDown8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown8.Enabled = false;
-            this.numericUpDown8.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown8.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown8.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown8.Name = "numericUpDown8";
-            this.numericUpDown8.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown8.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown8.TabIndex = 1;
             this.numericUpDown8.ThousandsSeparator = true;
             this.numericUpDown8.ValueChanged += new System.EventHandler(this.numericUpDown8_ValueChanged);
@@ -833,14 +833,14 @@
             // 
             this.numericUpDown14.DecimalPlaces = 2;
             this.numericUpDown14.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown14.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown14.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown14.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown14.Name = "numericUpDown14";
-            this.numericUpDown14.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown14.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown14.TabIndex = 2;
             this.numericUpDown14.ThousandsSeparator = true;
             this.numericUpDown14.ValueChanged += new System.EventHandler(this.numericUpDown14_ValueChanged);
@@ -859,7 +859,7 @@
             this.tableLayoutPanel13.Name = "tableLayoutPanel13";
             this.tableLayoutPanel13.RowCount = 1;
             this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel13.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel13.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel13.TabIndex = 11;
             // 
             // label29
@@ -868,7 +868,7 @@
             this.label29.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label29.Location = new System.Drawing.Point(3, 0);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(182, 24);
+            this.label29.Size = new System.Drawing.Size(191, 24);
             this.label29.TabIndex = 0;
             this.label29.Text = "Разовая премия (сверхурочные):";
             this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -878,14 +878,14 @@
             this.numericUpDown7.DecimalPlaces = 2;
             this.numericUpDown7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown7.Enabled = false;
-            this.numericUpDown7.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown7.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown7.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown7.Name = "numericUpDown7";
-            this.numericUpDown7.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown7.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown7.TabIndex = 1;
             this.numericUpDown7.ThousandsSeparator = true;
             this.numericUpDown7.ValueChanged += new System.EventHandler(this.numericUpDown7_ValueChanged);
@@ -894,14 +894,14 @@
             // 
             this.numericUpDown13.DecimalPlaces = 2;
             this.numericUpDown13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown13.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown13.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown13.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown13.Name = "numericUpDown13";
-            this.numericUpDown13.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown13.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown13.TabIndex = 2;
             this.numericUpDown13.ThousandsSeparator = true;
             this.numericUpDown13.ValueChanged += new System.EventHandler(this.numericUpDown13_ValueChanged);
@@ -920,7 +920,7 @@
             this.tableLayoutPanel9.Name = "tableLayoutPanel9";
             this.tableLayoutPanel9.RowCount = 1;
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel9.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel9.TabIndex = 10;
             // 
             // label28
@@ -929,7 +929,7 @@
             this.label28.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label28.Location = new System.Drawing.Point(3, 0);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(182, 24);
+            this.label28.Size = new System.Drawing.Size(191, 24);
             this.label28.TabIndex = 0;
             this.label28.Text = "Доплата за ночные:";
             this.label28.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -939,14 +939,14 @@
             this.numericUpDown6.DecimalPlaces = 2;
             this.numericUpDown6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown6.Enabled = false;
-            this.numericUpDown6.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown6.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown6.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown6.Name = "numericUpDown6";
-            this.numericUpDown6.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown6.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown6.TabIndex = 1;
             this.numericUpDown6.ThousandsSeparator = true;
             this.numericUpDown6.ValueChanged += new System.EventHandler(this.numericUpDown6_ValueChanged);
@@ -955,14 +955,14 @@
             // 
             this.numericUpDown12.DecimalPlaces = 2;
             this.numericUpDown12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown12.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown12.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown12.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown12.Name = "numericUpDown12";
-            this.numericUpDown12.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown12.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown12.TabIndex = 2;
             this.numericUpDown12.ThousandsSeparator = true;
             this.numericUpDown12.ValueChanged += new System.EventHandler(this.numericUpDown12_ValueChanged);
@@ -981,7 +981,7 @@
             this.tableLayoutPanel12.Name = "tableLayoutPanel12";
             this.tableLayoutPanel12.RowCount = 1;
             this.tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel12.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel12.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel12.TabIndex = 7;
             // 
             // label27
@@ -990,7 +990,7 @@
             this.label27.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label27.Location = new System.Drawing.Point(3, 0);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(182, 24);
+            this.label27.Size = new System.Drawing.Size(191, 24);
             this.label27.TabIndex = 0;
             this.label27.Text = "Ежемесячная премия:";
             this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1000,14 +1000,14 @@
             this.numericUpDown5.DecimalPlaces = 2;
             this.numericUpDown5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown5.Enabled = false;
-            this.numericUpDown5.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown5.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown5.Name = "numericUpDown5";
-            this.numericUpDown5.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown5.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown5.TabIndex = 1;
             this.numericUpDown5.ThousandsSeparator = true;
             this.numericUpDown5.ValueChanged += new System.EventHandler(this.numericUpDown5_ValueChanged);
@@ -1016,14 +1016,14 @@
             // 
             this.numericUpDown11.DecimalPlaces = 2;
             this.numericUpDown11.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown11.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown11.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown11.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown11.Name = "numericUpDown11";
-            this.numericUpDown11.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown11.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown11.TabIndex = 2;
             this.numericUpDown11.ThousandsSeparator = true;
             this.numericUpDown11.ValueChanged += new System.EventHandler(this.numericUpDown11_ValueChanged);
@@ -1043,7 +1043,7 @@
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // numericUpDown1
@@ -1058,7 +1058,7 @@
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(151, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(158, 20);
             this.numericUpDown1.TabIndex = 0;
             this.numericUpDown1.ThousandsSeparator = true;
             // 
@@ -1067,14 +1067,14 @@
             this.numericUpDown2.DecimalPlaces = 2;
             this.numericUpDown2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown2.Enabled = false;
-            this.numericUpDown2.Location = new System.Drawing.Point(160, 3);
+            this.numericUpDown2.Location = new System.Drawing.Point(167, 3);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             10000000,
             0,
             0,
             0});
             this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(151, 20);
+            this.numericUpDown2.Size = new System.Drawing.Size(158, 20);
             this.numericUpDown2.TabIndex = 1;
             this.numericUpDown2.ThousandsSeparator = true;
             // 
@@ -1083,14 +1083,14 @@
             this.numericUpDown3.DecimalPlaces = 2;
             this.numericUpDown3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown3.Enabled = false;
-            this.numericUpDown3.Location = new System.Drawing.Point(317, 3);
+            this.numericUpDown3.Location = new System.Drawing.Point(331, 3);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             10000000,
             0,
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(152, 20);
+            this.numericUpDown3.Size = new System.Drawing.Size(160, 20);
             this.numericUpDown3.TabIndex = 2;
             this.numericUpDown3.ThousandsSeparator = true;
             // 
@@ -1108,7 +1108,7 @@
             this.tableLayoutPanel8.Name = "tableLayoutPanel8";
             this.tableLayoutPanel8.RowCount = 1;
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel8.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel8.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel8.TabIndex = 2;
             // 
             // label1
@@ -1117,7 +1117,7 @@
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(151, 24);
+            this.label1.Size = new System.Drawing.Size(158, 24);
             this.label1.TabIndex = 0;
             this.label1.Text = "Оклад:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -1126,9 +1126,9 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Location = new System.Drawing.Point(160, 0);
+            this.label2.Location = new System.Drawing.Point(167, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(151, 24);
+            this.label2.Size = new System.Drawing.Size(158, 24);
             this.label2.TabIndex = 1;
             this.label2.Text = "Ежемесячная премия:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -1137,9 +1137,9 @@
             // 
             this.label20.AutoSize = true;
             this.label20.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label20.Location = new System.Drawing.Point(317, 0);
+            this.label20.Location = new System.Drawing.Point(331, 0);
             this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(152, 24);
+            this.label20.Size = new System.Drawing.Size(160, 24);
             this.label20.TabIndex = 2;
             this.label20.Text = "Сумма:";
             this.label20.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -1158,7 +1158,7 @@
             this.tableLayoutPanel10.Name = "tableLayoutPanel10";
             this.tableLayoutPanel10.RowCount = 1;
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel10.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel10.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel10.TabIndex = 4;
             // 
             // label21
@@ -1167,7 +1167,7 @@
             this.label21.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label21.Location = new System.Drawing.Point(3, 0);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(182, 24);
+            this.label21.Size = new System.Drawing.Size(191, 24);
             this.label21.TabIndex = 0;
             this.label21.Text = "Вид начисления:";
             this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1176,9 +1176,9 @@
             // 
             this.label22.AutoSize = true;
             this.label22.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label22.Location = new System.Drawing.Point(191, 0);
+            this.label22.Location = new System.Drawing.Point(200, 0);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(135, 24);
+            this.label22.Size = new System.Drawing.Size(142, 24);
             this.label22.TabIndex = 1;
             this.label22.Text = "Расчётные значения:";
             this.label22.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1187,9 +1187,9 @@
             // 
             this.label23.AutoSize = true;
             this.label23.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label23.Location = new System.Drawing.Point(332, 0);
+            this.label23.Location = new System.Drawing.Point(348, 0);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(137, 24);
+            this.label23.Size = new System.Drawing.Size(143, 24);
             this.label23.TabIndex = 2;
             this.label23.Text = "Фактические значения:";
             this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1208,7 +1208,7 @@
             this.tableLayoutPanel11.Name = "tableLayoutPanel11";
             this.tableLayoutPanel11.RowCount = 1;
             this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel11.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel11.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel11.TabIndex = 6;
             // 
             // label26
@@ -1217,7 +1217,7 @@
             this.label26.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label26.Location = new System.Drawing.Point(3, 0);
             this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(182, 24);
+            this.label26.Size = new System.Drawing.Size(191, 24);
             this.label26.TabIndex = 0;
             this.label26.Text = "Оклад по часам:";
             this.label26.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1227,14 +1227,14 @@
             this.numericUpDown4.DecimalPlaces = 2;
             this.numericUpDown4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown4.Enabled = false;
-            this.numericUpDown4.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown4.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown4.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown4.Name = "numericUpDown4";
-            this.numericUpDown4.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown4.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown4.TabIndex = 1;
             this.numericUpDown4.ThousandsSeparator = true;
             this.numericUpDown4.ValueChanged += new System.EventHandler(this.numericUpDown4_ValueChanged);
@@ -1243,14 +1243,14 @@
             // 
             this.numericUpDown10.DecimalPlaces = 2;
             this.numericUpDown10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown10.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown10.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown10.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown10.Name = "numericUpDown10";
-            this.numericUpDown10.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown10.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown10.TabIndex = 2;
             this.numericUpDown10.ThousandsSeparator = true;
             this.numericUpDown10.ValueChanged += new System.EventHandler(this.numericUpDown10_ValueChanged);
@@ -1261,7 +1261,7 @@
             this.label24.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label24.Location = new System.Drawing.Point(3, 0);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(472, 20);
+            this.label24.Size = new System.Drawing.Size(494, 20);
             this.label24.TabIndex = 8;
             this.label24.Text = "Заработная плата";
             this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1272,7 +1272,7 @@
             this.label25.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label25.Location = new System.Drawing.Point(3, 80);
             this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(472, 20);
+            this.label25.Size = new System.Drawing.Size(494, 20);
             this.label25.TabIndex = 9;
             this.label25.Text = "Начисления";
             this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1289,7 +1289,7 @@
             this.tableLayoutPanel16.Name = "tableLayoutPanel16";
             this.tableLayoutPanel16.RowCount = 1;
             this.tableLayoutPanel16.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel16.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel16.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel16.TabIndex = 14;
             // 
             // label32
@@ -1298,7 +1298,7 @@
             this.label32.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label32.Location = new System.Drawing.Point(3, 0);
             this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(182, 24);
+            this.label32.Size = new System.Drawing.Size(191, 24);
             this.label32.TabIndex = 0;
             this.label32.Text = "Дополнительные платежи:";
             this.label32.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1307,14 +1307,14 @@
             // 
             this.numericUpDown16.DecimalPlaces = 2;
             this.numericUpDown16.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown16.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown16.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown16.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown16.Name = "numericUpDown16";
-            this.numericUpDown16.Size = new System.Drawing.Size(278, 20);
+            this.numericUpDown16.Size = new System.Drawing.Size(291, 20);
             this.numericUpDown16.TabIndex = 1;
             this.numericUpDown16.ThousandsSeparator = true;
             this.numericUpDown16.ValueChanged += new System.EventHandler(this.numericUpDown16_ValueChanged);
@@ -1325,7 +1325,7 @@
             this.label33.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label33.Location = new System.Drawing.Point(3, 385);
             this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(472, 20);
+            this.label33.Size = new System.Drawing.Size(494, 20);
             this.label33.TabIndex = 15;
             this.label33.Text = "Удержания";
             this.label33.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1344,15 +1344,15 @@
             this.tableLayoutPanel20.Name = "tableLayoutPanel20";
             this.tableLayoutPanel20.RowCount = 1;
             this.tableLayoutPanel20.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel20.Size = new System.Drawing.Size(472, 34);
+            this.tableLayoutPanel20.Size = new System.Drawing.Size(494, 34);
             this.tableLayoutPanel20.TabIndex = 20;
             // 
             // button2
             // 
             this.button2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button2.Location = new System.Drawing.Point(191, 3);
+            this.button2.Location = new System.Drawing.Point(200, 3);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(135, 28);
+            this.button2.Size = new System.Drawing.Size(142, 28);
             this.button2.TabIndex = 0;
             this.button2.Text = "Сохранить";
             this.button2.UseVisualStyleBackColor = true;
@@ -1361,9 +1361,9 @@
             // button3
             // 
             this.button3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button3.Location = new System.Drawing.Point(332, 3);
+            this.button3.Location = new System.Drawing.Point(348, 3);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(137, 28);
+            this.button3.Size = new System.Drawing.Size(143, 28);
             this.button3.TabIndex = 1;
             this.button3.Text = "Отмена";
             this.button3.UseVisualStyleBackColor = true;
@@ -1374,7 +1374,7 @@
             this.button4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.button4.Location = new System.Drawing.Point(3, 3);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(182, 28);
+            this.button4.Size = new System.Drawing.Size(191, 28);
             this.button4.TabIndex = 2;
             this.button4.Text = "Редактировать зарплату";
             this.button4.UseVisualStyleBackColor = true;
@@ -1394,7 +1394,7 @@
             this.tableLayoutPanel21.Name = "tableLayoutPanel21";
             this.tableLayoutPanel21.RowCount = 1;
             this.tableLayoutPanel21.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel21.Size = new System.Drawing.Size(472, 24);
+            this.tableLayoutPanel21.Size = new System.Drawing.Size(494, 24);
             this.tableLayoutPanel21.TabIndex = 21;
             // 
             // label38
@@ -1403,7 +1403,7 @@
             this.label38.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label38.Location = new System.Drawing.Point(3, 0);
             this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(182, 24);
+            this.label38.Size = new System.Drawing.Size(191, 24);
             this.label38.TabIndex = 0;
             this.label38.Text = "Всего начислено:";
             this.label38.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1413,14 +1413,14 @@
             this.numericUpDown22.DecimalPlaces = 2;
             this.numericUpDown22.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown22.Enabled = false;
-            this.numericUpDown22.Location = new System.Drawing.Point(191, 3);
+            this.numericUpDown22.Location = new System.Drawing.Point(200, 3);
             this.numericUpDown22.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown22.Name = "numericUpDown22";
-            this.numericUpDown22.Size = new System.Drawing.Size(135, 20);
+            this.numericUpDown22.Size = new System.Drawing.Size(142, 20);
             this.numericUpDown22.TabIndex = 1;
             this.numericUpDown22.ThousandsSeparator = true;
             this.numericUpDown22.ValueChanged += new System.EventHandler(this.numericUpDown22_ValueChanged);
@@ -1430,14 +1430,14 @@
             this.numericUpDown23.DecimalPlaces = 2;
             this.numericUpDown23.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numericUpDown23.Enabled = false;
-            this.numericUpDown23.Location = new System.Drawing.Point(332, 3);
+            this.numericUpDown23.Location = new System.Drawing.Point(348, 3);
             this.numericUpDown23.Maximum = new decimal(new int[] {
             1000000000,
             0,
             0,
             0});
             this.numericUpDown23.Name = "numericUpDown23";
-            this.numericUpDown23.Size = new System.Drawing.Size(137, 20);
+            this.numericUpDown23.Size = new System.Drawing.Size(143, 20);
             this.numericUpDown23.TabIndex = 2;
             this.numericUpDown23.ThousandsSeparator = true;
             this.numericUpDown23.ValueChanged += new System.EventHandler(this.numericUpDown23_ValueChanged);
@@ -1446,7 +1446,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1010, 638);
+            this.ClientSize = new System.Drawing.Size(1264, 641);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
