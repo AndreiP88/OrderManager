@@ -568,15 +568,10 @@ namespace OrderManager
                     {
                         if (category == await getInfo.GetCategoryMachine(sqlReader["machine"].ToString()) || category == "" || category == "-1")
                         {
-                            //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
-                            GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+                            int typeJob = (int)sqlReader["typeJob"];
 
-                            //int amountThisOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
-                            int amountThisOrder = (int)sqlReader["amountOfOrder"];
-                            int lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
-
-                            if (lastCount < 0)
-                                lastCount = 0;
+                            int amountThisOrder = Convert.ToInt32(sqlReader["amountOfOrder"]);
+                            int lastCount = 0;
 
                             //int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
                             int workTime = (int)sqlReader["timeToWork"];
@@ -584,19 +579,43 @@ namespace OrderManager
                             int timeWorkingOut = 0;
                             int lastTimeWork = 0;
 
-                            if (workTime != 0)
+                            int lastTimeMakeready = 0;
+                            int timeMakeready = 0;
+
+                            if (typeJob == 0)
                             {
-                                orderNorm = amountThisOrder * 60 / workTime;
-                                timeWorkingOut = (int)sqlReader["done"] * 60 / orderNorm;
-                                lastTimeWork = (lastCount * 60) / orderNorm;
+                                //sqlReader["machine"].ToString(), sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()
+                                GetCountOfDone orderCount = new GetCountOfDone(shiftID, (int)sqlReader["orderID"], Convert.ToInt32(sqlReader["counterRepeat"])); // ordersBase.GetValue("counterRepeat").ToString() - раньше этот запрос был
+
+                                lastCount = amountThisOrder - orderCount.OrderCalculate(true, false);
+
+                                if (lastCount < 0)
+                                    lastCount = 0;
+
+                                if (workTime != 0)
+                                {
+                                    orderNorm = amountThisOrder * 60 / workTime;
+
+                                    if (orderNorm > 0)
+                                    {
+                                        timeWorkingOut = Convert.ToInt32(sqlReader["done"]) * 60 / orderNorm;
+                                        lastTimeWork = (lastCount * 60) / orderNorm;
+                                    }
+                                }
+
+                                lastTimeMakeready = LastTimeMakeready(shiftID, Convert.ToInt32(sqlReader["count"]), (int)sqlReader["machine"], (int)sqlReader["orderID"], Convert.ToInt32(sqlReader["counterRepeat"]));
+                                timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
+                            }
+                            else
+                            {
+                                timeWorkingOut = Convert.ToInt32(sqlReader["makereadyConsider"]) * Convert.ToInt32(sqlReader["checkIntoWorkingOut"]) * workTime;
+                                lastTimeWork = workTime;
                             }
 
-                            int lastTimeMakeready = LastTimeMakeready(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"]);
-                            int timeMakeready = timeOperations.DateDifferenceToMinutes(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
                             int timeWork = timeOperations.DateDifferenceToMinutes(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString());
                             int lastTimeWorkForDeviation = 0;
 
-                            int makereadyConsider = getOrders.GetMakereadyConsider(shiftID, (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"], (int)sqlReader["machine"]);
+                            int makereadyConsider = Convert.ToInt32(sqlReader["makereadyConsider"]);//getOrders.GetMakereadyConsider(shiftID, (int)sqlReader["orderID"], Convert.ToInt32(sqlReader["counterRepeat"]), (int)sqlReader["machine"]);
 
                             if (timeWorkingOut > 0)
                             {
@@ -627,10 +646,11 @@ namespace OrderManager
                                 deviation = mkDeviation + ", " + wkDeviation;
                             }*/
 
-                            timeWorkingOut += FullWorkoutTime(shiftID, (int)sqlReader["count"], (int)sqlReader["machine"], (int)sqlReader["orderID"], (int)sqlReader["counterRepeat"],
+                            timeWorkingOut += FullWorkoutTime(shiftID, Convert.ToInt32(sqlReader["count"]), (int)sqlReader["machine"], (int)sqlReader["orderID"], Convert.ToInt32(sqlReader["counterRepeat"]),
                                 sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
 
                             orders.Add(new Order(
+                                typeJob,
                                 Convert.ToInt32(sqlReader["count"]),
                                 (int)sqlReader["orderID"],
                                 sqlReader["machine"].ToString(),
@@ -651,7 +671,7 @@ namespace OrderManager
                                 timeWorkingOut,
                                 mkDeviation,
                                 wkDeviation,
-                                (int)sqlReader["counterRepeat"],
+                                Convert.ToInt32(sqlReader["counterRepeat"]),
                                 sqlReader["note"].ToString(),
                                 sqlReader["privateNote"].ToString()
                                 ));

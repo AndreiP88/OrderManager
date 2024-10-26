@@ -4,6 +4,7 @@ namespace OrderManager
 {
     internal class Order
     {
+        public int TypeJob;
         public int id;
         public int orderIndex;
         public string machineOfOrder;
@@ -24,10 +25,11 @@ namespace OrderManager
         public int counterRepeat;
         public string note;
         public string notePrivate;
-        public Order(int indexOrderInProgress, int orderID, string machine, string number, string modification, string orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
+        public Order(int typeJob, int indexOrderInProgress, int orderID, string machine, string number, string modification, string orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
             int plannedWork, int facticalMakeready, int facticalWork, int countDone, int cNorm,
             int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, int orderCounterRepeat, string orderNote, string orderPrivateNote)
         {
+            this.TypeJob = typeJob;
             this.id = indexOrderInProgress;
             this.orderIndex = orderID;
             this.machineOfOrder = machine;

@@ -601,7 +601,6 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
-
         }
 
         private void UpdateInfoParameter(String machine, String parameter, String value)

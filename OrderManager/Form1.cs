@@ -576,10 +576,22 @@ namespace OrderManager
                                 item.SubItems.Add(ordersCurrentShift[index].numberOfOrder);
                                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder);
                                 item.SubItems.Add(ordersCurrentShift[index].modificationOfOrder);
-                                item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
-                                item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
-                                item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
-                                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+
+                                if (ordersCurrentShift[index].TypeJob == 1)
+                                {
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+                                }
+                                else
+                                {
+                                    item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
+                                    item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
+                                    item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
+                                    item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+                                }
+                                
                                 item.SubItems.Add(facticalTime);
                                 item.SubItems.Add(deviation);
                                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
@@ -1973,7 +1985,12 @@ namespace OrderManager
                             lastTimeToWork = targetTime - wOut;
                             //int targetCount = (lastTimeToWork - mkTime) * norm / 60;
                             //int targetAmount = done + targetCount;
-                            int lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
+                            int lackOfTime = lastTimeToWork;
+
+                            if (norm + mkTime > 0)
+                            {
+                                lackOfTime = lastTimeToWork - (60 * lastCount / norm + mkTime);
+                            }
 
                             if (lastTimeToWork > 0)
                             {
@@ -2040,7 +2057,16 @@ namespace OrderManager
                                     {
                                         //int targetCount = (lastTimeToWork - remainingMakereadyPart) * norm / 60;
                                         //int targetAmount = done + targetCount;
-                                        int lackOfTime = lastTimeToWork - (60 * (remainingLastCount) / norm + remainingMakereadyPart);
+                                        int lackOfTime = 0;//lastTimeToWork - (60 * remainingLastCount / norm + remainingMakereadyPart);
+
+                                        if (norm > 0)
+                                        {
+                                            lackOfTime = lastTimeToWork - (60 * remainingLastCount / norm + remainingMakereadyPart);
+                                        }
+                                        else
+                                        {
+                                            lackOfTime = lastTimeToWork - (remainingMakereadyPart);
+                                        }
 
                                         if (isNotMorePercentOverAmount)
                                         {
@@ -2068,7 +2094,16 @@ namespace OrderManager
                                 }
                                 else
                                 {
-                                    int lackOfTime = lastTimeToWork - (60 * (remainingLastCount) / norm);
+                                    int lackOfTime = 0;//lastTimeToWork - (60 * remainingLastCount / norm + remainingMakereadyPart);
+
+                                    if (norm > 0)
+                                    {
+                                        lackOfTime = lastTimeToWork - (60 * remainingLastCount / norm);
+                                    }
+                                    else
+                                    {
+                                        lackOfTime = lastTimeToWork;
+                                    }
 
                                     if (isNotMorePercentOverAmount)
                                     {
@@ -2496,7 +2531,12 @@ namespace OrderManager
                 }
 
                 int previewCountValue = (int)numericUpDown1.Value;
-                int previewWOutCurrentOrder = previewCountValue * 60 / norm;
+                int previewWOutCurrentOrder = 0;
+
+                if (norm > 0)
+                {
+                    previewWOutCurrentOrder = previewCountValue * 60 / norm;
+                }
 
                 label41.Text = ordersCurrentShift[idLastOrder].numberOfOrder + ": " + ordersCurrentShift[idLastOrder].nameOfOrder;
                 label40.Text = "Текущая выработка: " + timeOperations.MinuteToTimeString(wOut) + " ч.";

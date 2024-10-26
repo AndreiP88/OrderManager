@@ -1,14 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
@@ -55,6 +52,8 @@ namespace OrderManager
         {
             InitializeComponent();
 
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
+
             this.ShiftID = loadShiftID;
             _editOrder = false;
         }
@@ -62,6 +61,8 @@ namespace OrderManager
         public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID)
         {
             InitializeComponent();
+
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
 
             this.ShiftID = loadShiftID;
             this.OrderInProgressID = orderInProgressID;
@@ -92,15 +93,21 @@ namespace OrderManager
 
         class Order
         {
+            public int TypeJob;
             public int IDOrder;
             public string numberOfOrder;
             public string modificationOfOrder;
+            public int CounterRepeat;
+            public int Status;
 
-            public Order(int idOrder, string number, string modification)
+            public Order(int typeJob, int idOrder, string number, string modification, int counterRepeat, int status)
             {
+                TypeJob = typeJob;
                 IDOrder = idOrder;
                 numberOfOrder = number;
                 modificationOfOrder = modification;
+                CounterRepeat = counterRepeat;
+                Status = status;
             }
         }
 
@@ -403,7 +410,7 @@ namespace OrderManager
                             }));
 
                             ordersNumbers?.Clear();
-                            ordersNumbers?.Add(new Order(-1, "", ""));
+                            ordersNumbers?.Add(new Order(-1, -1, "", "", 0, 0));
 
                             ordersIndexes?.Clear();
                             ordersIndexes?.Add(-1);
@@ -436,10 +443,54 @@ namespace OrderManager
                                         sqlReader["nameOfOrder"].ToString() + strModification + " - " + Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0"));
                                     }));
 
-                                    ordersNumbers.Add(new Order((int)sqlReader["count"], sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString()));
+                                    ordersNumbers.Add(new Order(0, (int)sqlReader["count"], sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), (int)sqlReader["counterRepeat"], (int)sqlReader["statusOfOrder"]));
 
                                     ordersIndexes.Add((int)sqlReader["count"]);
                                 }
+                                //Добавить загрузку незавершенных простоев, возможно придется переделать ordersNumbers или ordersIndexes
+
+                                await Connect.CloseAsync();
+                            }
+
+                            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                            {
+                                await Connect.OpenAsync();
+                                MySqlCommand Command = new MySqlCommand
+                                {
+                                    Connection = Connect,
+                                    CommandText = @"SELECT
+	                                                    idletime.id, 
+	                                                    idletime.machine, 
+	                                                    idletime.normTime, 
+	                                                    idletime.checkIntoWorkingOut, 
+	                                                    idletime.`status`, 
+	                                                    idletime.note, 
+	                                                    idletimelist.`name`, 
+	                                                    idletimelist.defaultNormTime, 
+	                                                    idletimelist.defaultCheckIntoWorkingOut
+                                                    FROM
+	                                                    idletime
+	                                                INNER JOIN
+	                                                    idletimelist
+	                                                ON 
+		                                                idletime.idIdletimeList = idletimelist.id 
+                                                    WHERE 
+                                                        idletime.`status` <> 2" + cLine
+                                };
+                                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                                while (await sqlReader.ReadAsync()) // считываем и вносим в комбобокс список заголовков
+                                {
+                                    Invoke(new Action(() =>
+                                    {
+                                        comboBox1.Items.Add("Простой: " + sqlReader["name"].ToString());
+                                    }));
+
+                                    ordersNumbers.Add(new Order(1, (int)sqlReader["id"], sqlReader["name"].ToString(), "", 0, (int)sqlReader["status"]));
+
+                                    ordersIndexes.Add((int)sqlReader["id"]);
+                                }
+                                //Добавить загрузку незавершенных простоев, возможно придется переделать ordersNumbers или ordersIndexes
 
                                 await Connect.CloseAsync();
                             }
@@ -482,32 +533,75 @@ namespace OrderManager
                 ValueOrdersBase getValue = new ValueOrdersBase();
                 GetOrdersFromBase getOrdersInProgressValue = new GetOrdersFromBase();
 
-                int orderIndex = ordersIndexes[comboBox1.SelectedIndex];
+                Order operation = ordersNumbers[comboBox1.SelectedIndex];
+
+                int typeJob = operation.TypeJob;
+                int orderIndex = operation.IDOrder;
+                int counterRepeat = operation.CounterRepeat;
 
                 int machine = await getInfo.GetMachineIDFromName(comboBox3.Text);
-                int counterRepeat = getValue.GetCounterRepeat(orderIndex);
+                int currentOrderID = getInfo.GetCurrentOrderID(machine.ToString());
 
-                ClearAllValue();
+                ClearAllValue();//add ildetime
+                tabControl1.Refresh();
 
-                LoadOrderFromDB(orderIndex);
-                SetVisibleElements(getValue.GetOrderStatus(orderIndex), getInfo.GetCurrentOrderID(machine.ToString()).ToString());
-
-                if (comboBox1.SelectedIndex != 0)
+                if (typeJob == -1)
                 {
-                    LoadCurrentOrderInProgressFromDB(ShiftID, machine, orderIndex, counterRepeat);
+                    tabPage1.Enabled = true;
+                    tabPage2.Enabled = true;
 
-                    //////////////////////////
-                    ///
-                    GetOrdersFromBase getOrders = new GetOrdersFromBase();
-
-                    int orderInProgressID = getOrders.GetOrderInProgressID(ShiftID, orderIndex, counterRepeat, Convert.ToInt32(machine));
-
-                    LoadTypesFromCurrentOrder(orderInProgressID);
-
-                    textBox6.Text = getOrdersInProgressValue.GetNote(ShiftID, orderIndex, counterRepeat, machine);
-
-                    ChangeTheStateOfTheMakereadySwitch(ShiftID, machine, orderIndex, counterRepeat);
+                    if (tabControl1.SelectedIndex == 0)
+                    {
+                        SetVisibleElements(0.ToString(), (-1).ToString());
+                    }
+                    if (tabControl1.SelectedIndex == 1)
+                    {
+                        SetVisibleElementIdleTime(-1, false);
+                    }
                 }
+                else if (typeJob == 0)
+                {
+                    tabControl1.SelectTab(0);
+
+                    tabPage2.Enabled = false;
+                    //tabControl1.TabPages[1].Visible = false;
+                    //tabPage2.Visible = false;
+                    tabPage2.Font = new Font(Font, FontStyle.Regular);
+
+                    LoadOrderFromDB(orderIndex);
+                    SetVisibleElements(operation.Status.ToString(), currentOrderID.ToString());
+                    //SetVisibleElements(getValue.GetOrderStatus(orderIndex), currentOrderID.ToString());
+
+                    if (comboBox1.SelectedIndex != 0)
+                    {
+                        LoadCurrentOrderInProgressFromDB(ShiftID, machine, orderIndex, counterRepeat);
+
+                        GetOrdersFromBase getOrders = new GetOrdersFromBase();
+
+                        int orderInProgressID = getOrders.GetOrderInProgressID(ShiftID, orderIndex, counterRepeat, Convert.ToInt32(machine));
+
+                        LoadTypesFromCurrentOrder(orderInProgressID);
+
+                        textBox6.Text = getOrdersInProgressValue.GetNote(ShiftID, orderIndex, counterRepeat, machine);
+
+                        ChangeTheStateOfTheMakereadySwitch(ShiftID, machine, orderIndex, counterRepeat);
+                    }
+                }
+                else if (typeJob == 1)
+                {
+                    tabControl1.SelectTab(1);
+
+                    tabPage1.Enabled = false;
+
+                    bool isCurrentOdrder = orderIndex == currentOrderID;
+
+                    SetVisibleElementIdleTime(operation.Status, isCurrentOdrder);
+
+                    await LoadIdletimeDetails(orderIndex);
+                    await LoadCurrentIdletimeFromDB(ShiftID, machine, orderIndex);
+                }
+
+                SetEnabledElements(comboBox1.SelectedIndex);
             }
         }
 
@@ -636,7 +730,7 @@ namespace OrderManager
             });
         }
 
-        private async Task LoadCurrentIdletimeFromDB(int shiftID, string machine, int idletimeID)
+        private async Task LoadCurrentIdletimeFromDB(int shiftID, int machine, int idletimeID)
         {
             //timeToWorkStart - начало
             //timeToWorkStop - завершение
@@ -828,8 +922,10 @@ namespace OrderManager
 
                 if (currentIdletimeID != -1)
                 {
-                    await LoadIdletimeDetails(currentIdletimeID);
-                    await LoadCurrentIdletimeFromDB(ShiftID, machine, currentIdletimeID);
+                    int indexIDLETime = ordersNumbers.FindIndex(x => x.TypeJob == 1 && x.IDOrder == currentIdletimeID);
+
+                    comboBox1.SelectedIndex = indexIDLETime;
+                    comboBox1.Enabled = false;
                 }
             }
         }
@@ -1046,7 +1142,65 @@ namespace OrderManager
             }
         }
 
-        
+        private void SetVisibleElementIdleTime(int status, bool isCurrentIdleTime)
+        {
+            button1.Enabled = true;
+            button2.Visible = false;
+            button3.Visible = false;
+            button4.Enabled = true;
+
+            if (status == -1)
+            {
+                button1.Text = "Начать простой";
+
+                idletimeNumericUpDownH.Enabled = true;
+                idletimeNumericUpDownM.Enabled = true;
+                comboBox4.Enabled = true;
+                dateTimePicker5.Visible = true;
+                dateTimePicker6.Visible = false;
+                textBox7.Visible = false;
+                checkBox2.Enabled = true;
+                
+            }
+            else if (status == 0)
+            {
+                button1.Text = "Начать простой";
+
+                idletimeNumericUpDownH.Enabled = false;
+                idletimeNumericUpDownM.Enabled = false;
+                comboBox4.Enabled = false;
+                dateTimePicker5.Visible = true;
+                dateTimePicker6.Visible = false;
+                textBox7.Visible = false;
+                checkBox2.Enabled = false;
+            }
+            else if (status == 1)
+            {
+                button1.Text = "Завершить простой";
+
+                if (isCurrentIdleTime)
+                {
+                    idletimeNumericUpDownH.Enabled = false;
+                    idletimeNumericUpDownM.Enabled = false;
+                    comboBox4.Enabled = false;
+                    dateTimePicker5.Visible = true;
+                    dateTimePicker6.Visible = true;
+                    textBox7.Visible = true;
+                    checkBox2.Enabled = false;
+                }
+            }
+        }
+
+        private string CalculateWorkTime(DateTimePicker firstTime, DateTimePicker secondTime)
+        {
+            string result = String.Empty;
+
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            result = timeOperations.DateDifferent(firstTime.Text, secondTime.Text);
+
+            return result;
+        }
 
         private bool CheckMakereadyNullTime()
         {
@@ -1136,6 +1290,13 @@ namespace OrderManager
             numericUpDown8.Value = 0;
             textBox2.Text = "";
             textBox5.Text = "";
+
+            comboBox4.Text = "";
+            idletimeNumericUpDownH.Value = 0;
+            idletimeNumericUpDownM.Value = 0;
+            checkBox2.Checked = false;
+            textBox7.Text = "";
+            textBox8.Text = "";
         }
 
         private async void AddOrderToDB()
@@ -1828,7 +1989,8 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            string machine = await getInfo.GetMachineFromName(comboBox3.Text);
+            int machineID = await getInfo.GetMachineIDFromName(comboBox3.Text);
+            string machine = machineID.ToString();
             int currentIdletimeID = getInfo.GetCurrentOrderID(machine);
 
             string nameIdletime = comboBox4.Text;
@@ -1843,9 +2005,9 @@ namespace OrderManager
 
             if (currentIdletimeID == -1)
             {
-                int idletimeID = await AddIdletimeToIdletimeDB(idIdlitimeList, normTimeIdletime, checkIntoWorkingOut, 1, note);
-                await AddNewIdletimeToOrdersInProgressBase(ShiftID, machine, _userID, idletimeID, timeStartIdletime, timeStopIdletime, 0, normTimeIdletime);
-                getInfo.UpdateInfo(machine, 1, 0, idletimeID, -1, false);
+                int idletimeID = await AddIdletimeToIdletimeDB(idIdlitimeList, machineID, normTimeIdletime, checkIntoWorkingOut, 1, note);
+                await AddNewIdletimeToOrdersInProgressBase(ShiftID, machine, _userID, idletimeID, timeStartIdletime, timeStopIdletime, 0, 0);
+                getInfo.UpdateInfo(machine, 1, 0, idletimeID, -1, true);
             }
             else
             {
@@ -1930,32 +2092,72 @@ namespace OrderManager
             }
         }
 
-        private async Task<int> AddIdletimeToIdletimeDB(int idIdleTimeList, int normTime, int checkIntoWorkingOut, int status, string note)
+        private async Task<int> AddIdletimeToIdletimeDB(int idIdleTimeList, int machine, int normTime, int checkIntoWorkingOut, int status, string note)
         {
             int result = -1;
 
+            int count = 0;
+
+            int idletimeID = ordersNumbers[comboBox1.SelectedIndex].IDOrder;
+
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
-                string commandText = "INSERT INTO idletime (idIdleTimeList, normTime, checkIntoWorkingOut, status, note) VALUES (@idIdleTimeList, @normTime, @checkIntoWorkingOut, @status, @note); " +
-                    "SELECT LAST_INSERT_ID() 'id';";
-
-                MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                Command.Parameters.AddWithValue("@idIdleTimeList", idIdleTimeList); // присваиваем переменной значение
-                Command.Parameters.AddWithValue("@normTime", normTime);
-                Command.Parameters.AddWithValue("@checkIntoWorkingOut", checkIntoWorkingOut);
-                Command.Parameters.AddWithValue("@status", status);
-                Command.Parameters.AddWithValue("@note", note);
-
-                await Connect.OpenAsync();
-
-                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
-
-                while (await sqlReader.ReadAsync())
+                MySqlCommand Command = new MySqlCommand
                 {
-                    result = Convert.ToInt32(sqlReader["id"]);
+                    Connection = Connect,
+                    CommandText = @"SELECT COUNT(*) FROM idletime WHERE id = @idletimeID"
+                };
+
+                Command.Parameters.AddWithValue("@idletimeID", idletimeID);
+
+                Connect.Open();
+                count = Convert.ToInt32(Command.ExecuteScalar());
+                Connect.Close();
+            }
+
+            if (count == 0)
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    string commandText = "INSERT INTO idletime (idIdleTimeList, machine, normTime, checkIntoWorkingOut, status, note) VALUES (@idIdleTimeList, @machine, @normTime, @checkIntoWorkingOut, @status, @note); " +
+                        "SELECT LAST_INSERT_ID() 'id';";
+
+                    MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@idIdleTimeList", idIdleTimeList); // присваиваем переменной значение
+                    Command.Parameters.AddWithValue("@machine", machine);
+                    Command.Parameters.AddWithValue("@normTime", normTime);
+                    Command.Parameters.AddWithValue("@checkIntoWorkingOut", checkIntoWorkingOut);
+                    Command.Parameters.AddWithValue("@status", status);
+                    Command.Parameters.AddWithValue("@note", note);
+
+                    await Connect.OpenAsync();
+
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                    while (await sqlReader.ReadAsync())
+                    {
+                        result = Convert.ToInt32(sqlReader["id"]);
+                    }
+
+                    await Connect.CloseAsync();
+                }
+            }
+            else
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    string commandText = "UPDATE idletime SET status = '1'" +
+                        "WHERE id = @id";
+
+                    MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                    Command.Parameters.AddWithValue("@id", idletimeID);
+
+                    Connect.Open();
+                    Command.ExecuteNonQuery();
+                    Connect.Close();
                 }
 
-                await Connect.CloseAsync();
+                result = idletimeID;
             }
 
             return result;
@@ -2153,8 +2355,6 @@ namespace OrderManager
                             }
                             Connect.Close();
                         }
-
-                        SetEnabledElements(comboBox1.SelectedIndex);
 
                         reconnectionRequired = false;
                     }
@@ -2848,11 +3048,22 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase orders = new ValueOrdersBase();
 
-            string machine = await getInfo.GetMachineFromName(comboBox3.Text);
+            int machine = await getInfo.GetMachineIDFromName(comboBox3.Text);
 
             int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
-            LoadCurrentOrderInProgressFromDB(ShiftID, Convert.ToInt32(machine), orderIndex, orders.GetCounterRepeat(orderIndex));
+            Order order = ordersNumbers[comboBox1.SelectedIndex];
+            int operationType = order.TypeJob;
+
+
+            if (operationType == 0)
+            {
+                LoadCurrentOrderInProgressFromDB(ShiftID, machine, order.IDOrder, order.CounterRepeat);
+            }
+            else if (operationType == 1)
+            {
+                await LoadCurrentIdletimeFromDB(ShiftID, machine, order.IDOrder);
+            }
         }
 
         private void AddEditCloseOrder_FormClosing(object sender, FormClosingEventArgs e)
@@ -3038,6 +3249,65 @@ namespace OrderManager
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedIndex == 0)
+            {
+                SetVisibleElements(0.ToString(), (-1).ToString());
+            }
+            if (tabControl1.SelectedIndex == 1)
+            {
+                SetVisibleElementIdleTime(-1, false);
+            }
+        }
+
+        private void dateTimePicker6_ValueChanged(object sender, EventArgs e)
+        {
+            textBox7.Text = CalculateWorkTime(dateTimePicker6, dateTimePicker5);
+        }
+
+        private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            e.Cancel = !e.TabPage.Enabled;
+        }
+
+        private void tabControl1_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            Color activeColor, unactiveColor;
+
+            if (comboBox1.SelectedIndex > 0)
+            {
+                activeColor = SystemColors.ControlText;
+                unactiveColor = SystemColors.ControlDark;
+            }
+            else
+            {
+                activeColor = SystemColors.ControlText;
+                unactiveColor = SystemColors.ControlText;
+            }
+
+            e.Graphics.SetClip(e.Bounds);
+            string text = tabControl1.TabPages[e.Index].Text;
+            SizeF sz = e.Graphics.MeasureString(text, e.Font);
+
+            bool bSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+            /*using (SolidBrush b = new SolidBrush(bSelected ? SystemColors.Highlight : SystemColors.Control))
+                e.Graphics.FillRectangle(b, e.Bounds);*/
+
+            using (SolidBrush b = new SolidBrush(bSelected ? activeColor : unactiveColor))
+                e.Graphics.DrawString(text, e.Font, b, e.Bounds.X + 5, e.Bounds.Y + (e.Bounds.Height - sz.Height) / 2);
+
+            if (tabControl1.SelectedIndex == e.Index)
+                e.DrawFocusRectangle();
+
+            e.Graphics.ResetClip();
         }
     }
 

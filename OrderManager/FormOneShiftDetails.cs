@@ -278,10 +278,21 @@ namespace OrderManager
                                 item.SubItems.Add(await getInfo.GetMachineName(ordersCurrentShift[index].machineOfOrder.ToString()));
                                 item.SubItems.Add(ordersCurrentShift[index].numberOfOrder.ToString() + modification);
                                 item.SubItems.Add(ordersCurrentShift[index].nameOfOrder.ToString());
-                                item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
-                                item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
-                                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
-                                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork));
+
+                                if (ordersCurrentShift[index].TypeJob == 0)
+                                {
+                                    item.SubItems.Add(ordersCurrentShift[index].amountOfOrder.ToString("N0"));
+                                    item.SubItems.Add(ordersCurrentShift[index].lastCount.ToString("N0"));
+                                    item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+                                    item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeMakeready) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork));
+                                }
+                                else
+                                {
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].plannedTimeWork));
+                                    item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].facticalTimeWork));
+                                }
                                 //item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation));
                                 item.SubItems.Add(deviation);
                                 item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
