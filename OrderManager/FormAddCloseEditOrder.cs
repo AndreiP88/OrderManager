@@ -112,7 +112,6 @@ namespace OrderManager
         }
 
         List<Order> ordersNumbers = new List<Order>();
-        List<int> ordersIndexes = new List<int>();
 
         bool loadAllOrdersToCurrentMachine = true;
 
@@ -412,9 +411,6 @@ namespace OrderManager
                             ordersNumbers?.Clear();
                             ordersNumbers?.Add(new Order(-1, -1, "", "", 0, 0));
 
-                            ordersIndexes?.Clear();
-                            ordersIndexes?.Add(-1);
-
                             string cLine = "";
 
                             if (loadAllOrdersToCurrentMachine == true)
@@ -444,8 +440,6 @@ namespace OrderManager
                                     }));
 
                                     ordersNumbers.Add(new Order(0, (int)sqlReader["count"], sqlReader["numberOfOrder"].ToString(), sqlReader["modification"].ToString(), (int)sqlReader["counterRepeat"], (int)sqlReader["statusOfOrder"]));
-
-                                    ordersIndexes.Add((int)sqlReader["count"]);
                                 }
                                 //Добавить загрузку незавершенных простоев, возможно придется переделать ordersNumbers или ordersIndexes
 
@@ -487,8 +481,6 @@ namespace OrderManager
                                     }));
 
                                     ordersNumbers.Add(new Order(1, (int)sqlReader["id"], sqlReader["name"].ToString(), "", 0, (int)sqlReader["status"]));
-
-                                    ordersIndexes.Add((int)sqlReader["id"]);
                                 }
                                 //Добавить загрузку незавершенных простоев, возможно придется переделать ordersNumbers или ordersIndexes
 
@@ -881,30 +873,16 @@ namespace OrderManager
 
                 if (currentOrderID != -1)
                 {
-                    int index = 0;
-                    for (int i = 0; i < ordersIndexes.Count; i++)
-                    {
-                        if (ordersIndexes[i] == currentOrderID)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
+                    int index = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == currentOrderID);
+
                     comboBox1.SelectedIndex = index;
                     comboBox1.Enabled = false;
                     //button7.Enabled = false;
                 }
                 else if (lastOrderID != -1)
                 {
-                    int index = 0;
-                    for (int i = 0; i < ordersIndexes.Count; i++)
-                    {
-                        if (ordersIndexes[i] == lastOrderID)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
+                    int index = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == lastOrderID);
+
                     comboBox1.SelectedIndex = index;
                     comboBox1.Enabled = true;
                     //button7.Enabled = false;
@@ -2300,8 +2278,7 @@ namespace OrderManager
             ValueOrdersBase ordersBase = new ValueOrdersBase();
 
             int orderIndex = ordersBase.GetOrderID(machine, number, modification);
-
-            int itemIndex = ordersIndexes.IndexOf(orderIndex);
+            int itemIndex = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == orderIndex);
 
             if (itemIndex != -1)
             {
@@ -2833,7 +2810,7 @@ namespace OrderManager
             }
             else
             {
-                orderIndex = ordersIndexes[comboBox1.SelectedIndex];
+                orderIndex = ordersNumbers[comboBox1.SelectedIndex].IDOrder;
             }
 
             int machine = Convert.ToInt32(await getInfo.GetMachineFromName(comboBox3.Text));
@@ -3253,7 +3230,7 @@ namespace OrderManager
 
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            //LoadDefaultValue();
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
