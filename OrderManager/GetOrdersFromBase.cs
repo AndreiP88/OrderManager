@@ -53,7 +53,7 @@ namespace OrderManager
         {
             int result = -1;
 
-            string value = (string)GetValueFromIndex(orderInProgressID, "typeJob");
+            string value = GetValueFromIndex(orderInProgressID, "typeJob").ToString();
 
             if (Int32.TryParse(value, out int res))
             {
@@ -95,7 +95,7 @@ namespace OrderManager
         {
             int result = -1;
 
-            string value = (string)GetValueFromIndex(orderInProgressID, "makereadyComplete");
+            string value = GetValueFromIndex(orderInProgressID, "makereadyComplete").ToString();
 
             if (Int32.TryParse(value, out int res))
             {
@@ -166,7 +166,12 @@ namespace OrderManager
         /// <returns>Индекс заказа</returns>
         public int GetOrderID(int id)
         {
-            return (int)GetValueFromIndex(id, "orderID");
+            object value = GetValueFromIndex(id, "orderID");
+
+            if (value != null)
+                return (int)value;
+            else
+                return -1;
         }
 
         /// <summary>

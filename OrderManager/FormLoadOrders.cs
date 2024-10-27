@@ -665,6 +665,7 @@ namespace OrderManager
 
             Task task = new Task(() => LoadPlan(cancelTokenSource.Token), cancelTokenSource.Token);
             task.Start();
+            //LoadPlan(cancelTokenSource.Token);
         }
 
         private async void LoadPlan(CancellationToken token)
@@ -751,6 +752,7 @@ namespace OrderManager
                                         WHERE
 	                                        man_planjob.status <> 2 AND
 	                                        man_planjob.flags <> 1 AND
+                                            plan_out_qty IS NOT NULL AND
 	                                        man_planjob.id_equip = @idMachine
                                         ORDER BY
 	                                        man_planjob.date_begin ASC"

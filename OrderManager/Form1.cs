@@ -80,11 +80,20 @@ namespace OrderManager
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            await CheckCurrentShiftActivity();
+            /*await CheckCurrentShiftActivity();
 
             Info.active = false;
             FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
             //FormAddCloseEditOrder form = new FormAddCloseEditOrder(Info.shiftIndex);
+            form.ShowDialog();
+            await LoadOrdersFromBase();
+            Info.active = true;*/
+
+            await CheckCurrentShiftActivity();
+
+            Info.active = false;
+            //FormAddCloseOrder form = new FormAddCloseOrder(Info.shiftIndex, Info.nameOfExecutor);
+            FormAddCloseEditOrder form = new FormAddCloseEditOrder(Info.shiftIndex);
             form.ShowDialog();
             await LoadOrdersFromBase();
             Info.active = true;
@@ -1441,7 +1450,7 @@ namespace OrderManager
                 ValueInfoBase getInfo = new ValueInfoBase();
 
                 Info.active = false;
-                FormAddCloseOrder form;
+                /*FormAddCloseOrder form;
 
                 if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder))
                 {
@@ -1455,7 +1464,22 @@ namespace OrderManager
                         ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
                 }
 
+                form.ShowDialog();*/
+
+                FormAddCloseEditOrder form;
+
+                if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder))
+                {
+                    form = new FormAddCloseEditOrder(Info.shiftIndex);
+                }
+                else
+                {
+                    form = new FormAddCloseEditOrder(Info.shiftIndex, 
+                        ordersCurrentShift[listView1.SelectedIndices[0]].id);
+                }
+
                 form.ShowDialog();
+
                 await LoadOrdersFromBase();
                 Info.active = true;
             }

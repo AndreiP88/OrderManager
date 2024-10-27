@@ -213,11 +213,11 @@ namespace OrderManager
                             switch (_typeJob)
                             {
                                 case 0:
-
-                                    break;
-                                case 1:
                                     await LoadOrderForEdit(OrderInProgressID);
                                     LoadTypesFromCurrentOrder(OrderInProgressID);
+                                    break;
+                                case 1:
+                                    
                                     break;
                                 default:
                                     break;
@@ -1602,7 +1602,7 @@ namespace OrderManager
 
                         UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                         UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
-
+                        
                         if (makereadyPart == makereadyLastPart)
                         {
                             newStatus = "2";
@@ -1637,11 +1637,18 @@ namespace OrderManager
                         else
                         {
                             makereadyPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready);
-
+                            
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
 
-                            newStatus = status;
+                            if (makereadyPart == makereadyLastPart)
+                            {
+                                newStatus = "2";
+                            }
+                            else
+                            {
+                                newStatus = status;
+                            }
                         }
                     }
 
