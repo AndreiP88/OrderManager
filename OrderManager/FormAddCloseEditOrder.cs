@@ -215,6 +215,7 @@ namespace OrderManager
                                 case 0:
                                     await LoadOrderForEdit(OrderInProgressID);
                                     LoadTypesFromCurrentOrder(OrderInProgressID);
+                                    CreateTransparentPannels();
                                     break;
                                 case 1:
                                     
@@ -2651,6 +2652,7 @@ namespace OrderManager
                             button6.Enabled = false;
                         }
 
+                        SetEnabledElements(comboBox1.SelectedIndex);
                         //SetEnabledElements(1);
                         LoadOrderFromDB(orderID);
                         LoadOrderInProgressFromDB(ShiftID, orderID, machineID, counterRepeat);
