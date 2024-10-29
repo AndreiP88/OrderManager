@@ -379,10 +379,10 @@ namespace OrderManager
                                 string commandText;
                                 if (detailsLoad == true)
                                 {
-                                    commandText = "SELECT * FROM ordersInProgress WHERE orderID = '" + orderID + "'";
+                                    commandText = "SELECT * FROM allordersinjob WHERE orderID = '" + orderID + "'";
                                 }
                                 else
-                                    commandText = "SELECT * FROM ordersInProgress WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(machineName) + "'";
+                                    commandText = "SELECT * FROM allordersinjob WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(machineName) + "'";
 
                                 await Connect.OpenAsync();
 
@@ -429,16 +429,16 @@ namespace OrderManager
 
                                         //отображение общего количества тиража не в каждой строке, а только в первой
                                         string amountOrder;
-                                        if (tmpAmountOrder == Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])) && tmpNumberOrders == sqlReader["orderID"].ToString())
+                                        if (tmpAmountOrder == Convert.ToInt32(sqlReader["amountOfOrder"]) && tmpNumberOrders == sqlReader["orderID"].ToString())
                                         {
                                             amountOrder = "";
                                         }
                                         else
                                         {
-                                            amountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"])).ToString("N0");
+                                            amountOrder = Convert.ToInt32(sqlReader["amountOfOrder"]).ToString("N0");
                                         }
 
-                                        string modification = ordersBase.GetOrderModification((int)sqlReader["orderID"]);
+                                        string modification = sqlReader["modification"].ToString();
 
                                         if (modification != "")
                                             modification = " (" + modification + ")";
@@ -448,7 +448,7 @@ namespace OrderManager
 
                                         tmpShiftsID = shiftID;
                                         tmpNumberOrders = sqlReader["orderID"].ToString();
-                                        tmpAmountOrder = Convert.ToInt32(ordersBase.GetAmountOfOrder((int)sqlReader["orderID"]));
+                                        tmpAmountOrder = Convert.ToInt32(sqlReader["amountOfOrder"]);
 
                                         amountAllOrders += Convert.ToInt32(sqlReader["done"]);
 
@@ -458,8 +458,8 @@ namespace OrderManager
                                         item.Text = (index + 1).ToString();
                                         item.SubItems.Add(date);
                                         item.SubItems.Add(name);
-                                        item.SubItems.Add(ordersBase.GetOrderNumber((int)sqlReader["orderID"]) + modification);
-                                        item.SubItems.Add(ordersBase.GetOrderName((int)sqlReader["orderID"]));
+                                        item.SubItems.Add(sqlReader["numberOfOrder"].ToString() + modification);
+                                        item.SubItems.Add(sqlReader["nameOfOrder"].ToString());
                                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString()));
                                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()));
                                         item.SubItems.Add(amountOrder);
