@@ -494,7 +494,7 @@ namespace OrderManager
                                     if (typeLoad == 0)
                                     {
                                         //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         if (statusValue.fullTimeDifferent > 0)
                                         {
@@ -519,7 +519,7 @@ namespace OrderManager
                                     }
                                     else if (typeLoad == 1)
                                     {
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         if (statusValue.fullTimeDifferent > 0)
                                         {
@@ -603,7 +603,16 @@ namespace OrderManager
                                 
                                 item.SubItems.Add(facticalTime);
                                 item.SubItems.Add(deviation);
-                                item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
+
+                                if (ordersCurrentShift[index].TypeJob == 1)
+                                {
+                                    item.SubItems.Add("");
+                                }
+                                else
+                                {
+                                    item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
+                                }
+                                    
                                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
                                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
                                 item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());

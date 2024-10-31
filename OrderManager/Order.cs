@@ -15,6 +15,7 @@ namespace OrderManager
         public int lastCount;
         public int plannedTimeMakeready;
         public int plannedTimeWork;
+        public int Status;
         public int facticalTimeMakeready;
         public int facticalTimeWork;
         public int done;
@@ -26,7 +27,7 @@ namespace OrderManager
         public string note;
         public string notePrivate;
         public Order(int typeJob, int indexOrderInProgress, int orderID, string machine, string number, string modification, string orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
-            int plannedWork, int facticalMakeready, int facticalWork, int countDone, int cNorm,
+            int plannedWork, int status, int facticalMakeready, int facticalWork, int countDone, int cNorm,
             int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, int orderCounterRepeat, string orderNote, string orderPrivateNote)
         {
             this.TypeJob = typeJob;
@@ -40,6 +41,7 @@ namespace OrderManager
             this.lastCount = lastCountOfOrder;
             this.plannedTimeMakeready = plannedMakeready;
             this.plannedTimeWork = plannedWork;
+            this.Status = status;
             this.facticalTimeMakeready = facticalMakeready;
             this.facticalTimeWork = facticalWork;
             this.done = countDone;

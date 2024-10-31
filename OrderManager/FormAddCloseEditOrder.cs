@@ -2965,6 +2965,7 @@ namespace OrderManager
         private async Task LoadIdletimeForEdit(int orderInProgressID)
         {
             ValueOrdersBase getOrder = new ValueOrdersBase();
+            ValueIdletimeBase getIdletime = new ValueIdletimeBase();
             ValueInfoBase getInfo = new ValueInfoBase();
             GetOrdersFromBase ordersFromBase = new GetOrdersFromBase();
 
@@ -2983,7 +2984,7 @@ namespace OrderManager
                         int machineID = ordersFromBase.GetMachineFromOrderInProgressID(orderInProgressID);
 
                         comboBox1.Items.Add("");
-                        comboBox1.Items.Add("Простой: " + getOrder.GetOrderName(orderID));
+                        comboBox1.Items.Add("Простой: " + getIdletime.GetIdletimeName(orderID));
                         comboBox1.SelectedIndex = 1;
                         comboBox1.Enabled = false;
 

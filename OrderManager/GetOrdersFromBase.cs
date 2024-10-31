@@ -580,6 +580,7 @@ namespace OrderManager
 
                             //int workTime = Convert.ToInt32(ordersBase.GetTimeToWork((int)sqlReader["orderID"]));
                             int workTime = (int)sqlReader["timeToWork"];
+                            int status = Convert.ToInt32(sqlReader["status"]);
                             int orderNorm = 0;
                             int timeWorkingOut = 0;
                             int lastTimeWork = 0;
@@ -669,6 +670,7 @@ namespace OrderManager
                                 lastCount,
                                 lastTimeMakeready * makereadyConsider,
                                 lastTimeWork,
+                                status,
                                 timeMakeready,
                                 timeWork,
                                 Convert.ToInt32(sqlReader["done"]),

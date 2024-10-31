@@ -335,6 +335,7 @@
     <Compile Include="SalaryForUser.cs" />
     <Compile Include="TypeInTheOrder.cs" />
     <Compile Include="ValueInfoBase.cs" />
+    <Compile Include="ValueIOrdersBase.cs" />
     <Compile Include="ValueStandardTimeBase .cs" />
     <Compile Include="ValueSalaryPaidBase.cs" />
     <Compile Include="ValueSalaryBase.cs" />
@@ -342,7 +343,7 @@
     <Compile Include="ValueShiftsBase.cs" />
     <Compile Include="ValueTypesBase.cs" />
     <Compile Include="ValueUserBase.cs" />
-    <Compile Include="ValueOrdersBase.cs" />
+    <Compile Include="ValueIdletimeBase.cs" />
     <Compile Include="FormLoadUserForm.cs">
       <SubType>Form</SubType>
     </Compile>
