@@ -438,7 +438,7 @@ namespace OrderManager
                                     if (typeLoad == 0)
                                     {
                                         //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         color = statusValue.color;
 
@@ -454,7 +454,7 @@ namespace OrderManager
                                     }
                                     else if (typeLoad == 1)
                                     {
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         color = statusValue.color;
 
@@ -1779,7 +1779,7 @@ namespace OrderManager
                     typeLoad = false;
                 }
 
-                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad, orderRegistrationType);
+                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad, orderRegistrationType, ordersCurrentShift[idx].TypeJob);
 
                 string statusStr = statusStrings.statusStr;
                 string message = statusStrings.message;

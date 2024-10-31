@@ -172,7 +172,7 @@ namespace OrderManager
                                     if (typeLoad == 0)
                                     {
                                         //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         color = statusValue.color;
 
@@ -188,7 +188,7 @@ namespace OrderManager
                                     }
                                     else if (typeLoad == 1)
                                     {
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         color = statusValue.color;
 
@@ -228,7 +228,7 @@ namespace OrderManager
                                     if (typeLoad == 0)
                                     {
                                         //OrderStatusValue statusValue = GetWorkingOutTimeForSelectedOrder(index, true);
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, true, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         if (statusValue.fullTimeDifferent > 0)
                                         {
@@ -243,7 +243,7 @@ namespace OrderManager
                                     }
                                     else if (typeLoad == 1)
                                     {
-                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType);
+                                        OrderStatusValue statusValue = workingOutTime.GetWorkingOutTimeForSelectedOrder(index, false, orderRegistrationType, ordersCurrentShift[index].TypeJob);
 
                                         if (statusValue.fullTimeDifferent > 0)
                                         {
@@ -295,8 +295,18 @@ namespace OrderManager
                                 }
                                 //item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].mkDeviation) + ", " + timeOperations.MinuteToTimeString(ordersCurrentShift[index].wkDeviation));
                                 item.SubItems.Add(deviation);
-                                item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
-                                item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
+
+                                if (ordersCurrentShift[index].TypeJob == 0)
+                                {
+                                    item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
+                                    item.SubItems.Add(ordersCurrentShift[index].norm.ToString("N0"));
+                                }
+                                else
+                                {
+                                    item.SubItems.Add("");
+                                    item.SubItems.Add("");
+                                }
+
                                 item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
                                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
 
