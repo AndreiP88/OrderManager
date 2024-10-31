@@ -172,6 +172,26 @@ namespace OrderManager
             groupBox4.Controls.Add(panel5);
             panel5.DoubleClick += panel5_DoubleClick;
             panel5.BringToFront();
+
+            TransparentPanel panel6 = new TransparentPanel()
+            {
+                Location = dateTimePicker5.Location,
+                Size = dateTimePicker5.Size,
+            };
+            panel6.Name = "panel6";
+            groupBox10.Controls.Add(panel6);
+            panel6.DoubleClick += panel6_DoubleClick;
+            panel6.BringToFront();
+
+            TransparentPanel panel7 = new TransparentPanel()
+            {
+                Location = dateTimePicker6.Location,
+                Size = dateTimePicker6.Size,
+            };
+            panel7.Name = "panel7";
+            groupBox10.Controls.Add(panel7);
+            panel7.DoubleClick += panel7_DoubleClick;
+            panel7.BringToFront();
         }
 
         private void HideNumericUpDownControls()
@@ -227,6 +247,7 @@ namespace OrderManager
                                 case 1:
                                     tabPage1.Enabled = false;
                                     await LoadIdletimeForEdit(OrderInProgressID);
+                                    CreateTransparentPannels();
                                     break;
                                 default:
                                     tabPage1.Enabled = true;
@@ -832,10 +853,12 @@ namespace OrderManager
 
                                         if (sqlReader["timeToWorkStop"].ToString() != "")
                                         {
+                                            dateTimePicker6.Visible = true;
                                             dateTimePicker6.Text = sqlReader["timeToWorkStop"].ToString();
                                         }
                                         else
                                         {
+                                            dateTimePicker6.Visible = false;
                                             dateTimePicker6.Text = DateTime.Now.ToString();
                                         }
 
@@ -1313,6 +1336,12 @@ namespace OrderManager
                 numericUpDown8.Enabled = true;
                 textBox2.Enabled = true;
                 textBox5.Enabled = true;
+
+                comboBox4.Enabled = true;
+                idletimeNumericUpDownH.Enabled = true;
+                idletimeNumericUpDownM.Enabled = true;
+                checkBox2.Enabled = true;
+
                 button5.Enabled = true;
                 button7.Enabled = true;
             }
@@ -1327,6 +1356,12 @@ namespace OrderManager
                 numericUpDown8.Enabled = false;
                 textBox2.Enabled = false;
                 textBox5.Enabled = false;
+
+                comboBox4.Enabled = false;
+                idletimeNumericUpDownH.Enabled = false;
+                idletimeNumericUpDownM.Enabled = false;
+                checkBox2.Enabled = false;
+
                 button5.Enabled = false;
                 button7.Enabled = false;
             }
@@ -1457,11 +1492,6 @@ namespace OrderManager
         private void AddNewOrderInProgress(string machine, string executor, int typeJob, int shiftID, int orderIndex, string makereadyStart,
             string makereadyStop, string workStart, string workStop, int makereadyConsider, int makereadyPartComplete, string done, int counterRepeat, string note)
         {
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
-
-            //string shiftStartID = shiftsBase.GetIDFromStartShift(shiftStart);
-
             int result = 0;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -1513,26 +1543,6 @@ namespace OrderManager
 
         private void ChangeTheStateOfTheMakereadySwitch(int shiftID, int machineID, int orderID, int counterRepeat)
         {
-            /*
-             - если заказ первый, то активен и включен
-	         - если не первый
-	         -- если добавление
-	         --- если есть время на приладку и сделано 0, то активен и включен
-	         --- ?если нет времени на приладку или сделано больше 0, то неактивен и выключен
-	         -- если уже добавлен (подтверждение/завершение)
-	         --- состоянипеп получать из бд
-
-            1. Проверить есть ли заказ в бд в работе (проверять по orderID, machineID, counterRepeat)
-            1.1. Если нет, то активно и включено
-            1.2. Если есть
-            1.2.1. проверка есть ли для текущей смены
-            1.2.1.1. если нет
-            1.2.1.1.1 то, если есть время на приладку и количество сделанного до == 0, активно и включено
-            1.2.1.2. если да
-            1.2.1.2.1. получить состояние из бд
-
-             */
-
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat, machineID);
             GetLeadTime leadTime = new GetLeadTime(shiftID, machineID, orderID, counterRepeat);
             ValueOrdersBase orders = new ValueOrdersBase();
@@ -2998,20 +3008,19 @@ namespace OrderManager
                         if (ShiftID == Form1.Info.shiftIndex || AdminMode)
                         {
                             button1.Visible = true;
-                            textBox6.Enabled = true;
+                            textBox8.Enabled = true;
+                            textBox7.Visible = true;
 
-                            button6.Enabled = true;
+                            button1.Text = "Подтвердить";
                         }
                         else
                         {
                             button1.Visible = false;
-                            textBox6.Enabled = false;
-
-                            button6.Enabled = false;
+                            textBox8.Enabled = false;
+                            textBox7.Visible = true;
                         }
 
-                        SetEnabledElements(comboBox1.SelectedIndex);//сделать для вкладки простоя
-                        //SetEnabledElements(1);
+                        SetEnabledElements(comboBox1.SelectedIndex);
                         await LoadIdletimeFromDB(orderID);
                         await LoadCurrentIdletimeFromDB(ShiftID, machineID, orderID);
                         //LoadOrderInProgressFromDB(ShiftID, orderID, machineID, counterRepeat);
@@ -3037,6 +3046,21 @@ namespace OrderManager
                 }
             }
             while (reconnectionRequired);
+        }
+
+        private void SaveChangesIdletime(int orderInProgressID)
+        {
+            if (dateTimePicker5.Visible)
+            {
+                UpdateData("timeToWorkStart", orderInProgressID, dateTimePicker5.Text);
+            }
+
+            if (dateTimePicker6.Visible)
+            {
+                UpdateData("timeToWorkStop", orderInProgressID, dateTimePicker6.Text);
+            }
+
+            UpdateData("note", orderInProgressID, textBox8.Text);
         }
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -3143,8 +3167,16 @@ namespace OrderManager
             }
             else if (typeJob == 1)
             {
-                await IdleAction();
-                Close();
+                if ((ShiftID == Form1.Info.shiftIndex && _editOrder) || AdminMode)
+                {
+                    SaveChangesIdletime(OrderInProgressID);
+                    Close();
+                }
+                else
+                {
+                    await IdleAction();
+                    Close();
+                }
             }
             
         }
@@ -3323,6 +3355,18 @@ namespace OrderManager
         private void panel5_DoubleClick(object sender, EventArgs e)
         {
             numericUpDown4.Enabled = true;
+            ((TransparentPanel)sender).Visible = false;
+        }
+
+        private void panel6_DoubleClick(object sender, EventArgs e)
+        {
+            dateTimePicker5.Enabled = true;
+            ((TransparentPanel)sender).Visible = false;
+        }
+
+        private void panel7_DoubleClick(object sender, EventArgs e)
+        {
+            dateTimePicker6.Enabled = true;
             ((TransparentPanel)sender).Visible = false;
         }
 
