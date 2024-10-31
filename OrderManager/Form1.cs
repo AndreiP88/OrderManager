@@ -1698,7 +1698,7 @@ namespace OrderManager
                     typeLoad = false;
                 }
 
-                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad, orderRegistrationType);
+                OrderStatusValue statusStrings = workingOutTime.GetWorkingOutTimeForSelectedOrder(idx, typeLoad, orderRegistrationType, ordersCurrentShift[idx].TypeJob);
 
                 /*string statusStr = GetWorkingOutTimeForSelectedOrder(idx).Item1;
                 string[] caption = GetWorkingOutTimeForSelectedOrder(idx).Item3;
@@ -1719,35 +1719,6 @@ namespace OrderManager
 
                 label29.Text = statusStrings.caption_3;
                 label31.Text = statusStrings.value_3;
-
-                /*if (orderRegistrationType == 0)
-                {
-                    label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
-                    label26.Text = statusStrings.statusStr;
-
-                    label25.Text = statusStrings.caption_1;
-                    label27.Text = statusStrings.value_1;
-
-                    label28.Text = statusStrings.caption_2;
-                    label30.Text = statusStrings.value_2;
-
-                    label29.Text = statusStrings.caption_3;
-                    label31.Text = statusStrings.value_3;
-                }
-                else
-                {
-                    label24.Text = ordersCurrentShift[idx].numberOfOrder + ": " + ordersCurrentShift[idx].nameOfOrder;
-                    label26.Text = "";
-
-                    label25.Text = "";
-                    label27.Text = "";
-
-                    label28.Text = statusStrings.caption_2;
-                    label30.Text = statusStrings.value_2;
-
-                    label29.Text = statusStrings.caption_4;
-                    label31.Text = statusStrings.value_4;
-                }*/
             }
             else
             {

@@ -73,15 +73,6 @@ namespace OrderManager
                             status = loadStatus;
                             break;
                     }
-
-                    /*if (loadStatus == 1 || loadStatus == 2)
-                    {
-                        status = 3;
-                    }
-                    else
-                    {
-                        status = loadStatus;
-                    }*/
                 }
             }
             else
@@ -98,7 +89,6 @@ namespace OrderManager
                         break;
                 }
             }
-            
 
             string shiftStart = shiftsBase.GetStartShiftFromID(shiftID); //get from Info or user base
 
@@ -182,8 +172,8 @@ namespace OrderManager
             {
                 Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
 
-                Console.WriteLine("Номер заказа: " + ordersCurrentShift[indexOrder].numberOfOrder);
-                Console.WriteLine("ID: " + ordersCurrentShift[indexOrder].id + " Status: " + status);
+                Console.WriteLine("Номер заказа: " + ordersCurrentShift[indexOrder].numberOfOrder + " Type: " + typeJob);
+                Console.WriteLine("ID: " + ordersCurrentShift[indexOrder].id + "Load status: " + loadStatus + " Status: " + status);
 
                 Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
                 Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));
@@ -242,7 +232,7 @@ namespace OrderManager
 
             if (status == 3)
             {
-                orderStatus.statusStr = "заказ выполняется";
+                orderStatus.statusStr = "выполняется";
 
                 if (currentLastTimeForFullWork < 0)
                 {
@@ -259,7 +249,7 @@ namespace OrderManager
 
                 if (currentLastTimeForMakeready > 0)
                 {
-                    orderStatus.caption_2 = "Приладка заказа. Осталось: ";
+                    orderStatus.caption_2 = "Приладка. Осталось: ";
                     orderStatus.value_2 = timeOperations.MinuteToTimeString(currentLastTimeForMakeready);
                 }
                 else
@@ -268,10 +258,10 @@ namespace OrderManager
                     orderStatus.value_2 = planedCoutOrder.ToString("N0") + " (" + (doneFromPreviewShifts + planedCoutOrder).ToString("N0") + ")";
                 }
 
-                orderStatus.caption_3 = "Планирумое время завершения заказа: ";
+                orderStatus.caption_3 = "Планирумое время завершения: ";
                 orderStatus.value_3 = timeToEndWork;
 
-                orderStatus.caption_4 = "Планирумое время завершения заказа: ";
+                orderStatus.caption_4 = "Планирумое время завершения: ";
                 orderStatus.value_4 = timeToEndWork;
 
                 orderStatus.message = orderStatus.caption_1 + orderStatus.value_1 + newLine +
@@ -334,7 +324,7 @@ namespace OrderManager
 
             if (status == 4)
             {
-                orderStatus.statusStr = "заказ завершен";
+                orderStatus.statusStr = "завершено";
 
                 if (workTimeDifferent < 0)
                 {
