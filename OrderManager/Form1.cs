@@ -1475,6 +1475,8 @@ namespace OrderManager
 
                 form.ShowDialog();*/
 
+                //проверить активен ли заказ для оборудования, даже если заказ не последний в списке
+
                 FormAddCloseEditOrder form;
 
                 if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder))

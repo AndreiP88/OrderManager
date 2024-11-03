@@ -1540,6 +1540,7 @@ namespace OrderManager
                     for (int j = 0; j < machines.Count; j++)
                     {
                         int orderIndex = Convert.ToInt32(getInfo.GetCurrentOrderID(machines[j]));
+                        int typeJob = getInfo.GetCurrentTypeJob(machines[j]);
 
                         GetLeadTime leadTimeCurr = new GetLeadTime(userBase.GetCurrentShiftStart(users[i]), Convert.ToInt32(machines[j]), orderIndex, getOrder.GetCounterRepeat(orderIndex));
 
@@ -1550,13 +1551,13 @@ namespace OrderManager
                         int currentShiftStart = -1;
                         string order = "";
 
-                        string orderNumCurrent = getOrder.GetOrderNumber(orderIndex);
-
+                        /*string orderNumCurrent = getOrder.GetOrderNumber(orderIndex);
+                        
 
                         if (orderNumCurrent != "-1")
                         {
                             order = orderNumCurrent + ", " + getOrder.GetOrderName(orderIndex);
-                        }
+                        }*/
                             
                         if (j == 0)
                         {
@@ -1579,7 +1580,7 @@ namespace OrderManager
                                                                           v.modificationOfOrder == getInfo.GetCurrentOrderModification(machines[j]) &&
                                                                           v.machineOfOrder == machines[j]);*/
 
-                        int idx = ordersCurrentShift.FindLastIndex((v) => v.orderIndex == orderIndex);
+                        int idx = ordersCurrentShift.FindLastIndex((v) => v.orderIndex == orderIndex && v.TypeJob == typeJob);
 
                         int timeDiff = 0;
 
@@ -1587,6 +1588,8 @@ namespace OrderManager
 
                         if (idx != -1)
                         {
+                            order = ordersCurrentShift[idx].numberOfOrder + ", " + ordersCurrentShift[idx].nameOfOrder;
+
                             int fullLastTime = ordersCurrentShift[idx].plannedTimeMakeready + ordersCurrentShift[idx].plannedTimeWork;
                             int fullFactTime = ordersCurrentShift[idx].facticalTimeMakeready + ordersCurrentShift[idx].facticalTimeWork;
 
@@ -3230,19 +3233,26 @@ namespace OrderManager
             //Завершение смены с вводом всех времени завершения операций дляя каждой машины и количеством выполненной продукции
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueUserBase getUser = new ValueUserBase();
+            GetOrdersFromBase ordersBase = new GetOrdersFromBase();
 
             ListView listV = (ListView)ControlFromKey("tableLayoutPanel1", "listView");
 
             int shiftID = Convert.ToInt32(listV.SelectedItems[0].Name);
             string userId = getUser.GetCurrentUserIDFromShiftStart(shiftID).ToString();
 
-            List<String> machines = await getInfo.GetMachines(userId);
+            List<string> machines = await getInfo.GetMachines(userId);
 
             for (int i = 0; i < machines.Count; i++)
             {
                 if (getInfo.GetActiveOrder(machines[i]))
                 {
-                    FormAddCloseOrder form = new FormAddCloseOrder(shiftID, userId, machines[i]);
+                    int orderID = getInfo.GetCurrentOrderID(machines[i]);
+                    int counterRepeat = getInfo.GetCurrentCounterRepeat(machines[i]);
+
+                    int orderInProgressID = ordersBase.GetOrderInProgressID(shiftID, orderID, counterRepeat, Convert.ToInt32(machines[i]));
+                    //MessageBox.Show("Смена: " + shiftID + " orderID: " + orderID + " orderInProgressID: " + orderInProgressID);
+                    //из-за counterRepeat возврат orderInProgressID = 1
+                    FormAddCloseEditOrder form = new FormAddCloseEditOrder(shiftID, orderInProgressID, false, true);
                     form.ShowDialog();
                 }
             }
@@ -3259,7 +3269,7 @@ namespace OrderManager
 
                 getShift.CloseShift(shiftID, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(userId);
-                userBase.UpdateCurrentShiftStart(userId, "");
+                userBase.UpdateCurrentShiftStart(userId, "-1");
 
                 MessageBox.Show("Смена завершена в " + DateTime.Now.ToString(), "Завершение смены", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }

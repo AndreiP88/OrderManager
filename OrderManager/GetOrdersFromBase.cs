@@ -32,7 +32,7 @@ namespace OrderManager
 
         public int GetOrderInProgressID(int shiftID, int orderIndex, int counterRepeat, int machine)
         {
-            int result = 1;
+            int result = -1;
 
             string value = GetValue("count", shiftID, orderIndex, counterRepeat, machine);
 
@@ -191,7 +191,9 @@ namespace OrderManager
         /// <returns>Индекс оборудования</returns>
         public int GetMachineFromOrderInProgressID(int id)
         {
-            return (int)GetValueFromIndex(id, "machine");
+            int result = GetValueFromIndex(id, "machine") == null ? -1 : (int)GetValueFromIndex(id, "machine");
+
+            return result;
         }
 
         /// <summary>
@@ -270,7 +272,7 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM ordersInProgress WHERE ((shiftID = @shiftID AND machine = @machine) AND (orderID = @id AND counterRepeat = @counterRepeat))"
+                    CommandText = @"SELECT * FROM allordersinjob WHERE ((shiftID = @shiftID AND machine = @machine) AND (orderID = @id AND counterRepeat = @counterRepeat))"
                 };
                 Command.Parameters.AddWithValue("@shiftID", shiftID);
                 Command.Parameters.AddWithValue("@id", orderIndex);

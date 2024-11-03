@@ -439,12 +439,14 @@ namespace OrderManager
             {
                 ValueInfoBase getInfo = new ValueInfoBase();
 
-                FormAddCloseOrder form;
+                /*FormAddCloseOrder form;
 
                 form = new FormAddCloseOrder(adminMode, timeShiftID,
                 ordersCurrentShift[listView1.SelectedIndices[0]].orderIndex,
                 ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder,
-                ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);
+                ordersCurrentShift[listView1.SelectedIndices[0]].counterRepeat);*/
+
+                FormAddCloseEditOrder form = new FormAddCloseEditOrder(timeShiftID, ordersCurrentShift[listView1.SelectedIndices[0]].id, adminMode);
 
                 form.ShowDialog();
                 await LoadOrdersFromBase();

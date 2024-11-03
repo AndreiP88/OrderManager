@@ -70,6 +70,7 @@ namespace OrderManager
 
         }
 
+        //
         public FormAddCloseOrder(int lShiftID, string lNameOfExecutor, string lMachine)
         {
             InitializeComponent();

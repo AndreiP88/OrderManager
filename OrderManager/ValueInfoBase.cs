@@ -152,9 +152,9 @@ namespace OrderManager
             return result;
         }
 
-        public string GetCurrentCounterRepeat(String machine)
+        public int GetCurrentCounterRepeat(string machine)
         {
-            return GetValue("machine", machine, "currentCounterRepeat");
+            return GetIntValue("machine", machine, "currentCounterRepeat");
         }
 
         public int GetLastOrderID(string machine)
@@ -399,6 +399,31 @@ namespace OrderManager
                 while (sqlReader.Read())
                 {
                     result = sqlReader[valueColomn].ToString();
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        private int GetIntValue(string findColomnName, string findParameter, string valueColomn)
+        {
+            int result = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM machinesInfo WHERE " + findColomnName + " = '" + findParameter + "'"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = sqlReader[valueColomn] == DBNull.Value ? -1 : Convert.ToInt32(sqlReader[valueColomn]);
                 }
 
                 Connect.Close();

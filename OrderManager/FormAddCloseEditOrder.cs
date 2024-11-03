@@ -1,11 +1,8 @@
-﻿using libData;
-using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
+﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
@@ -22,15 +19,6 @@ namespace OrderManager
         bool AdminCloseOrder = false;
 
         bool _editOrder;
-
-        /*bool aMode;
-        bool adminCloseOrder;
-        int shiftIndex;
-        string nameOfExecutor;
-        int loadOrderId;
-        string loadMachine;
-        int loadCounterRepeat;*/
-
         int _userID;
         int _orderRegistrationType;
         int _typeJob;
@@ -71,6 +59,21 @@ namespace OrderManager
             this.ShiftID = loadShiftID;
             this.OrderInProgressID = orderInProgressID;
             _editOrder = true;
+        }
+
+        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, bool adminMode = false, bool adminModeClose = false)
+        {
+            InitializeComponent();
+
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
+
+            this.ShiftID = loadShiftID;
+            this.OrderInProgressID = orderInProgressID;
+
+            this.AdminMode = adminMode;
+            this.AdminCloseOrder = adminModeClose;
+
+            _editOrder = false;
         }
 
         /*
@@ -233,6 +236,7 @@ namespace OrderManager
 
                         if (_editOrder)
                         {
+                            //_machineID = getOrders.GetMachineFromOrderInProgressID(OrderInProgressID);
                             _typeJob = getOrders.GetJobType(OrderInProgressID);
                             tabControl1.SelectTab(_typeJob);
 
@@ -264,7 +268,14 @@ namespace OrderManager
 
                             if (comboBox3.Items.Count > 0)
                             {
-                                await SelectLastMachineToComboBox(_userID);
+                                if (AdminCloseOrder)
+                                {
+                                    await SelectMachineToComboBoxForCurrentOrderInProgress(OrderInProgressID);
+                                }
+                                else
+                                {
+                                    await SelectLastMachineToComboBox(_userID);
+                                }
                             }
                         }
 
@@ -586,6 +597,7 @@ namespace OrderManager
                 }
                 else if (typeJob == 0)
                 {
+                    tabPage1.Enabled = true;
                     tabPage2.Enabled = false;
 
                     tabControl1.SelectTab(0);
@@ -612,6 +624,7 @@ namespace OrderManager
                 else if (typeJob == 1)
                 {
                     tabPage1.Enabled = false;
+                    tabPage2.Enabled = true;
 
                     tabControl1.SelectTab(1);
 
@@ -858,7 +871,7 @@ namespace OrderManager
                                         }
                                         else
                                         {
-                                            dateTimePicker6.Visible = false;
+                                            dateTimePicker6.Visible = true;
                                             dateTimePicker6.Text = DateTime.Now.ToString();
                                         }
 
@@ -943,6 +956,24 @@ namespace OrderManager
             {
                 machine = getMachine.GetLastMachineForUser(idUser.ToString());
             }
+
+            string machineName = await getInfo.GetMachineName(machine.ToString());
+            int indexMachineFromComboBobx = comboBox3.Items.IndexOf(machineName);
+
+            if (machine != -1 && indexMachineFromComboBobx != -1)
+                comboBox3.SelectedIndex = indexMachineFromComboBobx;
+            else
+                comboBox3.SelectedIndex = 0;
+        }
+
+        private async Task SelectMachineToComboBoxForCurrentOrderInProgress(int orderInProgressID)
+        {
+            ValueUserBase getMachine = new ValueUserBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            
+            int machine = getOrders.GetMachineFromOrderInProgressID(orderInProgressID);
+            MessageBox.Show("orderInProgressID: " + orderInProgressID + " machine: " + machine);
 
             string machineName = await getInfo.GetMachineName(machine.ToString());
             int indexMachineFromComboBobx = comboBox3.Items.IndexOf(machineName);
