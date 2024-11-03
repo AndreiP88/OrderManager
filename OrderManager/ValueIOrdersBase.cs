@@ -102,19 +102,38 @@ namespace OrderManager
 
         public string GetOrderStatusName(int index)
         {
-            String result = "";
-            String status = GetValueFromIndex(index, "statusOfOrder");
+            string status = GetValueFromIndex(index, "statusOfOrder");
 
-            if (status == "0")
-                result = "Заказ не выполняется";
-            if (status == "1")
-                result = "Выполняется приладка";
-            if (status == "2")
-                result = "Приладка завершена";
-            if (status == "3")
-                result = "Заказ в работе";
-            if (status == "4")
-                result = "Заказ завершен";
+            string result = GetOrderStatusNameFromStatusIndex(Convert.ToInt32(status));
+
+            return result;
+        }
+
+        public string GetOrderStatusNameFromStatusIndex(int status)
+        {
+            string result;
+
+            switch (status)
+            {
+                case 0:
+                    result = "Заказ не выполняется";
+                    break;
+                case 1:
+                    result = "Выполняется приладка";
+                    break;
+                case 2:
+                    result = "Приладка завершена";
+                    break;
+                case 3:
+                    result = "Заказ в работе";
+                    break;
+                case 4:
+                    result = "Заказ завершен";
+                    break;
+                default:
+                    result = "";
+                    break;
+            }
 
             return result;
         }

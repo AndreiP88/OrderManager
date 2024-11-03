@@ -62,21 +62,24 @@ namespace OrderManager
             SetValue(index, "counterRepeat", newCounterRepaeat);
         }
 
-        public string GetOrderStatusName(int index)
+        public string GetIdletimeStatusName(int status)
         {
-            String result = "";
-            String status = GetValueFromIndex(index, "statusOfOrder");
+            string result = "";
 
-            if (status == "0")
-                result = "Заказ не выполняется";
-            if (status == "1")
-                result = "Выполняется приладка";
-            if (status == "2")
-                result = "Приладка завершена";
-            if (status == "3")
-                result = "Заказ в работе";
-            if (status == "4")
-                result = "Заказ завершен";
+            switch (status)
+            {
+                case 0:
+                    result = "Простой не активен";
+                    break;
+                case 1:
+                    result = "Простой активен"; 
+                    break;
+                case 2:
+                    result = "Простой завершен"; 
+                    break;
+                default: 
+                    break;
+            }
 
             return result;
         }

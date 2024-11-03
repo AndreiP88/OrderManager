@@ -1061,6 +1061,7 @@ namespace OrderManager
             await Task.Run(async () =>
             {
                 ValueInfoBase getInfo = new ValueInfoBase();
+                ValueIdletimeBase getIdletime = new ValueIdletimeBase();
                 ValueOrdersBase getOrder = new ValueOrdersBase();
 
                 bool reconnectionRequired = false;
@@ -1084,19 +1085,36 @@ namespace OrderManager
                             {
                                 foreach (string machine in machines)
                                 {
-                                    int currentOrderID = Convert.ToInt32(getInfo.GetCurrentOrderID(machine));
+                                    int currentOrderID = getInfo.GetCurrentOrderID(machine);
+                                    int currentTypeJob = getInfo.GetCurrentTypeJob(machine);
+
+                                    int idx = ordersCurrentShift.FindIndex(x => x.TypeJob == currentTypeJob && x.orderIndex == currentOrderID);
 
                                     string order = "";
-                                    if (currentOrderID != -1)
+                                    int status = -1;
+
+                                    if (idx != -1)
                                     {
-                                        order = getOrder.GetOrderNumber(currentOrderID) + ", " + getOrder.GetOrderName(currentOrderID);
+                                        order = ordersCurrentShift[idx].numberOfOrder + ", " + ordersCurrentShift[idx].nameOfOrder;
+                                        status = ordersCurrentShift[idx].Status;
+                                    }
+
+                                    string statusName = "";
+
+                                    if (currentTypeJob == 0)
+                                    {
+                                        statusName = getOrder.GetOrderStatusNameFromStatusIndex(status);
+                                    }
+                                    else if (currentTypeJob == 1)
+                                    {
+                                        statusName = getIdletime.GetIdletimeStatusName(status);
                                     }
 
                                     ListViewItem item = new ListViewItem();
 
                                     item.Name = machine;
                                     item.Text = await getInfo.GetMachineName(machine);
-                                    item.SubItems.Add(getOrder.GetOrderStatusName(currentOrderID));
+                                    item.SubItems.Add(statusName);
                                     item.SubItems.Add(order);
 
                                     Invoke(new Action(() =>
