@@ -2096,6 +2096,7 @@ namespace OrderManager
         private async Task IdleAction()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
+            ValueUserBase userBase = new ValueUserBase();
 
             int machineID = await getInfo.GetMachineIDFromName(comboBox3.Text);
             string machine = machineID.ToString();
@@ -2108,6 +2109,8 @@ namespace OrderManager
 
             string timeStartIdletime = dateTimePicker5.Text;
             string timeStopIdletime = "";
+
+            userBase.UpdateLastMachine(_userID.ToString(), await getInfo.GetMachineFromName(comboBox3.Text));
 
             int idIdlitimeList = await AddIdletimeToIdletimeListDB(nameIdletime, normTimeIdletime, checkIntoWorkingOut);
 
