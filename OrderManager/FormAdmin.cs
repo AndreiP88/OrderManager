@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OrderManager.Form1;
 
 namespace OrderManager
 {
@@ -3263,13 +3264,33 @@ namespace OrderManager
             }
             else
             {
-                ValueUserBase userBase = new ValueUserBase();
+                FormCloseShift form = new FormCloseShift();
+                form.ShowDialog();
+                bool result = form.ShiftVal;
+
+                if (result)
+                {
+                    ValueUserBase userBase = new ValueUserBase();
+                    ValueInfoBase infoBase = new ValueInfoBase();
+                    ValueShiftsBase getShift = new ValueShiftsBase();
+
+                    getShift.CloseShift(shiftID, DateTime.Now.ToString());
+                    infoBase.CompleteTheShift(userId);
+                    userBase.UpdateCurrentShiftStart(userId, "-1");
+                    getShift.SetNoteShift(shiftID, form.NoteVal);
+                    getShift.SetCheckFullShift(shiftID, form.FullShiftVal);
+                    getShift.SetCheckOvertimeShift(shiftID, form.OvertimeShiftVal);
+                }
+
+
+
+                /*ValueUserBase userBase = new ValueUserBase();
                 ValueInfoBase infoBase = new ValueInfoBase();
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
                 getShift.CloseShift(shiftID, DateTime.Now.ToString());
                 infoBase.CompleteTheShift(userId);
-                userBase.UpdateCurrentShiftStart(userId, "-1");
+                userBase.UpdateCurrentShiftStart(userId, "-1");*/
 
                 MessageBox.Show("Смена завершена в " + DateTime.Now.ToString(), "Завершение смены", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
