@@ -1511,28 +1511,28 @@ namespace OrderManager
             // planToolStripMenuItem
             // 
             this.planToolStripMenuItem.Name = "planToolStripMenuItem";
-            this.planToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.planToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.planToolStripMenuItem.Text = "Просмотр плана";
             this.planToolStripMenuItem.Click += new System.EventHandler(this.planToolStripMenuItem_Click);
             // 
             // viewAllOrdersToolStripMenuItem
             // 
             this.viewAllOrdersToolStripMenuItem.Name = "viewAllOrdersToolStripMenuItem";
-            this.viewAllOrdersToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.viewAllOrdersToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.viewAllOrdersToolStripMenuItem.Text = "Просмотр всех заказов";
             this.viewAllOrdersToolStripMenuItem.Click += new System.EventHandler(this.просмотрВсехЗаказовToolStripMenuItem_Click);
             // 
             // viewOperationsToolStripMenuItem
             // 
             this.viewOperationsToolStripMenuItem.Name = "viewOperationsToolStripMenuItem";
-            this.viewOperationsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.viewOperationsToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.viewOperationsToolStripMenuItem.Text = "Просмотр операций";
             this.viewOperationsToolStripMenuItem.Click += new System.EventHandler(this.просмотрОперацийToolStripMenuItem_Click);
             // 
             // normToolStripMenuItem
             // 
             this.normToolStripMenuItem.Name = "normToolStripMenuItem";
-            this.normToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.normToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.normToolStripMenuItem.Text = "Нормы";
             this.normToolStripMenuItem.Click += new System.EventHandler(this.normToolStripMenuItem_Click);
             // 
@@ -1615,7 +1615,7 @@ namespace OrderManager
             this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
             this.toolStripDropDownButton3.ShowDropDownArrow = false;
-            this.toolStripDropDownButton3.Size = new System.Drawing.Size(62, 22);
+            this.toolStripDropDownButton3.Size = new System.Drawing.Size(61, 22);
             this.toolStripDropDownButton3.Text = "Выход";
             // 
             // exitToolStripMenuItem

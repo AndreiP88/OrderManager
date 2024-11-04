@@ -18,11 +18,11 @@ namespace OrderManager
         bool AdminMode = false;
         bool AdminCloseOrder = false;
 
-        bool _editOrder;
-        int _machine;
-        int _userID;
-        int _orderRegistrationType;
-        int _typeJob;
+        bool _editOrder = false;
+        int _machine = -1;
+        int _userID = -1;
+        int _orderRegistrationType = -1;
+        int _typeJob = -1;
 
         public class TransparentPanel : Panel
         {
@@ -295,6 +295,7 @@ namespace OrderManager
                                     if (_machine == -1)
                                     {
                                         await SelectLastMachineToComboBox(_userID);
+                                        comboBox3.Enabled = true;
                                     }
                                     else
                                     {
