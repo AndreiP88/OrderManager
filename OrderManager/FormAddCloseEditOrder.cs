@@ -73,7 +73,15 @@ namespace OrderManager
             this.AdminMode = adminMode;
             this.AdminCloseOrder = adminModeClose;
 
-            _editOrder = false;
+            if (adminModeClose)
+            {
+                _editOrder = false;
+            }
+            else
+            {
+                _editOrder = true;
+            }
+            
         }
 
         /*
@@ -973,7 +981,6 @@ namespace OrderManager
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
             
             int machine = getOrders.GetMachineFromOrderInProgressID(orderInProgressID);
-            MessageBox.Show("orderInProgressID: " + orderInProgressID + " machine: " + machine);
 
             string machineName = await getInfo.GetMachineName(machine.ToString());
             int indexMachineFromComboBobx = comboBox3.Items.IndexOf(machineName);
