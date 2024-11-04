@@ -19,6 +19,7 @@ namespace OrderManager
         bool AdminCloseOrder = false;
 
         bool _editOrder;
+        int _machine;
         int _userID;
         int _orderRegistrationType;
         int _typeJob;
@@ -50,7 +51,7 @@ namespace OrderManager
             _editOrder = false;
         }
 
-        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID)
+        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, int activeMachine = -1)
         {
             InitializeComponent();
 
@@ -58,7 +59,16 @@ namespace OrderManager
 
             this.ShiftID = loadShiftID;
             this.OrderInProgressID = orderInProgressID;
-            _editOrder = true;
+
+            if (activeMachine == -1)
+            {
+                _editOrder = true;
+            }
+            else
+            {
+                _editOrder = false;
+                _machine = activeMachine;
+            }
         }
 
         public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, bool adminMode = false, bool adminModeClose = false)
@@ -282,7 +292,15 @@ namespace OrderManager
                                 }
                                 else
                                 {
-                                    await SelectLastMachineToComboBox(_userID);
+                                    if (_machine == -1)
+                                    {
+                                        await SelectLastMachineToComboBox(_userID);
+                                    }
+                                    else
+                                    {
+                                        await SelectMachineToComboBoxFromMachineID(_machine);
+                                        comboBox3.Enabled = false;
+                                    }
                                 }
                             }
                         }
@@ -981,6 +999,15 @@ namespace OrderManager
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
             
             int machine = getOrders.GetMachineFromOrderInProgressID(orderInProgressID);
+
+            await SelectMachineToComboBoxFromMachineID(machine);
+        }
+
+        private async Task SelectMachineToComboBoxFromMachineID(int machine)
+        {
+            ValueUserBase getMachine = new ValueUserBase();
+            ValueInfoBase getInfo = new ValueInfoBase();
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
 
             string machineName = await getInfo.GetMachineName(machine.ToString());
             int indexMachineFromComboBobx = comboBox3.Items.IndexOf(machineName);

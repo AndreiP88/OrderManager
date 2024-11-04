@@ -1495,16 +1495,25 @@ namespace OrderManager
 
                 //проверить активен ли заказ для оборудования, даже если заказ не последний в списке
 
+                int idx = listView1.SelectedIndices[0];
+
+                ValueInfoBase infoBase = new ValueInfoBase();
+
+                string machine = ordersCurrentShift[idx].machineOfOrder;
+
+                int currentTypeJob = infoBase.GetCurrentTypeJob(machine);
+                int currentOrderID = infoBase.GetCurrentOrderID(machine);
+
                 FormAddCloseEditOrder form;
 
-                if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder))
+                //if (listView1.SelectedIndices[0] == listView1.Items.Count - 1 && getInfo.GetActiveOrder(ordersCurrentShift[listView1.SelectedIndices[0]].machineOfOrder))
+                if (currentTypeJob == ordersCurrentShift[idx].TypeJob && currentOrderID == ordersCurrentShift[idx].orderIndex)
                 {
-                    form = new FormAddCloseEditOrder(Info.shiftIndex);
+                    form = new FormAddCloseEditOrder(Info.shiftIndex, ordersCurrentShift[idx].id, Convert.ToInt32(ordersCurrentShift[idx].machineOfOrder));
                 }
                 else
                 {
-                    form = new FormAddCloseEditOrder(Info.shiftIndex, 
-                        ordersCurrentShift[listView1.SelectedIndices[0]].id);
+                    form = new FormAddCloseEditOrder(Info.shiftIndex, ordersCurrentShift[idx].id, -1);
                 }
 
                 form.ShowDialog();
