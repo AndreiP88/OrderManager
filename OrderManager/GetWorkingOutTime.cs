@@ -42,7 +42,6 @@ namespace OrderManager
         public OrderStatusValue GetWorkingOutTimeForSelectedOrder(int indexOrder, bool plannedWorkingOut, int orderRegistrationType, int typeJob = 0)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
-            ValueOrdersBase valueOrders = new ValueOrdersBase();
             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
             ValueInfoBase infoBase = new ValueInfoBase();
@@ -56,6 +55,8 @@ namespace OrderManager
             //string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
             int loadStatus = ordersCurrentShift[indexOrder].Status;
             int status = loadStatus;
+
+            int chevkIntoWorkingOutIdletime = 1;
 
             if (typeJob == 0)
             {
@@ -77,6 +78,10 @@ namespace OrderManager
             }
             else
             {
+                ValueIdletimeBase valueIdletime = new ValueIdletimeBase();
+
+                chevkIntoWorkingOutIdletime = valueIdletime.GetIdletimeCheckIntoWorkingOut(ordersCurrentShift[indexOrder].orderIndex);
+
                 switch (loadStatus)
                 {
                     case 1:
@@ -139,7 +144,7 @@ namespace OrderManager
             }
 
             int currentLastTimeForMakeready = timeOperations.MinuteDifference(lastTimeForMK, currentLead, false); //остаток времеи на приладку только положительные
-            int currentLastTimeForFullWork = timeOperations.MinuteDifference(fullTimeForWork, currentLead, false); //остаток времеи на выполнение заказа только положительные
+            int currentLastTimeForFullWork = timeOperations.MinuteDifference(fullTimeForWork * chevkIntoWorkingOutIdletime, currentLead, false); //остаток времеи на выполнение заказа только положительные
 
             int timeForWork = timeOperations.MinuteDifference(currentLead, lastTimeForMK, true); //время выполнения закзаза (без приладки) > 0
 
