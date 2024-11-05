@@ -2520,6 +2520,24 @@ namespace OrderManager
             }*/
         }
 
+        private void CalculatePreviewFromEnteredValue(int typeCalculateIndex)
+        {
+            switch (typeCalculateIndex)
+            {
+                case 0:
+                    UpdatePreviewWorkingOut();
+                    break;
+                case 2:
+                    UpdatePreviewQuantityCalculationByTime(true);
+                    break;
+                case 6:
+                    UpdatePreviewQuantityCalculationByTime();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private async void UpdatePreviewWorkingOut()
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
@@ -2785,7 +2803,7 @@ namespace OrderManager
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            UpdatePreviewCalculate(comboBox8.SelectedIndex);
+            CalculatePreviewFromEnteredValue(comboBox8.SelectedIndex);
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -2828,7 +2846,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                UpdatePreviewCalculate(comboBox8.SelectedIndex);
+                CalculatePreviewFromEnteredValue(comboBox8.SelectedIndex);
             }
         }
 
@@ -2836,7 +2854,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                UpdatePreviewCalculate(comboBox8.SelectedIndex);
+                CalculatePreviewFromEnteredValue(comboBox8.SelectedIndex);
             }
         }
 
@@ -2844,7 +2862,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                UpdatePreviewCalculate(comboBox8.SelectedIndex);
+                CalculatePreviewFromEnteredValue(comboBox8.SelectedIndex);
             }
         }
 
