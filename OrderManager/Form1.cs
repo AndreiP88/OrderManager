@@ -2340,7 +2340,7 @@ namespace OrderManager
 
             if (comboBox5.SelectedIndex == selectedIndexPreviewWOut2)
             {
-                UpdatePreviewCalculate(comboBox8.SelectedIndex);
+                UpdatePreview();
             }
             else
             {
@@ -2357,15 +2357,15 @@ namespace OrderManager
         {
             selectedIndexWOut2 = comboBox5.SelectedIndex;
 
-            UpdatePreviewCalculate(comboBox8.SelectedIndex);
+            UpdatePreview();
         }
 
         private void comboBox8_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdatePreviewCalculate(comboBox8.SelectedIndex);
+            UpdatePreview();
         }
 
-        private void UpdatePreviewCalculate(int typeCalculateIndex)
+        private void UpdatePreviewCalculateForOrderInWork(int typeCalculateIndex)
         {
             switch (typeCalculateIndex)
             {
@@ -2535,6 +2535,88 @@ namespace OrderManager
                     break;
                 default:
                     break;
+            }
+        }
+
+        private async void UpdatePreview()
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            ValueInfoBase infoBase = new ValueInfoBase();
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
+
+            int wOut, wOutAllOrders;
+            //int norm;
+            int idLastOrder = await GetIDLastOrderFromSelectedMachine(comboBox5.Text);
+            string machine = await infoBase.GetMachineFromName(comboBox5.Text);
+
+            bool activeOrderFromMachine = infoBase.GetActiveOrder(machine);
+
+            label40.Text = "";
+            label41.Text = "";
+            label43.Text = "";
+            label44.Text = "";
+
+            if (idLastOrder >= 0)
+            {
+                Order order = ordersCurrentShift[idLastOrder];
+
+                if (comboBox4.SelectedIndex == 0)
+                {
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, "", false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, "");
+                }
+                else
+                {
+                    wOut = CountWorkingOutOrders(ordersCurrentShift.Count, machine, false);
+                    wOutAllOrders = CountWorkingOutOrders(ordersCurrentShift.Count, machine);
+                }
+
+                label41.Text = order.numberOfOrder + ": " + order.nameOfOrder;
+                label40.Text = "Текущая выработка: " + timeOperations.MinuteToTimeString(wOut) + " ч.";
+
+                int typeJob = order.TypeJob;
+
+                if (typeJob == 0)
+                {
+                    tableLayoutPanel10.ColumnStyles[0].Width = 60;
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[2].Width = 1;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[4].Width = 39;
+                    tableLayoutPanel10.ColumnStyles[5].Width = 1;
+
+                    UpdatePreviewCalculateForOrderInWork(comboBox8.SelectedIndex);
+                }
+                else
+                {
+                    tableLayoutPanel10.ColumnStyles[0].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[1].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[2].Width = 1;
+                    tableLayoutPanel10.ColumnStyles[3].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[4].Width = 0;
+                    tableLayoutPanel10.ColumnStyles[5].Width = 100;
+
+                    ValueIdletimeBase valueIdletime = new ValueIdletimeBase();
+
+                    int checkIntoWorkingOut = valueIdletime.GetIdletimeCheckIntoWorkingOut(order.orderIndex);
+
+                    if (checkIntoWorkingOut == 1)
+                    {
+                        label45.Text = "Время простоя будет учтено в общей выработке после завершения";
+                    }
+                    else
+                    {
+                        label45.Text = "Время простоя не будет учтено в общей выработке";
+                    }
+
+                    int previewWOut = order.plannedTimeWork * checkIntoWorkingOut + wOut;
+
+
+                    label42.Text = "Выработка:";
+                    label43.Text = timeOperations.MinuteToTimeString(previewWOut) + " ч.";
+                    label44.Text = getPercent.PercentString(previewWOut);
+                }
             }
         }
 

@@ -17,18 +17,6 @@ namespace OrderManager
         }
 
         /// <summary>
-        /// Получить индекс заказа в базе по номеру, модификации и оборудованию
-        /// </summary>
-        /// <param name="currentMachine"></param>
-        /// <param name="orderNumber"></param>
-        /// <param name="orderModification"></param>
-        /// <returns></returns>
-        public int GetOrderID(string currentMachine, string orderNumber, string orderModification)
-        {
-            return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, "count"));
-        }
-
-        /// <summary>
         /// Получить статус заказа по индексу
         /// </summary>
         /// <param name="index"></param>
@@ -36,9 +24,9 @@ namespace OrderManager
         public string GetOrderStatus(int index)
         {
             string result = "0";
-            string value = GetValueFromIndex(index, "statusOfOrder");
+            string value = (string)GetValueFromIndex(index, "status");
 
-            if (value != "-1")
+            if (value != null)
             {
                 result = value;
             }
@@ -52,10 +40,14 @@ namespace OrderManager
         /// <returns></returns>
         public string GetIdletimeName(int index)
         {
-            return GetValueFromIndex(index, "name");
+            return (string)GetValueFromIndex(index, "name");
         }
 
-        
+
+        public int GetIdletimeCheckIntoWorkingOut(int index)
+        {
+            return Convert.ToInt32(GetValueFromIndex(index, "checkIntoWorkingOut"));
+        }
 
         public void SetNewCounterRepeat(int index, string newCounterRepaeat)
         {
@@ -113,9 +105,9 @@ namespace OrderManager
             return result;
         }
 
-        private String GetValueFromIndex(int index, String nameOfColomn)
+        private object GetValueFromIndex(int index, String nameOfColomn)
         {
-            string result = "-1";
+            object result = null;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

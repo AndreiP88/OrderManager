@@ -168,6 +168,7 @@ namespace OrderManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.label45 = new System.Windows.Forms.Label();
             this.numericUpDown6 = new OrderManager.FormattedNumericUpDown();
             this.numericUpDown5 = new OrderManager.FormattedNumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
@@ -854,16 +855,18 @@ namespace OrderManager
             // 
             // tableLayoutPanel10
             // 
-            this.tableLayoutPanel10.ColumnCount = 5;
-            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this.tableLayoutPanel10.ColumnCount = 6;
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 59.5F));
             this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 1F));
             this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 39.5F));
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1F));
             this.tableLayoutPanel10.Controls.Add(this.panel1, 0, 0);
             this.tableLayoutPanel10.Controls.Add(this.comboBox8, 0, 0);
             this.tableLayoutPanel10.Controls.Add(this.button2, 4, 0);
             this.tableLayoutPanel10.Controls.Add(this.numericUpDown1, 3, 0);
+            this.tableLayoutPanel10.Controls.Add(this.label45, 5, 0);
             this.tableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel10.Location = new System.Drawing.Point(273, 3);
             this.tableLayoutPanel10.Name = "tableLayoutPanel10";
@@ -878,7 +881,7 @@ namespace OrderManager
             this.panel1.Controls.Add(this.numericUpDown6);
             this.panel1.Controls.Add(this.numericUpDown5);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(118, 3);
+            this.panel1.Location = new System.Drawing.Point(117, 3);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(94, 22);
             this.panel1.TabIndex = 4;
@@ -912,16 +915,16 @@ namespace OrderManager
             "- 12:00, премия 20%"});
             this.comboBox8.Location = new System.Drawing.Point(3, 3);
             this.comboBox8.Name = "comboBox8";
-            this.comboBox8.Size = new System.Drawing.Size(109, 21);
+            this.comboBox8.Size = new System.Drawing.Size(108, 21);
             this.comboBox8.TabIndex = 3;
             this.comboBox8.SelectedIndexChanged += new System.EventHandler(this.comboBox8_SelectedIndexChanged);
             // 
             // button2
             // 
             this.button2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button2.Location = new System.Drawing.Point(319, 3);
+            this.button2.Location = new System.Drawing.Point(318, 3);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(72, 22);
+            this.button2.Size = new System.Drawing.Size(70, 22);
             this.button2.TabIndex = 1;
             this.button2.Text = "Рассчитать";
             this.button2.UseVisualStyleBackColor = true;
@@ -930,7 +933,7 @@ namespace OrderManager
             // numericUpDown1
             // 
             this.numericUpDown1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numericUpDown1.Location = new System.Drawing.Point(219, 3);
+            this.numericUpDown1.Location = new System.Drawing.Point(218, 3);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             999999999,
             0,
@@ -1683,6 +1686,17 @@ namespace OrderManager
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(31, 17);
             this.toolStripStatusLabel5.Text = "base";
             // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label45.Location = new System.Drawing.Point(394, 0);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(1, 28);
+            this.label45.TabIndex = 5;
+            this.label45.Text = "Выработка простоя";
+            this.label45.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // numericUpDown6
             // 
             this.numericUpDown6.Format = "00";
@@ -1749,6 +1763,7 @@ namespace OrderManager
             this.tableLayoutPanel8.PerformLayout();
             this.tableLayoutPanel9.ResumeLayout(false);
             this.tableLayoutPanel10.ResumeLayout(false);
+            this.tableLayoutPanel10.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
@@ -1905,6 +1920,7 @@ namespace OrderManager
         private FormattedNumericUpDown numericUpDown5;
         private ComboBox comboBox8;
         private ToolStripMenuItem addEditorderNEWToolStripMenuItem;
+        private Label label45;
     }
 }
 
