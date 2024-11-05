@@ -1874,15 +1874,17 @@ namespace OrderManager
         {
             ValueInfoBase infoBase = new ValueInfoBase();
 
-            int idx = -1;
+            string machineID = await infoBase.GetMachineFromName(machineName);
 
-            for (int i = 0; i < ordersCurrentShift.Count; i++)
+            int idx = ordersCurrentShift.FindLastIndex(x=>x.machineOfOrder == machineID);
+
+            /*for (int i = 0; i < ordersCurrentShift.Count; i++)
             {
                 if (await infoBase.GetMachineName(ordersCurrentShift[i].machineOfOrder) == machineName)
                 {
                     idx = i;
                 }
-            }
+            }*/
 
             return idx;
         }
@@ -2338,7 +2340,7 @@ namespace OrderManager
 
             if (comboBox5.SelectedIndex == selectedIndexPreviewWOut2)
             {
-                UpdatePreviewCalculate();
+                UpdatePreviewCalculate(comboBox8.SelectedIndex);
             }
             else
             {
@@ -2355,12 +2357,17 @@ namespace OrderManager
         {
             selectedIndexWOut2 = comboBox5.SelectedIndex;
 
-            UpdatePreviewCalculate();
+            UpdatePreviewCalculate(comboBox8.SelectedIndex);
         }
 
         private void comboBox8_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (comboBox8.SelectedIndex)
+            UpdatePreviewCalculate(comboBox8.SelectedIndex);
+        }
+
+        private void UpdatePreviewCalculate(int typeCalculateIndex)
+        {
+            switch (typeCalculateIndex)
             {
                 case 0:
                     tableLayoutPanel10.ColumnStyles[1].Width = 0;
@@ -2496,11 +2503,8 @@ namespace OrderManager
                 default:
                     break;
             }
-        }
 
-        private void UpdatePreviewCalculate()
-        {
-            switch (comboBox8.SelectedIndex)
+            /*switch (comboBox8.SelectedIndex)
             {
                 case 0:
                     UpdatePreviewWorkingOut();
@@ -2513,7 +2517,7 @@ namespace OrderManager
                     break;
                 default:
                     break;
-            }
+            }*/
         }
 
         private async void UpdatePreviewWorkingOut()
@@ -2781,7 +2785,7 @@ namespace OrderManager
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            UpdatePreviewCalculate();
+            UpdatePreviewCalculate(comboBox8.SelectedIndex);
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -2824,7 +2828,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                UpdatePreviewCalculate();
+                UpdatePreviewCalculate(comboBox8.SelectedIndex);
             }
         }
 
@@ -2832,7 +2836,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                UpdatePreviewCalculate();
+                UpdatePreviewCalculate(comboBox8.SelectedIndex);
             }
         }
 
@@ -2840,7 +2844,7 @@ namespace OrderManager
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                UpdatePreviewCalculate();
+                UpdatePreviewCalculate(comboBox8.SelectedIndex);
             }
         }
 
