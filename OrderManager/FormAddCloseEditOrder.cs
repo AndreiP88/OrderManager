@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
@@ -1033,18 +1034,34 @@ namespace OrderManager
                 if (currentOrderID != -1)
                 {
                     int index = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == currentOrderID);
-
-                    comboBox1.SelectedIndex = index;
-                    comboBox1.Enabled = false;
-                    //button7.Enabled = false;
+                    
+                    if (index != -1)
+                    {
+                        comboBox1.SelectedIndex = index;
+                        comboBox1.Enabled = false;
+                        //button7.Enabled = false;
+                    }
+                    else
+                    {
+                        comboBox1.SelectedIndex = 0;
+                        comboBox1.Enabled = true;
+                    }
                 }
                 else if (lastOrderID != -1)
                 {
                     int index = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == lastOrderID);
-
-                    comboBox1.SelectedIndex = index;
-                    comboBox1.Enabled = true;
-                    //button7.Enabled = false;
+                    
+                    if (index != -1)
+                    {
+                        comboBox1.SelectedIndex = index;
+                        comboBox1.Enabled = true;
+                        //button7.Enabled = false;
+                    }
+                    else
+                    {
+                        comboBox1.SelectedIndex = 0;
+                        comboBox1.Enabled = true;
+                    }
                 }
                 else
                 {

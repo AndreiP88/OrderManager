@@ -159,7 +159,10 @@ namespace OrderManager
 
         public int GetLastMachineForUser(string id)
         {
-            return Convert.ToInt32(GetValueInfo("user", id.ToString(), "lastMachine"));
+            //return Convert.ToInt32(GetValueInfo("user", id.ToString(), "lastMachine"));
+            object load = GetValueInfo("user", id, "lastMachine");
+
+            return load == DBNull.Value ? -1 : (int)load;
         }
 
         public String GetActiveUser(String id)
@@ -167,9 +170,11 @@ namespace OrderManager
             return (string)GetValue("id", id, "activeUser");
         }
 
-        public String GetPasswordUser(String id)
+        public String GetPasswordUser(string id)
         {
-            return (string)GetValue("id", id, "passwordUser");
+            object load = GetValue("id", id, "passwordUser");
+
+            return load == DBNull.Value ? string.Empty : (string)load;
         }
 
         public int GetCurrentShiftStart(string id)
