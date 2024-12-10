@@ -1030,6 +1030,7 @@ namespace OrderManager
             {
                 int currentOrderID = getInfo.GetCurrentOrderID(machine);
                 int lastOrderID = getInfo.GetLastOrderID(machine);
+                bool activeOrder = getInfo.GetActiveOrder(machine);
 
                 if (currentOrderID != -1)
                 {
@@ -1038,7 +1039,7 @@ namespace OrderManager
                     if (index != -1)
                     {
                         comboBox1.SelectedIndex = index;
-                        comboBox1.Enabled = false;
+                        comboBox1.Enabled = !activeOrder;
                         //button7.Enabled = false;
                     }
                     else
