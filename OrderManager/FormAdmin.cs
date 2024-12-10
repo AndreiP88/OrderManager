@@ -431,14 +431,53 @@ namespace OrderManager
             }
         }
 
-        private void DeactivateOrder(int orderIndex)
+        private bool DeactivateOrder(int orderIndex)
         {
             ValueOrdersBase orders = new ValueOrdersBase();
+            ValueInfoBase infoBase = new ValueInfoBase();
 
-            DialogResult result;
-            result = MessageBox.Show("Вы действительно хотите завершить заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-                orders.SetNewStatus(orderIndex, "4");
+            bool result = false;
+
+            DialogResult primResult;
+            primResult = MessageBox.Show("Вы действительно хотите завершить заказ?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (primResult == DialogResult.Yes)
+            {
+                int machineID = orders.GetMachineIDForOrder(orderIndex);
+                int currentOrderID = infoBase.GetCurrentOrderID(machineID.ToString());
+                int lastOrderID = infoBase.GetLastOrderID(machineID.ToString());
+
+                DialogResult subResult;
+
+                if (currentOrderID == orderIndex)
+                {
+                    subResult = MessageBox.Show("Выбранный заказ в данный момент выполняется.\nЖелаете продолжить?", "Завершение заказа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (subResult == DialogResult.Yes)
+                    {
+                        infoBase.UpdateLastOrderID(machineID, -1);
+                        infoBase.UpdateCurrentOrderID(machineID, -1);
+                        infoBase.UpdateActiveOrderStatus(machineID, false);
+
+                        orders.SetNewStatus(orderIndex, "4");
+
+                        result = true;
+                    }
+                }
+                else
+                {
+                    if (lastOrderID == orderIndex)
+                    {
+                        infoBase.UpdateLastOrderID(machineID, -1);
+                    }
+
+                    orders.SetNewStatus(orderIndex, "4");
+
+                    result = true;
+                }
+            }
+
+            return result;
         }
 
         private async void AbortOrder(String machine, int orderIndex)
@@ -3447,8 +3486,10 @@ namespace OrderManager
 
                     break;
                 case 5:
-                    DeactivateOrder(ordersIndexes[listV.SelectedIndices[0]]);
-                    UpdatePage(currentPage);
+                    if (DeactivateOrder(ordersIndexes[listV.SelectedIndices[0]]))
+                    {
+                        UpdatePage(currentPage);
+                    }
                     break;
 
                 default:

@@ -571,9 +571,24 @@ namespace OrderManager
             return result;
         }
 
-        public void UpdateCurrentOrder(String machine, int orderIndex)
+        public void UpdateCurrentOrder(string machine, int orderIndex)
         {
             UpdateInfoParameter(machine, "currentOrderID", orderIndex.ToString());
+        }
+
+        public void UpdateCurrentOrderID(int machine, int orderIndex)
+        {
+            UpdateInfoParameter(machine.ToString(), "currentOrderID", orderIndex.ToString());
+        }
+
+        public void UpdateLastOrderID(int machine, int orderIndex)
+        {
+            UpdateInfoParameter(machine.ToString(), "lastOrderID", orderIndex.ToString());
+        }
+
+        public void UpdateActiveOrderStatus(int machine, bool activeOrder)
+        {
+            UpdateInfoParameter(machine.ToString(), "activeOrder", activeOrder.ToString());
         }
 
         public async void CompleteTheShift(string nameOfExecutor)
@@ -628,7 +643,7 @@ namespace OrderManager
             }
         }
 
-        private void UpdateInfoParameter(String machine, String parameter, String value)
+        private void UpdateInfoParameter(string machine, string parameter, string value)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

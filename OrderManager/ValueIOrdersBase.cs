@@ -46,6 +46,11 @@ namespace OrderManager
             return result;
         }
 
+        public int GetMachineIDForOrder(int index)
+        {
+            return Convert.ToInt32(GetValueFromIndex(index, "machine"));
+        }
+
         public string GetOrderName(int index)
         {
             return GetValueFromIndex(index, "nameOfOrder");
