@@ -622,6 +622,8 @@ namespace OrderManager
                     {
                         SetVisibleElementIdleTime(-1, false);
                     }
+
+                    listView1.Items.Clear();
                 }
                 else if (typeJob == 0)
                 {
