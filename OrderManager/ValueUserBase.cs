@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Drawing;
 using System.Linq;
 
 namespace OrderManager
@@ -68,6 +69,106 @@ namespace OrderManager
             var indexes = load?.Split(';')?.Select(Int32.Parse)?.ToList();
 
             return indexes;
+        }
+
+        public ShiftShedule GetUserShiftShedule(int userID)
+        {
+            object loadStartShiftDate = GetValueInfo("user", userID.ToString(), "shiftStartDate");
+            string startShiftDate = loadStartShiftDate == DBNull.Value ? string.Empty : (string)loadStartShiftDate;
+
+            object loadShiftBlanks = GetValueInfo("user", userID.ToString(), "shiftShedule");
+            string blanksLine = loadShiftBlanks == DBNull.Value ? string.Empty : (string)loadShiftBlanks;
+
+            object loadShiftColors = GetValueInfo("user", userID.ToString(), "shiftColors");
+            string colorsLine = loadShiftColors == DBNull.Value ? "-1;-1;-1" : (string)loadShiftColors;
+
+            List<ShiftBlank> shiftBlanks = new List<ShiftBlank>();
+
+            List<string> blanks = blanksLine?.Split(';')?.ToList();
+
+            if (blanks != null && blanks.Count > 0)
+            {
+                foreach (string shift in blanks)
+                {
+                    string[] blank = shift?.Split('|');
+
+                    if (blank.Length > 1)
+                    {
+                        shiftBlanks.Add(new ShiftBlank(
+                        blank[0],
+                        blank[1]
+                        ));
+                    }
+                }
+            }
+
+            Color[] shiftColors = new Color[3];
+
+            //string[] colors = colorsLine?.Split(';');
+            List<int> colors = colorsLine?.Split(';')?.Select(Int32.Parse)?.ToList();
+
+            if (colors.Count == 3)
+            {
+                for (int i = 0; i < colors.Count; i++)
+                {
+                    shiftColors[i] = Color.FromArgb(colors[i]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < colors.Count; i++)
+                {
+                    shiftColors[i] = Color.FromArgb(-1);
+                }
+            }
+
+            /*ShiftShedule shiftShedule = new ShiftShedule
+            {
+                UserID = userID,
+                ShiftStartDate = startShiftDate,
+                ShiftBlanks = shiftBlanks,
+                ShiftColors = shiftColors,
+            };*/
+
+            ShiftShedule shiftShedule = new ShiftShedule(userID, startShiftDate, shiftBlanks, shiftColors);
+
+            return shiftShedule;
+        }
+
+        public void SetUserShiftShedule(ShiftShedule shiftShedule)
+        {
+            int userID = shiftShedule.UserID;
+            string shiftDateStart = shiftShedule.ShiftStartDate;
+            string shiftBlanksLine = "";
+            string shiftColorsLine = "";
+
+            List<ShiftBlank> shiftBlanks = shiftShedule.ShiftBlanks;
+
+            for (int i = 0; i < shiftBlanks.Count; i++)
+            {
+                shiftBlanksLine += shiftBlanks[i].Shift + "|" + shiftBlanks[i].Name;
+
+                if (i < shiftBlanks.Count - 1)
+                {
+                    shiftBlanksLine += ";";
+                }
+            }
+
+            Color[] colors = shiftShedule.ShiftColors;
+
+            for (int i = 0; i < colors.Length; ++i)
+            {
+                shiftColorsLine += colors[i].ToArgb();
+
+                if (i < colors.Length - 1)
+                {
+                    shiftColorsLine += ";";
+                }
+            }
+
+            UpdateValueInfo("shiftStartDate", userID.ToString(), shiftDateStart);
+            UpdateValueInfo("shiftShedule", userID.ToString(), shiftBlanksLine);
+            UpdateValueInfo("shiftColors", userID.ToString(), shiftColorsLine);
         }
 
         public String GetIDUserFromName(String nameUser)

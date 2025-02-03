@@ -11,21 +11,20 @@ namespace OrderManager
             InitializeComponent();
         }
 
-        public void Refresh(int day, string shift, string hour)
+        public void Refresh(int day, string shift, string name)
         {
             dayNumber.Text = day.ToString();
             shiftLabel.Text = shift;
-            firstTimeLabel.Text = hour.ToString();
+            firstTimeLabel.Text = name;
+            secondTimeLabel.Text = "";
 
-            secondTimeLabel.Text = hour.ToString();
-
-            if (shift == "")
+            if (shift != "")
             {
-                this.BackColor = Color.Turquoise;
+                this.BackColor = Color.NavajoWhite;
             }
             else
             {
-                this.BackColor = Color.NavajoWhite;
+                this.BackColor = Color.Turquoise;
             }
         }
 
@@ -48,13 +47,13 @@ namespace OrderManager
                 secondTimeLabel.Font = new Font("Microsoft Sans Serif", 11, FontStyle.Bold);
             }
 
-            if (shift == "")
+            if (firstHour != "" || secondHour != "")
             {
-                this.BackColor = Color.Turquoise;
+                this.BackColor = Color.NavajoWhite;
             }
             else
             {
-                this.BackColor = Color.NavajoWhite;
+                this.BackColor = Color.Turquoise;
             }
         }
 

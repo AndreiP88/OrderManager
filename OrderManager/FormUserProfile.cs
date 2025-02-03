@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Globalization;
-using System.Runtime.ConstrainedExecution;
 using System.Linq;
 
 namespace OrderManager
 {
     public partial class FormUserProfile : Form
     {
-        String idUser;
+        string idUser;
+        int userID;
 
         int _wTime = 680;
         int _percentOvertime = 100;
@@ -21,11 +21,12 @@ namespace OrderManager
         int overTime = 0;
         int countNightShifts = 0;
 
-        public FormUserProfile(String userID)
+        public FormUserProfile(string userIndex)
         {
             InitializeComponent();
 
-            this.idUser = userID;
+            this.idUser = userIndex;
+            this.userID = Convert.ToInt32(userIndex);
         }
 
         private void FormUserProfile_Load(object sender, EventArgs e)
@@ -77,7 +78,7 @@ namespace OrderManager
             {
                 tableLayoutPanel1.ColumnStyles[0].Width = 100;
                 tableLayoutPanel1.ColumnStyles[1].Width = 0;
-                this.Width = 840;
+                this.Width = 770;
             }
         }
 
@@ -110,12 +111,15 @@ namespace OrderManager
 
         }
 
-        private void LoadCalendarShifts(DateTime date)
+        /*private void LoadCalendarShifts(DateTime date)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetShiftsFromBase getShifts = new GetShiftsFromBase(idUser);
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            ValueUserBase userBase = new ValueUserBase();
+            
+            ShiftShedule shiftShedule = userBase.GetUserShiftShedule(userID);
 
             List<int> shifts = getShifts.LoadShiftsList(date);
             List<int> shiftsDays = new List<int>();
@@ -155,14 +159,20 @@ namespace OrderManager
 
             for (int i = 1; i <= days; i++)
             {
-                string nShift = "";
+                
                 int workTimeShift = 0;
                 int workTimeFirstShift = 0;
                 int workTimeSecondShift = 0;
 
+                string firstTimeStr = "";
+                string secondTimeStr = "";
+
                 bool shiftOvertime = false;
                 bool firstShiftOvertime = false;
                 bool secondShiftOvertime = false;
+
+                var currentDate = new DateTime(now.Year, now.Month, i);
+                string nShift = shiftShedule.GetCurrentShiftFromShedule(currentDate.ToString("dd.MM.yyyy"));
 
                 //List<int> indexes = shiftsDays.FindAll(x => x == i);
                 List<int> indexes = Enumerable.Range(0, shiftsDays.Count).Where(x => shiftsDays[x] == i).ToList();
@@ -171,16 +181,7 @@ namespace OrderManager
                 for (int j = 0; j < indexes.Count; j++)
                 {
                     string shift = getNumberShift.NumberShift(shiftsBase.GetStartShiftFromID(shifts[indexes[j]]));
-
-                    if (nShift == "")
-                    {
-                        nShift = shift;
-                    }
-                    else
-                    {
-                        nShift += " / " + shift;
-                    }
-
+                    
                     if (shiftsBase.GetCheckFullShift(shifts[indexes[j]]))
                     {
                         workTimeShift = _wTime;
@@ -207,22 +208,167 @@ namespace OrderManager
                     {
                         workTimeFirstShift = workTimeShift;
                         firstShiftOvertime = shiftOvertime;
+
+                        firstTimeStr = shift + " - " + timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeFirstShift, true);
                     }
                     else if (shift == "II")
                     {
                         workTimeSecondShift = workTimeShift;
                         secondShiftOvertime = shiftOvertime;
+
+                        secondTimeStr = shift + " - " + timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeSecondShift, true);
+
                         countNightShifts++;
                     }
 
                     fullWorkTime += workTimeShift;
                 }
 
-                string firstTimeStr = timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeFirstShift, true);
-                string secondTimeStr = timeOperations.TotalMinutesToHoursAndMinutesStr(workTimeSecondShift, true);
-
                 DayBlank currDay = new DayBlank();
                 currDay.Refresh(i, nShift, firstTimeStr, secondTimeStr, firstShiftOvertime, secondShiftOvertime);
+
+                if (dayCurrWeek == 8)
+                {
+                    dayCurrWeek = 1;
+                    weekOfMonth++;
+                }
+
+                if (weekOfMonth != oldWeekOfMonth)
+                {
+                    oldWeekOfMonth = weekOfMonth;
+
+                    AddNumberWeekOfYear(new DateTime(now.Year, now.Month, i), weekOfMonth);
+                }
+
+                tableLayoutPanel5.Controls.Add(currDay, dayCurrWeek, weekOfMonth);
+
+                //MessageBox.Show("День недели: " + dayCurrWeek.ToString() + ". Неделя месяца: " + weekOfMonth.ToString());
+
+                dayCurrWeek++;
+            }
+
+            label11.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullWorkTime);
+            label13.Text = timeOperations.TotalMinutesToHoursAndMinutesStr(fullOverTime);
+            label15.Text = countFullShifts.ToString();
+            label17.Text = countOvertimeShifts.ToString();
+            label19.Text = countPartialShifts.ToString();
+
+            workTime = fullWorkTime;
+            overTime = fullOverTime;
+        }*/
+
+        private void LoadCalendarShifts(DateTime date)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(idUser);
+            GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            ValueUserBase userBase = new ValueUserBase();
+
+            ShiftShedule shiftShedule = userBase.GetUserShiftShedule(userID);
+
+            List<int> shifts = getShifts.LoadShiftsList(date);
+            List<int> shiftsDays = new List<int>();
+
+            int fullWorkTime = 0;
+            int fullOverTime = 0;
+            int countFullShifts = 0;
+            int countOvertimeShifts = 0;
+            int countPartialShifts = 0;
+
+            for (int i = 0; i < shifts.Count; i++)
+            {
+                shiftsDays.Add(Convert.ToDateTime(shiftsBase.GetStartShiftFromID(shifts[i])).Day);
+            }
+
+            var now = date;
+
+            var startOfTheMonth = new DateTime(now.Year, now.Month, 1);
+
+            int days = DateTime.DaysInMonth(now.Year, now.Month);
+
+            int dayOfTheWeek = Convert.ToInt32(startOfTheMonth.DayOfWeek.ToString("d")) == 0
+                ? 7
+                : Convert.ToInt32(startOfTheMonth.DayOfWeek.ToString("d"));
+
+            //MessageBox.Show(dayOfTheWeek.ToString());
+
+            int dayCurrWeek = dayOfTheWeek;
+            int weekOfMonth = 1;
+            int oldWeekOfMonth = 0;
+
+            tableLayoutPanel5.Controls.Clear();
+
+            countNightShifts = 0;
+
+            AddDaysNames();
+
+            for (int i = 1; i <= days; i++)
+            {
+
+                int workTimeShift = 0;
+                int workTimeFirstShift = 0;
+                int workTimeSecondShift = 0;
+
+                bool planedDay, factDay = false, planedNight, factNight = false;
+                bool overtimeDay = false, overtimeNight = false;
+
+                var currentDate = new DateTime(now.Year, now.Month, i);
+                string planedShift = shiftShedule.GetCurrentShiftFromShedule(currentDate.ToString("dd.MM.yyyy"));
+
+                //List<int> indexes = shiftsDays.FindAll(x => x == i);
+                List<int> indexes = Enumerable.Range(0, shiftsDays.Count).Where(x => shiftsDays[x] == i).ToList();
+                //int ii = shiftsDays.Count(p => p == i);
+
+                for (int j = 0; j < indexes.Count; j++)
+                {
+                    string shift = getNumberShift.NumberShift(shiftsBase.GetStartShiftFromID(shifts[indexes[j]]));
+                    bool overtimeShift = false;
+
+                    if (shiftsBase.GetCheckFullShift(shifts[indexes[j]]))
+                    {
+                        workTimeShift = _wTime;
+                        countFullShifts++;
+                    }
+                    else
+                    {
+                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShiftFromID(shifts[indexes[j]]), shiftsBase.GetStartShiftFromID(shifts[indexes[j]])));
+                        countPartialShifts++;
+                    }
+
+                    if (shiftsBase.GetCheckOvertimeShift(shifts[indexes[j]]))
+                    {
+                        fullOverTime += workTimeShift;
+                        countOvertimeShifts++;
+                        overtimeShift = true;
+                    }
+
+                    if (shift == "I")
+                    {
+                        workTimeFirstShift = workTimeShift;
+                        overtimeDay = overtimeShift;
+
+                        factDay = true;
+                    }
+                    else if (shift == "II")
+                    {
+                        workTimeSecondShift = workTimeShift;
+                        overtimeNight = overtimeShift;
+
+                        factNight = true;
+
+                        countNightShifts++;
+                    }
+
+                    fullWorkTime += workTimeShift;
+                }
+
+                planedDay = planedShift == "I";
+                planedNight = planedShift == "II";
+
+                DayBlankFull currDay = new DayBlankFull();
+                //currDay.Refresh(i, nShift, firstTimeStr, secondTimeStr, firstShiftOvertime, secondShiftOvertime);
+                currDay.Refresh(i, planedDay, planedNight, factDay, factNight, overtimeDay, overtimeNight, shiftShedule.ShiftColors);
 
                 if (dayCurrWeek == 8)
                 {
@@ -455,7 +601,7 @@ namespace OrderManager
             {
                 tableLayoutPanel1.ColumnStyles[0].Width = 100;
                 tableLayoutPanel1.ColumnStyles[1].Width = 0;
-                this.Width = 740;
+                this.Width = 770;
 
                 settingsBase.UpdateDeteilsSalary(idUser, "False");
             }
@@ -561,6 +707,14 @@ namespace OrderManager
 
             LoadSalary();
             RetentionFromSalary();
+        }
+
+        private void buttonShiftShedule_Click(object sender, EventArgs e)
+        {
+            FormShiftSchedule form = new FormShiftSchedule(userID);
+            form.ShowDialog();
+
+            LoadCalendar();
         }
     }
 }
