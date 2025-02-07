@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -19,12 +18,12 @@ namespace OrderManager
 
             dateTime = dateTime.AddHours(6);
 
-            if (timeOne.AddHours(-4) <= dateTime && dateTime <= timeOne.AddHours(6))
+            if (timeOne.AddHours(-3) <= dateTime && dateTime <= timeOne.AddHours(7))
             {
                 result = "I";
             }
                 
-            if (timeTwo.AddHours(-4) <= dateTime && dateTime <= timeTwo.AddHours(6))
+            if (timeTwo.AddHours(-3) <= dateTime && dateTime <= timeTwo.AddHours(7))
             {
                 result = "II";
             }
@@ -49,12 +48,12 @@ namespace OrderManager
 
             dateTime = dateTime.AddHours(6);
 
-            if (timeOne.AddHours(-4) <= dateTime && dateTime <= timeOne.AddHours(6))
+            if (timeOne.AddHours(-3) <= dateTime && dateTime <= timeOne.AddHours(7))
             {
                 result = timeOne.ToString();
             }
                 
-            if (timeTwo.AddHours(-4) <= dateTime && dateTime <= timeTwo.AddHours(6))
+            if (timeTwo.AddHours(-3) <= dateTime && dateTime <= timeTwo.AddHours(7))
             {
                 result = timeTwo.ToString();
             }

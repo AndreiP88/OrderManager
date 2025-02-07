@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -8,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
 {
@@ -272,15 +274,18 @@ namespace OrderManager
                         ValueUserBase usersBase = new ValueUserBase();
                         ValueShiftsBase shiftsBase = new ValueShiftsBase();
 
+                        string overtimeShift = IsOvertimeShift(currentUser, startOfShift).ToString();
+
                         using (MySqlConnection Connect = DBConnection.GetDBConnection())
                         {
-                            string commandText = "INSERT INTO shifts (nameUser, startShift) " +
-                                "SELECT * FROM (SELECT @nameUser, @startShift) " +
-                                "AS tmp WHERE NOT EXISTS(SELECT startShift FROM shifts WHERE startShift = @startShift) LIMIT 1";
+                            string commandText = "INSERT INTO shifts (nameUser, startShift, overtimeShift) " +
+                                "SELECT * FROM (SELECT @nameUser, @startShift, @overtimeShift) " +
+                                "AS tmp WHERE NOT EXISTS(SELECT startShift, nameUser FROM shifts WHERE startShift = @startShift AND nameUser = @nameUser) LIMIT 1";
 
                             MySqlCommand Command = new MySqlCommand(commandText, Connect);
                             Command.Parameters.AddWithValue("@nameUser", currentUser);
                             Command.Parameters.AddWithValue("@startShift", startOfShift);
+                            Command.Parameters.AddWithValue("@overtimeShift", overtimeShift);
 
                             Connect.Open();
                             Command.ExecuteNonQuery();
@@ -314,6 +319,34 @@ namespace OrderManager
                 }
             }
             while (reconnectionRequired);
+        }
+
+        private bool IsOvertimeShift(string user, string startOfShift)
+        {
+            bool result = false;
+
+            ValueUserBase userBase = new ValueUserBase();
+            GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
+
+            int userID = Convert.ToInt32(user);
+
+            ShiftShedule shiftShedule = userBase.GetUserShiftShedule(userID);
+
+            string currentShiftFromShedule = shiftShedule.GetCurrentShiftFromShedule(startOfShift);
+            string currentShiftFromTimeStart = getNumberShift.NumberShift(startOfShift);
+
+            if (currentShiftFromTimeStart != "" && currentShiftFromTimeStart != currentShiftFromShedule)
+            {
+                DialogResult dialog = MessageBox.Show("Смена, которую Вы открываете, не соответствует Вашему графику.\n" +
+                    "Отметить смену, как сверхурочную?", "Внимание", MessageBoxButtons.YesNo);
+
+                if (dialog == DialogResult.Yes)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
         }
 
         private void ActivateDeactivateMachines(String currentUser)

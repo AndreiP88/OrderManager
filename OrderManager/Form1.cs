@@ -1189,7 +1189,7 @@ namespace OrderManager
 
             Info.active = false;
 
-            FormCloseShift form = new FormCloseShift();
+            FormCloseShift form = new FormCloseShift(Info.shiftIndex, false);
             form.ShowDialog();
             bool result = form.ShiftVal;
 

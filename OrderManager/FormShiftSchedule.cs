@@ -217,6 +217,8 @@ namespace OrderManager
 
         private void SelectColor(int index)
         {
+            colorDialog1.Color = shiftShedule.ShiftColors[index];
+
             if (colorDialog1.ShowDialog() == DialogResult.OK)
             {
                 Color color = colorDialog1.Color;

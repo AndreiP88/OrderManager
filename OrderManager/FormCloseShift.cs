@@ -10,32 +10,36 @@ namespace OrderManager
         int loadStartOfShift = -1;
         bool _edit = false;
 
-        public FormCloseShift()
+        public FormCloseShift(int lStartOfShift)
         {
             InitializeComponent();
 
             _edit = false;
         }
-        public FormCloseShift(int lStartOfShift)
+        public FormCloseShift(int lStartOfShift, bool edit)
         {
             InitializeComponent();
 
-            _edit = true;
+            _edit = edit;
 
             this.loadStartOfShift = lStartOfShift;
 
-            this.Text = "Комментарий";
+            if (edit)
+            {
+                this.Text = "Комментарий";
 
-            label1.Text = "";
+                label1.Text = "";
 
-            //textBox1.Enabled = false;
-            textBox1.ReadOnly = true;
+                //textBox1.Enabled = false;
+                textBox1.ReadOnly = true;
 
-            button1.Enabled = false;
-            button1.Text = "Сохранить";
+                button1.Enabled = false;
+                button1.Text = "Сохранить";
 
-            LoadNote(loadStartOfShift);
-            LoadCheckFullShift(loadStartOfShift);
+                LoadNote(loadStartOfShift);
+                LoadCheckFullShift(loadStartOfShift);                
+            }
+
             LoadCheckOvertimeShift(loadStartOfShift);
         }
 

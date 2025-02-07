@@ -3303,7 +3303,7 @@ namespace OrderManager
             }
             else
             {
-                FormCloseShift form = new FormCloseShift();
+                FormCloseShift form = new FormCloseShift(shiftID, false);
                 form.ShowDialog();
                 bool result = form.ShiftVal;
 

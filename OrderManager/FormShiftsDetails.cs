@@ -336,7 +336,7 @@ namespace OrderManager
 
         private void LoadShiftNote(int shiftID)
         {
-            FormCloseShift form = new FormCloseShift(shiftID);
+            FormCloseShift form = new FormCloseShift(shiftID, true);
             form.ShowDialog();
 
             bool result = form.ShiftVal;

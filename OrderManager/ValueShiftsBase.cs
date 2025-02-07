@@ -1,12 +1,8 @@
-﻿using libData;
-using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
+﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
