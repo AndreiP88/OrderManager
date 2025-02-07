@@ -55,6 +55,18 @@
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox5 = new System.Windows.Forms.PictureBox();
+            this.pictureBox6 = new System.Windows.Forms.PictureBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.pictureBox7 = new System.Windows.Forms.PictureBox();
+            this.button8 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
+            this.button11 = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -63,6 +75,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
@@ -255,12 +271,20 @@
             // 
             // tableLayoutPanel5
             // 
-            this.tableLayoutPanel5.ColumnCount = 5;
+            this.tableLayoutPanel5.ColumnCount = 13;
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 5F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 919F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 5F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 5F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.Controls.Add(this.pictureBox1, 2, 0);
             this.tableLayoutPanel5.Controls.Add(this.label1, 1, 0);
             this.tableLayoutPanel5.Controls.Add(this.button5, 3, 0);
@@ -270,6 +294,18 @@
             this.tableLayoutPanel5.Controls.Add(this.label3, 1, 2);
             this.tableLayoutPanel5.Controls.Add(this.button6, 3, 1);
             this.tableLayoutPanel5.Controls.Add(this.button7, 3, 2);
+            this.tableLayoutPanel5.Controls.Add(this.label4, 5, 0);
+            this.tableLayoutPanel5.Controls.Add(this.label5, 5, 1);
+            this.tableLayoutPanel5.Controls.Add(this.label6, 5, 2);
+            this.tableLayoutPanel5.Controls.Add(this.pictureBox4, 6, 0);
+            this.tableLayoutPanel5.Controls.Add(this.pictureBox5, 6, 1);
+            this.tableLayoutPanel5.Controls.Add(this.pictureBox6, 6, 2);
+            this.tableLayoutPanel5.Controls.Add(this.label7, 9, 0);
+            this.tableLayoutPanel5.Controls.Add(this.pictureBox7, 10, 0);
+            this.tableLayoutPanel5.Controls.Add(this.button8, 7, 0);
+            this.tableLayoutPanel5.Controls.Add(this.button9, 7, 1);
+            this.tableLayoutPanel5.Controls.Add(this.button10, 7, 2);
+            this.tableLayoutPanel5.Controls.Add(this.button11, 11, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(7, 160);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
@@ -283,7 +319,7 @@
             // pictureBox1
             // 
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(128, 3);
+            this.pictureBox1.Location = new System.Drawing.Point(138, 3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(24, 24);
             this.pictureBox1.TabIndex = 0;
@@ -295,7 +331,7 @@
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label1.Location = new System.Drawing.Point(8, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(114, 30);
+            this.label1.Size = new System.Drawing.Size(124, 30);
             this.label1.TabIndex = 1;
             this.label1.Text = "1 смена:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -303,18 +339,19 @@
             // button5
             // 
             this.button5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button5.Location = new System.Drawing.Point(158, 3);
+            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button5.Location = new System.Drawing.Point(168, 3);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(94, 24);
+            this.button5.Size = new System.Drawing.Size(29, 24);
             this.button5.TabIndex = 2;
-            this.button5.Text = "Выбрать цвет";
+            this.button5.Text = "...";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // pictureBox2
             // 
             this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox2.Location = new System.Drawing.Point(128, 33);
+            this.pictureBox2.Location = new System.Drawing.Point(138, 33);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(24, 24);
             this.pictureBox2.TabIndex = 3;
@@ -323,7 +360,7 @@
             // pictureBox3
             // 
             this.pictureBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox3.Location = new System.Drawing.Point(128, 63);
+            this.pictureBox3.Location = new System.Drawing.Point(138, 63);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(24, 24);
             this.pictureBox3.TabIndex = 4;
@@ -335,7 +372,7 @@
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label2.Location = new System.Drawing.Point(8, 30);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(114, 30);
+            this.label2.Size = new System.Drawing.Size(124, 30);
             this.label2.TabIndex = 5;
             this.label2.Text = "2 смена:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -346,7 +383,7 @@
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label3.Location = new System.Drawing.Point(8, 60);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(114, 30);
+            this.label3.Size = new System.Drawing.Size(124, 30);
             this.label3.TabIndex = 6;
             this.label3.Text = "Выходной:";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -354,24 +391,159 @@
             // button6
             // 
             this.button6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button6.Location = new System.Drawing.Point(158, 33);
+            this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button6.Location = new System.Drawing.Point(168, 33);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(94, 24);
+            this.button6.Size = new System.Drawing.Size(29, 24);
             this.button6.TabIndex = 7;
-            this.button6.Text = "Выбрать цвет";
+            this.button6.Text = "...";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button7
             // 
             this.button7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button7.Location = new System.Drawing.Point(158, 63);
+            this.button7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button7.Location = new System.Drawing.Point(168, 63);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(94, 24);
+            this.button7.Size = new System.Drawing.Size(29, 24);
             this.button7.TabIndex = 8;
-            this.button7.Text = "Выбрать цвет";
+            this.button7.Text = "...";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
+            // colorDialog1
+            // 
+            this.colorDialog1.FullOpen = true;
+            this.colorDialog1.SolidColorOnly = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label4.Location = new System.Drawing.Point(208, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(124, 30);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Сверхурочная смена:";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label5.Location = new System.Drawing.Point(208, 30);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(124, 30);
+            this.label5.TabIndex = 10;
+            this.label5.Text = "Сегодняшний день:";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label6.Location = new System.Drawing.Point(208, 60);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(124, 30);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Число:";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // pictureBox4
+            // 
+            this.pictureBox4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox4.Location = new System.Drawing.Point(338, 3);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(24, 24);
+            this.pictureBox4.TabIndex = 12;
+            this.pictureBox4.TabStop = false;
+            // 
+            // pictureBox5
+            // 
+            this.pictureBox5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox5.Location = new System.Drawing.Point(338, 33);
+            this.pictureBox5.Name = "pictureBox5";
+            this.pictureBox5.Size = new System.Drawing.Size(24, 24);
+            this.pictureBox5.TabIndex = 13;
+            this.pictureBox5.TabStop = false;
+            // 
+            // pictureBox6
+            // 
+            this.pictureBox6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox6.Location = new System.Drawing.Point(338, 63);
+            this.pictureBox6.Name = "pictureBox6";
+            this.pictureBox6.Size = new System.Drawing.Size(24, 24);
+            this.pictureBox6.TabIndex = 14;
+            this.pictureBox6.TabStop = false;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label7.Location = new System.Drawing.Point(408, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(124, 30);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "Содержимое:";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // pictureBox7
+            // 
+            this.pictureBox7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox7.Location = new System.Drawing.Point(538, 3);
+            this.pictureBox7.Name = "pictureBox7";
+            this.pictureBox7.Size = new System.Drawing.Size(24, 24);
+            this.pictureBox7.TabIndex = 16;
+            this.pictureBox7.TabStop = false;
+            // 
+            // button8
+            // 
+            this.button8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button8.Location = new System.Drawing.Point(368, 3);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(29, 24);
+            this.button8.TabIndex = 17;
+            this.button8.Text = "...";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // button9
+            // 
+            this.button9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button9.Location = new System.Drawing.Point(368, 33);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(29, 24);
+            this.button9.TabIndex = 18;
+            this.button9.Text = "...";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // button10
+            // 
+            this.button10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button10.Location = new System.Drawing.Point(368, 63);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(29, 24);
+            this.button10.TabIndex = 19;
+            this.button10.Text = "...";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // button11
+            // 
+            this.button11.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button11.Location = new System.Drawing.Point(568, 3);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(29, 24);
+            this.button11.TabIndex = 20;
+            this.button11.Text = "...";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
             // FormShiftSchedule
             // 
@@ -396,6 +568,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -427,5 +603,17 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.PictureBox pictureBox5;
+        private System.Windows.Forms.PictureBox pictureBox6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.PictureBox pictureBox7;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button button11;
     }
 }

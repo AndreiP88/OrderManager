@@ -316,6 +316,8 @@ namespace OrderManager
                 var currentDate = new DateTime(now.Year, now.Month, i);
                 string planedShift = shiftShedule.GetCurrentShiftFromShedule(currentDate.ToString("dd.MM.yyyy"));
 
+                bool today = DateTime.Now.ToString("dd.MM.yyyy") == currentDate.ToString("dd.MM.yyyy");
+
                 //List<int> indexes = shiftsDays.FindAll(x => x == i);
                 List<int> indexes = Enumerable.Range(0, shiftsDays.Count).Where(x => shiftsDays[x] == i).ToList();
                 //int ii = shiftsDays.Count(p => p == i);
@@ -368,7 +370,7 @@ namespace OrderManager
 
                 DayBlankFull currDay = new DayBlankFull();
                 //currDay.Refresh(i, nShift, firstTimeStr, secondTimeStr, firstShiftOvertime, secondShiftOvertime);
-                currDay.Refresh(i, planedDay, planedNight, factDay, factNight, overtimeDay, overtimeNight, shiftShedule.ShiftColors);
+                currDay.Refresh(i, planedDay, planedNight, factDay, factNight, overtimeDay, overtimeNight, today, shiftShedule.ShiftColors);
 
                 if (dayCurrWeek == 8)
                 {

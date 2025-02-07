@@ -13,7 +13,7 @@ namespace OrderManager
 
         private string _day = "";
 
-        private Color[] _colors = { Color.FromArgb(-1), Color.FromArgb(-1), Color.FromArgb(-1) };
+        private Color[] _colors = { Color.FromArgb(-1), Color.FromArgb(-1), Color.FromArgb(-1), Color.FromArgb(-1), Color.FromArgb(-1), Color.FromArgb(-1), Color.FromArgb(-1) };
         private bool _planedDay = false;
         private bool _planedNight = false;
         private bool _factDay = false;
@@ -21,6 +21,8 @@ namespace OrderManager
 
         private bool _overtimeDay = false;
         private bool _overtimeNight = false;
+
+        private bool _today = false;
 
         /*private static int h = 100;
         private static int w = 120;
@@ -50,7 +52,7 @@ namespace OrderManager
             }*/
         }
 
-        public void Refresh(int day, bool planedDay, bool planedNight, bool factDay, bool factNight, bool overtimeDay, bool overtimeNight, Color[] colors)
+        public void Refresh(int day, bool planedDay, bool planedNight, bool factDay, bool factNight, bool overtimeDay, bool overtimeNight, bool today, Color[] colors)
         {
             _day = day.ToString();
 
@@ -64,6 +66,8 @@ namespace OrderManager
 
             _overtimeDay = overtimeDay;
             _overtimeNight = overtimeNight;
+
+            _today = today;
         }
 
         public void Refresh(int day, bool planedDay, bool planedNight, bool factDay, bool factNight, Color[] colors)
@@ -119,6 +123,16 @@ namespace OrderManager
             DrawShift(color, pointsNightShiftFact, _day, _overtimeNight);
         }
 
+        private Point[] PointsToday()
+        {
+            int h = this.panel1.Height;
+            int w = this.panel1.Width;
+
+            Point[] pointsToday = { new Point(0, 0), new Point(w, 0), new Point(w, h), new Point(0, h) };
+
+            return pointsToday;
+        }
+
         private void DrawShift(Color color, Point[] points, string day, bool overtimeShift = false)
         {
             Graphics formGraphics = panel1.CreateGraphics();
@@ -128,13 +142,21 @@ namespace OrderManager
 
             if (overtimeShift)
             {
-                Pen pen = new Pen(Color.Red, 2);
+                Pen pen = new Pen(_colors[3], 2);
                 formGraphics.DrawPolygon(pen, points);
+
+                pen.Dispose();
+            }
+
+            if (_today)
+            {
+                formGraphics.DrawPolygon(new Pen(_colors[4], 2), PointsToday());
             }
             
             Font font = new Font(FontFamily.GenericSansSerif, 13f);
-            formGraphics.DrawString(day, font, Brushes.DarkBlue, 4, 4);
+            formGraphics.DrawString(day, font, new SolidBrush(_colors[5]), 4, 4);
 
+            font.Dispose();
             brush.Dispose();
             formGraphics.Dispose();
         }

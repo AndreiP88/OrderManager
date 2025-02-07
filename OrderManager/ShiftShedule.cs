@@ -9,7 +9,7 @@ namespace OrderManager
         private int _id;
         private string _shiftStartDate;
         private List<ShiftBlank> _shiftBlanks = new List<ShiftBlank>();
-        private Color[] _shiftColors = new Color[3];
+        private Color[] _shiftColors = new Color[7];
 
         public ShiftShedule()
         {

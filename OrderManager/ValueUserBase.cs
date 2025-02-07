@@ -102,21 +102,20 @@ namespace OrderManager
                 }
             }
 
-            Color[] shiftColors = new Color[3];
+            Color[] shiftColors = new Color[7];
 
             //string[] colors = colorsLine?.Split(';');
             List<int> colors = colorsLine?.Split(';')?.Select(Int32.Parse)?.ToList();
 
-            if (colors.Count == 3)
+            int colorsCount = colors.Count;
+
+            for (int i = 0; i < 7; i++)
             {
-                for (int i = 0; i < colors.Count; i++)
+                if (i < colorsCount)
                 {
                     shiftColors[i] = Color.FromArgb(colors[i]);
                 }
-            }
-            else
-            {
-                for (int i = 0; i < colors.Count; i++)
+                else
                 {
                     shiftColors[i] = Color.FromArgb(-1);
                 }
@@ -156,7 +155,7 @@ namespace OrderManager
 
             Color[] colors = shiftShedule.ShiftColors;
 
-            for (int i = 0; i < colors.Length; ++i)
+            for (int i = 0; i < colors.Length; i++)
             {
                 shiftColorsLine += colors[i].ToArgb();
 

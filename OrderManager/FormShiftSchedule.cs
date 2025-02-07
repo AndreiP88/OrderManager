@@ -249,6 +249,18 @@ namespace OrderManager
                 case 2:
                     pictureBox3.BackColor = color;
                     break;
+                case 3:
+                    pictureBox4.BackColor = color;
+                    break;
+                case 4:
+                    pictureBox5.BackColor = color;
+                    break;
+                case 5:
+                    pictureBox6.BackColor = color;
+                    break;
+                case 6:
+                    pictureBox7.BackColor = color;
+                    break;
             }
         }
 
@@ -265,6 +277,26 @@ namespace OrderManager
         private void button7_Click(object sender, EventArgs e)
         {
             SelectColor(2);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            SelectColor(3);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            SelectColor(4);
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            SelectColor(5);
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            SelectColor(6);
         }
     }
 }
