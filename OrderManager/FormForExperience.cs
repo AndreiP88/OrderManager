@@ -557,5 +557,71 @@ namespace OrderManager
                 }
             }
         }
+
+        private void SetTypeToBase(int id, int newType)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE orders SET makereadyType = @type " +
+                    "WHERE count = @count";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@type", newType);
+                Command.Parameters.AddWithValue("@count", id);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            return;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM ordersInProgress"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    int typeJob = (int)sqlReader["typeJob"];
+                    int makereadyComplete = (int)sqlReader["makereadyComplete"];
+                    int newType = -3;
+
+                    if (typeJob == 0)
+                    {
+                        if (makereadyComplete == -2)
+                        {
+                            newType = -1;
+                        }
+                        else
+                        {
+                            newType = 0;
+                        }
+
+                        SetTypeToBase((int)sqlReader["orderID"], newType);
+                    }
+
+                    ListViewItem item = new ListViewItem();
+
+                    item.Name = sqlReader["count"].ToString();
+                    item.Text = sqlReader["count"].ToString();
+                    item.SubItems.Add(sqlReader["orderID"].ToString());
+                    item.SubItems.Add(makereadyComplete.ToString());
+                    item.SubItems.Add(newType.ToString());
+
+                    listView2.Items.Add(item);
+                }
+
+                Connect.Close();
+            }
+        }
     }
 }

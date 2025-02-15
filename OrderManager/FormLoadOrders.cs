@@ -697,65 +697,44 @@ namespace OrderManager
                     {
                         Connection = Connect,
                         CommandText = @"SELECT
-	                                        man_planjob.id_man_planjob, 
-	                                        man_planjob.date_begin, 
-	                                        man_planjob.date_end, 
-	                                        man_planjob.status, 
-	                                        man_planjob.flags, 
-	                                        man_planjob.id_equip, 
-	                                        man_planjob_list.plan_out_qty, 
-	                                        man_planjob_list.normtime, 
-	                                        order_head.order_num, 
-	                                        order_head.order_name, 
-	                                        common_ul_directory.ul_name, 
-	                                        common_equip_directory.equip_name, 
-	                                        man_planjob_list.id_norm_operation, 
-	                                        man_idletime.idletime_type, 
-	                                        man_idletime.id_idletime, 
-	                                        idletime_directory.idletime_name, 
-	                                        man_idletime.id_man_idletime, 
-	                                        order_head.id_order_head
+                                          man_planjob.id_man_planjob,
+                                          man_planjob.date_begin,
+                                          man_planjob.date_end,
+                                          man_planjob.status,
+                                          man_planjob.flags,
+                                          man_planjob.id_equip,
+                                          man_planjob_list.plan_out_qty,
+                                          man_planjob_list.normtime,
+                                          order_head.order_num,
+                                          common_ul_directory.ul_name,
+                                          order_head.order_name,
+                                          order_detail.detail_name,
+                                          common_equip_directory.equip_name,
+                                          man_planjob_list.id_norm_operation,
+                                          man_idletime.idletime_type,
+                                          man_idletime.id_idletime,
+                                          idletime_directory.idletime_name,
+                                          man_idletime.id_man_idletime,
+                                          order_head.id_order_head,
+                                          man_planjob.id_man_order_job_item 
                                         FROM
-	                                        dbo.man_planjob
-	                                        INNER JOIN
-	                                        dbo.man_planjob_list
-	                                        ON 
-		                                        man_planjob.id_man_order_job_item = man_planjob_list.id_man_order_job_item
-	                                        LEFT JOIN
-	                                        dbo.man_order_job_item
-	                                        ON 
-		                                        man_planjob.id_man_order_job_item = man_order_job_item.id_man_order_job_item
-	                                        LEFT JOIN
-	                                        dbo.man_order_job
-	                                        ON 
-		                                        man_order_job_item.id_man_order_job = man_order_job.id_man_order_job
-	                                        LEFT JOIN
-	                                        dbo.order_head
-	                                        ON 
-		                                        man_order_job.id_order_head = order_head.id_order_head
-	                                        LEFT JOIN
-	                                        dbo.common_ul_directory
-	                                        ON 
-		                                        order_head.id_customer = common_ul_directory.id_common_ul_directory
-	                                        LEFT JOIN
-	                                        dbo.common_equip_directory
-	                                        ON 
-		                                        man_order_job.id_equip = common_equip_directory.id_common_equip_directory
-	                                        LEFT JOIN
-	                                        dbo.man_idletime
-	                                        ON 
-		                                        man_order_job.id_man_order_job = man_idletime.id_man_order_job
-	                                        LEFT JOIN
-	                                        dbo.idletime_directory
-	                                        ON 
-		                                        man_idletime.id_idletime = idletime_directory.id_idletime_directory
+                                          dbo.man_planjob
+                                          INNER JOIN dbo.man_planjob_list ON man_planjob.id_man_order_job_item = man_planjob_list.id_man_order_job_item
+                                          LEFT JOIN dbo.man_order_job_item ON man_planjob.id_man_order_job_item = man_order_job_item.id_man_order_job_item
+                                          LEFT JOIN dbo.man_order_job ON man_order_job_item.id_man_order_job = man_order_job.id_man_order_job
+                                          LEFT JOIN dbo.order_head ON man_order_job.id_order_head = order_head.id_order_head
+                                          LEFT JOIN dbo.common_ul_directory ON order_head.id_customer = common_ul_directory.id_common_ul_directory
+                                          LEFT JOIN dbo.common_equip_directory ON man_order_job.id_equip = common_equip_directory.id_common_equip_directory
+                                          LEFT JOIN dbo.man_idletime ON man_order_job.id_man_order_job = man_idletime.id_man_order_job
+                                          LEFT JOIN dbo.idletime_directory ON man_idletime.id_idletime = idletime_directory.id_idletime_directory
+                                          LEFT JOIN dbo.order_detail ON man_order_job_item.itemid = order_detail.id_order_detail 
                                         WHERE
-	                                        man_planjob.status <> 2 AND
-	                                        man_planjob.flags <> 1 AND
-                                            plan_out_qty IS NOT NULL AND
-	                                        man_planjob.id_equip = @idMachine
+                                          man_planjob.status <> 2 AND
+                                          man_planjob.flags <> 1 AND
+                                          plan_out_qty IS NOT NULL AND
+	                                      man_planjob.id_equip = @idMachine
                                         ORDER BY
-	                                        man_planjob.date_begin ASC"
+	                                      man_planjob.date_begin ASC"
                     };
                     Command.Parameters.AddWithValue("@idMachine", idMachine);
 
@@ -785,7 +764,7 @@ namespace OrderManager
                                         sqlReader["date_end"].ToString(),
                                         sqlReader["order_num"].ToString(),
                                         sqlReader["ul_name"].ToString(),
-                                        sqlReader["order_name"].ToString(),
+                                        sqlReader["order_name"].ToString() + ": " + sqlReader["detail_name"].ToString(),
                                         0,
                                         0,
                                         0,

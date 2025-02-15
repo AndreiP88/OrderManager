@@ -53,6 +53,9 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
+            this.button5 = new System.Windows.Forms.Button();
+            this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // button1
@@ -97,7 +100,7 @@
             this.listView1.GridLines = true;
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(510, 12);
+            this.listView1.Location = new System.Drawing.Point(734, 12);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(288, 504);
@@ -187,14 +190,16 @@
             // 
             this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader10,
-            this.columnHeader11});
+            this.columnHeader11,
+            this.columnHeader12,
+            this.columnHeader15});
             this.listView2.FullRowSelect = true;
             this.listView2.GridLines = true;
             this.listView2.HideSelection = false;
             this.listView2.Location = new System.Drawing.Point(195, 12);
             this.listView2.MultiSelect = false;
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(309, 504);
+            this.listView2.Size = new System.Drawing.Size(514, 504);
             this.listView2.TabIndex = 5;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
@@ -239,11 +244,30 @@
             this.textBox3.Size = new System.Drawing.Size(85, 20);
             this.textBox3.TabIndex = 8;
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(13, 102);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(175, 23);
+            this.button5.TabIndex = 9;
+            this.button5.Text = "Изменить тип приладки ";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // columnHeader12
+            // 
+            this.columnHeader12.Width = 145;
+            // 
+            // columnHeader15
+            // 
+            this.columnHeader15.Width = 153;
+            // 
             // FormForExperience
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(810, 545);
+            this.ClientSize = new System.Drawing.Size(1034, 545);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
@@ -287,5 +311,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.ColumnHeader columnHeader12;
+        private System.Windows.Forms.ColumnHeader columnHeader15;
     }
 }

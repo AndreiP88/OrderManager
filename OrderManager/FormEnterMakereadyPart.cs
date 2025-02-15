@@ -1,9 +1,4 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.IO;
-using System.Runtime.CompilerServices;
+﻿using System;
 using System.Windows.Forms;
 
 namespace OrderManager
@@ -11,6 +6,8 @@ namespace OrderManager
     public partial class FormEnterMakereadyPart : Form
     {
         bool _edit = false;
+        int _type = 1;
+        int makereadyTime = -1;
 
         int ShiftID;
         int Machine;
@@ -31,7 +28,7 @@ namespace OrderManager
             this.OrderInProgressID = orderInProgressID;
         }
 
-        public FormEnterMakereadyPart(int shiftID, int machine, int orderIndex, int counterRepeat, int currentTimeMakeready)
+        public FormEnterMakereadyPart(int shiftID, int machine, int orderIndex, int counterRepeat, int currentTimeMakeready, int typeMakeready)
         {
             InitializeComponent();
 
@@ -43,17 +40,22 @@ namespace OrderManager
             this.CounterRepeat = counterRepeat;
             this.CurrentTimeMakeready = currentTimeMakeready;
 
+
+            this._type = typeMakeready;
+
             this.OrderInProgressID = -1;
         }
 
         private void LoadOtherParameters(int orderInProgressID)
         {
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            ValueOrdersBase orders = new ValueOrdersBase();
 
             this.ShiftID = getOrders.GetShiftIDFromOrderInProgressID(orderInProgressID);
             this.Machine = getOrders.GetMachineFromOrderInProgressID(orderInProgressID);
             this.OrderIndex = getOrders.GetOrderID(orderInProgressID);
             this.CounterRepeat = getOrders.GetCounterRepeatFromOrderInProgressID(orderInProgressID);
+            this._type = orders.GetMakereadyType(OrderIndex);
         }
 
         int maxValueTrackBox = 1000;
@@ -64,20 +66,30 @@ namespace OrderManager
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             GetLeadTime leadTime = new GetLeadTime(ShiftID, Machine, OrderIndex, CounterRepeat);
 
-            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
-
-            trackBar1.Maximum = makereadyTime;
-
+            makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, true);
-            int lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
+            int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(OrderInProgressID);
+
+            int lastTimeMakeready = -2;
+
+            if (_type == 0)
+            {
+                lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
+                trackBar1.Maximum = makereadyTime;
+
+                SetTimeValue(currentMakereadyPart);
+            }
+            else if (_type == 1)
+            {
+                lastTimeMakeready = 100 - makereadySummPreviousParts;
+                trackBar1.Maximum = 100;
+
+                SetTimeValue(currentMakereadyPart * makereadyTime / 100);
+            }
 
             maxValueTrackBox = lastTimeMakeready;
 
-            int currentMakereadyPart = getOrders.GetMakereadyPartFromOrderID(OrderInProgressID);
-
             SetTrackBarValue(currentMakereadyPart);
-            SetTimeValue(currentMakereadyPart);
-
             SetPercentValue(trackBar1.Value, trackBar1.Maximum);
         }
         private void SetValueForAdd()
@@ -85,25 +97,46 @@ namespace OrderManager
             ValueOrdersBase ordersBase = new ValueOrdersBase();
             GetLeadTime leadTime = new GetLeadTime(ShiftID, Machine, OrderIndex, CounterRepeat);
 
-            int makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
-
-            trackBar1.Maximum = makereadyTime;
+            makereadyTime = Convert.ToInt32(ordersBase.GetTimeMakeready(OrderIndex));
 
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
-            int lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
+            
+            int lastTimeMakeready = -2;
+
+            if (_type == 0)
+            {
+                lastTimeMakeready = makereadyTime - makereadySummPreviousParts;
+                trackBar1.Maximum = makereadyTime;
+
+                if (CurrentTimeMakeready > lastTimeMakeready)
+                {
+                    SetTrackBarValue(lastTimeMakeready);
+                    SetTimeValue(lastTimeMakeready);
+                }
+                else
+                {
+                    SetTrackBarValue(CurrentTimeMakeready);
+                    SetTimeValue(CurrentTimeMakeready);
+                }
+            }
+            else if (_type == 1)
+            {
+                lastTimeMakeready = 100 - makereadySummPreviousParts;
+                trackBar1.Maximum = 100;
+
+                if (CurrentTimeMakeready > lastTimeMakeready)
+                {
+                    SetTrackBarValue(lastTimeMakeready);
+                    SetTimeValue(lastTimeMakeready * makereadyTime / 100);
+                }
+                else
+                {
+                    SetTrackBarValue(CurrentTimeMakeready);
+                    SetTimeValue(CurrentTimeMakeready * 100 / makereadyTime);
+                }
+            }
 
             maxValueTrackBox = lastTimeMakeready;
-
-            if (CurrentTimeMakeready > lastTimeMakeready)
-            {
-                SetTrackBarValue(lastTimeMakeready);
-                SetTimeValue(lastTimeMakeready);
-            }
-            else
-            {
-                SetTrackBarValue(CurrentTimeMakeready);
-                SetTimeValue(CurrentTimeMakeready);
-            }
 
             SetPercentValue(trackBar1.Value, trackBar1.Maximum);
         }
@@ -128,6 +161,18 @@ namespace OrderManager
             return trackBar1.Value;
         }
 
+        private int GetPercentValue()
+        {
+            int result = 0;
+
+            int currentValue = trackBar1.Value;
+            int maxValue = trackBar1.Maximum;
+
+            result = 100 * currentValue / maxValue;
+
+            return result;
+        }
+
         private void SetTrackBarValue(int value)
         {
             trackBar1.Value = value;
@@ -145,18 +190,18 @@ namespace OrderManager
             SetTrackBarValue(value);
         }
 
+        public int Type
+        {
+            get => _type;
+            set => _type = value;
+        }
+
         private bool newValue = false;
 
         public bool NewValue
         {
-            get
-            {
-                return newValue;
-            }
-            set
-            {
-                newValue = value;
-            }
+            get => newValue;
+            set => newValue = value;
         }
 
         private int mkPart = 0;
@@ -187,7 +232,23 @@ namespace OrderManager
 
         private void button1_Click(object sender, EventArgs e)
         {
+            //Сделать часть приладки, передавать тип (0 - время, 1 - часть приладки (0 - 100))
+
             newValue = true;
+
+            switch (_type)
+            {
+                case 0:
+                    mkPart = GetTimeValue();
+                    break;
+                case 1:
+                    mkPart = GetPercentValue();
+                    break;
+                default:
+                    newValue = false;
+                    break;
+            }
+
             mkPart = GetTimeValue();
 
             this.Hide();
@@ -203,7 +264,7 @@ namespace OrderManager
             else
             {
                 SetValueForAdd();
-                button2.Enabled = false;
+                button2.Enabled = true;
             }
         }
 
@@ -213,8 +274,16 @@ namespace OrderManager
             {
                 trackBar1.Value = maxValueTrackBox;
             }
+            
+            if (_type == 0)
+            {
+                SetTimeValue(trackBar1.Value);
+            }
+            else if (_type == 1)
+            {
+                SetTimeValue(trackBar1.Value * makereadyTime / 100);
+            }
 
-            SetTimeValue(trackBar1.Value);
             SetPercentValue(trackBar1.Value, trackBar1.Maximum);
         }
 

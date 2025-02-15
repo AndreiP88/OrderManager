@@ -805,7 +805,7 @@ namespace OrderManager
         {
             int result = -1;
 
-            FormEnterMakereadyPart form = new FormEnterMakereadyPart(shiftID, machine, orderIndex, counterRepeat, currentTimeMakeready);
+            FormEnterMakereadyPart form = new FormEnterMakereadyPart(shiftID, machine, orderIndex, counterRepeat, currentTimeMakeready, 1);
             form.ShowDialog();
 
             if (form.NewValue)

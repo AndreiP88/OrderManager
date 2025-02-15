@@ -71,6 +71,11 @@ namespace OrderManager
             return Convert.ToInt32(GetValueFromIndex(index, "counterRepeat"));
         }
 
+        public int GetMakereadyType(int index)
+        {
+            return Convert.ToInt32(GetValueFromIndex(index, "makereadyType"));
+        }
+
         public string GetAmountOfOrder(int index)
         {
             return GetValueFromIndex(index, "amountOfOrder");

@@ -1497,6 +1497,7 @@ namespace OrderManager
             String stamp = textBox2.Text;
             String status = "0";
             String counterR = "0";
+            int mkType = 1;
 
             //SELECT COUNT(*) FROM YourTable WHERE YourKeyCol = YourKeyValue
 
@@ -1527,8 +1528,8 @@ namespace OrderManager
                         "SELECT * FROM (SELECT @orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR) " +
                         "AS tmp WHERE NOT EXISTS(SELECT numberOfOrder FROM orders WHERE (numberOfOrder = @number AND modification = @modification) AND machine = @machine) LIMIT 1";*/
 
-                    string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
-                        "VALUES (@orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR)";
+                    string commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat, makereadyType) " +
+                        "VALUES (@orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR, @makereadyType)";
 
                     MySqlCommand Command = new MySqlCommand(commandText, Connect);
                     Command.Parameters.AddWithValue("@orderAddedDate", orderAddedDate); // присваиваем переменной значение
@@ -1542,7 +1543,7 @@ namespace OrderManager
                     Command.Parameters.AddWithValue("@stamp", stamp);
                     Command.Parameters.AddWithValue("@status", status);
                     Command.Parameters.AddWithValue("@counterR", counterR);
-
+                    Command.Parameters.AddWithValue("@makereadyType", mkType);
 
                     Connect.Open();
                     Command.ExecuteNonQuery();
@@ -1563,7 +1564,7 @@ namespace OrderManager
                         "VALUES (@orderID, @name, @count)";
 
                         MySqlCommand Command = new MySqlCommand(commandText, Connect);
-                        Command.Parameters.AddWithValue("@orderID", orderID); // присваиваем переменной значение
+                        Command.Parameters.AddWithValue("@orderID", orderID);
                         Command.Parameters.AddWithValue("@name", items[i]);
                         Command.Parameters.AddWithValue("@count", items[i + 1]);
 
@@ -1684,11 +1685,11 @@ namespace OrderManager
             }
         }
 
-        private int ManualEnterPartMakereadyComplete(int shiftID, int machine, int orderIndex, int counterRepeat, int currentTimeMakeready)
+        private int ManualEnterPartMakereadyComplete(int shiftID, int machine, int orderIndex, int counterRepeat, int currentTimeMakeready, int typeMakeready)
         {
             int result = -1;
 
-            FormEnterMakereadyPart form = new FormEnterMakereadyPart(shiftID, machine, orderIndex, counterRepeat, currentTimeMakeready);
+            FormEnterMakereadyPart form = new FormEnterMakereadyPart(shiftID, machine, orderIndex, counterRepeat, currentTimeMakeready, typeMakeready);
             form.ShowDialog();
 
             if (form.NewValue)
@@ -1699,7 +1700,7 @@ namespace OrderManager
             return result;
         }
 
-        private async void AcceptOrderInProgressToDB()
+        private async Task<bool> AcceptOrderInProgressToDB()
         {
             //ValueInfoBase getInfo = new ValueInfoBase();
             //ValueOrdersBase getValue = new ValueOrdersBase();
@@ -1722,12 +1723,13 @@ namespace OrderManager
 
             string status = orders.GetOrderStatus(orderID);
             int counterRepeat = orders.GetCounterRepeat(orderID);
-            int currentOrderID = infoBase.GetCurrentOrderID(machineCurrent);// сделать загрузку из базы в соответствии с выбранным оборудованием
+            int currentOrderID = infoBase.GetCurrentOrderID(machineCurrent);
             int lastOrderID = infoBase.GetLastOrderID(machineCurrent);
 
             GetCountOfDone orderCalc = new GetCountOfDone(shiftID, orderID, counterRepeat);
             
-            //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, machineCurrent);
+            //int orderInProgressID = getOrders.GetOrderInProgressID(shiftID, orderID, counterRepeat, Convert.ToInt32(machineCurrent));
+            
 
             String makereadyStart = dateTimePicker1.Text;
             String makereadyStop = dateTimePicker2.Text;
@@ -1739,6 +1741,8 @@ namespace OrderManager
 
             GetLeadTime leadTime = new GetLeadTime(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
 
+            int mkTypeLoad = orders.GetMakereadyType(orderID);
+
             int makereadyTime = Convert.ToInt32(orders.GetTimeMakeready(orderID));
 
             int currentTimeMakeready = timeOperations.DateDifferenceToMinutes(makereadyStop, makereadyStart);
@@ -1746,7 +1750,16 @@ namespace OrderManager
 
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
 
-            int makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+            int makereadyLastPart = -2;
+
+            if (mkTypeLoad == 0)
+            {
+                makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+            }
+            else if (mkTypeLoad == 1)
+            {
+                makereadyLastPart = 100 - makereadySummPreviousParts;
+            }
 
             /*int lastMakereadyPart = -1;
 
@@ -1776,7 +1789,14 @@ namespace OrderManager
                 {
                     if (_orderRegistrationType == 0)
                     {
-                        makereadyPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready);
+                        int mkPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready, mkTypeLoad);
+
+                        makereadyPart = mkPart;
+
+                        if (makereadyPart == -1)
+                        {
+                            return false;
+                        }
 
                         UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                         UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
@@ -1814,8 +1834,15 @@ namespace OrderManager
                         }
                         else
                         {
-                            makereadyPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready);
-                            
+                            int mkPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready, mkTypeLoad);
+
+                            makereadyPart = mkPart;
+
+                            if (makereadyPart == -1)
+                            {
+                                return false;
+                            }
+
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
 
@@ -1888,6 +1915,8 @@ namespace OrderManager
             }
 
             orders.SetNewStatus(orderID, newStatus);
+
+            return true;
         }
 
         private async void CloseOrderInProgressToDB()
@@ -1928,7 +1957,19 @@ namespace OrderManager
             int makereadyTime = Convert.ToInt32(orders.GetTimeMakeready(orderID));
 
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
-            int makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+
+            int mkTypeLoad = orders.GetMakereadyType(orderID);
+
+            int makereadyLastPart = -2;
+
+            if (mkTypeLoad == 0)
+            {
+                makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+            }
+            else if (mkTypeLoad == 1)
+            {
+                makereadyLastPart = 100 - makereadySummPreviousParts;
+            }
 
             userBase.UpdateLastMachine(executor, await infoBase.GetMachineFromName(comboBox3.Text));
 
@@ -2024,7 +2065,7 @@ namespace OrderManager
             Close();
         }
 
-        private async void AbortOrderInProgressToDB()
+        private async Task<bool> AbortOrderInProgressToDB()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
@@ -2037,7 +2078,7 @@ namespace OrderManager
             int shiftID = ShiftID;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            
+
             String newStatus = "0";
 
             string machineCurrent = await getInfo.GetMachineFromName(comboBox3.Text);
@@ -2061,13 +2102,25 @@ namespace OrderManager
 
             GetLeadTime leadTime = new GetLeadTime(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
 
+            int mkTypeLoad = orders.GetMakereadyType(orderID);
+
             int makereadyTime = Convert.ToInt32(orders.GetTimeMakeready(orderID));
 
             int currentTimeMakeready = timeOperations.DateDifferenceToMinutes(makereadyStop, makereadyStart);
             int makereadyPart = 0;
 
             int makereadySummPreviousParts = leadTime.CalculateMakereadyParts(true, false, false);
-            int makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+
+            int makereadyLastPart = -2;
+
+            if (mkTypeLoad == 0)
+            {
+                makereadyLastPart = makereadyTime - makereadySummPreviousParts;
+            }
+            else if (mkTypeLoad == 1)
+            {
+                makereadyLastPart = 100 - makereadySummPreviousParts;
+            }
 
             userBase.UpdateLastMachine(executor, await getInfo.GetMachineFromName(comboBox3.Text));
 
@@ -2077,7 +2130,14 @@ namespace OrderManager
                 {
                     if (_orderRegistrationType == 0)
                     {
-                        makereadyPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready);
+                        int mkPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready, mkTypeLoad);
+
+                        makereadyPart = mkPart;
+
+                        if (makereadyPart == -1)
+                        {
+                            return false;
+                        }
 
                         UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                         UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
@@ -2110,7 +2170,14 @@ namespace OrderManager
                         }
                         else
                         {
-                            makereadyPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready);
+                            int mkPart = ManualEnterPartMakereadyComplete(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat, currentTimeMakeready, mkTypeLoad);
+
+                            makereadyPart = mkPart;
+
+                            if (makereadyPart == -1)
+                            {
+                                return false;
+                            }
 
                             UpdateData("timeMakereadyStop", machineCurrent, shiftID, orderID, counterRepeat, makereadyStop);
                             UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyPart);
@@ -2146,6 +2213,8 @@ namespace OrderManager
             orders.IncrementCounterRepeat(orderID);
             orders.SetNewStatus(orderID, newStatus);
             getInfo.UpdateInfo(machineCurrent, -1, 0, -1, -1, false);
+
+            return true;
         }
 
         private async Task IdleAction()
@@ -3199,8 +3268,9 @@ namespace OrderManager
                             if (result == DialogResult.Yes)
                             {
                                 orders.SetNewStatus(orderIndex, "3");
-                                AcceptOrderInProgressToDB();
-                                Close();
+
+                                if (await AcceptOrderInProgressToDB())
+                                    Close();
                             }
                             else if (result == DialogResult.No)
                             {
@@ -3215,8 +3285,8 @@ namespace OrderManager
                             if (result == DialogResult.Yes)
                             {
                                 orders.SetNewStatus(orderIndex, "3");
-                                AcceptOrderInProgressToDB();
-                                Close();
+                                if (await AcceptOrderInProgressToDB())
+                                    Close();
                             }
                             else if (result == DialogResult.No)
                             {
@@ -3237,15 +3307,15 @@ namespace OrderManager
                                 }
                                 else if (result == DialogResult.No)
                                 {
-                                    AcceptOrderInProgressToDB();
-                                    Close();
+                                    if (await AcceptOrderInProgressToDB())
+                                        Close();
                                 }
                             }
                         }
                         else
                         {
-                            AcceptOrderInProgressToDB();
-                            Close();
+                            if (await AcceptOrderInProgressToDB())
+                                Close();
                         }
                     }
                     else
@@ -3298,8 +3368,8 @@ namespace OrderManager
                 }
                 else if (result == DialogResult.No)
                 {
-                    AcceptOrderInProgressToDB();
-                    Close();
+                    if (await AcceptOrderInProgressToDB())
+                        Close();
                 }
                 else if (result == DialogResult.Cancel)
                 {
@@ -3318,7 +3388,7 @@ namespace OrderManager
         {
             ValueInfoBase getInfo = new ValueInfoBase();
 
-            AbortOrderInProgressToDB();
+            await AbortOrderInProgressToDB();
 
             string machine = await getInfo.GetMachineFromName(comboBox3.Text);
             await SelectedMachineChange(machine);
