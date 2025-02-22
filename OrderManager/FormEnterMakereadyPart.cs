@@ -124,15 +124,17 @@ namespace OrderManager
                 lastTimeMakeready = 100 - makereadySummPreviousParts;
                 trackBar1.Maximum = 100;
 
-                if (CurrentTimeMakeready > lastTimeMakeready)
+                int currentMakereadyPart = CurrentTimeMakeready * 100 / makereadyTime;
+
+                if (currentMakereadyPart > lastTimeMakeready)
                 {
                     SetTrackBarValue(lastTimeMakeready);
                     SetTimeValue(lastTimeMakeready * makereadyTime / 100);
                 }
                 else
                 {
-                    SetTrackBarValue(CurrentTimeMakeready);
-                    SetTimeValue(CurrentTimeMakeready * 100 / makereadyTime);
+                    SetTrackBarValue(currentMakereadyPart);
+                    SetTimeValue(CurrentTimeMakeready);
                 }
             }
 
