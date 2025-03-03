@@ -417,10 +417,14 @@ namespace OrderManager
                                 string commandText;
                                 if (detailsLoad == true)
                                 {
-                                    commandText = "SELECT * FROM allordersinjob WHERE orderID = '" + orderID + "'";
+                                    commandText = "SELECT * FROM allordersinjob WHERE orderID = '" + orderID + "' ";
                                 }
                                 else
-                                    commandText = "SELECT * FROM allordersinjob WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(machineName) + "'";
+                                {
+                                    commandText = "SELECT * FROM allordersinjob WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(machineName) + "' ";
+                                }
+
+                                commandText += "ORDER BY timeMakereadyStart is not null ASC, timeToWorkStart is not null ASC";
 
                                 await Connect.OpenAsync();
 
@@ -549,7 +553,7 @@ namespace OrderManager
                                 {
                                     ListViewItem item = ordersFromShift[i].ListViewItems[j];
 
-                                    if (j == ordersFromShift[i].ListViewItems.Count - 1)
+                                    if (j == ordersFromShift[i].ListViewItems.Count - 1 && !detailsLoad)
                                     {
                                         item.SubItems[10].Text = (timeOperations.MinuteToTimeString((int)ordersFromShift[i].WorkingOut) + " (" + getPercentWorkingOut.PercentString((int)ordersFromShift[i].WorkingOut) + ")");
                                     }
