@@ -385,7 +385,6 @@ namespace OrderManager
                             int amountAllOrders = 0;
 
                             int indexOrdersFromShift = -1;
-                            float workingOutputs = 0;
 
                             string year = "";
                             string month = "";
@@ -472,13 +471,9 @@ namespace OrderManager
 
                                             ordersFromShift.Add(new OrdersFromShift(shiftID));
                                             indexOrdersFromShift = ordersFromShift.Count - 1;
-
-                                            workingOutputs = 0;
                                         }
 
                                         ordersFromShift[indexOrdersFromShift].WorkingOut += (float)Convert.ToDouble(sqlReader["workingOut"]);
-
-                                        workingOutputs += (float)Convert.ToDouble(sqlReader["workingOut"]);
 
                                         //отображение общего количества тиража не в каждой строке, а только в первой
                                         string amountOrder;
