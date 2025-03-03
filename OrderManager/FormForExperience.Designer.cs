@@ -49,20 +49,21 @@
             this.listView2 = new System.Windows.Forms.ListView();
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.button5 = new System.Windows.Forms.Button();
-            this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.button6 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(12, 12);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(177, 23);
+            this.button1.Size = new System.Drawing.Size(209, 23);
             this.button1.TabIndex = 0;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
@@ -72,7 +73,7 @@
             // 
             this.button2.Location = new System.Drawing.Point(12, 42);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(177, 23);
+            this.button2.Size = new System.Drawing.Size(209, 23);
             this.button2.TabIndex = 1;
             this.button2.Text = "button2";
             this.button2.UseVisualStyleBackColor = true;
@@ -180,7 +181,7 @@
             // 
             this.button3.Location = new System.Drawing.Point(12, 72);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(177, 23);
+            this.button3.Size = new System.Drawing.Size(209, 23);
             this.button3.TabIndex = 4;
             this.button3.Text = "Индекс смены в базу заказов";
             this.button3.UseVisualStyleBackColor = true;
@@ -196,10 +197,10 @@
             this.listView2.FullRowSelect = true;
             this.listView2.GridLines = true;
             this.listView2.HideSelection = false;
-            this.listView2.Location = new System.Drawing.Point(195, 12);
+            this.listView2.Location = new System.Drawing.Point(227, 12);
             this.listView2.MultiSelect = false;
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(514, 504);
+            this.listView2.Size = new System.Drawing.Size(482, 504);
             this.listView2.TabIndex = 5;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
@@ -212,6 +213,14 @@
             // 
             this.columnHeader11.Text = "DateTime";
             this.columnHeader11.Width = 230;
+            // 
+            // columnHeader12
+            // 
+            this.columnHeader12.Width = 145;
+            // 
+            // columnHeader15
+            // 
+            this.columnHeader15.Width = 153;
             // 
             // button4
             // 
@@ -248,25 +257,28 @@
             // 
             this.button5.Location = new System.Drawing.Point(13, 102);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(175, 23);
+            this.button5.Size = new System.Drawing.Size(208, 23);
             this.button5.TabIndex = 9;
             this.button5.Text = "Изменить тип приладки ";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
-            // columnHeader12
+            // button6
             // 
-            this.columnHeader12.Width = 145;
-            // 
-            // columnHeader15
-            // 
-            this.columnHeader15.Width = 153;
+            this.button6.Location = new System.Drawing.Point(13, 132);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(208, 23);
+            this.button6.TabIndex = 10;
+            this.button6.Text = "Перенести заказчиков новую базу";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // FormForExperience
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1034, 545);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);
@@ -314,5 +326,6 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.ColumnHeader columnHeader12;
         private System.Windows.Forms.ColumnHeader columnHeader15;
+        private System.Windows.Forms.Button button6;
     }
 }

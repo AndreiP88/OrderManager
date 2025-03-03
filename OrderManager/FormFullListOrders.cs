@@ -42,6 +42,38 @@ namespace OrderManager
             this.DefaultMachine = defaultMachine;
         }
 
+        class OrdersFromShift
+        {
+            int _shiftID;
+            float _workingOut;
+            List<ListViewItem> _listViewItems;
+
+            public OrdersFromShift(int shiftID)
+            {
+                _shiftID = shiftID;
+                _workingOut = 0;
+                _listViewItems = new List<ListViewItem>();
+            }
+
+            public int ShiftID
+            {
+                get => _shiftID;
+                //set => _shiftID = value;
+            }
+
+            public float WorkingOut
+            {
+                get => _workingOut;
+                set => _workingOut = value;
+            }
+
+            public List<ListViewItem> ListViewItems
+            {
+                get => _listViewItems;
+                set => _listViewItems = value;
+            }
+        }
+
         String GetParametersLine()
         {
             String pLine = "";
@@ -322,6 +354,7 @@ namespace OrderManager
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            GetPercentFromWorkingOut getPercentWorkingOut = new GetPercentFromWorkingOut();
 
             await Task.Run(async () =>
             {
@@ -351,6 +384,9 @@ namespace OrderManager
                             int countOrders = 0;
                             int amountAllOrders = 0;
 
+                            int indexOrdersFromShift = -1;
+                            float workingOutputs = 0;
+
                             string year = "";
                             string month = "";
                             string machine = "";
@@ -359,6 +395,8 @@ namespace OrderManager
                             string selectMonth = "1";
                             string machineName = "";
                             string searchValue = "";
+
+                            List<OrdersFromShift> ordersFromShift = new List<OrdersFromShift>();
 
                             Invoke(new Action(() =>
                             {
@@ -414,18 +452,29 @@ namespace OrderManager
 
                                         //отображение имени исполнителя не в каждой строке, а только в начале смены
                                         //возможно сделать, как опцию
-                                        String date, name;
+                                        string date, name;
                                         if (tmpShiftsID == shiftID)
                                         {
                                             date = "";
                                             name = "";
+
+                                            //workingOutputs += ((float)sqlReader["workingOut"]);
                                         }
                                         else
                                         {
                                             date = Convert.ToDateTime(shiftStart).ToString("d");
                                             date += ", " + getNumberShift.NumberShift(shiftStart);
                                             name = usersBase.GetNameUser(sqlReader["executor"].ToString());
+
+                                            ordersFromShift.Add(new OrdersFromShift(shiftID));
+                                            indexOrdersFromShift = ordersFromShift.Count - 1;
+
+                                            workingOutputs = 0;
                                         }
+
+                                        ordersFromShift[indexOrdersFromShift].WorkingOut += (float)Convert.ToDouble(sqlReader["workingOut"]);
+
+                                        workingOutputs += (float)Convert.ToDouble(sqlReader["workingOut"]);
 
                                         //отображение общего количества тиража не в каждой строке, а только в первой
                                         string amountOrder;
@@ -446,10 +495,6 @@ namespace OrderManager
                                         if (tmpNumberOrders != sqlReader["orderID"].ToString())
                                             countOrders++;
 
-                                        tmpShiftsID = shiftID;
-                                        tmpNumberOrders = sqlReader["orderID"].ToString();
-                                        tmpAmountOrder = Convert.ToInt32(sqlReader["amountOfOrder"]);
-
                                         amountAllOrders += Convert.ToInt32(sqlReader["done"]);
 
                                         ListViewItem item = new ListViewItem();
@@ -464,6 +509,8 @@ namespace OrderManager
                                         item.SubItems.Add(timeOperations.DateDifferent(sqlReader["timeToWorkStop"].ToString(), sqlReader["timeToWorkStart"].ToString()));
                                         item.SubItems.Add(amountOrder);
                                         item.SubItems.Add(Convert.ToInt32(sqlReader["done"]).ToString("N0"));
+                                        item.SubItems.Add(timeOperations.MinuteToTimeString(Convert.ToInt32(sqlReader["workingOut"])));
+                                        item.SubItems.Add("");
                                         item.SubItems.Add(sqlReader["note"].ToString());
 
                                         if (token.IsCancellationRequested)
@@ -471,16 +518,49 @@ namespace OrderManager
                                             break;
                                         }
 
+                                        ordersFromShift[indexOrdersFromShift].ListViewItems.Add(item);
+
                                         Invoke(new Action(() =>
                                         {
-                                            listView1?.Items?.Add(item);
+                                            //listView1?.Items?.Add(item);
                                         }));
 
                                         index++;
+
+                                        tmpShiftsID = shiftID;
+                                        tmpNumberOrders = sqlReader["orderID"].ToString();
+                                        tmpAmountOrder = Convert.ToInt32(sqlReader["amountOfOrder"]);
                                     }
 
                                 }
                                 await Connect.CloseAsync();
+                            }
+
+                            for (int i = 0; i < ordersFromShift.Count; i++)
+                            {
+                                Color color = Color.White;
+
+                                if (i % 2 != 0)
+                                {
+                                    color = Color.Silver;
+                                }
+
+                                for (int j = 0; j < ordersFromShift[i].ListViewItems.Count; j++)
+                                {
+                                    ListViewItem item = ordersFromShift[i].ListViewItems[j];
+
+                                    if (j == ordersFromShift[i].ListViewItems.Count - 1)
+                                    {
+                                        item.SubItems[10].Text = (timeOperations.MinuteToTimeString((int)ordersFromShift[i].WorkingOut) + " (" + getPercentWorkingOut.PercentString((int)ordersFromShift[i].WorkingOut) + ")");
+                                    }
+
+                                    item.BackColor = color;
+
+                                    Invoke(new Action(() =>
+                                    {
+                                        listView1?.Items?.Add(item);
+                                    }));
+                                }
                             }
 
                             if (token.IsCancellationRequested)

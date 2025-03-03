@@ -21,6 +21,7 @@ namespace OrderManager
         public int done;
         public int norm;
         public int workingOut;
+        public float workingOutDB;
         public int mkDeviation;
         public int wkDeviation;
         public int counterRepeat;
@@ -28,7 +29,7 @@ namespace OrderManager
         public string notePrivate;
         public Order(int typeJob, int indexOrderInProgress, int orderID, string machine, string number, string modification, string orderName, int orderAmount, int lastCountOfOrder, int plannedMakeready,
             int plannedWork, int status, int facticalMakeready, int facticalWork, int countDone, int cNorm,
-            int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, int orderCounterRepeat, string orderNote, string orderPrivateNote)
+            int orderWorkingOut, int mkDeviationOrder, int wkDeviationOrder, int orderCounterRepeat, string orderNote, string orderPrivateNote, float workingOutDB)
         {
             this.TypeJob = typeJob;
             this.id = indexOrderInProgress;
@@ -52,6 +53,7 @@ namespace OrderManager
             this.counterRepeat = orderCounterRepeat;
             this.note = orderNote;
             this.notePrivate = orderPrivateNote;
+            this.workingOutDB = workingOutDB;
         }
 
 

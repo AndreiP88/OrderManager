@@ -613,7 +613,7 @@ namespace OrderManager
                                     item.SubItems.Add(ordersCurrentShift[index].done.ToString("N0"));
                                 }
                                     
-                                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut));
+                                item.SubItems.Add(timeOperations.MinuteToTimeString(ordersCurrentShift[index].workingOut) + " (" + timeOperations.MinuteToTimeString((int)ordersCurrentShift[index].workingOutDB) + ")");
                                 item.SubItems.Add(ordersCurrentShift[index].note.ToString());
                                 item.SubItems.Add(ordersCurrentShift[index].notePrivate.ToString());
 

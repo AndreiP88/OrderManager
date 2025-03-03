@@ -664,6 +664,8 @@ namespace OrderManager
                                 typeMakeready, timeMakeready, (int)sqlReader["makereadyComplete"], makereadyConsider, 
                                 sqlReader["timeMakereadyStop"].ToString(), sqlReader["timeMakereadyStart"].ToString());
 
+                            float timeWorkingOutDB = (float)Convert.ToDouble(sqlReader["workingOut"]);
+
                             orders.Add(new Order(
                                 typeJob,
                                 Convert.ToInt32(sqlReader["count"]),
@@ -689,7 +691,8 @@ namespace OrderManager
                                 wkDeviation,
                                 Convert.ToInt32(sqlReader["counterRepeat"]),
                                 sqlReader["note"].ToString(),
-                                sqlReader["privateNote"].ToString()
+                                sqlReader["privateNote"].ToString(),
+                                timeWorkingOutDB
                                 ));
                         }
                     }
@@ -845,7 +848,8 @@ namespace OrderManager
                                 wkDeviation,
                                 Convert.ToInt32(sqlReader["counterRepeat"]),
                                 sqlReader["note"].ToString(),
-                                sqlReader["privateNote"].ToString()
+                                sqlReader["privateNote"].ToString(),
+                                0
                                 ));
                         }
                     }
