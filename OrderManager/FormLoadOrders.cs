@@ -355,7 +355,7 @@ namespace OrderManager
                     break;
                 }
 
-                List<string> jobItem = new List<string>();
+                List<int> jobItem = new List<int>();
                 List<string> itemID = new List<string>();
 
                 string stamp = await GetStampFromOrderNumber(orderNumbers[i].numberOfOrder);
@@ -383,7 +383,7 @@ namespace OrderManager
                         }
 
                         ///////
-                        jobItem.Add(sqlReader["id_man_order_job_item"].ToString());
+                        jobItem.Add(Convert.ToInt32(sqlReader["id_man_order_job_item"]));
                         itemID.Add(sqlReader["itemid"].ToString());
                     }
                     //MessageBox.Show(itemOrder.Count.ToString());
@@ -466,8 +466,8 @@ namespace OrderManager
 
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
                             {
-                                wkNormTime.Add(Convert.ToInt32(sqlReader["normtime"]));
-                                amounts.Add(Convert.ToInt32(sqlReader["plan_out_qty"]));
+                                wkNormTime.Add(sqlReader["normtime"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["normtime"]));
+                                amounts.Add(sqlReader["plan_out_qty"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["plan_out_qty"]));
                             }
                         }
                         connection.Close();
@@ -497,7 +497,8 @@ namespace OrderManager
                                 wkNormTime[j],
                                 amounts[j],
                                 stamp,
-                                orderHeadList[i]
+                                orderHeadList[i],
+                                jobItem[k]
                             ));
 
                             int index = orders.Count - 1;
@@ -531,7 +532,8 @@ namespace OrderManager
                                     wkNormTime[j],
                                     amounts[j],
                                     stamp,
-                                    orderHeadList[i]
+                                    orderHeadList[i],
+                                    jobItem[k]
                                 ));
 
                                 int index = orders.Count - 1;
@@ -547,7 +549,8 @@ namespace OrderManager
                                     0,
                                     0,
                                     stamp,
-                                    orderHeadList[i]
+                                    orderHeadList[i],
+                                    jobItem[k]
                                 ));
 
                                 int index = orders.Count - 1;
@@ -584,7 +587,8 @@ namespace OrderManager
                                     wkNormTime[j],
                                     amounts[j],
                                     stamp,
-                                    orderHeadList[i]
+                                    orderHeadList[i],
+                                    jobItem[k]
                                 ));
 
                                 int index = orders.Count - 1;
@@ -600,7 +604,8 @@ namespace OrderManager
                                     wkNormTime[j],
                                     amounts[j],
                                     stamp,
-                                    orderHeadList[i]
+                                    orderHeadList[i],
+                                    jobItem[k]
                                 ));
 
                                 int index = orders.Count - 1;
@@ -748,6 +753,7 @@ namespace OrderManager
                         }
 
                         int idManPlanJob = Convert.ToInt32(sqlReader["id_man_planjob"]);
+                        int idManOrderJobItem = Convert.ToInt32(sqlReader["id_man_order_job_item"]);
 
                         if (!DBNull.Value.Equals(sqlReader["order_num"]))
                         {
@@ -769,7 +775,8 @@ namespace OrderManager
                                         0,
                                         0,
                                         await GetStampFromOrderNumber(sqlReader["order_num"].ToString()),
-                                        sqlReader["id_order_head"].ToString()
+                                        sqlReader["id_order_head"].ToString(),
+                                        idManOrderJobItem
                                     ));
 
                                 itemIndex = orders.Count - 1;
@@ -810,7 +817,8 @@ namespace OrderManager
                                         Convert.ToInt32(sqlReader["normtime"]),
                                         0,
                                         "",
-                                        ""
+                                        "",
+                                        idManOrderJobItem
                                     ));
 
                                 itemIndex = orders.Count - 1;

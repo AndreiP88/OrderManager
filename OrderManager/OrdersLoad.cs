@@ -14,8 +14,9 @@
         public int amountOfOrder;
         public string stamp;
         public string headOrder;
+        public int idManOrderJobItem;
 
-        public OrdersLoad(int typeJob, int idManPlanJob, string timeStartOrder, string timeEndOrder, string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp, string head)
+        public OrdersLoad(int typeJob, int idManPlanJob, string timeStartOrder, string timeEndOrder, string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp, string head, int idManOrderJobItem)
         {
             this.TypeJob = typeJob;
             this.IDManPlanJob = idManPlanJob;
@@ -28,10 +29,11 @@
             this.workTime = wkTime;
             this.amountOfOrder = amount;
             this.stamp = orderStamp;
-            this.headOrder = head;   
+            this.headOrder = head;
+            this.idManOrderJobItem = idManOrderJobItem;
         }
 
-        public OrdersLoad(string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp, string head)
+        public OrdersLoad(string number, string customer, string item, int mkTime, int wkTime, int amount, string orderStamp, string head, int idManOrderJobItem)
         {
             this.TypeJob = 0;
             this.IDManPlanJob = -1;
@@ -45,6 +47,7 @@
             this.amountOfOrder = amount;
             this.stamp = orderStamp;
             this.headOrder = head;
+            this.idManOrderJobItem = idManOrderJobItem;
         }
     }
 }

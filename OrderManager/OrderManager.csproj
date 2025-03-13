@@ -130,6 +130,12 @@
     <Compile Include="DBConnection.cs" />
     <Compile Include="DBMySQLUtils.cs" />
     <Compile Include="FileDownloader.cs" />
+    <Compile Include="FormAddCloseEditOrderOLD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddCloseEditOrderOLD.Designer.cs">
+      <DependentUpon>FormAddCloseEditOrderOLD.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAddCloseEditOrder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,6 +177,12 @@
     </Compile>
     <Compile Include="FormDataBaseReconnect.Designer.cs">
       <DependentUpon>FormDataBaseReconnect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormLoadOrderOperations.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLoadOrderOperations.Designer.cs">
+      <DependentUpon>FormLoadOrderOperations.cs</DependentUpon>
     </Compile>
     <Compile Include="FormShiftSchedule.cs">
       <SubType>Form</SubType>
@@ -256,11 +268,15 @@
     <Compile Include="FormTypesInTheOrder.Designer.cs">
       <DependentUpon>FormTypesInTheOrder.cs</DependentUpon>
     </Compile>
+    <Compile Include="GetOrderOperations.cs" />
     <Compile Include="GetWorkingOutSum.cs" />
     <Compile Include="GetWorkingOutTime.cs" />
     <Compile Include="INISettings.cs" />
     <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="DataBaseReconnect.cs" />
+    <Compile Include="LoadOrder.cs" />
+    <Compile Include="LoadShift.cs" />
+    <Compile Include="LoadOrderOperations.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="OrdersLoad.cs" />
     <Compile Include="OrderStatusValue.cs" />
@@ -379,6 +395,9 @@
     <EmbeddedResource Include="DayBlank.resx">
       <DependentUpon>DayBlank.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormAddCloseEditOrderOLD.resx">
+      <DependentUpon>FormAddCloseEditOrderOLD.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormAddCloseEditOrder.resx">
       <DependentUpon>FormAddCloseEditOrder.cs</DependentUpon>
     </EmbeddedResource>
@@ -408,6 +427,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormDataBaseReconnect.resx">
       <DependentUpon>FormDataBaseReconnect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLoadOrderOperations.resx">
+      <DependentUpon>FormLoadOrderOperations.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormShiftSchedule.resx">
       <DependentUpon>FormShiftSchedule.cs</DependentUpon>

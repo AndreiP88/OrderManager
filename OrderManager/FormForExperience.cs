@@ -628,5 +628,22 @@ namespace OrderManager
         {
 
         }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            ValueUserBase userBase = new ValueUserBase();
+
+            List<int> ids = userBase.GetIndexUserFromASBase(1);
+
+            for (int i = 0; ids.Count > i; i++)
+            {
+                ListViewItem item = new ListViewItem();
+
+                item.Name = ids[i].ToString();
+                item.Text = ids[i].ToString();
+
+                listView2.Items.Add(item);
+            }
+        }
     }
 }

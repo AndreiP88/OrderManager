@@ -65,8 +65,8 @@ namespace OrderManager
             //List<int> indexes = new List<int>();
 
             string load = (string)GetValue("id", userID.ToString(), "indexUserFromAS");
-
-            var indexes = load?.Split(';')?.Select(Int32.Parse)?.ToList();
+            //load = load.Remove(load.Length - 1);
+            List<int> indexes = load?.Split(';')?.Select(Int32.Parse)?.ToList();
 
             return indexes;
         }
@@ -589,6 +589,7 @@ namespace OrderManager
             }
         }
 
+        //Потом сделать не перебором, а по запросу
         public int GetUserIdFromASystemID(int userASystemID)
         {
             int result = -1;

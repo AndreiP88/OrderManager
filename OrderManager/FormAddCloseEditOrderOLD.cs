@@ -11,7 +11,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
-    public partial class FormAddCloseEditOrder : Form
+    public partial class FormAddCloseEditOrderOLD : Form
     {
         int ShiftID;
         //int OrderID = -1;
@@ -42,7 +42,7 @@ namespace OrderManager
             }
         }
 
-        public FormAddCloseEditOrder(int loadShiftID)
+        public FormAddCloseEditOrderOLD(int loadShiftID)
         {
             InitializeComponent();
 
@@ -52,7 +52,7 @@ namespace OrderManager
             _editOrder = false;
         }
 
-        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, int activeMachine = -1)
+        public FormAddCloseEditOrderOLD(int loadShiftID, int orderInProgressID, int activeMachine = -1)
         {
             InitializeComponent();
 
@@ -72,7 +72,7 @@ namespace OrderManager
             }
         }
 
-        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, bool adminMode = false, bool adminModeClose = false)
+        public FormAddCloseEditOrderOLD(int loadShiftID, int orderInProgressID, bool adminMode = false, bool adminModeClose = false)
         {
             InitializeComponent();
 
@@ -1818,16 +1818,6 @@ namespace OrderManager
 
                             //int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, orderInProgressID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
                             int lastTimeMakeready = makereadyLastPart;
-
-                            if (mkTypeLoad == 0)
-                            {
-                                lastTimeMakeready = makereadyTime - makereadyLastPart;
-                            }
-                            else if (mkTypeLoad == 1)
-                            {
-                                lastTimeMakeready = makereadyTime * makereadyLastPart / 100;
-                            }
-                            
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
@@ -3231,26 +3221,6 @@ namespace OrderManager
             UpdateData("note", orderInProgressID, textBox8.Text);
         }
 
-        private void LoadOtherShifts(OrdersLoad ordersLoad)
-        {
-            GetOrderOperations orderOperations = new GetOrderOperations();
-
-            int idManOrderJobItem = ordersLoad.idManOrderJobItem;
-
-
-            LoadOrder loadOrder = orderOperations.OperationsForOrder(idManOrderJobItem);
-
-            /*
-             * Сделать проверку на совпадение смен и, если есть расхождение, то предложить добавить недостающие смены
-             * Получить все смены в менеджере для заказа
-             * for (int i = 0; i < loadOrder.Shift.Count; i++)
-            {
-                Console.WriteLine(loadOrder.Shift[i].UserID + ": " + loadOrder.Shift[i].ShiftDate + " " + loadOrder.Shift[i].ShiftNumber + ": " + loadOrder.Shift[i].IDFbcBrigade);
-                Console.WriteLine("::::: " + loadOrder.Shift[i].OrderOperations[0].MakereadyStart + " - " + loadOrder.Shift[i].OrderOperations[0].MakereadyStop + ": " + loadOrder.Shift[i].OrderOperations[0].MakereadyComplete);
-                Console.WriteLine("::::: " + loadOrder.Shift[i].OrderOperations[0].WorkStart + " - " + loadOrder.Shift[i].OrderOperations[0].WorkStop + ": " + loadOrder.Shift[i].OrderOperations[0].Done);
-            }*/
-        }
-
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             await LoadOrderDetails();
@@ -3640,8 +3610,6 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                LoadOtherShifts(fm.SetValue);
-
                 SetNewOrder(fm.SetValue, fm.Types);
             }
         }
