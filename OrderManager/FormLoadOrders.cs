@@ -784,7 +784,7 @@ namespace OrderManager
 
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
                             {
-                                orders[itemIndex].makereadyTime = Convert.ToInt32(sqlReader["normtime"]) / Convert.ToInt32(sqlReader["plan_out_qty"]);
+                                orders[itemIndex].makereadyTime = (int)(Convert.ToDouble(sqlReader["normtime"]) / Convert.ToDouble(sqlReader["plan_out_qty"]));
                             }
 
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)

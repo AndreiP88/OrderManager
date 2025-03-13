@@ -3243,12 +3243,17 @@ namespace OrderManager
             /*
              * Сделать проверку на совпадение смен и, если есть расхождение, то предложить добавить недостающие смены
              * Получить все смены в менеджере для заказа
-             * for (int i = 0; i < loadOrder.Shift.Count; i++)
+             * 
+             * 
+             * 
+             */
+
+            for (int i = 0; i < loadOrder.Shift.Count; i++)
             {
                 Console.WriteLine(loadOrder.Shift[i].UserID + ": " + loadOrder.Shift[i].ShiftDate + " " + loadOrder.Shift[i].ShiftNumber + ": " + loadOrder.Shift[i].IDFbcBrigade);
                 Console.WriteLine("::::: " + loadOrder.Shift[i].OrderOperations[0].MakereadyStart + " - " + loadOrder.Shift[i].OrderOperations[0].MakereadyStop + ": " + loadOrder.Shift[i].OrderOperations[0].MakereadyComplete);
                 Console.WriteLine("::::: " + loadOrder.Shift[i].OrderOperations[0].WorkStart + " - " + loadOrder.Shift[i].OrderOperations[0].WorkStop + ": " + loadOrder.Shift[i].OrderOperations[0].Done);
-            }*/
+            }
         }
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -3384,7 +3389,7 @@ namespace OrderManager
             int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
 
             String status = orders.GetOrderStatus(orderIndex);
-
+            //
             if (numericUpDown4.Value < numericUpDown3.Value && status == "3")
             {
                 MessageBoxManager.Register();

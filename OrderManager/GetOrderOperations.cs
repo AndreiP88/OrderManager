@@ -184,6 +184,8 @@ namespace OrderManager
                                 shiftEnd,
                                 new List<LoadOrderOperations>()
                                 ));*/
+                            counterMK = 0;
+                            counterWK = 0;
 
                             loadOrder.Shift.Add(new LoadShift());
 
