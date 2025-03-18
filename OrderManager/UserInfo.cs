@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OrderManager
 {
@@ -12,7 +13,7 @@ namespace OrderManager
         public String dateOfEmployment;
         public String dateOfBirth;
         public String activeUser;
-        public string indexUser;
+        public List<int> indexUser;
         public String dateOfDismissal;
         public String note;
         private object v;
@@ -22,7 +23,7 @@ namespace OrderManager
             this.v = v;
         }
 
-        public UserInfo(int userID, string surname, string name, string patronymic, string categoryesMachine, string dateOfEmployment, string dateOfBirth, string activeUser, string indexUser, string dateOfDismissal, string note)
+        public UserInfo(int userID, string surname, string name, string patronymic, string categoryesMachine, string dateOfEmployment, string dateOfBirth, string activeUser, List<int> indexUser, string dateOfDismissal, string note)
         {
             this.userID = userID;
             this.surname = surname;

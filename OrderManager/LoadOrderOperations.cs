@@ -9,6 +9,10 @@
         private int makereadyComplete;
         private int done;
 
+        public LoadOrderOperations()
+        {
+
+        }
         public LoadOrderOperations(string makereadyStart, string makereadyStop, string workStart, string workStop, int makereadyComplete, int done)
         {
             MakereadyStart = makereadyStart;

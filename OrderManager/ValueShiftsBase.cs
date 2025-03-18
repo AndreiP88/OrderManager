@@ -1,4 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -315,5 +317,41 @@ namespace OrderManager
             return result;
         }
 
+        public List<string> GetShiftFromDate(int userID, string date)
+        {
+            List<string> startShift = new List<string>();
+
+            try
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT startShift FROM `shifts`
+                                        WHERE str_to_date(startShift, '%d.%m.%Y') = str_to_date(@startDate,  '%d.%m.%Y')
+                                        AND nameUser = @userID"
+                    };
+                    Command.Parameters.AddWithValue("@startDate", date);
+                    Command.Parameters.AddWithValue("@userID", userID);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        startShift.Add(sqlReader["startShift"].ToString());
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка получения списка смен: " + ex.ToString());
+            }
+
+            return startShift;
+        }
     }
 }

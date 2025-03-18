@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using libData;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -60,13 +61,13 @@ namespace OrderManager
             return fullName;
         }
 
-        public List<int> GetIndexUserFromASBase(int userID)
+        public List<int> GetIndexUserFromASBase(int indexUserFromASBase)
         {
-            //List<int> indexes = new List<int>();
+            List<int> indexes = GetASIndexes(indexUserFromASBase);
 
-            string load = (string)GetValue("id", userID.ToString(), "indexUserFromAS");
+            /*string load = (string)GetValue("id", userID.ToString(), "indexUserFromAS");
             //load = load.Remove(load.Length - 1);
-            List<int> indexes = load?.Split(';')?.Select(Int32.Parse)?.ToList();
+            List<int> indexes = load?.Split(';')?.Select(Int32.Parse)?.ToList();*/
 
             return indexes;
         }
@@ -170,9 +171,9 @@ namespace OrderManager
             UpdateValueInfo("shiftColors", userID.ToString(), shiftColorsLine);
         }
 
-        public String GetIDUserFromName(String nameUser)
+        public int GetIDUserFromName(string nameUser)
         {
-            String result = "";
+            int result = -1;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -186,7 +187,7 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
-                    result = sqlReader["id"].ToString();
+                    result = (int)sqlReader["id"];
                 }
 
                 Connect.Close();
@@ -427,8 +428,12 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
+                    int userID = Convert.ToInt32(sqlReader["id"]);
+
+                    List<int> indexASUsers = GetASIndexes(userID);
+
                     userInfos.Add(new UserInfo(
-                        Convert.ToInt32(sqlReader["id"]),
+                        userID,
                         sqlReader["surname"].ToString(),
                         sqlReader["name"].ToString(),
                         sqlReader["patronymic"].ToString(),
@@ -436,7 +441,7 @@ namespace OrderManager
                         sqlReader["dateOfEmployment"].ToString(),
                         sqlReader["dateOfBirth"].ToString(),
                         sqlReader["activeUser"].ToString(),
-                        sqlReader["indexUserFromAS"].ToString(),
+                        indexASUsers,
                         sqlReader["dateOfDismissal"].ToString(),
                         sqlReader["note"].ToString()
                         ));
@@ -450,7 +455,7 @@ namespace OrderManager
 
         public Object GetUserInfoFromID(string userID)
         {
-            UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", "", "", "");
+            UserInfo userInfos = new UserInfo(-1, "", "", "", "", "", "", "", new List<int>(), "", "");
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -467,8 +472,12 @@ namespace OrderManager
 
                 while (sqlReader.Read())
                 {
+                    int loadUserID = Convert.ToInt32(sqlReader["id"]);
+
+                    List<int> indexASUsers = GetASIndexes(loadUserID);
+
                     userInfos = new UserInfo(
-                        Convert.ToInt32(sqlReader["id"]),
+                        loadUserID,
                         sqlReader["surname"].ToString(),
                         sqlReader["name"].ToString(),
                         sqlReader["patronymic"].ToString(),
@@ -476,7 +485,7 @@ namespace OrderManager
                         sqlReader["dateOfEmployment"].ToString(),
                         sqlReader["dateOfBirth"].ToString(),
                         sqlReader["activeUser"].ToString(),
-                        sqlReader["indexUserFromAS"].ToString(),
+                        indexASUsers,
                         sqlReader["dateOfDismissal"].ToString(),
                         sqlReader["note"].ToString()
                         );
@@ -589,12 +598,31 @@ namespace OrderManager
             }
         }
 
-        //Потом сделать не перебором, а по запросу
-        public int GetUserIdFromASystemID(int userASystemID)
+        public int GetUserIdFromASystemID(int indexUserFromASBase)
         {
             int result = -1;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM usersindexesasbase WHERE indexUserFromASBase = @indexUserFromASBase"
+                };
+                Command.Parameters.AddWithValue("@indexUserFromASBase", indexUserFromASBase);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = (int)sqlReader["userID"];
+                }
+
+                Connect.Close();
+            }
+
+            /*using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 Connect.Open();
                 MySqlCommand Command = new MySqlCommand
@@ -617,7 +645,7 @@ namespace OrderManager
                 }
 
                 Connect.Close();
-            }
+            }*/
 
             return result;
         }
@@ -697,5 +725,60 @@ namespace OrderManager
             return result;
         }
 
+        private List<int> GetASIndexes(int userID)
+        {
+            List<int> result = new List<int>();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM usersindexesasbase WHERE userID = @userID"
+                };
+                Command.Parameters.AddWithValue("@userID", userID);
+
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result.Add((int)sqlReader["indexUserFromASBase"]);
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+
+        public bool AddNewASUsersIndexes(int userID, List<int> indexesUserFromASBase)
+        {
+            bool result = false;
+
+            List<int> currentIndexes = GetASIndexes(userID);
+            //сделать удаление лишних
+            foreach (int index in indexesUserFromASBase)
+            {
+                if (!currentIndexes.Contains(index))
+                {
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                    {
+                        string commandText = "INSERT INTO usersindexesasbase (userID, indexUserFromASBase) VALUES (@userID, @userIDAS)";
+
+                        MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                        Command.Parameters.AddWithValue("@userID", userID);
+                        Command.Parameters.AddWithValue("@userIDAS", index);
+
+                        Connect.Open();
+                        Command.ExecuteNonQuery();
+                        Connect.Close();
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

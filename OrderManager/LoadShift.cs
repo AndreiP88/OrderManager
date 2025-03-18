@@ -4,27 +4,31 @@ namespace OrderManager
 {
     public class LoadShift
     {
+        private bool isNewShift;
         private int idFbcBrigade;
         private int userID;
+        private int userIDBaseOM;
         private string shiftDate;
         private int shiftNumber;
         private string shiftStart;
         private string shiftEnd;
-        private List<LoadOrderOperations> orderOperations = new List<LoadOrderOperations>();
+        private List<LoadOrder> order = new List<LoadOrder>();
 
         public LoadShift()
         {
 
         }
-        public LoadShift(int idFbcBrigade, int userID, string shiftDate, int shiftNumber, string shiftStart, string shiftEnd, List<LoadOrderOperations> orderOperations)
+        public LoadShift(bool isNewShift, int idFbcBrigade, int userID, int userIDBaseOM, string shiftDate, int shiftNumber, string shiftStart, string shiftEnd, List<LoadOrder> order)
         {
+            IsNewShift = isNewShift;
             IDFbcBrigade = idFbcBrigade;
             UserID = userID;
+            UserIDBaseOM = userIDBaseOM;
             ShiftDate = shiftDate;
             ShiftNumber = shiftNumber;
             ShiftStart = shiftStart;
             ShiftEnd = shiftEnd;
-            OrderOperations = orderOperations;
+            Order = order;
         }
 
         public LoadShift(string shiftDate, int shiftNumber)
@@ -33,6 +37,12 @@ namespace OrderManager
             ShiftNumber = shiftNumber;
             ShiftStart = "";
             ShiftEnd = "";
+        }
+
+        public bool IsNewShift
+        {
+            get => isNewShift;
+            set => isNewShift = value;
         }
         public int IDFbcBrigade
         {
@@ -43,6 +53,11 @@ namespace OrderManager
         {
             get => userID;
             set => userID = value;
+        }
+        public int UserIDBaseOM
+        {
+            get => userIDBaseOM;
+            set => userIDBaseOM = value;
         }
         public string ShiftDate
         {
@@ -64,10 +79,11 @@ namespace OrderManager
             get => shiftEnd;
             set => shiftEnd = value;
         }
-        public List<LoadOrderOperations> OrderOperations
+
+        public List<LoadOrder> Order
         {
-            get => orderOperations;
-            set => orderOperations = value;
+            get => order;
+            set => order = value;
         }
     }
 }

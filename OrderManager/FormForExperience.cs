@@ -575,6 +575,22 @@ namespace OrderManager
             }
         }
 
+        private void AddNewIndexes(int userId, int userIDAsystem)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "INSERT INTO usersindexesasbase (userID, indexUserFromASBase) VALUES (@userID, @userIDAS)";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@userID", userId);
+                Command.Parameters.AddWithValue("@userIDAS", userIDAsystem);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
         private void button5_Click(object sender, EventArgs e)
         {
             return;
@@ -643,6 +659,44 @@ namespace OrderManager
                 item.Text = ids[i].ToString();
 
                 listView2.Items.Add(item);
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            ValueUserBase userBase = new ValueUserBase();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM users"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    int id = (int)sqlReader["id"];
+
+                    List<int> ids = userBase.GetIndexUserFromASBase(id);
+
+                    for (int i = 0; ids.Count > i; i++)
+                    {
+                        AddNewIndexes(id, ids[i]);
+
+                        ListViewItem item = new ListViewItem();
+
+                        item.Name = sqlReader["id"].ToString();
+                        item.Text = id.ToString();
+                        item.SubItems.Add(ids[i].ToString());
+
+                        listView2.Items.Add(item);
+                    }
+                }
+
+                Connect.Close();
             }
         }
     }

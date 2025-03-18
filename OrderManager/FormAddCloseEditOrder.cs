@@ -2029,6 +2029,16 @@ namespace OrderManager
 
                             //int lastTimeMakeready = getOrders.LastTimeForMakeready(shiftID, Convert.ToInt32(machineCurrent), orderID, counterRepeat);
                             int lastTimeMakeready = makereadyLastPart;
+
+                            if (mkTypeLoad == 0)
+                            {
+                                lastTimeMakeready = makereadyTime - makereadyLastPart;
+                            }
+                            else if (mkTypeLoad == 1)
+                            {
+                                lastTimeMakeready = makereadyTime * makereadyLastPart / 100;
+                            }
+
                             string timeMakereadyStop = timeOperations.DateTimeAmountMunutes(makereadyStart, lastTimeMakeready);
                             string timeToWorkStart = timeOperations.DateTimeAmountMunutes(timeMakereadyStop, 1);
 
@@ -3233,12 +3243,57 @@ namespace OrderManager
 
         private void LoadOtherShifts(OrdersLoad ordersLoad)
         {
+            GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             GetOrderOperations orderOperations = new GetOrderOperations();
+            ValueUserBase userBase = new ValueUserBase();
+            ValueShiftsBase valueShifts = new ValueShiftsBase();
 
             int idManOrderJobItem = ordersLoad.idManOrderJobItem;
 
+            List<LoadShift> loadShifts = orderOperations.ShiftListForOrder(idManOrderJobItem);
 
-            LoadOrder loadOrder = orderOperations.OperationsForOrder(idManOrderJobItem);
+            bool therIsAShiftToAdd = false;
+
+            for (int i = 0; i < loadShifts.Count; i++)
+            {
+                int userOMIndex = userBase.GetUserIdFromASystemID(loadShifts[i].UserID);
+                string shiftDate = loadShifts[i].ShiftDate;
+                int shiftNumber = loadShifts[i].ShiftNumber;
+
+                List<string> shiftsListOM = valueShifts.GetShiftFromDate(userOMIndex, shiftDate);
+
+                loadShifts[i].UserIDBaseOM = userOMIndex;
+
+                if (shiftsListOM.Count > 0)
+                {
+                    for (int j = 0; j < shiftsListOM.Count; j++)
+                    {
+                        int shiftOMNumber = getNumberShift.NumberShiftNum(shiftsListOM[j]);
+
+                        if (Convert.ToDateTime(shiftsListOM[j]).ToString("dd.MM.yyyy") == shiftDate && shiftOMNumber == shiftNumber)
+                        {
+                            loadShifts[i].IsNewShift = false;
+                        }
+                        else
+                        {
+                            therIsAShiftToAdd = true;
+                            loadShifts[i].IsNewShift = true;
+                        }
+                    } 
+                }
+                else
+                {
+                    therIsAShiftToAdd = true;
+                    loadShifts[i].IsNewShift = true;
+                }
+            }
+
+            if (therIsAShiftToAdd)
+            {
+                FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts);
+                form.ShowDialog();
+            }
+
 
             /*
              * Сделать проверку на совпадение смен и, если есть расхождение, то предложить добавить недостающие смены
@@ -3248,12 +3303,26 @@ namespace OrderManager
              * 
              */
 
-            for (int i = 0; i < loadOrder.Shift.Count; i++)
+
+            /*List<LoadShift> loadShiftOrders = orderOperations.OperationsForOrder(loadShifts);
+
+            for (int i = 0; i < loadShiftOrders.Count; i++)
             {
-                Console.WriteLine(loadOrder.Shift[i].UserID + ": " + loadOrder.Shift[i].ShiftDate + " " + loadOrder.Shift[i].ShiftNumber + ": " + loadOrder.Shift[i].IDFbcBrigade);
-                Console.WriteLine("::::: " + loadOrder.Shift[i].OrderOperations[0].MakereadyStart + " - " + loadOrder.Shift[i].OrderOperations[0].MakereadyStop + ": " + loadOrder.Shift[i].OrderOperations[0].MakereadyComplete);
-                Console.WriteLine("::::: " + loadOrder.Shift[i].OrderOperations[0].WorkStart + " - " + loadOrder.Shift[i].OrderOperations[0].WorkStop + ": " + loadOrder.Shift[i].OrderOperations[0].Done);
-            }
+                Console.WriteLine(loadShiftOrders[i].UserID + ": " + loadShiftOrders[i].ShiftDate + " " + loadShiftOrders[i].ShiftNumber + ": " + loadShiftOrders[i].IDFbcBrigade);
+
+                for (int j = 0; j < loadShiftOrders[i].Order.Count; j++)
+                {
+                    LoadOrder order = loadShiftOrders[i].Order[j];
+
+                    //if (loadShiftOrders[i].IsNewShift)
+                    {
+                        Console.WriteLine("::::: " + order.IdManOrderJobItem + " - " + order.OrderNumber + ": " + order.NameCustomer + ", " + order.AmountOfOrder);
+                        Console.WriteLine("::::: " + order.OrderOperations[0].MakereadyStart + " - " + order.OrderOperations[0].MakereadyStop + ": " + order.OrderOperations[0].MakereadyComplete);
+                        Console.WriteLine("::::: " + order.OrderOperations[0].WorkStart + " - " + order.OrderOperations[0].WorkStop + ": " + order.OrderOperations[0].Done);
+                        Console.WriteLine();
+                    }
+                }
+            }*/
         }
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)

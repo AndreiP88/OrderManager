@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
+using System.Linq;
 
 namespace OrderManager
 {
@@ -90,7 +91,7 @@ namespace OrderManager
             textBox1.Text = getInfo.surname;
             textBox2.Text = getInfo.name;
             textBox3.Text = getInfo.patronymic;
-            textBox5.Text = getInfo.indexUser;
+            textBox5.Text = string.Join(";", getInfo.indexUser);
 
             dateTimePicker1.Text = getInfo.dateOfBirth;
             dateTimePicker2.Text = getInfo.dateOfEmployment;
@@ -282,17 +283,15 @@ namespace OrderManager
 
             String note = textBox4.Text;
 
-            string indexUserFromAS = textBox5.Text;
-
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
                 string commandText;
                 if (!_loadForEdit)
-                    commandText = "INSERT INTO users (nameUser, surname, name, patronymic, categoryesMachine, dateOfBirth, dateOfEmployment, activeUser, indexUserFromAS, note) " +
-                        "VALUES (@nameUser, @surname, @name, @patronymic, @categoryesMachine, @dateOfBirth, @dateOfEmployment, @activeUser, @indexUserFromAS, @note)";
+                    commandText = "INSERT INTO users (nameUser, surname, name, patronymic, categoryesMachine, dateOfBirth, dateOfEmployment, activeUser, note) " +
+                        "VALUES (@nameUser, @surname, @name, @patronymic, @categoryesMachine, @dateOfBirth, @dateOfEmployment, @activeUser, @note)";
                 else
                     commandText = "UPDATE users SET nameUser = @nameUser, surname = @surname, name = @name, patronymic = @patronymic, categoryesMachine = @categoryesMachine, " +
-                    "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, dateOfDismissal = @dateOfDismissal, indexUserFromAS = @indexUserFromAS, note = @note " +
+                    "dateOfBirth = @dateOfBirth, dateOfEmployment = @dateOfEmployment, activeUser = @activeUser, dateOfDismissal = @dateOfDismissal, note = @note " +
                     "WHERE id = @userIDLoad";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -305,7 +304,6 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@dateOfBirth", dateOfBirth);
                 Command.Parameters.AddWithValue("@dateOfEmployment", dateOfEmployment);
                 Command.Parameters.AddWithValue("@activeUser", activeUser);
-                Command.Parameters.AddWithValue("@indexUserFromAS", indexUserFromAS);
                 Command.Parameters.AddWithValue("@dateOfDismissal", dateOfDismissal);
                 Command.Parameters.AddWithValue("@note", note);
 
@@ -314,7 +312,12 @@ namespace OrderManager
                 Connect.Close();
             }
 
-            String userID = getUser.GetIDUserFromName(shortName);
+            int userID = getUser.GetIDUserFromName(shortName);
+
+            string indexUserFromAS = textBox5.Text;
+            List<int> indexes = indexUserFromAS?.Split(';')?.Select(Int32.Parse)?.ToList();
+
+            getUser.AddNewASUsersIndexes(userID, indexes);
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {

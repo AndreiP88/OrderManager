@@ -1998,8 +1998,7 @@ namespace OrderManager
                 DateTime date;
                 date = DateTime.MinValue.AddYears(Convert.ToInt32(comboBoxYear.Text) - 1).AddMonths(comboBoxMount.SelectedIndex);
 
-                String userId;
-                userId = getUser.GetIDUserFromName(comboBoxUser.Text);
+                int userId = getUser.GetIDUserFromName(comboBoxUser.Text);
 
                 CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
                 CancellationToken token = cancelTokenSource.Token;
@@ -2018,10 +2017,10 @@ namespace OrderManager
             }
         }
 
-        private async void LoadShiftsFromBase(CancellationToken token, DateTime date, String nameOfExecutor)
+        private async void LoadShiftsFromBase(CancellationToken token, DateTime date, int nameOfExecutor)
         {
             ValueShiftsBase shiftValue = new ValueShiftsBase();
-            GetShiftsFromBase getShifts = new GetShiftsFromBase(nameOfExecutor);
+            GetShiftsFromBase getShifts = new GetShiftsFromBase(nameOfExecutor.ToString());
             GetDateTimeOperations dateTimeOperations = new GetDateTimeOperations();
             GetPercentFromWorkingOut getPercent = new GetPercentFromWorkingOut();
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
