@@ -365,6 +365,7 @@
     <Compile Include="ShiftBlank.cs" />
     <Compile Include="TypeInTheOrder.cs" />
     <Compile Include="ValueInfoBase.cs" />
+    <Compile Include="GetValueFromASBase.cs" />
     <Compile Include="ValueIOrdersBase.cs" />
     <Compile Include="ValueStandardTimeBase .cs" />
     <Compile Include="ValueSalaryPaidBase.cs" />

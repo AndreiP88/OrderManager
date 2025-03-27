@@ -714,6 +714,58 @@ namespace OrderManager
             }
         }
 
+        public async Task<LoadOrderOperations> LoadOrdersOperation(int shiftID, int orderID)
+        {
+            LoadOrderOperations orderOperations = new LoadOrderOperations();
+
+            orderOperations.OrderOperationID = -1;
+            orderOperations.MakereadyComplete = 0;
+            orderOperations.Done = 0;
+
+            try
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    await Connect.OpenAsync();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        //CommandText = @"SELECT * FROM ordersInProgress WHERE shiftID = '" + shiftID + "'"
+                        CommandText = @"SELECT * FROM allOrdersInJob WHERE shiftID = @shiftID AND orderID = @orderID AND typeJob = 0"
+                    };
+                    Command.Parameters.AddWithValue("@shiftID", shiftID);
+                    Command.Parameters.AddWithValue("@orderID", orderID);
+
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                    while (await sqlReader.ReadAsync())
+                    {
+                        orderOperations.OrderOperationID = Convert.ToInt32(sqlReader["count"]);
+                        orderOperations.MakereadyStart = sqlReader["timeMakereadyStart"].ToString();
+                        orderOperations.MakereadyStop = sqlReader["timeMakereadyStop"].ToString();
+                        orderOperations.WorkStart = sqlReader["timeToWorkStart"].ToString();
+                        orderOperations.WorkStop = sqlReader["timeToWorkStop"].ToString();
+                        orderOperations.MakereadyComplete += Convert.ToInt32(sqlReader["makereadyConsider"]) * Convert.ToInt32(sqlReader["makereadyComplete"]);
+                        orderOperations.Done += Convert.ToInt32(sqlReader["done"]);
+                    }
+
+                    await Connect.CloseAsync();
+                }
+
+                return orderOperations;
+            }
+            catch (SqlException sqlEx)
+            {
+                LogException.WriteLine("LoadAllOrdersFromBase: " + string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+                throw new ApplicationException(string.Format("MySQL #{0}: {1}", sqlEx.Number, sqlEx.Message));
+            }
+            catch (Exception ex)
+            {
+                LogException.WriteLine("LoadAllOrdersFromBase: " + ex.Message);
+                throw new ApplicationException(ex.Message);
+            }
+        }
+
         public async Task<object> LoadAllOrdersFromBaseOLD(int shiftID, string category)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();

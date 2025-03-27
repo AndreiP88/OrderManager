@@ -171,14 +171,14 @@ namespace OrderManager
 
             /*orderStatus.wkTimeDifferent = wkTimeDifferent;*/
 
-            bool print = true;
+            bool print = false;
 
             if (print)
             {
                 Console.WriteLine("<<<<<" + DateTime.Now.ToString() + ">>>>>");
 
-                Console.WriteLine("Номер заказа: " + ordersCurrentShift[indexOrder].numberOfOrder + " Type: " + typeJob);
-                Console.WriteLine("ID: " + ordersCurrentShift[indexOrder].id + "Load status: " + loadStatus + " Status: " + status);
+                Console.WriteLine("Номер заказа: " + ordersCurrentShift[indexOrder].numberOfOrder + ", Type: " + typeJob);
+                Console.WriteLine("ID: " + ordersCurrentShift[indexOrder].id + ", Load status: " + loadStatus + ", Status: " + status);
 
                 Console.WriteLine("Начало выполнения заказа: " + timeStartOrder);
                 Console.WriteLine("Время выполнения заказа: " + timeOperations.MinuteToTimeString(currentLead));

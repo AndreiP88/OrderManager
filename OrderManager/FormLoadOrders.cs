@@ -275,7 +275,7 @@ namespace OrderManager
             return result;
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
             //LoadOrdersByNumber(textBox1.Text);
             StartSearch(textBox1.Text);

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -1499,8 +1500,9 @@ namespace OrderManager
             String counterR = "0";
             int mkType = 1;
 
+            await ordersBase.AddOrderToDB(Convert.ToInt32(machine), number, name, modification, Convert.ToInt32(amount), Convert.ToInt32(timeM), Convert.ToInt32(timeW), stamp, items, Convert.ToInt32(status), Convert.ToInt32(counterR), mkType);
             //SELECT COUNT(*) FROM YourTable WHERE YourKeyCol = YourKeyValue
-
+            return;
             int result = 0;
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -3091,7 +3093,13 @@ namespace OrderManager
             }
             
         }
-
+        private async Task ReloadLastOrder(string machine)
+        {
+            if (!_editOrder)
+            {
+                await SelectedMachineChange(machine);
+            }
+        }
         private async void LoadTypes(int orderInProgressID)
         {
             ValueInfoBase getInfo = new ValueInfoBase();
@@ -3241,17 +3249,17 @@ namespace OrderManager
             UpdateData("note", orderInProgressID, textBox8.Text);
         }
 
-        private void LoadOtherShifts(OrdersLoad ordersLoad)
+        private async Task<bool> LoadOtherShiftsAsync(int idManOrderJobItem)
         {
+            bool isAddedOrders = false;
+
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             GetOrderOperations orderOperations = new GetOrderOperations();
             ValueUserBase userBase = new ValueUserBase();
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
-            int idManOrderJobItem = ordersLoad.idManOrderJobItem;
-
-            List<LoadShift> loadShifts = orderOperations.ShiftListForOrder(idManOrderJobItem);
-
+            List<LoadShift> loadShifts = await orderOperations.ShiftListForOrderAsync(idManOrderJobItem);
+            //MessageBox.Show("idManOrderJobItem: " + idManOrderJobItem + ", loadShifts.Count: " + loadShifts.Count);
             bool therIsAShiftToAdd = false;
 
             for (int i = 0; i < loadShifts.Count; i++)
@@ -3261,7 +3269,7 @@ namespace OrderManager
                 int shiftNumber = loadShifts[i].ShiftNumber;
 
                 List<string> shiftsListOM = valueShifts.GetShiftFromDate(userOMIndex, shiftDate);
-
+                //MessageBox.Show("userOMIndex: " + userOMIndex + ", shiftDate: " + shiftDate + ", shiftsListOM.Count: " + shiftsListOM.Count);
                 loadShifts[i].UserIDBaseOM = userOMIndex;
 
                 if (shiftsListOM.Count > 0)
@@ -3269,15 +3277,18 @@ namespace OrderManager
                     for (int j = 0; j < shiftsListOM.Count; j++)
                     {
                         int shiftOMNumber = getNumberShift.NumberShiftNum(shiftsListOM[j]);
-
+                        //MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j]).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == "+  shiftNumber);
                         if (Convert.ToDateTime(shiftsListOM[j]).ToString("dd.MM.yyyy") == shiftDate && shiftOMNumber == shiftNumber)
                         {
                             loadShifts[i].IsNewShift = false;
+                            loadShifts[i].IndexOMShift = valueShifts.GetIDFromStartShift(shiftsListOM[j]);
                         }
                         else
                         {
                             therIsAShiftToAdd = true;
                             loadShifts[i].IsNewShift = true;
+                            loadShifts[i].IsLoadShift = true;
+                            loadShifts[i].IndexOMShift = -1;
                         }
                     } 
                 }
@@ -3285,6 +3296,7 @@ namespace OrderManager
                 {
                     therIsAShiftToAdd = true;
                     loadShifts[i].IsNewShift = true;
+                    loadShifts[i].IsLoadShift = true;
                 }
             }
 
@@ -3292,17 +3304,11 @@ namespace OrderManager
             {
                 FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts);
                 form.ShowDialog();
+
+                isAddedOrders = form.IsAddedOrders;
             }
 
-
-            /*
-             * Сделать проверку на совпадение смен и, если есть расхождение, то предложить добавить недостающие смены
-             * Получить все смены в менеджере для заказа
-             * 
-             * 
-             * 
-             */
-
+            return isAddedOrders;
 
             /*List<LoadShift> loadShiftOrders = orderOperations.OperationsForOrder(loadShifts);
 
@@ -3336,9 +3342,6 @@ namespace OrderManager
 
             if (typeJob == 0)
             {
-                ValueInfoBase getInfo = new ValueInfoBase();
-                ValueOrdersBase orders = new ValueOrdersBase();
-
                 if ((ShiftID == Form1.Info.shiftIndex && _editOrder) || AdminMode)
                 {
                     SaveChanges(OrderInProgressID);
@@ -3346,12 +3349,31 @@ namespace OrderManager
                 }
                 else
                 {
+                    ValueInfoBase getInfo = new ValueInfoBase();
+                    ValueOrdersBase orders = new ValueOrdersBase();
+                    GetValueFromASBase valueFromASBase = new GetValueFromASBase();
+
                     //сделать проверку статуса и в зависимости от статуса и условий выбирать
                     if (CheckNotEmptyFields() == true)
                     {
+                        string machine = await getInfo.GetMachineFromName(comboBox3.Text);
+                        string orderNumber = textBox1.Text;
+
+                        int equipID = Convert.ToInt32(await getInfo.GetIDEquipMachine(machine));
+                        int idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
+
+                        if (await LoadOtherShiftsAsync(idManOrderJobItem))
+                        {
+                            await ReloadLastOrder(machine);
+                        }
+                        else
+                        {
+
+                        }
+
                         DialogResult result;
 
-                        if (!CheckOrderAvailable(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text))
+                        if (!CheckOrderAvailable(machine, textBox1.Text, textBox5.Text))
                         {
                             AddOrderToDB();
                         }
@@ -3361,7 +3383,7 @@ namespace OrderManager
                             return;
                         }
 
-                        int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text);
+                        int orderIndex = orders.GetOrderID(machine, textBox1.Text, textBox5.Text);
 
                         String status = orders.GetOrderStatus(orderIndex);
 
@@ -3398,7 +3420,7 @@ namespace OrderManager
                             }
 
                         }
-                        else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(await getInfo.GetMachineFromName(comboBox3.Text)) != -1)
+                        else if (numericUpDown4.Value >= numericUpDown3.Value && numericUpDown4.Value > 0 && getInfo.GetCurrentOrderID(machine) != -1)
                         {
                             if (status == "1" || status == "3")
                             {
@@ -3459,7 +3481,7 @@ namespace OrderManager
 
             String status = orders.GetOrderStatus(orderIndex);
             //
-            if (numericUpDown4.Value < numericUpDown3.Value && status == "3")
+            if (numericUpDown4.Value < numericUpDown3.Value && numericUpDown4.Value > 0 /*&& status == "3"*/)
             {
                 MessageBoxManager.Register();
                 //result = MessageBox.Show("Выработка меньше планируемой!\r\n\r\nДа - завершить заказ\r\nНет - подтвердить заказ", "Завершение заказа", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -3714,9 +3736,14 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                LoadOtherShifts(fm.SetValue);
-
-                SetNewOrder(fm.SetValue, fm.Types);
+                if (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem))
+                {
+                    await ReloadLastOrder(machine);
+                }
+                else
+                {
+                    SetNewOrder(fm.SetValue, fm.Types);
+                }
             }
         }
 

@@ -4,7 +4,10 @@ using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace OrderManager
 {
@@ -192,6 +195,49 @@ namespace OrderManager
                 Command.ExecuteNonQuery();
                 Connect.Close();
             }
+        }
+        /// <summary>
+        /// Добавление завершенной смены при автоматическом внесении смен
+        /// </summary>
+        /// <param name="shift"></param>
+        /// <returns>Индекс добавленной смены</returns>
+        public async Task<int> AddClosedShiftAsync(LoadShift shift)
+        {
+            int shiftID = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                await Connect.OpenAsync();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"INSERT INTO shifts (nameUser, startShift, stopShift, note, fullShift, overtimeShift) 
+                                        SELECT @nameUser, @startShift, @stopShift, @note, @fullShift, @overtimeShift 
+                                    WHERE 
+                                        NOT EXISTS (SELECT startShift, nameUser FROM shifts WHERE startShift = @startShift AND nameUser = @nameUser) LIMIT 1; 
+                                    SELECT id FROM shifts  
+                                    WHERE  
+                                        startShift = @startShift  
+                                        AND nameUser = @nameUser"
+                };
+                Command.Parameters.AddWithValue("@nameUser", shift.UserIDBaseOM);
+                Command.Parameters.AddWithValue("@startShift", shift.ShiftStart);
+                Command.Parameters.AddWithValue("@stopShift", shift.ShiftEnd);
+                Command.Parameters.AddWithValue("@note", "");
+                Command.Parameters.AddWithValue("@fullShift", "True");
+                Command.Parameters.AddWithValue("@overtimeShift", "False");
+
+                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                while (await sqlReader.ReadAsync())
+                {
+                    shiftID = sqlReader["id"] == DBNull.Value ? -1 : Convert.ToInt32(sqlReader["id"]);
+                }
+
+                Connect.Close();
+            }
+
+            return shiftID;
         }
 
         public void CloseShift(int shiftID, string stopShift)

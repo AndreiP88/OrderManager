@@ -81,6 +81,17 @@ namespace OrderManager
             return result;
         }
 
+        public async Task<int> GetMachineIndexFromIDEquip(int equipID)
+        {
+            int result = -1;
+            object load = await GetValueMachines("idEquip", equipID.ToString(), "id");
+
+            result = Convert.ToInt32(load ?? -1);
+            //result = (string)(load == null ? string.Empty : load);
+
+            return result;
+        }
+
         public async Task<string> GetMachineStartWork(string machine)
         {
             string result = "";

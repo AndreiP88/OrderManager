@@ -1,9 +1,8 @@
-﻿using libData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace OrderManager
 {
@@ -13,9 +12,12 @@ namespace OrderManager
         {
 
         }
-        public List<LoadShift> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
+        public async Task<List<LoadShift>> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
         {
             List<LoadShift> loadShifts = shifts;
+
+            ValueShiftsBase valueShifts = new ValueShiftsBase();
+            ValueInfoBase valueInfo = new ValueInfoBase();
 
             try
             {
@@ -26,7 +28,7 @@ namespace OrderManager
 
                     using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
                     {
-                        Connect.OpenAsync();
+                        await Connect.OpenAsync();
                         SqlCommand Command = new SqlCommand
                         {
                             Connection = Connect,
@@ -71,7 +73,7 @@ namespace OrderManager
                         };
                         Command.Parameters.AddWithValue("@idFbcBrigade", idFbcBrigade);
 
-                        DbDataReader sqlReader = Command.ExecuteReader();
+                        DbDataReader sqlReader = await Command.ExecuteReaderAsync();
 
                         int counter = 0;
                         int counterMK = 0;
@@ -79,7 +81,7 @@ namespace OrderManager
 
                         int tmpIdManOrderJobItem = -1;
 
-                        while (sqlReader.Read())
+                        while (await sqlReader.ReadAsync())
                         {
                             //sqlReader["shift_no"] == DBNull.Value ? 0 : (int)Convert.ToInt32(sqlReader["shift_no"])
                             counter++;
@@ -88,8 +90,8 @@ namespace OrderManager
                             int operationType = sqlReader["operation_type"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["operation_type"]);
                             int equipID = sqlReader["id_equip"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["id_equip"]);
 
-                            string operationBegin = sqlReader["date_begin"] == DBNull.Value ? string.Empty : sqlReader["date_begin"].ToString();
-                            string operationEnd = sqlReader["date_end"] == DBNull.Value ? string.Empty : sqlReader["date_end"].ToString();
+                            string operationBegin = sqlReader["date_begin"] == DBNull.Value ? "" : Convert.ToDateTime(sqlReader["date_begin"]).ToString("HH:mm dd.MM.yyyy");
+                            string operationEnd = sqlReader["date_end"] == DBNull.Value ? "" : Convert.ToDateTime(sqlReader["date_end"]).ToString("HH:mm dd.MM.yyyy");
 
                             float factQty = sqlReader["fact_out_qty"] == DBNull.Value ? 0 : (float)Convert.ToDouble(sqlReader["fact_out_qty"]);
 
@@ -119,10 +121,11 @@ namespace OrderManager
 
                             if (itemIndex == -1)
                             {
-                                loadShifts[i].Order.Add(GetOrderFromID(idManOrderJobItem));
+                                loadShifts[i].Order.Add(await GetOrderFromIDAsync(idManOrderJobItem));
+
                                 itemIndex = loadShifts[i].Order.Count - 1;
 
-                                loadShifts[i].Order[itemIndex].EquipID = equipID;
+                                loadShifts[i].Order[itemIndex].EquipID = await valueInfo.GetMachineIndexFromIDEquip(equipID);
 
                                 loadShifts[i].Order[itemIndex].OrderOperations.Add(new LoadOrderOperations());
                             }
@@ -158,12 +161,21 @@ namespace OrderManager
                                 }                                
                             }
 
-                            /*Console.WriteLine(i + ":: " + "<" + itemIndex + ">" + idFbcBrigade + " :: " + idManOrderJobItem + ": " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyComplete + "::: " +
-                                loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].Done);*/
+                            Console.WriteLine(i + ":: " + "<" + itemIndex + ">" + idFbcBrigade + " :: " + idManOrderJobItem + ": " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyComplete + "::: " +
+                                loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].Done);
+                            Console.WriteLine(i + ":: " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStart + " - " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStop + " ::: " +
+                                loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart + " - " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop);
+
                             tmpIdManOrderJobItem = idManOrderJobItem;
                         }
 
                         Connect.Close();
+                    }
+
+                    for (int j = 0; j < loadShifts[i].Order.Count; j++)
+                    {
+                        //loadShifts[i].Order[j].IsOrderLoad = await IsNewOrderForSelectedShift(loadShifts[i], loadShifts[i].Order[j]);
+                        loadShifts[i].Order[j] = await IsNewOrderForSelectedShift(loadShifts[i], loadShifts[i].Order[j]);
                     }
                 }
             }
@@ -174,6 +186,99 @@ namespace OrderManager
             }
 
             return loadShifts;
+        }
+
+        private async Task<LoadOrder> IsNewOrderForSelectedShift(LoadShift shift, LoadOrder order)
+        {
+            LoadOrder result = order;
+
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            ValueOrdersBase valueOrders = new ValueOrdersBase();
+
+            result.IsOrderLoad = false;
+            result.OrderOperations[0].OLDValueMakereadyComplete = -1;
+            result.OrderOperations[0].OLDValueDone = -1;
+
+            if (!shift.IsNewShift)
+            {
+                //LoadOrder order = shift.Order[shift.Order.Count - 1];
+
+                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder);
+                //MessageBox.Show(orderOMIndex + ": " + order.EquipID.ToString() + "; " + order.OrderNumber + " - " + order.ItemOrder);
+                if (orderOMIndex == -1)
+                {
+                    result.IsOrderLoad = true;
+                }
+                else
+                {
+                    int shiftOMIndex = shift.IndexOMShift;
+
+                    LoadOrderOperations orderOperations = await getOrders.LoadOrdersOperation(shiftOMIndex, orderOMIndex);
+                    //MessageBox.Show(orderOperations.MakereadyComplete + " != " + order.OrderOperations[0].MakereadyComplete + " || " + orderOperations.Done + " != " + order.OrderOperations[0].Done);
+                    if (orderOperations.OrderOperationID != -1)
+                    {
+                        if (orderOperations.MakereadyComplete != order.OrderOperations[0].MakereadyComplete)
+                        {
+                            result.IsOrderLoad = true;
+                            result.OrderOperations[0].OLDValueMakereadyComplete = orderOperations.MakereadyComplete;
+                        }
+                        if (orderOperations.Done != order.OrderOperations[0].Done)
+                        {
+                            result.IsOrderLoad = true;
+                            result.OrderOperations[0].OLDValueDone = orderOperations.Done;
+                        }
+                    }
+                }
+
+                result.OrderOMIndex = orderOMIndex;
+            }
+            else
+            {
+                result.IsOrderLoad = true;
+                result.OrderOMIndex = -1;
+            }
+
+            return result;
+        }
+
+        private async Task<bool> IsNewOrderForSelectedShiftOLD(LoadShift shift, LoadOrder order)
+        {
+            bool result = false;
+
+            GetOrdersFromBase getOrders = new GetOrdersFromBase();
+            ValueOrdersBase valueOrders = new ValueOrdersBase();
+
+            if (!shift.IsNewShift)
+            {
+                //LoadOrder order = shift.Order[shift.Order.Count - 1];
+
+                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder);
+                //MessageBox.Show(orderOMIndex + ": " + order.EquipID.ToString() + "; " + order.OrderNumber + " - " + order.ItemOrder);
+                if (orderOMIndex == -1)
+                {
+                    result = true;
+                }
+                else
+                {
+                    int shiftOMIndex = shift.IndexOMShift;
+                    LoadOrderOperations orderOperations = await getOrders.LoadOrdersOperation(shiftOMIndex, orderOMIndex);
+                    //MessageBox.Show(orderOperations.MakereadyComplete + " != " + order.OrderOperations[0].MakereadyComplete + " || " + orderOperations.Done + " != " + order.OrderOperations[0].Done);
+                    if (orderOperations.MakereadyComplete != order.OrderOperations[0].MakereadyComplete || orderOperations.Done != order.OrderOperations[0].Done)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+            }
+            else
+            {
+                result = true;
+            }
+
+            return result;
         }
 
         /*public List<LoadShift> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
@@ -416,7 +521,7 @@ namespace OrderManager
             return loadShifts;
         }*/
 
-        public List<LoadShift> ShiftListForOrder(int idManOrderJobItem)
+        public async Task<List<LoadShift>> ShiftListForOrderAsync(int idManOrderJobItem)
         {
             List<LoadShift> loadShifts = new List<LoadShift>();
 
@@ -424,7 +529,7 @@ namespace OrderManager
             {
                 using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
                 {
-                    Connect.OpenAsync();
+                    await Connect.OpenAsync();
                     SqlCommand Command = new SqlCommand
                     {
                         Connection = Connect,
@@ -458,9 +563,9 @@ namespace OrderManager
                     };
                     Command.Parameters.AddWithValue("@idManOrderJobItem", idManOrderJobItem);
 
-                    DbDataReader sqlReader = Command.ExecuteReader();
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
 
-                    while (sqlReader.Read())
+                    while (await sqlReader.ReadAsync())
                     {
                         //sqlReader["shift_no"] == DBNull.Value ? 0 : (int)Convert.ToInt32(sqlReader["shift_no"])
 
@@ -499,15 +604,16 @@ namespace OrderManager
             return loadShifts;
         }
 
-        private LoadOrder GetOrderFromID(int idManOrderJobItem)
+        private async Task<LoadOrder> GetOrderFromIDAsync(int idManOrderJobItem)
         {
             LoadOrder loadOrder = new LoadOrder();
+            GetValueFromASBase valueFromASBase = new GetValueFromASBase();
 
             try
             {
                 using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
                 {
-                    Connect.OpenAsync();
+                    await Connect.OpenAsync();
                     SqlCommand Command = new SqlCommand
                     {
                         Connection = Connect,
@@ -518,7 +624,10 @@ namespace OrderManager
 	                                        norm_operation_table.ord AS operation_type, 
 	                                        man_planjob_list.id_norm_operation, 
 	                                        man_planjob_list.plan_out_qty, 
-	                                        man_planjob_list.normtime
+	                                        man_planjob_list.normtime, 
+	                                        order_head.order_name, 
+	                                        order_head.id_order_head, 
+	                                        order_detail.detail_name
                                         FROM
 	                                        dbo.man_planjob_list
 	                                        INNER JOIN
@@ -541,14 +650,18 @@ namespace OrderManager
 	                                        dbo.common_ul_directory
 	                                        ON 
 		                                        order_head.id_customer = common_ul_directory.id_common_ul_directory
+	                                        INNER JOIN
+	                                        dbo.order_detail
+	                                        ON 
+		                                        man_order_job_item.itemid = order_detail.id_order_detail
                                         WHERE
 	                                        man_planjob_list.id_man_order_job_item = @idManOrderJobItem"
                     };
                     Command.Parameters.AddWithValue("@idManOrderJobItem", idManOrderJobItem);
 
-                    DbDataReader sqlReader = Command.ExecuteReader();
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
 
-                    while (sqlReader.Read())
+                    while (await sqlReader.ReadAsync())
                     {
                         //sqlReader["shift_no"] == DBNull.Value ? 0 : (int)Convert.ToInt32(sqlReader["shift_no"])
 
@@ -557,8 +670,12 @@ namespace OrderManager
                         string orderNumber = sqlReader["order_num"] == DBNull.Value ? string.Empty : sqlReader["order_num"].ToString();
                         string nameCustomer = sqlReader["ul_name"] == DBNull.Value ? string.Empty : sqlReader["ul_name"].ToString();
                         int operationType = sqlReader["operation_type"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["operation_type"]);
-                        int normTime = sqlReader["id_norm_operation"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["id_norm_operation"]);
+                        int normTime = sqlReader["normtime"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["normtime"]);
                         int planQty = sqlReader["plan_out_qty"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["plan_out_qty"]);
+                        string item = sqlReader["order_name"] == DBNull.Value ? string.Empty : sqlReader["order_name"].ToString() + ": ";
+                        item += sqlReader["detail_name"] == DBNull.Value ? string.Empty : sqlReader["detail_name"].ToString();
+
+                        int idOrderHead = sqlReader["id_order_head"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["id_order_head"]);
 
                         if (operationType == 0)
                         {
@@ -575,6 +692,9 @@ namespace OrderManager
                         //loadOrder.EquipID = equipID;
                         loadOrder.OrderNumber = orderNumber;
                         loadOrder.NameCustomer = nameCustomer;
+                        loadOrder.StampOrder = valueFromASBase.GetStampFromOrderIDHead(12, idOrderHead);
+                        loadOrder.ItemOrder = item;
+                        loadOrder.Items = valueFromASBase.LoadItemsFromOrder(idOrderHead);
                     }
 
                     Connect.Close();
@@ -582,7 +702,7 @@ namespace OrderManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка получения заказа: " + ex.Message);
+                Console.WriteLine("GetOrderFromID. Ошибка получения заказа: " + ex.Message);
                 LogException.WriteLine(ex.Message);
             }
 

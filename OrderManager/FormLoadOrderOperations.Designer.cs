@@ -37,6 +37,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.label3 = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -44,13 +45,9 @@
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -117,6 +114,7 @@
             this.button3.TabIndex = 0;
             this.button3.Text = "Сохранить";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // tableLayoutPanel4
             // 
@@ -161,7 +159,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.888889F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.888889F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.Controls.Add(this.label3, 0, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -172,6 +170,17 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(978, 26);
             this.tableLayoutPanel3.TabIndex = 9;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label3.Location = new System.Drawing.Point(3, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(668, 26);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Тестовая функция, пока только для отображения";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // listView1
             // 
             this.listView1.CheckBoxes = true;
@@ -181,10 +190,7 @@
             this.columnHeader4,
             this.columnHeader3,
             this.columnHeader5,
-            this.columnHeader6,
-            this.columnHeader7,
-            this.columnHeader8,
-            this.columnHeader9});
+            this.columnHeader6});
             this.listView1.ContextMenuStrip = this.contextMenuStrip1;
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.FullRowSelect = true;
@@ -198,6 +204,7 @@
             this.listView1.TabIndex = 10;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.listView1_ItemChecked);
             // 
             // columnHeader1
             // 
@@ -206,43 +213,28 @@
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "ФИО";
-            this.columnHeader2.Width = 180;
+            this.columnHeader2.Text = "Заказ";
+            this.columnHeader2.Width = 100;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "Дата";
-            this.columnHeader4.Width = 75;
+            this.columnHeader4.Text = "Заказчик";
+            this.columnHeader4.Width = 200;
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "Смена";
-            this.columnHeader3.Width = 45;
+            this.columnHeader3.Text = "Тираж";
+            this.columnHeader3.Width = 100;
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "Заказ";
-            this.columnHeader5.Width = 80;
+            this.columnHeader5.Text = "Приладка, выполнено %";
+            this.columnHeader5.Width = 140;
             // 
             // columnHeader6
             // 
-            this.columnHeader6.Text = "Заказчик";
-            this.columnHeader6.Width = 160;
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "Тираж";
-            this.columnHeader7.Width = 70;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "Приладка";
-            this.columnHeader8.Width = 65;
-            // 
-            // columnHeader9
-            // 
-            this.columnHeader9.Text = "Сделано";
-            this.columnHeader9.Width = 75;
+            this.columnHeader6.Text = "Продукция, сделано шт.";
+            this.columnHeader6.Width = 140;
             // 
             // contextMenuStrip1
             // 
@@ -264,17 +256,6 @@
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.deleteToolStripMenuItem.Text = "Удалить";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Location = new System.Drawing.Point(3, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(674, 26);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Тестовая функция, пока только для отображения";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // FormLoadOrderOperations
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -287,7 +268,7 @@
             this.Name = "FormLoadOrderOperations";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Список элементов заказа: ";
-            this.Load += new System.EventHandler(this.FormLoadOrderOperations_Load);
+            this.Load += new System.EventHandler(this.FormLoadOrderOperations_LoadAsync);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
@@ -319,9 +300,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
-        private System.Windows.Forms.ColumnHeader columnHeader7;
-        private System.Windows.Forms.ColumnHeader columnHeader8;
-        private System.Windows.Forms.ColumnHeader columnHeader9;
         private System.Windows.Forms.Label label3;
     }
 }

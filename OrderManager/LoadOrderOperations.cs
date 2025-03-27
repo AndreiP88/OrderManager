@@ -2,12 +2,15 @@
 {
     public class LoadOrderOperations
     {
-        private string makereadyStart;
-        private string makereadyStop;
-        private string workStart;
-        private string workStop;
+        private int orderOperationID;
+        private string makereadyStart = "";
+        private string makereadyStop = "";
+        private string workStart = "";
+        private string workStop = "";
         private int makereadyComplete;
+        private int oldValueMakereadyComplete;
         private int done;
+        private int oldValueDone;
 
         public LoadOrderOperations()
         {
@@ -23,6 +26,11 @@
             Done = done;
         }
 
+        public int OrderOperationID
+        {
+            get => orderOperationID;
+            set => orderOperationID = value;
+        }
         public string MakereadyStart
         {
             get => makereadyStart;
@@ -52,11 +60,20 @@
             get => makereadyComplete;
             set => makereadyComplete = value;
         }
-
+        public int OLDValueMakereadyComplete
+        {
+            get => oldValueMakereadyComplete;
+            set => oldValueMakereadyComplete = value;
+        }
         public int Done
         {
             get => done;
             set => done = value;
+        }
+        public int OLDValueDone
+        {
+            get => oldValueDone;
+            set => oldValueDone = value;
         }
     }
 }

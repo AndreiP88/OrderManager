@@ -2,6 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -170,9 +174,9 @@ namespace OrderManager
             return result;
         }
 
-        private String GetValue(String machine, String numberOfOrder, String modificationOfOrder, String nameOfColomn)
+        private string GetValue(string machine, string numberOfOrder, string modificationOfOrder, string nameOfColomn)
         {
-            String result = "0";
+            string result = "-1";
 
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
             {
@@ -234,6 +238,148 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
                 Command.Parameters.AddWithValue("@id", index);
                 Command.Parameters.AddWithValue("@value", value);
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
+        public async Task<int> AddOrderToDB(int machine, string number, string name, string modification, int amount, int timeMakeready, int timeWork, string stamp, List<string> items, int status = 0, int counterRepeat = 0, int mkType = 1)
+        {
+            int addedRowsCount = -1;
+            int orderID = -1;
+
+            string orderAddedDate = DateTime.Now.ToString();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                await Connect.OpenAsync();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    /*CommandText = @"SELECT count AS previewOrderID FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine;
+                                    INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat, makereadyType) 
+                                        SELECT @oddedDate, @machine, @number, @nameOfOrder, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR, @makereadyType 
+                                    WHERE 
+                                        NOT EXISTS (SELECT numberOfOrder, modification, machine FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine) LIMIT 1;  
+                                    SELECT count AS orderID FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine; 
+                                    SELECT ROW_COUNT() AS addedRows"*/
+                    CommandText = @"INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat, makereadyType) 
+                                        SELECT @oddedDate, @machine, @number, @nameOfOrder, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR, @makereadyType 
+                                    WHERE 
+                                        NOT EXISTS (SELECT numberOfOrder, modification, machine FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine) LIMIT 1;  
+                                    SELECT 
+                                    (SELECT count FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine) AS orderID, 
+                                    (SELECT ROW_COUNT()) AS addedRows"
+                };
+                Command.Parameters.AddWithValue("@oddedDate", orderAddedDate); // присваиваем переменной значение
+                Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@number", number);
+                Command.Parameters.AddWithValue("@nameOfOrder", name);
+                Command.Parameters.AddWithValue("@modification", modification);
+                Command.Parameters.AddWithValue("@amount", amount);
+                Command.Parameters.AddWithValue("@timeM", timeMakeready);
+                Command.Parameters.AddWithValue("@timeW", timeWork);
+                Command.Parameters.AddWithValue("@stamp", stamp);
+                Command.Parameters.AddWithValue("@status", status);
+                Command.Parameters.AddWithValue("@counterR", counterRepeat);
+                Command.Parameters.AddWithValue("@makereadyType", mkType);
+
+                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                while (await sqlReader.ReadAsync())
+                {
+                    addedRowsCount = sqlReader["addedRows"] == DBNull.Value ? -1 : Convert.ToInt32(sqlReader["addedRows"]);
+                    orderID = sqlReader["orderID"] == DBNull.Value ? -1 : Convert.ToInt32(sqlReader["orderID"]);
+                }
+
+                Connect.Close();
+            }
+
+            if (addedRowsCount > 0)
+            {
+                for (int i = 0; i < items.Count; i += 2)
+                {
+                    using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                    {
+                        string commandText = "INSERT INTO typesList (orderID, name, count) " +
+                        "VALUES (@orderID, @name, @count)";
+
+                        MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                        Command.Parameters.AddWithValue("@orderID", orderID);
+                        Command.Parameters.AddWithValue("@name", items[i]);
+                        Command.Parameters.AddWithValue("@count", items[i + 1]);
+
+                        Connect.Open();
+                        Command.ExecuteNonQuery();
+                        Connect.Close();
+                    }
+                }
+            }
+
+            return orderID;
+        }
+
+        public async Task<int> AddNewOrderInProgressAsync(int machine, int executor, int typeJob, int shiftID, int orderIndex, string makereadyStart,
+            string makereadyStop, string workStart, string workStop, int makereadyConsider, int makereadyPartComplete, int done, int counterRepeat, string note)
+        {
+            int orderInProgressID = 0;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                await Connect.OpenAsync();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"INSERT INTO ordersInProgress (machine, executor, typeJob, shiftID, orderID, timeMakereadyStart, timeMakereadyStop, timeToWorkStart, timeToWorkStop, makereadyConsider, makereadyComplete, done, counterRepeat, note) 
+                                    SELECT @machine, @executor, @typeJob, @shiftID, @orderID, @makereadyStart, @makereadyStop, @workStart, @workStop, @makereadyConsider, @makereadyComplete, @done, @counterRepeat, @note 
+                                    WHERE NOT EXISTS (SELECT shiftID, orderID, counterRepeat FROM ordersInProgress WHERE shiftID = @shiftID AND orderID = @orderID AND counterRepeat = @counterRepeat) LIMIT 1; 
+                                    SELECT count FROM ordersInProgress  
+                                    WHERE  
+                                        shiftID = @shiftID AND orderID = @orderID AND counterRepeat = @counterRepeat"
+                };
+                Command.Parameters.AddWithValue("@machine", machine);
+                Command.Parameters.AddWithValue("@executor", executor);
+                Command.Parameters.AddWithValue("@typeJob", typeJob);
+                Command.Parameters.AddWithValue("@shiftID", shiftID);
+                Command.Parameters.AddWithValue("@orderID", orderIndex);
+                Command.Parameters.AddWithValue("@makereadyStart", makereadyStart);
+                Command.Parameters.AddWithValue("@makereadyStop", makereadyStop);
+                Command.Parameters.AddWithValue("@workStart", workStart);
+                Command.Parameters.AddWithValue("@workStop", workStop);
+                Command.Parameters.AddWithValue("@makereadyConsider", makereadyConsider);
+                Command.Parameters.AddWithValue("@makereadyComplete", makereadyPartComplete);
+                Command.Parameters.AddWithValue("@done", done);
+                Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
+                Command.Parameters.AddWithValue("@note", note);
+
+                DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                while (await sqlReader.ReadAsync())
+                {
+                    orderInProgressID = sqlReader["count"] == DBNull.Value ? -1 : Convert.ToInt32(sqlReader["count"]);
+                }
+
+                Connect.Close();
+            }
+
+            return orderInProgressID;
+        }
+
+        public void UpdateData(string nameOfColomn, int machineCurrent, int shiftID, int orderIndex, int counterRepeat, object value)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE ordersInProgress SET " + nameOfColomn + " = @value " +
+                    "WHERE ((machine = @machineCurrent AND shiftID = @shiftID) AND (orderID = @id AND counterRepeat = @counterRepeat))";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@machineCurrent", machineCurrent); // присваиваем переменной значение
+                Command.Parameters.AddWithValue("@shiftID", shiftID);
+                Command.Parameters.AddWithValue("@id", orderIndex);
+                Command.Parameters.AddWithValue("@counterRepeat", counterRepeat);
+                Command.Parameters.AddWithValue("@value", value);
+
                 Connect.Open();
                 Command.ExecuteNonQuery();
                 Connect.Close();

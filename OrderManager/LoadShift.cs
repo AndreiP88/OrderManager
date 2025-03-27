@@ -5,7 +5,9 @@ namespace OrderManager
     public class LoadShift
     {
         private bool isNewShift;
+        private bool isLoadShift;
         private int idFbcBrigade;
+        private int indexOMShift;
         private int userID;
         private int userIDBaseOM;
         private string shiftDate;
@@ -18,10 +20,11 @@ namespace OrderManager
         {
 
         }
-        public LoadShift(bool isNewShift, int idFbcBrigade, int userID, int userIDBaseOM, string shiftDate, int shiftNumber, string shiftStart, string shiftEnd, List<LoadOrder> order)
+        public LoadShift(bool isNewShift, int idFbcBrigade, int indexOMShift, int userID, int userIDBaseOM, string shiftDate, int shiftNumber, string shiftStart, string shiftEnd, List<LoadOrder> order)
         {
             IsNewShift = isNewShift;
             IDFbcBrigade = idFbcBrigade;
+            IndexOMShift = indexOMShift;
             UserID = userID;
             UserIDBaseOM = userIDBaseOM;
             ShiftDate = shiftDate;
@@ -44,10 +47,20 @@ namespace OrderManager
             get => isNewShift;
             set => isNewShift = value;
         }
+        public bool IsLoadShift
+        {
+            get => isLoadShift;
+            set => isLoadShift = value;
+        }
         public int IDFbcBrigade
         {
             get => idFbcBrigade;
             set => idFbcBrigade = value;
+        }
+        public int IndexOMShift
+        {
+            get => indexOMShift;
+            set => indexOMShift = value;
         }
         public int UserID
         {
