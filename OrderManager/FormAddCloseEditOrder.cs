@@ -3249,9 +3249,9 @@ namespace OrderManager
             UpdateData("note", orderInProgressID, textBox8.Text);
         }
 
-        private async Task<bool> LoadOtherShiftsAsync(int idManOrderJobItem)
+        private async Task<int> LoadOtherShiftsAsync(int idManOrderJobItem, bool fullViewLoad = false)
         {
-            bool isAddedOrders = false;
+            int typeAccepShifts = -1;
 
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             GetOrderOperations orderOperations = new GetOrderOperations();
@@ -3302,13 +3302,13 @@ namespace OrderManager
 
             if (therIsAShiftToAdd)
             {
-                FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts);
+                FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts, fullViewLoad);
                 form.ShowDialog();
 
-                isAddedOrders = form.IsAddedOrders;
+                typeAccepShifts = form.TypeAcceptedOrder;
             }
 
-            return isAddedOrders;
+            return typeAccepShifts;
 
             /*List<LoadShift> loadShiftOrders = orderOperations.OperationsForOrder(loadShifts);
 
@@ -3362,12 +3362,19 @@ namespace OrderManager
                         int equipID = Convert.ToInt32(await getInfo.GetIDEquipMachine(machine));
                         int idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
 
-                        if (await LoadOtherShiftsAsync(idManOrderJobItem))
+                        switch(await LoadOtherShiftsAsync(idManOrderJobItem, true))
                         {
-                            await ReloadLastOrder(machine);
-                        }
-                        else
-                        {
+                            case 1:
+                                await ReloadLastOrder(machine);
+                                break;
+                            case 2:
+                                await ReloadLastOrder(machine);
+                                return;
+                                break;
+                            case 3:
+                                return;
+                            case 4:
+                                break;
 
                         }
 
@@ -3736,13 +3743,14 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                if (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem))
+                switch (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem))
                 {
-                    await ReloadLastOrder(machine);
-                }
-                else
-                {
-                    SetNewOrder(fm.SetValue, fm.Types);
+                    case 1:
+                        await ReloadLastOrder(machine);
+                        break;
+                    case 4:
+                        SetNewOrder(fm.SetValue, fm.Types);
+                        break;
                 }
             }
         }

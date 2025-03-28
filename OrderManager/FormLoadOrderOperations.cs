@@ -11,26 +11,29 @@ namespace OrderManager
         private List<LoadShift> loadShift;
         private List<LoadShift> loadShiftOrders;
 
+        private bool viewAllButtons;
+
         private bool _loadShiftList = false;
 
-        public FormLoadOrderOperations(List<LoadShift> loadShift)
+        public FormLoadOrderOperations(List<LoadShift> loadShift, bool viewAllButtons = false)
         {
             InitializeComponent();
 
             this.loadShift = loadShift;
+            this.viewAllButtons = viewAllButtons;
         }
 
-        private bool isAddedOrders = false;
+        private int typeAcceptedOrder = 1;
 
-        public bool IsAddedOrders
+        public int TypeAcceptedOrder
         {
             get
             {
-                return isAddedOrders;
+                return typeAcceptedOrder;
             }
             set
             {
-                isAddedOrders = value;
+                typeAcceptedOrder = value;
             }
         }
 
@@ -370,17 +373,22 @@ namespace OrderManager
 
         private async void FormLoadOrderOperations_LoadAsync(object sender, EventArgs e)
         {
+            if (viewAllButtons)
+            {
+                button2.Visible = true;
+                button3.Visible = true;
+            }
+            else
+            {
+                button2.Visible = false;
+                button3.Visible = false;
+            }
+
             GetOrderOperations orderOperations = new GetOrderOperations();
 
             loadShiftOrders = await orderOperations.OperationsForOrder(loadShift);
 
             LoadShiftListToListView(loadShiftOrders);
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            IsAddedOrders = false;
-            Close();
         }
 
         private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
@@ -392,9 +400,42 @@ namespace OrderManager
             }
         }
 
-        private async void button3_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            IsAddedOrders = await AcceptNewValuesAsync();
+            if (await AcceptNewValuesAsync())
+            {
+                TypeAcceptedOrder = 1;
+            }
+            else
+            {
+                TypeAcceptedOrder = 4;
+            }
+
+            Close();
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            if (await AcceptNewValuesAsync())
+            {
+                TypeAcceptedOrder = 2;
+            }
+            else
+            {
+                TypeAcceptedOrder = 4;
+            }
+            Close();
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            TypeAcceptedOrder = 3;
+
+            Close();
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            TypeAcceptedOrder = 4;
+
             Close();
         }
     }
