@@ -1,4 +1,5 @@
-﻿using System;
+﻿using libData;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -12,12 +13,29 @@ namespace OrderManager
         {
 
         }
-        public async Task<List<LoadShift>> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
+        private class DoneSumm
+        {
+            public int id;
+            public int summ;
+
+            public DoneSumm()
+            {
+
+            }
+            public DoneSumm(int id, int done)
+            {
+                this.id = id;
+                this.summ = done;
+            }
+        }
+            public async Task<List<LoadShift>> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
         {
             List<LoadShift> loadShifts = shifts;
 
             ValueShiftsBase valueShifts = new ValueShiftsBase();
             ValueInfoBase valueInfo = new ValueInfoBase();
+
+            List<DoneSumm> doneSumms = new List<DoneSumm>();
 
             try
             {
@@ -93,6 +111,8 @@ namespace OrderManager
                             string operationBegin = sqlReader["date_begin"] == DBNull.Value ? "" : Convert.ToDateTime(sqlReader["date_begin"]).ToString("HH:mm dd.MM.yyyy");
                             string operationEnd = sqlReader["date_end"] == DBNull.Value ? "" : Convert.ToDateTime(sqlReader["date_end"]).ToString("HH:mm dd.MM.yyyy");
 
+                            string dateEnd = sqlReader["date_end"] == DBNull.Value ? "" : sqlReader["date_end"].ToString();
+
                             float factQty = sqlReader["fact_out_qty"] == DBNull.Value ? 0 : (float)Convert.ToDouble(sqlReader["fact_out_qty"]);
 
                             if (loadIdManOrderJobItem != -1)
@@ -158,13 +178,16 @@ namespace OrderManager
 
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop = operationEnd;
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].Done += (int)factQty;
+
+                                    loadShifts[i].Order[itemIndex].LastAmount = loadShifts[i].Order[itemIndex].AmountOfOrder - await SummPreviewOperations(idManOrderJobItem, dateEnd);
                                 }                                
                             }
 
-                            Console.WriteLine(i + ":: " + "<" + itemIndex + ">" + idFbcBrigade + " :: " + idManOrderJobItem + ": " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyComplete + "::: " +
+
+                            /*Console.WriteLine(i + ":: " + "<" + itemIndex + ">" + idFbcBrigade + " :: " + idManOrderJobItem + ": " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyComplete + "::: " +
                                 loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].Done);
                             Console.WriteLine(i + ":: " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStart + " - " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStop + " ::: " +
-                                loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart + " - " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop);
+                                loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart + " - " + loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop);*/
 
                             tmpIdManOrderJobItem = idManOrderJobItem;
                         }
@@ -686,6 +709,7 @@ namespace OrderManager
                         {
                             loadOrder.WorkTime = normTime;
                             loadOrder.AmountOfOrder = planQty;
+                            loadOrder.LastAmount = planQty;
                         }
 
                         loadOrder.IdManOrderJobItem = idManOrderJobItem;
@@ -707,6 +731,60 @@ namespace OrderManager
             }
 
             return loadOrder;
+        }
+        public async Task<int> SummPreviewOperations(int idManOrderJobItem, string currentDateTime)
+        {
+            int summPreviewOperations = 0;
+
+            try
+            {
+                using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
+                {
+                    await Connect.OpenAsync();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT
+	                                        SUM(man_factjob.fact_out_qty) AS summPreview
+                                        FROM
+	                                        dbo.man_planjob_list
+	                                        INNER JOIN
+	                                        dbo.man_order_job_item
+	                                        ON 
+		                                        man_planjob_list.id_man_order_job_item = man_order_job_item.id_man_order_job_item
+	                                        INNER JOIN
+	                                        dbo.norm_operation_table
+	                                        ON 
+		                                        man_planjob_list.id_norm_operation = norm_operation_table.id_norm_operation
+	                                        INNER JOIN
+	                                        dbo.man_factjob
+	                                        ON 
+		                                        man_planjob_list.id_man_planjob_list = man_factjob.id_man_planjob_list
+                                        WHERE
+	                                        norm_operation_table.ord = 1
+                                          AND man_planjob_list.id_man_order_job_item = @idManOrderJobItem
+                                          AND man_factjob.date_end < @currentDateTime"
+                    };
+                    Command.Parameters.AddWithValue("@idManOrderJobItem", idManOrderJobItem);
+                    Command.Parameters.AddWithValue("@currentDateTime", currentDateTime);
+
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                    while (await sqlReader.ReadAsync())
+                    {
+                        int idFbcBrigade = sqlReader["summPreview"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["summPreview"]);
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка: " + ex.Message);
+                LogException.WriteLine(ex.Message);
+            }
+
+            return summPreviewOperations;
         }
     }
 }

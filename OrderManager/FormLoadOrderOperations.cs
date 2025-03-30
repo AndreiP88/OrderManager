@@ -87,9 +87,11 @@ namespace OrderManager
                     listViewItemOrders.Name = j.ToString();//shift.Order[j].IdManOrderJobItem.ToString();
                     listViewItemOrders.Text = (j + 1).ToString();
 
+                    listViewItemOrders.SubItems.Add(shift.Order[j].EquipID.ToString());
                     listViewItemOrders.SubItems.Add(shift.Order[j].OrderNumber);
                     listViewItemOrders.SubItems.Add(shift.Order[j].NameCustomer);
                     listViewItemOrders.SubItems.Add(shift.Order[j].AmountOfOrder.ToString("N0"));
+                    listViewItemOrders.SubItems.Add(shift.Order[j].LastAmount.ToString("N0"));
                     listViewItemOrders.SubItems.Add(makereadyCompleteView);
                     listViewItemOrders.SubItems.Add(doneView);
 

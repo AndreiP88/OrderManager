@@ -13,6 +13,7 @@ namespace OrderManager
         private int makereadyTime;
         private int workTime;
         private int amountOfOrder;
+        private int lastAmount;
         private string stamp;
         private string itemOrder;
         private List<string> items;
@@ -81,6 +82,11 @@ namespace OrderManager
         {
             get => amountOfOrder;
             set => amountOfOrder = value;
+        }
+        public int LastAmount
+        {
+            get => lastAmount;
+            set => lastAmount = value;
         }
         public string StampOrder
         {
