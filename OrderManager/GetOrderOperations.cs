@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -108,10 +109,10 @@ namespace OrderManager
                             int operationType = sqlReader["operation_type"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["operation_type"]);
                             int equipID = sqlReader["id_equip"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["id_equip"]);
 
-                            string operationBegin = sqlReader["date_begin"] == DBNull.Value ? "" : Convert.ToDateTime(sqlReader["date_begin"]).ToString("HH:mm dd.MM.yyyy");
-                            string operationEnd = sqlReader["date_end"] == DBNull.Value ? "" : Convert.ToDateTime(sqlReader["date_end"]).ToString("HH:mm dd.MM.yyyy");
+                            string operationBegin = sqlReader["date_begin"] == DBNull.Value ? "" : sqlReader["date_begin"].ToString();
+                            string operationEnd = sqlReader["date_end"] == DBNull.Value ? "" : sqlReader["date_end"].ToString();
 
-                            string dateEnd = sqlReader["date_end"] == DBNull.Value ? "" : sqlReader["date_end"].ToString();
+                            //string dateEnd = sqlReader["date_end"] == DBNull.Value ? "" : sqlReader["date_end"].ToString();
 
                             float factQty = sqlReader["fact_out_qty"] == DBNull.Value ? 0 : (float)Convert.ToDouble(sqlReader["fact_out_qty"]);
 
@@ -160,10 +161,10 @@ namespace OrderManager
 
                                     if (counterMK == 1)
                                     {
-                                        loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStart = operationBegin;
+                                        loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStart = Convert.ToDateTime(operationBegin).ToString("HH:mm dd.MM.yyyy");
                                     }
 
-                                    loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStop = operationEnd;
+                                    loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStop = Convert.ToDateTime(operationEnd).ToString("HH:mm dd.MM.yyyy");
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyComplete += Convert.ToInt32(factQty * 100);
                                 }
 
@@ -173,13 +174,13 @@ namespace OrderManager
 
                                     if (counterWK == 1)
                                     {
-                                        loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart = operationBegin;
+                                        loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart = Convert.ToDateTime(operationBegin).ToString("HH:mm dd.MM.yyyy");
+                                        loadShifts[i].Order[itemIndex].LastAmount = loadShifts[i].Order[itemIndex].AmountOfOrder - await SummPreviewOperations(idManOrderJobItem, operationBegin);
+                                        MessageBox.Show(idManOrderJobItem + ": " + operationBegin + " - " + await SummPreviewOperations(idManOrderJobItem, operationBegin));
                                     }
 
-                                    loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop = operationEnd;
+                                    loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop = Convert.ToDateTime(operationEnd).ToString("HH:mm dd.MM.yyyy");
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].Done += (int)factQty;
-
-                                    loadShifts[i].Order[itemIndex].LastAmount = loadShifts[i].Order[itemIndex].AmountOfOrder - await SummPreviewOperations(idManOrderJobItem, dateEnd);
                                 }                                
                             }
 
@@ -762,8 +763,8 @@ namespace OrderManager
 		                                        man_planjob_list.id_man_planjob_list = man_factjob.id_man_planjob_list
                                         WHERE
 	                                        norm_operation_table.ord = 1
-                                          AND man_planjob_list.id_man_order_job_item = @idManOrderJobItem
-                                          AND man_factjob.date_end < @currentDateTime"
+                                            AND man_planjob_list.id_man_order_job_item = @idManOrderJobItem
+                                            AND man_factjob.date_end < @currentDateTime"
                     };
                     Command.Parameters.AddWithValue("@idManOrderJobItem", idManOrderJobItem);
                     Command.Parameters.AddWithValue("@currentDateTime", currentDateTime);
@@ -772,7 +773,7 @@ namespace OrderManager
 
                     while (await sqlReader.ReadAsync())
                     {
-                        int idFbcBrigade = sqlReader["summPreview"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["summPreview"]);
+                        summPreviewOperations = sqlReader["summPreview"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["summPreview"]);
                     }
 
                     Connect.Close();
