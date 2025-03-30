@@ -25,6 +25,16 @@ namespace OrderManager
 
             return result;
         }
+        public async Task<string> GetMachineNameFromEquipID(int equipID)
+        {
+            string result = "";
+            object load = await GetValueMachines("idEquip", equipID.ToString(), "name");
+
+            result = (string)(load ?? string.Empty);
+            //result = (string)(load == null ? string.Empty : load);
+            Console.WriteLine(equipID + ", " +result);
+            return result;
+        }
 
         public async Task<string> GetMachineFromName(string machineName)
         {

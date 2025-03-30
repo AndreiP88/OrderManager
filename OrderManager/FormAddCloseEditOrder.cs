@@ -3372,10 +3372,12 @@ namespace OrderManager
                                 return;
                                 break;
                             case 3:
-                                return;
-                            case 4:
                                 break;
-
+                            case 4:
+                                return;
+                                break;
+                            default:
+                                break;
                         }
 
                         DialogResult result;
@@ -3745,7 +3747,7 @@ namespace OrderManager
             {
                 switch (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem))
                 {
-                    case 1:
+                    case 3:
                         await ReloadLastOrder(machine);
                         break;
                     case 4:

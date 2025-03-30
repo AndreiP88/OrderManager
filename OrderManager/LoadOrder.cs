@@ -8,6 +8,7 @@ namespace OrderManager
         private int idManOrderJobItem;
         private int orderOMIndex;
         private int equipID;
+        private string equipName;
         private string orderNumber;
         private string nameCustomer;
         private int makereadyTime;
@@ -57,7 +58,11 @@ namespace OrderManager
             get => equipID;
             set => equipID = value;
         }
-
+        public string EquipName
+        {
+            get => equipName;
+            set => equipName = value;
+        }
         public string OrderNumber
         {
             get => orderNumber;

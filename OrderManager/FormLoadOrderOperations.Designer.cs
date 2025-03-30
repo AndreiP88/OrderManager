@@ -47,11 +47,11 @@
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -109,7 +109,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(149, 41);
             this.button4.TabIndex = 1;
-            this.button4.Text = "Отменить и продолжить";
+            this.button4.Text = "Отменить и вернуться";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -177,7 +177,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(145, 41);
             this.button3.TabIndex = 0;
-            this.button3.Text = "Отменить и вернуться";
+            this.button3.Text = "Отменить и продолжить";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -188,7 +188,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.888889F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.888889F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.Controls.Add(this.label3, 0, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -205,7 +205,7 @@
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label3.Location = new System.Drawing.Point(3, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(690, 26);
+            this.label3.Size = new System.Drawing.Size(689, 26);
             this.label3.TabIndex = 0;
             this.label3.Text = "Список смен и заказов для внесения в базу данных";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -267,6 +267,16 @@
             this.columnHeader6.Text = "Остаток";
             this.columnHeader6.Width = 100;
             // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "Приладка, выполнено %";
+            this.columnHeader7.Width = 140;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "Продукция, сделано шт.";
+            this.columnHeader8.Width = 140;
+            // 
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -287,16 +297,6 @@
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.deleteToolStripMenuItem.Text = "Удалить";
             // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "Приладка, выполнено %";
-            this.columnHeader7.Width = 140;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "Продукция, сделано шт.";
-            this.columnHeader8.Width = 140;
-            // 
             // FormLoadOrderOperations
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -309,6 +309,7 @@
             this.Name = "FormLoadOrderOperations";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Смены";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormLoadOrderOperations_FormClosing);
             this.Load += new System.EventHandler(this.FormLoadOrderOperations_LoadAsync);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);

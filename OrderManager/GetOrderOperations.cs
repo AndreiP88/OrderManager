@@ -52,37 +52,42 @@ namespace OrderManager
                         {
                             Connection = Connect,
                             CommandText = @"SELECT
-	                                            fbc_brigade.id_fbc_brigade, 
-	                                            man_planjob_list.id_man_order_job_item, 
-	                                            norm_operation_table.ord AS operation_type, 
-	                                            man_planjob_list.id_norm_operation, 
-	                                            man_planjob_list.plan_out_qty, 
-	                                            man_planjob_list.normtime, 
-	                                            man_factjob.date_begin, 
-	                                            man_factjob.date_end, 
-	                                            man_factjob.duration, 
-	                                            man_factjob.fact_out_qty, 
-	                                            man_factjob.id_equip, 
-	                                            man_factjob.norm_time
-                                            FROM
-	                                            dbo.man_factjob
-	                                            INNER JOIN
-	                                            dbo.man_planjob_list
-	                                            ON 
-		                                            man_factjob.id_man_planjob_list = man_planjob_list.id_man_planjob_list
-	                                            INNER JOIN
-	                                            dbo.norm_operation_table
-	                                            ON 
-		                                            man_planjob_list.id_norm_operation = norm_operation_table.id_norm_operation
-	                                            INNER JOIN
-	                                            dbo.fbc_brigade
-	                                            ON 
-		                                            (
-			                                            fbc_brigade.date_end IS NOT NULL AND
-			                                            man_factjob.date_begin >= fbc_brigade.date_begin AND
-			                                            man_factjob.date_begin <= fbc_brigade.date_end AND
-			                                            man_factjob.id_common_employee = fbc_brigade.id_common_employee
-		                                            )
+	                                        fbc_brigade.id_fbc_brigade, 
+	                                        man_planjob_list.id_man_order_job_item, 
+	                                        norm_operation_table.ord AS operation_type, 
+	                                        man_planjob_list.id_norm_operation, 
+	                                        man_planjob_list.plan_out_qty, 
+	                                        man_planjob_list.normtime, 
+	                                        man_factjob.date_begin, 
+	                                        man_factjob.date_end, 
+	                                        man_factjob.duration, 
+	                                        man_factjob.fact_out_qty, 
+	                                        man_factjob.id_equip, 
+	                                        man_factjob.norm_time, 
+	                                        common_equip_directory.equip_name
+                                        FROM
+	                                        dbo.man_factjob
+	                                        INNER JOIN
+	                                        dbo.man_planjob_list
+	                                        ON 
+		                                        man_factjob.id_man_planjob_list = man_planjob_list.id_man_planjob_list
+	                                        INNER JOIN
+	                                        dbo.norm_operation_table
+	                                        ON 
+		                                        man_planjob_list.id_norm_operation = norm_operation_table.id_norm_operation
+	                                        INNER JOIN
+	                                        dbo.fbc_brigade
+	                                        ON 
+		                                        (
+			                                        fbc_brigade.date_end IS NOT NULL AND
+			                                        man_factjob.date_begin >= fbc_brigade.date_begin AND
+			                                        man_factjob.date_begin <= fbc_brigade.date_end AND
+			                                        man_factjob.id_common_employee = fbc_brigade.id_common_employee
+		                                        )
+	                                        INNER JOIN
+	                                        dbo.common_equip_directory
+	                                        ON 
+		                                        man_factjob.id_equip = common_equip_directory.id_common_equip_directory
                                             WHERE
 	                                            fbc_brigade.id_fbc_brigade = @idFbcBrigade
                                             ORDER BY
@@ -108,6 +113,7 @@ namespace OrderManager
                             int idManOrderJobItem = sqlReader["id_man_order_job_item"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["id_man_order_job_item"]);
                             int operationType = sqlReader["operation_type"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["operation_type"]);
                             int equipID = sqlReader["id_equip"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["id_equip"]);
+                            string equipName = sqlReader["equip_name"] == DBNull.Value ? "" : sqlReader["equip_name"].ToString();
 
                             string operationBegin = sqlReader["date_begin"] == DBNull.Value ? "" : sqlReader["date_begin"].ToString();
                             string operationEnd = sqlReader["date_end"] == DBNull.Value ? "" : sqlReader["date_end"].ToString();
@@ -147,6 +153,7 @@ namespace OrderManager
                                 itemIndex = loadShifts[i].Order.Count - 1;
 
                                 loadShifts[i].Order[itemIndex].EquipID = await valueInfo.GetMachineIndexFromIDEquip(equipID);
+                                loadShifts[i].Order[itemIndex].EquipName = equipName;
 
                                 loadShifts[i].Order[itemIndex].OrderOperations.Add(new LoadOrderOperations());
                             }
@@ -176,7 +183,6 @@ namespace OrderManager
                                     {
                                         loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart = Convert.ToDateTime(operationBegin).ToString("HH:mm dd.MM.yyyy");
                                         loadShifts[i].Order[itemIndex].LastAmount = loadShifts[i].Order[itemIndex].AmountOfOrder - await SummPreviewOperations(idManOrderJobItem, operationBegin);
-                                        MessageBox.Show(idManOrderJobItem + ": " + operationBegin + " - " + await SummPreviewOperations(idManOrderJobItem, operationBegin));
                                     }
 
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop = Convert.ToDateTime(operationEnd).ToString("HH:mm dd.MM.yyyy");

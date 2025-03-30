@@ -37,9 +37,10 @@ namespace OrderManager
             }
         }
 
-        private void LoadShiftListToListView(List<LoadShift> shifts)
+        private async Task LoadShiftListToListViewAsync(List<LoadShift> shifts)
         {
             ValueUserBase userBase = new ValueUserBase();
+            ValueInfoBase infoBase = new ValueInfoBase();
 
             _loadShiftList = true;
 
@@ -56,7 +57,7 @@ namespace OrderManager
 
                 LoadShift shift = shifts[i];
 
-                string shiftDetail = userBase.GetSmalNameUser(shift.UserIDBaseOM.ToString()) + ". Дата: " + shift.ShiftDate + ", Смена: " + shift.ShiftNumber + ". Время: " + shift.ShiftStart + " - " + shift.ShiftEnd + " ID: " + shift.IndexOMShift;
+                string shiftDetail = userBase.GetSmalNameUser(shift.UserIDBaseOM.ToString()) + ". Дата: " + shift.ShiftDate + ", Смена: " + shift.ShiftNumber + ". Время: " + shift.ShiftStart + " - " + shift.ShiftEnd + "; ID: " + shift.IndexOMShift;
 
                 ListViewGroup listViewGroup = new ListViewGroup(shiftDetail);
                 listViewGroup.Name = i.ToString();//shift.IDFbcBrigade.ToString();
@@ -87,7 +88,7 @@ namespace OrderManager
                     listViewItemOrders.Name = j.ToString();//shift.Order[j].IdManOrderJobItem.ToString();
                     listViewItemOrders.Text = (j + 1).ToString();
 
-                    listViewItemOrders.SubItems.Add(shift.Order[j].EquipID.ToString());
+                    listViewItemOrders.SubItems.Add(shift.Order[j].EquipName);
                     listViewItemOrders.SubItems.Add(shift.Order[j].OrderNumber);
                     listViewItemOrders.SubItems.Add(shift.Order[j].NameCustomer);
                     listViewItemOrders.SubItems.Add(shift.Order[j].AmountOfOrder.ToString("N0"));
@@ -303,6 +304,7 @@ namespace OrderManager
             string workStop = order.OrderOperations[0].WorkStop;
             int makereadyComplete = order.OrderOperations[0].MakereadyComplete;
             int done = order.OrderOperations[0].Done;
+            int lastAmount = order.LastAmount;
             int counterRepeat = 0;
 
             int makereadyConsider = 0;
@@ -316,7 +318,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    if (done > amount)
+                    if (done > lastAmount)
                     {
                         newStatus = 4;
                     }
@@ -336,7 +338,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    if (done > amount)
+                    if (done > lastAmount)
                     {
                         newStatus = 4;
                     }
@@ -377,20 +379,26 @@ namespace OrderManager
         {
             if (viewAllButtons)
             {
+                button1.Visible = true;
                 button2.Visible = true;
-                button3.Visible = true;
+
+                button3.Text = "Отменить и продолжить";
+                button4.Text = "Отменить и вернуться";
             }
             else
             {
+                button1.Visible = false;
                 button2.Visible = false;
-                button3.Visible = false;
+
+                button3.Text = "Сохранить";
+                button4.Text = "Отменить";
             }
 
             GetOrderOperations orderOperations = new GetOrderOperations();
 
             loadShiftOrders = await orderOperations.OperationsForOrder(loadShift);
 
-            LoadShiftListToListView(loadShiftOrders);
+            await LoadShiftListToListViewAsync(loadShiftOrders);
         }
 
         private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
@@ -426,6 +434,7 @@ namespace OrderManager
             {
                 TypeAcceptedOrder = 4;
             }
+
             Close();
         }
         private void button3_Click(object sender, EventArgs e)
@@ -439,6 +448,11 @@ namespace OrderManager
             TypeAcceptedOrder = 4;
 
             Close();
+        }
+
+        private void FormLoadOrderOperations_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            TypeAcceptedOrder = 4;
         }
     }
 }
