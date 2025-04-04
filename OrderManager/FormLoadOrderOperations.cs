@@ -437,9 +437,23 @@ namespace OrderManager
 
             Close();
         }
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_ClickAsync(object sender, EventArgs e)
         {
-            TypeAcceptedOrder = 3;
+            if (!viewAllButtons)
+            {
+                if (await AcceptNewValuesAsync())
+                {
+                    TypeAcceptedOrder = 3;
+                }
+                else
+                {
+                    TypeAcceptedOrder = 4;
+                }
+            }
+            else
+            {
+                TypeAcceptedOrder = 3;
+            }
 
             Close();
         }
@@ -452,7 +466,7 @@ namespace OrderManager
 
         private void FormLoadOrderOperations_FormClosing(object sender, FormClosingEventArgs e)
         {
-            TypeAcceptedOrder = 4;
+            //TypeAcceptedOrder = 4;
         }
     }
 }
