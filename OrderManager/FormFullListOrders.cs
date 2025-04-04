@@ -423,7 +423,7 @@ namespace OrderManager
                                     commandText = "SELECT * FROM allordersinjob WHERE " + commandLine + " AND machine = '" + await getInfo.GetMachineFromName(machineName) + "' ";
                                 }
 
-                                commandText += "ORDER BY timeMakereadyStart is not null ASC, timeToWorkStart is not null ASC";
+                                commandText += "ORDER BY IF (timeMakereadyStart <> '', STR_TO_DATE (timeMakereadyStart, '%H:%i %d.%m.%Y'), STR_TO_DATE (timeToWorkStart, '%H:%i %d.%m.%Y')) ASC";
 
                                 await Connect.OpenAsync();
 
