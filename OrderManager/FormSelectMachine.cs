@@ -24,6 +24,7 @@ namespace OrderManager
 
         CancellationTokenSource cancelTokenSource;
 
+        bool _isNewShift = false;
         private void ChangeCaptionButton()
         {
             int checkedCount = 0;
@@ -40,11 +41,19 @@ namespace OrderManager
                 {
                     button1.Text = "Выбрать и начать смену";
                     button1.Enabled = true;
+                    _isNewShift = true;
+
+                    dateTimePicker1.Visible = true;
+                    comboBox1.Visible = true;
                 }
                 else
                 {
                     button1.Text = "Применить";
                     button1.Enabled = true;
+                    _isNewShift = false;
+
+                    dateTimePicker1.Visible = false;
+                    comboBox1.Visible = false;
                 }
             }
             else
@@ -227,6 +236,9 @@ namespace OrderManager
             await LoadMachine(cancelTokenSource.Token);
             timer1.Enabled = true;
             ChangeCaptionButton();
+
+            dateTimePicker1.Value = DateTime.Now;
+            dateTimePicker1.Checked = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -239,7 +251,7 @@ namespace OrderManager
             }
             else
             {
-                ShiftStart(Form1.Info.nameOfExecutor, DateTime.Now.ToString());
+                ShiftStart(Form1.Info.nameOfExecutor, comboBox1.SelectedIndex + 1, dateTimePicker1.Value.ToString("dd.MM.yyyy HH:mm:ss"));
                 ActivateDeactivateMachines(Form1.Info.nameOfExecutor);
             }
 
@@ -260,7 +272,7 @@ namespace OrderManager
             }*/
         }
 
-        private void ShiftStart(string currentUser, string startOfShift)
+        private void ShiftStart(string currentUser, int shiftNumber, string startOfShift)
         {
             bool reconnectionRequired = false;
             DialogResult dialog = DialogResult.Retry;
@@ -278,12 +290,17 @@ namespace OrderManager
 
                         using (MySqlConnection Connect = DBConnection.GetDBConnection())
                         {
-                            string commandText = "INSERT INTO shifts (nameUser, startShift, overtimeShift) " +
-                                "SELECT * FROM (SELECT @nameUser, @startShift, @overtimeShift) " +
-                                "AS tmp WHERE NOT EXISTS(SELECT startShift, nameUser FROM shifts WHERE startShift = @startShift AND nameUser = @nameUser) LIMIT 1";
+                            /*string commandText = "INSERT INTO shifts (nameUser, shiftNumber, startShift, overtimeShift) " +
+                                "SELECT * FROM (SELECT @nameUser, @shiftNumber, @startShift, @overtimeShift) " +
+                                "AS tmp WHERE NOT EXISTS(SELECT startShift, nameUser FROM shifts WHERE startShift = @startShift AND nameUser = @nameUser) LIMIT 1";*/
+
+                            string commandText = "INSERT INTO shifts (nameUser, shiftNumber, startShift, overtimeShift) " +
+                                "SELECT @nameUser, @shiftNumber, @startShift, @overtimeShift " +
+                                "WHERE NOT EXISTS (SELECT nameUser, shiftNumber, startShift FROM shifts WHERE nameUser = @nameUser AND shiftNumber = @shiftNumber AND startShift = @startShift) LIMIT 1";
 
                             MySqlCommand Command = new MySqlCommand(commandText, Connect);
                             Command.Parameters.AddWithValue("@nameUser", currentUser);
+                            Command.Parameters.AddWithValue("@shiftNumber", shiftNumber);
                             Command.Parameters.AddWithValue("@startShift", startOfShift);
                             Command.Parameters.AddWithValue("@overtimeShift", overtimeShift);
 
@@ -564,6 +581,18 @@ namespace OrderManager
             }
         }
 
+        private void SelectShiftNumber(string selectedDateTime)
+        {
+            GetNumberShiftFromTimeStart numberShiftFromTimeStart = new GetNumberShiftFromTimeStart();
+
+            int shiftNumber = numberShiftFromTimeStart.NumberShiftNum(selectedDateTime);
+
+            if (shiftNumber > 0)
+            {
+                comboBox1.SelectedIndex = shiftNumber - 1;
+            }
+        }
+
         void checkBoxMachine_CheckedChanged(object sender, EventArgs e)
         {
             //CheckBox c1 = sender as CheckBox;
@@ -581,6 +610,13 @@ namespace OrderManager
         private void timer1_Tick(object sender, EventArgs e)
         {
             UpdateMachinesStatus();
+
+            if (!dateTimePicker1.Checked)
+            {
+                dateTimePicker1.Value = DateTime.Now;
+
+                dateTimePicker1.Checked = false;
+            }
         }
 
         private void FormSelectMachine_FormClosing(object sender, FormClosingEventArgs e)
@@ -588,6 +624,11 @@ namespace OrderManager
             timer1.Enabled = false;
             cancelTokenSource?.Cancel();
             Thread.Sleep(100);
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            SelectShiftNumber(dateTimePicker1.Value.ToString());
         }
     }
 }

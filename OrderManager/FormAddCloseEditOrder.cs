@@ -3268,7 +3268,8 @@ namespace OrderManager
                 string shiftDate = loadShifts[i].ShiftDate;
                 int shiftNumber = loadShifts[i].ShiftNumber;
 
-                List<string> shiftsListOM = valueShifts.GetShiftFromDate(userOMIndex, shiftDate);
+                //List<string> shiftsListOM = valueShifts.GetShiftFromDate(userOMIndex, shiftDate);
+                List<LoadShift> shiftsListOM = valueShifts.GetShiftListFromDate(userOMIndex, shiftDate);
                 //MessageBox.Show("userOMIndex: " + userOMIndex + ", shiftDate: " + shiftDate + ", shiftsListOM.Count: " + shiftsListOM.Count);
                 loadShifts[i].UserIDBaseOM = userOMIndex;
 
@@ -3276,12 +3277,12 @@ namespace OrderManager
                 {
                     for (int j = 0; j < shiftsListOM.Count; j++)
                     {
-                        int shiftOMNumber = getNumberShift.NumberShiftNum(shiftsListOM[j]);
-                        //MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j]).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == "+  shiftNumber);
-                        if (Convert.ToDateTime(shiftsListOM[j]).ToString("dd.MM.yyyy") == shiftDate && shiftOMNumber == shiftNumber)
+                        int shiftOMNumber = shiftsListOM[j].ShiftNumber; //getNumberShift.NumberShiftNum(shiftsListOM[j]);
+                        //MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == "+  shiftNumber);
+                        if (Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") == shiftDate && shiftOMNumber == shiftNumber)
                         {
                             loadShifts[i].IsNewShift = false;
-                            loadShifts[i].IndexOMShift = valueShifts.GetIDFromStartShift(shiftsListOM[j]);
+                            loadShifts[i].IndexOMShift = valueShifts.GetIDFromStartShift(shiftsListOM[j].ShiftStart);
                         }
                         else
                         {

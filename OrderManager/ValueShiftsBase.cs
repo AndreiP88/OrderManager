@@ -211,16 +211,16 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"INSERT INTO shifts (nameUser, startShift, stopShift, note, fullShift, overtimeShift) 
-                                        SELECT @nameUser, @startShift, @stopShift, @note, @fullShift, @overtimeShift 
+                    CommandText = @"INSERT INTO shifts (nameUser, shiftNumber, startShift, stopShift, note, fullShift, overtimeShift) 
+                                        SELECT @nameUser, @shiftNumber, @startShift, @stopShift, @note, @fullShift, @overtimeShift 
                                     WHERE 
-                                        NOT EXISTS (SELECT startShift, nameUser FROM shifts WHERE startShift = @startShift AND nameUser = @nameUser) LIMIT 1; 
-                                    SELECT id FROM shifts  
+                                        NOT EXISTS (SELECT nameUser, shiftNumber, startShift FROM shifts WHERE nameUser = @nameUser AND shiftNumber = @shiftNumber AND startShift = @startShift) LIMIT 1; 
+                                    SELECT id FROM shifts 
                                     WHERE  
-                                        startShift = @startShift  
-                                        AND nameUser = @nameUser"
+                                        nameUser = @nameUser AND shiftNumber = @shiftNumber AND startShift = @startShift"
                 };
                 Command.Parameters.AddWithValue("@nameUser", shift.UserIDBaseOM);
+                Command.Parameters.AddWithValue("@shiftNumber", shift.ShiftNumber);
                 Command.Parameters.AddWithValue("@startShift", shift.ShiftStart);
                 Command.Parameters.AddWithValue("@stopShift", shift.ShiftEnd);
                 Command.Parameters.AddWithValue("@note", "");
@@ -387,6 +387,43 @@ namespace OrderManager
                     while (sqlReader.Read())
                     {
                         startShift.Add(sqlReader["startShift"].ToString());
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка получения списка смен: " + ex.ToString());
+            }
+
+            return startShift;
+        }
+
+        public List<LoadShift> GetShiftListFromDate(int userID, string date)
+        {
+            List<LoadShift> startShift = new List<LoadShift>();
+
+            try
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT shiftNumber, startShift FROM `shifts`
+                                        WHERE str_to_date(startShift, '%d.%m.%Y') = str_to_date(@startDate,  '%d.%m.%Y')
+                                        AND nameUser = @userID"
+                    };
+                    Command.Parameters.AddWithValue("@startDate", date);
+                    Command.Parameters.AddWithValue("@userID", userID);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        startShift.Add(new LoadShift(userID, (int)sqlReader["shiftNumber"], sqlReader["startShift"].ToString()));
                     }
 
                     Connect.Close();

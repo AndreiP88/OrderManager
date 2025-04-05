@@ -42,6 +42,14 @@ namespace OrderManager
             ShiftEnd = "";
         }
 
+        public LoadShift(int userID, int shiftNumber, string shiftStart)
+        {
+            UserID = userID;
+            ShiftNumber = shiftNumber;
+            ShiftStart = shiftStart;
+            ShiftEnd = "";
+        }
+
         public bool IsNewShift
         {
             get => isNewShift;

@@ -58,12 +58,12 @@ namespace OrderManager
 
             dateTime = dateTime.AddHours(6);
 
-            if (timeOne.AddHours(-3) <= dateTime && dateTime <= timeOne.AddHours(7))
+            if (timeOne.AddHours(-3) <= dateTime && dateTime <= timeOne.AddHours(9))
             {
                 result = 1;
             }
 
-            if (timeTwo.AddHours(-3) <= dateTime && dateTime <= timeTwo.AddHours(7))
+            if (timeTwo.AddHours(-3) <= dateTime && dateTime <= timeTwo.AddHours(9))
             {
                 result = 2;
             }

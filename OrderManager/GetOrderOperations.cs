@@ -1,10 +1,8 @@
-﻿using libData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace OrderManager
 {
@@ -617,8 +615,8 @@ namespace OrderManager
                             loadShifts[itemIndex].UserID = userID;
                             loadShifts[itemIndex].ShiftDate = Convert.ToDateTime(shiftBegin).ToString("dd.MM.yyyy");
                             loadShifts[itemIndex].ShiftNumber = shiftNumber;
-                            loadShifts[itemIndex].ShiftStart = shiftBegin;
-                            loadShifts[itemIndex].ShiftEnd = shiftEnd;
+                            loadShifts[itemIndex].ShiftStart = Convert.ToDateTime(shiftBegin).ToString("dd.MM.yyyy HH:mm:ss");
+                            loadShifts[itemIndex].ShiftEnd = Convert.ToDateTime(shiftEnd).ToString("dd.MM.yyyy HH:mm:ss");
                         }
                     }
 

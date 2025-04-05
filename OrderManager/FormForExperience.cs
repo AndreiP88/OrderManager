@@ -575,6 +575,23 @@ namespace OrderManager
             }
         }
 
+        private void SetNumberShiftToBase(int id, int shiftNumber)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE shifts SET shiftNumber = @shiftNumber " +
+                    "WHERE id = @id";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@shiftNumber", shiftNumber);
+                Command.Parameters.AddWithValue("@id", id);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
         private void AddNewIndexes(int userId, int userIDAsystem)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -694,6 +711,44 @@ namespace OrderManager
 
                         listView2.Items.Add(item);
                     }
+                }
+
+                Connect.Close();
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            GetNumberShiftFromTimeStart numberShiftFromTimeStart = new GetNumberShiftFromTimeStart();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM shifts"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    string startShift = sqlReader["startShift"].ToString();
+                    int shiftNumber = numberShiftFromTimeStart.NumberShiftNum(startShift);
+
+                    if (startShift != "")
+                    {
+                        SetNumberShiftToBase((int)sqlReader["id"], shiftNumber);
+                    }
+
+                    ListViewItem item = new ListViewItem();
+
+                    item.Name = sqlReader["id"].ToString();
+                    item.Text = sqlReader["id"].ToString();
+                    item.SubItems.Add(sqlReader["startShift"].ToString());
+                    item.SubItems.Add(shiftNumber.ToString());
+
+                    listView2.Items.Add(item);
                 }
 
                 Connect.Close();
