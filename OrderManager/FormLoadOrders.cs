@@ -314,6 +314,7 @@ namespace OrderManager
             string idNormOperationMakeWork = valueCategory.GetWKIDNormOperation(category);
 
             List<string> orderHeadList = new List<string>();
+            List<string> orderHeadNameList = new List<string>();
 
             string connectionString = @"Data Source = SRV-ACS\DSACS; Initial Catalog = asystem; Persist Security Info = True; User ID = ds; Password = 1";
 
@@ -338,6 +339,7 @@ namespace OrderManager
                     }
 
                     orderHeadList.Add(sqlReader["id_order_head"].ToString());
+                    orderHeadNameList.Add(sqlReader["order_name"].ToString());
 
                     orderNumbers.Add(new OrderLoadNumber(
                         sqlReader["order_num"].ToString(),
@@ -426,7 +428,7 @@ namespace OrderManager
                             }
 
                             ///////
-                            itemOrder.Add(sqlReader["detail_name"].ToString());
+                            itemOrder.Add(orderHeadNameList[i] + ": " + sqlReader["detail_name"].ToString());
                         }
                         //MessageBox.Show(itemOrder.Count.ToString());
                         connection.Close();
