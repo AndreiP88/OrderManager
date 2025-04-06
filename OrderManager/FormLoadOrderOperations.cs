@@ -318,13 +318,20 @@ namespace OrderManager
                 }
                 else
                 {
-                    if (done > lastAmount)
+                    if (done != 0)
                     {
-                        newStatus = 4;
+                        if (done > lastAmount)
+                        {
+                            newStatus = 4;
+                        }
+                        else
+                        {
+                            newStatus = 3;
+                        }
                     }
                     else
                     {
-                        newStatus = 3;
+                        newStatus = 2;
                     }
                 }
 
@@ -338,13 +345,20 @@ namespace OrderManager
                 }
                 else
                 {
-                    if (done > lastAmount)
+                    if (done != 0)
                     {
-                        newStatus = 4;
+                        if (done > lastAmount)
+                        {
+                            newStatus = 4;
+                        }
+                        else
+                        {
+                            newStatus = 3;
+                        }
                     }
                     else
                     {
-                        newStatus = 3;
+                        newStatus = 2;
                     }
                 }
 

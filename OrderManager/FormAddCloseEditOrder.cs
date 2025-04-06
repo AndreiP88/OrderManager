@@ -3365,6 +3365,8 @@ namespace OrderManager
 
                         switch(await LoadOtherShiftsAsync(idManOrderJobItem, true))
                         {
+                            case -1:;
+                                break;
                             case 1:
                                 await ReloadLastOrder(machine);
                                 break;
@@ -3748,6 +3750,9 @@ namespace OrderManager
             {
                 switch (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem))
                 {
+                    case -1:
+                        SetNewOrder(fm.SetValue, fm.Types);
+                        break;
                     case 3:
                         await ReloadLastOrder(machine);
                         break;
