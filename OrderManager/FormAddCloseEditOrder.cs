@@ -3339,6 +3339,8 @@ namespace OrderManager
 
         private async void button1_Click(object sender, EventArgs e)
         {
+            button1.Enabled = false;
+
             int typeJob = tabControl1.SelectedIndex;
 
             if (typeJob == 0)
@@ -3365,18 +3367,20 @@ namespace OrderManager
 
                         switch(await LoadOtherShiftsAsync(idManOrderJobItem, true))
                         {
-                            case -1:;
+                            case -1:
                                 break;
                             case 1:
                                 await ReloadLastOrder(machine);
                                 break;
                             case 2:
                                 await ReloadLastOrder(machine);
+                                button1.Enabled = true;
                                 return;
                                 break;
                             case 3:
                                 break;
                             case 4:
+                                button1.Enabled = true;
                                 return;
                                 break;
                             default:
@@ -3392,6 +3396,7 @@ namespace OrderManager
                         else if (comboBox1.SelectedIndex == 0)
                         {
                             MessageBox.Show("Заказ №" + textBox1.Text + " есть в базе, выберите из списка или проверьте введенные данные.", "Добавление заказа", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            button1.Enabled = true;
                             return;
                         }
 
@@ -3475,7 +3480,8 @@ namespace OrderManager
                     Close();
                 }
             }
-            
+
+            button1.Enabled = true;
         }
 
         private async void button2_Click(object sender, EventArgs e)
