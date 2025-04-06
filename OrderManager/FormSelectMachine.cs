@@ -233,6 +233,9 @@ namespace OrderManager
             cancelTokenSource?.Cancel();
             cancelTokenSource = new CancellationTokenSource();
 
+            dateTimePicker1.Visible = false;
+            comboBox1.Visible = false;
+
             await LoadMachine(cancelTokenSource.Token);
             timer1.Enabled = true;
             ChangeCaptionButton();
