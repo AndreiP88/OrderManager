@@ -305,6 +305,7 @@ namespace OrderManager
             int makereadyComplete = order.OrderOperations[0].MakereadyComplete;
             int done = order.OrderOperations[0].Done;
             int lastAmount = order.LastAmount;
+            int lastMakeready = order.LastMakeready;
             int counterRepeat = 0;
 
             int makereadyConsider = 0;
@@ -341,7 +342,14 @@ namespace OrderManager
             {
                 if (workStart == "" && workStop == "")
                 {
-                    newStatus = 2;
+                    if (makereadyComplete > lastMakeready)
+                    {
+                        newStatus = 2;
+                    }
+                    else
+                    {
+                        newStatus = 1;
+                    }
                 }
                 else
                 {
@@ -364,7 +372,7 @@ namespace OrderManager
 
                 makereadyConsider = 1;
             }
-
+            
             if (order.OrderOperations[0].OrderOperationID == 0)
             {
                 await valueOrders.AddNewOrderInProgressAsync(machineCurrent, shift.UserIDBaseOM, typeJob, shiftID, orderID, makereadyStart, makereadyStop, workStart, workStop, makereadyConsider, makereadyComplete, done, counterRepeat, "");

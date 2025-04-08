@@ -160,13 +160,18 @@ namespace OrderManager
                             
                             if (itemOperationsIndex != -1)
                             {
+                                int[] summPreview = await SummPreviewOperationsAll(idManOrderJobItem, operationBegin);
+                                
                                 if (operationType == 0)
                                 {
                                     counterMK++;
 
                                     if (counterMK == 1)
                                     {
+                                        //Console.WriteLine(loadShifts[i].Order[itemIndex].OrderNumber + ": " + loadShifts[i].Order[itemIndex].LastMakeready + " - " + summPreview[0]);
                                         loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStart = Convert.ToDateTime(operationBegin).ToString("HH:mm dd.MM.yyyy");
+                                        loadShifts[i].Order[itemIndex].LastMakeready -= summPreview[0];
+                                        //Console.WriteLine(loadShifts[i].Order[itemIndex].LastMakeready);
                                     }
 
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].MakereadyStop = Convert.ToDateTime(operationEnd).ToString("HH:mm dd.MM.yyyy");
@@ -180,7 +185,8 @@ namespace OrderManager
                                     if (counterWK == 1)
                                     {
                                         loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStart = Convert.ToDateTime(operationBegin).ToString("HH:mm dd.MM.yyyy");
-                                        loadShifts[i].Order[itemIndex].LastAmount = loadShifts[i].Order[itemIndex].AmountOfOrder - await SummPreviewOperations(idManOrderJobItem, operationBegin);
+                                        //loadShifts[i].Order[itemIndex].LastAmount = loadShifts[i].Order[itemIndex].AmountOfOrder - await SummPreviewOperations(idManOrderJobItem, operationBegin);
+                                        loadShifts[i].Order[itemIndex].LastAmount -= summPreview[1];
                                     }
 
                                     loadShifts[i].Order[itemIndex].OrderOperations[itemOperationsIndex].WorkStop = Convert.ToDateTime(operationEnd).ToString("HH:mm dd.MM.yyyy");
@@ -708,6 +714,7 @@ namespace OrderManager
                         if (operationType == 0)
                         {
                             loadOrder.MakereadyTime = normTime / planQty;
+                            loadOrder.LastMakeready = planQty * 100;
                         }
 
                         if (operationType == 1)
@@ -736,6 +743,65 @@ namespace OrderManager
             }
 
             return loadOrder;
+        }
+
+        public async Task<int[]> SummPreviewOperationsAll(int idManOrderJobItem, string currentDateTime)
+        {
+            int[] summPreviewOperations = { 0, 0 };
+
+            try
+            {
+                using (SqlConnection Connect = DBConnection.GetSQLServerConnection())
+                {
+                    await Connect.OpenAsync();
+                    SqlCommand Command = new SqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT
+                                            SUM(CASE WHEN norm_operation_table.ord = 0 THEN fact_out_qty ELSE 0 END) AS summPreviewMakeready,
+                                            SUM(CASE WHEN norm_operation_table.ord = 1 THEN fact_out_qty ELSE 0 END) AS summPreviewDone
+                                        FROM
+	                                        dbo.man_planjob_list
+	                                        INNER JOIN
+	                                        dbo.man_order_job_item
+	                                        ON 
+		                                        man_planjob_list.id_man_order_job_item = man_order_job_item.id_man_order_job_item
+	                                        INNER JOIN
+	                                        dbo.norm_operation_table
+	                                        ON 
+		                                        man_planjob_list.id_norm_operation = norm_operation_table.id_norm_operation
+	                                        INNER JOIN
+	                                        dbo.man_factjob
+	                                        ON 
+		                                        man_planjob_list.id_man_planjob_list = man_factjob.id_man_planjob_list
+                                        WHERE
+	                                        man_planjob_list.id_man_order_job_item = @idManOrderJobItem
+                                            AND man_factjob.date_end < @currentDateTime"
+                    };
+                    Command.Parameters.AddWithValue("@idManOrderJobItem", idManOrderJobItem);
+                    Command.Parameters.AddWithValue("@currentDateTime", currentDateTime);
+
+                    DbDataReader sqlReader = await Command.ExecuteReaderAsync();
+
+                    while (await sqlReader.ReadAsync())
+                    {
+                        float previewMakeready = sqlReader["summPreviewMakeready"] == DBNull.Value ? 0 : (float)Convert.ToDouble(sqlReader["summPreviewMakeready"]);
+                        int previewDone = sqlReader["summPreviewDone"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["summPreviewDone"]);
+
+                        summPreviewOperations[0] += Convert.ToInt32(previewMakeready * 100);
+                        summPreviewOperations[1] += previewDone;
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка: " + ex.Message);
+                LogException.WriteLine(ex.Message);
+            }
+
+            return summPreviewOperations;
         }
         public async Task<int> SummPreviewOperations(int idManOrderJobItem, string currentDateTime)
         {
