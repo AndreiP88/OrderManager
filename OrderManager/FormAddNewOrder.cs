@@ -15,6 +15,7 @@ namespace OrderManager
 
         List<String> numbersOrdersInProgress;
         int numbersOrder;
+        int _orderJobItemID = -1;
 
         List<string> items = new List<string>();
 
@@ -141,7 +142,7 @@ namespace OrderManager
             return result;
         }
 
-        private async void AddOrderToDB()
+        private async void AddOrderToDB()//переделать потом
         {
             ValueInfoBase getInfo = new ValueInfoBase();
             GetDateTimeOperations totalMinutes = new GetDateTimeOperations();
@@ -159,7 +160,7 @@ namespace OrderManager
             String stamp = textBox2.Text;
             String status = "0";
             String counterR = "0";
-            int orderJobItemID = (int)numericUpDown2.Value;
+            int orderJobItemID = _orderJobItemID;
 
             int result = 0;
 
@@ -215,7 +216,16 @@ namespace OrderManager
 
             if (result == 0)
             {
-                int orderID = ordersBase.GetOrderID(machine, number, modification, orderJobItemID);
+                int orderID = -1;
+
+                if (orderJobItemID > 0)
+                {
+                    orderID = ordersBase.GetOrderID(Convert.ToInt32(machine), number, orderJobItemID);
+                }
+                else
+                {
+                    orderID = ordersBase.GetOrderID(Convert.ToInt32(machine), number, modification);
+                }
 
                 for (int i = 0; i < items.Count; i = i + 2)
                 {
@@ -330,7 +340,16 @@ namespace OrderManager
 
             int orderJobItemID = (int)numericUpDown2.Value;
 
-            int orderIndex = getValue.GetOrderID(await getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text, orderJobItemID);
+            int orderIndex = -1;
+
+            if (_orderJobItemID > 0)
+            {
+                orderIndex = getValue.GetOrderID(Convert.ToInt32(await getInfo.GetMachineFromName(comboBox1.Text)), textBox1.Text, orderJobItemID);
+            }
+            else
+            {
+                orderIndex = getValue.GetOrderID(Convert.ToInt32(await getInfo.GetMachineFromName(comboBox1.Text)), textBox1.Text, textBox5.Text);
+            }
 
             if (CheckNotEmptyFields() == true)
             {
@@ -509,6 +528,7 @@ namespace OrderManager
             numericUpDown8.Value = workM;
 
             items = itemsOrder;
+            _orderJobItemID = order.idManOrderJobItem;
         }
     }
 

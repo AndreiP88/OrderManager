@@ -3,9 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Xml.Linq;
 
 namespace OrderManager
 {
@@ -27,9 +24,89 @@ namespace OrderManager
         /// <param name="orderNumber"></param>
         /// <param name="orderModification"></param>
         /// <returns></returns>
-        public int GetOrderID(string currentMachine, string orderNumber, string orderModification, int orderJobItemID)
+        public int GetOrderID(string currentMachine, string orderNumber, string orderModification, int orderJobItemID, int c)
         {
-            return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, orderJobItemID, "count"));
+            int result = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND numberOfOrder = @number AND modification = @orderModification AND orderJobItemID = @orderJobItemID"
+                };
+                Command.Parameters.AddWithValue("@machine", currentMachine);
+                Command.Parameters.AddWithValue("@number", orderNumber);
+                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                Command.Parameters.AddWithValue("@orderJobItemID", orderJobItemID);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = Convert.ToInt32(sqlReader["count"]);
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+        public int GetOrderID(int currentMachine, string orderNumber, int orderJobItemID)
+        {
+            int result = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND numberOfOrder = @number AND orderJobItemID = @orderJobItemID"
+                };
+                Command.Parameters.AddWithValue("@machine", currentMachine);
+                Command.Parameters.AddWithValue("@number", orderNumber);
+                Command.Parameters.AddWithValue("@orderJobItemID", orderJobItemID);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = Convert.ToInt32(sqlReader["count"]);
+                    break;
+                }
+
+                Connect.Close();
+            }
+
+            return result;
+        }
+        public int GetOrderID(int currentMachine, string orderNumber, string orderModification)
+        {
+            int result = -1;
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND numberOfOrder = @number AND modification = @orderModification"
+                };
+                Command.Parameters.AddWithValue("@machine", currentMachine);
+                Command.Parameters.AddWithValue("@number", orderNumber);
+                Command.Parameters.AddWithValue("@orderModification", orderModification);
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    result = Convert.ToInt32(sqlReader["count"]);
+                    break;
+                }
+
+                Connect.Close();
+            }
+
+            return result;
         }
 
         /// <summary>

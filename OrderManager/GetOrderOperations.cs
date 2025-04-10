@@ -237,7 +237,17 @@ namespace OrderManager
             {
                 //LoadOrder order = shift.Order[shift.Order.Count - 1];
 
-                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder, order.IdManOrderJobItem);
+                int orderOMIndex = -1;
+
+                if (order.IdManOrderJobItem > 0)
+                {
+                    orderOMIndex = valueOrders.GetOrderID(order.EquipID, order.OrderNumber, order.IdManOrderJobItem);
+                }
+                else
+                {
+                    orderOMIndex = valueOrders.GetOrderID(order.EquipID, order.OrderNumber, order.ItemOrder);
+                }
+                    
                 //MessageBox.Show(orderOMIndex + ": " + order.EquipID.ToString() + "; " + order.OrderNumber + " - " + order.ItemOrder);
                 if (orderOMIndex == -1)
                 {
@@ -286,7 +296,16 @@ namespace OrderManager
             {
                 //LoadOrder order = shift.Order[shift.Order.Count - 1];
 
-                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder, order.IdManOrderJobItem);
+                int orderOMIndex = -1;
+
+                if (order.IdManOrderJobItem > 0)
+                {
+                    orderOMIndex = valueOrders.GetOrderID(order.EquipID, order.OrderNumber, order.IdManOrderJobItem);
+                }
+                else
+                {
+                    orderOMIndex = valueOrders.GetOrderID(order.EquipID, order.OrderNumber, order.ItemOrder);
+                }
                 //MessageBox.Show(orderOMIndex + ": " + order.EquipID.ToString() + "; " + order.OrderNumber + " - " + order.ItemOrder);
                 if (orderOMIndex == -1)
                 {

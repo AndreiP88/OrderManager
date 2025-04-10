@@ -23,7 +23,7 @@ namespace OrderManager
         int _userID = -1;
         int _orderRegistrationType = -1;
         int _typeJob = -1;
-        //int _orderJobItemID = -1;
+        int _orderJobItemID = -1;
 
         public class TransparentPanel : Panel
         {
@@ -605,7 +605,9 @@ namespace OrderManager
 
                 int machine = await getInfo.GetMachineIDFromName(comboBox3.Text);
                 int currentOrderID = getInfo.GetCurrentOrderID(machine.ToString());
-                numericUpDown9.Value = -1;
+
+                _orderJobItemID = -1;
+                numericUpDown9.Value = _orderJobItemID;
 
                 ClearAllValue();//add ildetime
                 tabControl1.Refresh();
@@ -1425,6 +1427,7 @@ namespace OrderManager
                 numericUpDown8.Enabled = true;
                 textBox2.Enabled = true;
                 textBox5.Enabled = true;
+                numericUpDown9.Enabled = true;
 
                 comboBox4.Enabled = true;
                 idletimeNumericUpDownH.Enabled = true;
@@ -1445,6 +1448,7 @@ namespace OrderManager
                 numericUpDown8.Enabled = false;
                 textBox2.Enabled = false;
                 textBox5.Enabled = false;
+                numericUpDown9.Enabled = false;
 
                 comboBox4.Enabled = false;
                 idletimeNumericUpDownH.Enabled = false;
@@ -1501,7 +1505,8 @@ namespace OrderManager
             String status = "0";
             String counterR = "0";
             int mkType = 1;
-            int orderJobItemID = (int)numericUpDown9.Value;
+
+            int orderJobItemID = _orderJobItemID;
 
             await ordersBase.AddOrderToDB(Convert.ToInt32(machine), number, name, modification, Convert.ToInt32(amount), Convert.ToInt32(timeM), Convert.ToInt32(timeW), stamp, items, Convert.ToInt32(status), Convert.ToInt32(counterR), mkType, orderJobItemID);
             //SELECT COUNT(*) FROM YourTable WHERE YourKeyCol = YourKeyValue
@@ -1720,7 +1725,7 @@ namespace OrderManager
             int shiftID = ShiftID;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            int orderJobItemID = (int)numericUpDown9.Value;
+            int orderJobItemID = _orderJobItemID;
 
             String newStatus = "0";
 
@@ -1949,7 +1954,7 @@ namespace OrderManager
             int shiftID = ShiftID;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            int orderJobItemID = (int)numericUpDown9.Value;
+            int orderJobItemID = _orderJobItemID;
 
             String newStatus = "0";
 
@@ -2106,7 +2111,7 @@ namespace OrderManager
             int shiftID = ShiftID;
             String number = textBox1.Text;
             String modification = textBox5.Text;
-            int orderJobItemID = (int)numericUpDown9.Value;
+            int orderJobItemID = _orderJobItemID;
 
             String newStatus = "0";
 
@@ -2634,6 +2639,7 @@ namespace OrderManager
                                 numericUpDown6.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeMakeready"])).Item2;
                                 numericUpDown7.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item1;
                                 numericUpDown8.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item2;
+                                _orderJobItemID = Convert.ToInt32(sqlReader["orderJobItemID"]);
                                 numericUpDown9.Value = Convert.ToInt32(sqlReader["orderJobItemID"]);
                                 textBox2.Text = sqlReader["orderStamp"].ToString();
                                 textBox5.Text = sqlReader["modification"].ToString();
@@ -3089,6 +3095,7 @@ namespace OrderManager
 
                     items = itemsOrder;
 
+                    _orderJobItemID = order.idManOrderJobItem;
                     numericUpDown9.Value = order.idManOrderJobItem;
                 }
             }
@@ -3373,9 +3380,20 @@ namespace OrderManager
                         string orderNumber = textBox1.Text;
 
                         int equipID = Convert.ToInt32(await getInfo.GetIDEquipMachine(machine));
-                        int idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
-                        
-                        switch(await LoadOtherShiftsAsync(idManOrderJobItem, true))
+                        //int idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
+                        int idManOrderJobItem;
+
+                        if (_orderJobItemID > 0)
+                        {
+                            idManOrderJobItem = _orderJobItemID;
+                            //
+                        }
+                        else
+                        {
+                            idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
+                        }
+
+                        switch (await LoadOtherShiftsAsync(idManOrderJobItem, true))
                         {
                             case -1:
                                 break;
@@ -3505,8 +3523,7 @@ namespace OrderManager
 
             DialogResult result;
 
-            int orderJobItemID = (int)numericUpDown9.Value;
-            int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text, orderJobItemID);
+            int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text, _orderJobItemID);
 
             String status = orders.GetOrderStatus(orderIndex);
             //

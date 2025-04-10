@@ -274,7 +274,7 @@ namespace OrderManager
             {
                 ValueOrdersBase valueOrders = new ValueOrdersBase();
 
-                newOrderID = await valueOrders.AddOrderToDB(order.EquipID, order.OrderNumber, order.NameCustomer, order.ItemOrder, order.AmountOfOrder, order.MakereadyTime, order.WorkTime, order.StampOrder, order.Items);
+                newOrderID = await valueOrders.AddOrderToDB(order.EquipID, order.OrderNumber, order.NameCustomer, order.ItemOrder, order.AmountOfOrder, order.MakereadyTime, order.WorkTime, order.StampOrder, order.Items, 0, 0, 1, order.IdManOrderJobItem);
 
                 //newOrderID = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder);
             }
