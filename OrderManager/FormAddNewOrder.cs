@@ -159,6 +159,7 @@ namespace OrderManager
             String stamp = textBox2.Text;
             String status = "0";
             String counterR = "0";
+            int orderJobItemID = (int)numericUpDown2.Value;
 
             int result = 0;
 
@@ -167,12 +168,13 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT COUNT(*) FROM orders WHERE ((numberOfOrder = @number AND modification = @modification) AND machine = @machine)"
+                    CommandText = @"SELECT COUNT(*) FROM orders WHERE (numberOfOrder = @number AND modification = @modification AND machine = @machine AND orderJobItemID = @orderJobItemID)"
                 };
 
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", number);
                 Command.Parameters.AddWithValue("@modification", modification);
+                Command.Parameters.AddWithValue("@orderJobItemID", orderJobItemID);
 
                 Connect.Open();
                 result = Convert.ToInt32(Command.ExecuteScalar());
@@ -184,11 +186,11 @@ namespace OrderManager
                 string commandText;
 
                 if (!editOrderLoad && result == 0)
-                    commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat) " +
-                        "VALUES (@orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR)";
+                    commandText = "INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat, orderJobItemID) " +
+                        "VALUES (@orderAddedDate, @machine, @number, @name, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR, @orderJobItemID)";
                 else
                     commandText = "UPDATE orders SET machine = @machine, numberOfOrder = @number, nameOfOrder = @name, modification = @modification, " +
-                    "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp " +
+                    "amountOfOrder = @amount, timeMakeready = @timeM, timeToWork = @timeW, orderStamp = @stamp, orderJobItemID = @orderJobItemID " +
                     "WHERE count = @orderCount";
 
                 MySqlCommand Command = new MySqlCommand(commandText, Connect);
@@ -204,7 +206,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@stamp", stamp);
                 Command.Parameters.AddWithValue("@status", status);
                 Command.Parameters.AddWithValue("@counterR", counterR);
-
+                Command.Parameters.AddWithValue("@orderJobItemID", orderJobItemID);
 
                 Connect.Open();
                 Command.ExecuteNonQuery();
@@ -213,7 +215,7 @@ namespace OrderManager
 
             if (result == 0)
             {
-                int orderID = ordersBase.GetOrderID(machine, number, modification);
+                int orderID = ordersBase.GetOrderID(machine, number, modification, orderJobItemID);
 
                 for (int i = 0; i < items.Count; i = i + 2)
                 {
@@ -315,6 +317,7 @@ namespace OrderManager
                     numericUpDown8.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item2;
                     textBox2.Text = sqlReader["orderStamp"].ToString();
                     textBox5.Text = sqlReader["modification"].ToString();
+                    numericUpDown2.Value = Convert.ToInt32(sqlReader["orderJobItemID"]);
                 }
                 Connect.Close();
             }
@@ -325,7 +328,9 @@ namespace OrderManager
             ValueInfoBase getInfo = new ValueInfoBase();
             ValueOrdersBase getValue = new ValueOrdersBase();
 
-            int orderIndex = getValue.GetOrderID(await getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text);
+            int orderJobItemID = (int)numericUpDown2.Value;
+
+            int orderIndex = getValue.GetOrderID(await getInfo.GetMachineFromName(comboBox1.Text), textBox1.Text, textBox5.Text, orderJobItemID);
 
             if (CheckNotEmptyFields() == true)
             {

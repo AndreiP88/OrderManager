@@ -27,9 +27,9 @@ namespace OrderManager
         /// <param name="orderNumber"></param>
         /// <param name="orderModification"></param>
         /// <returns></returns>
-        public int GetOrderID(string currentMachine, string orderNumber, string orderModification)
+        public int GetOrderID(string currentMachine, string orderNumber, string orderModification, int orderJobItemID)
         {
-            return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, "count"));
+            return Convert.ToInt32(GetValue(currentMachine, orderNumber, orderModification, orderJobItemID, "count"));
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace OrderManager
             return result;
         }
 
-        private string GetValue(string machine, string numberOfOrder, string modificationOfOrder, string nameOfColomn)
+        private string GetValue(string machine, string numberOfOrder, string modificationOfOrder, int orderJobItemID, string nameOfColomn)
         {
             string result = "-1";
 
@@ -184,11 +184,12 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND (numberOfOrder = @number AND modification = @orderModification)"
+                    CommandText = @"SELECT * FROM orders WHERE machine = @machine AND numberOfOrder = @number AND modification = @orderModification AND orderJobItemID = @orderJobItemID"
                 };
                 Command.Parameters.AddWithValue("@machine", machine);
                 Command.Parameters.AddWithValue("@number", numberOfOrder);
                 Command.Parameters.AddWithValue("@orderModification", modificationOfOrder);
+                Command.Parameters.AddWithValue("@orderJobItemID", orderJobItemID);
                 DbDataReader sqlReader = Command.ExecuteReader();
 
                 while (sqlReader.Read())
@@ -244,7 +245,7 @@ namespace OrderManager
             }
         }
 
-        public async Task<int> AddOrderToDB(int machine, string number, string name, string modification, int amount, int timeMakeready, int timeWork, string stamp, List<string> items, int status = 0, int counterRepeat = 0, int mkType = 1)
+        public async Task<int> AddOrderToDB(int machine, string number, string name, string modification, int amount, int timeMakeready, int timeWork, string stamp, List<string> items, int status = 0, int counterRepeat = 0, int mkType = 1, int orderJobItemID = -1)
         {
             int addedRowsCount = -1;
             int orderID = -1;
@@ -264,12 +265,12 @@ namespace OrderManager
                                         NOT EXISTS (SELECT numberOfOrder, modification, machine FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine) LIMIT 1;  
                                     SELECT count AS orderID FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine; 
                                     SELECT ROW_COUNT() AS addedRows"*/
-                    CommandText = @"INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat, makereadyType) 
-                                        SELECT @oddedDate, @machine, @number, @nameOfOrder, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR, @makereadyType 
+                    CommandText = @"INSERT INTO orders (orderAddedDate, machine, numberOfOrder, nameOfOrder, modification, amountOfOrder, timeMakeready, timeToWork, orderStamp, statusOfOrder, counterRepeat, makereadyType, orderJobItemID) 
+                                        SELECT @oddedDate, @machine, @number, @nameOfOrder, @modification, @amount, @timeM, @timeW, @stamp, @status, @counterR, @makereadyType, @orderJobItemID 
                                     WHERE 
-                                        NOT EXISTS (SELECT numberOfOrder, modification, machine FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine) LIMIT 1;  
+                                        NOT EXISTS (SELECT numberOfOrder, modification, orderJobItemID, machine FROM orders WHERE numberOfOrder = @number AND modification = @modification AND orderJobItemID = @orderJobItemID AND machine = @machine) LIMIT 1;  
                                     SELECT 
-                                    (SELECT count FROM orders WHERE numberOfOrder = @number AND modification = @modification AND machine = @machine) AS orderID, 
+                                    (SELECT count FROM orders WHERE numberOfOrder = @number AND modification = @modification AND orderJobItemID = @orderJobItemID AND machine = @machine) AS orderID, 
                                     (SELECT ROW_COUNT()) AS addedRows"
                 };
                 Command.Parameters.AddWithValue("@oddedDate", orderAddedDate); // присваиваем переменной значение
@@ -284,6 +285,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@status", status);
                 Command.Parameters.AddWithValue("@counterR", counterRepeat);
                 Command.Parameters.AddWithValue("@makereadyType", mkType);
+                Command.Parameters.AddWithValue("@orderJobItemID", orderJobItemID);
 
                 DbDataReader sqlReader = await Command.ExecuteReaderAsync();
 

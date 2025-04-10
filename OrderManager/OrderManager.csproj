@@ -130,12 +130,6 @@
     <Compile Include="DBConnection.cs" />
     <Compile Include="DBMySQLUtils.cs" />
     <Compile Include="FileDownloader.cs" />
-    <Compile Include="FormAddCloseEditOrderOLD.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormAddCloseEditOrderOLD.Designer.cs">
-      <DependentUpon>FormAddCloseEditOrderOLD.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormAddCloseEditOrder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -313,12 +307,6 @@
     <Compile Include="FormSelectMachine.Designer.cs">
       <DependentUpon>FormSelectMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormAddCloseOrder.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormAddCloseOrder.Designer.cs">
-      <DependentUpon>FormAddCloseOrder.cs</DependentUpon>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -395,9 +383,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DayBlank.resx">
       <DependentUpon>DayBlank.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormAddCloseEditOrderOLD.resx">
-      <DependentUpon>FormAddCloseEditOrderOLD.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormAddCloseEditOrder.resx">
       <DependentUpon>FormAddCloseEditOrder.cs</DependentUpon>
@@ -479,9 +464,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormSelectMachine.resx">
       <DependentUpon>FormSelectMachine.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormAddCloseOrder.resx">
-      <DependentUpon>FormAddCloseOrder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

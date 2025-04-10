@@ -306,7 +306,7 @@ namespace OrderManager
             int done = order.OrderOperations[0].Done;
             int lastAmount = order.LastAmount;
             int lastMakeready = order.LastMakeready;
-            int counterRepeat = 0;
+            int counterRepeat = valueOrders.GetCounterRepeat(orderID);
 
             int makereadyConsider = 0;
             int newStatus = 0;

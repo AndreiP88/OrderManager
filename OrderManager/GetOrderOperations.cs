@@ -237,7 +237,7 @@ namespace OrderManager
             {
                 //LoadOrder order = shift.Order[shift.Order.Count - 1];
 
-                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder);
+                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder, order.IdManOrderJobItem);
                 //MessageBox.Show(orderOMIndex + ": " + order.EquipID.ToString() + "; " + order.OrderNumber + " - " + order.ItemOrder);
                 if (orderOMIndex == -1)
                 {
@@ -286,7 +286,7 @@ namespace OrderManager
             {
                 //LoadOrder order = shift.Order[shift.Order.Count - 1];
 
-                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder);
+                int orderOMIndex = valueOrders.GetOrderID(order.EquipID.ToString(), order.OrderNumber, order.ItemOrder, order.IdManOrderJobItem);
                 //MessageBox.Show(orderOMIndex + ": " + order.EquipID.ToString() + "; " + order.OrderNumber + " - " + order.ItemOrder);
                 if (orderOMIndex == -1)
                 {
