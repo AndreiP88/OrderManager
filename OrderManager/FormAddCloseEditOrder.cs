@@ -1560,7 +1560,16 @@ namespace OrderManager
                     Connect.Close();
                 }
 
-                int orderID = ordersBase.GetOrderID(machine, number, modification, orderJobItemID);
+                int orderID = -1;
+
+                if (orderJobItemID > 0)
+                {
+                    orderID = ordersBase.GetOrderID(Convert.ToInt32(machine), number, orderJobItemID);
+                }
+                else
+                {
+                    orderID = ordersBase.GetOrderID(Convert.ToInt32(machine), number, modification);
+                }
 
                 for (int i = 0; i < items.Count; i += 2)
                 {
@@ -1731,7 +1740,16 @@ namespace OrderManager
 
             string machineCurrent = await infoBase.GetMachineFromName(comboBox3.Text);
 
-            int orderID = orders.GetOrderID(machineCurrent, number, modification, orderJobItemID);
+            int orderID = -1;
+
+            if (orderJobItemID > 0)
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machineCurrent), number, orderJobItemID);
+            }
+            else
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machineCurrent), number, modification);
+            }
 
             string status = orders.GetOrderStatus(orderID);
             int counterRepeat = orders.GetCounterRepeat(orderID);
@@ -1944,7 +1962,7 @@ namespace OrderManager
         private async void CloseOrderInProgressToDB()
         {
             ValueInfoBase infoBase = new ValueInfoBase();
-            ValueOrdersBase getValue = new ValueOrdersBase();
+            //ValueOrdersBase getValue = new ValueOrdersBase();
             ValueUserBase userBase = new ValueUserBase();
             ValueOrdersBase orders = new ValueOrdersBase();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
@@ -1959,10 +1977,20 @@ namespace OrderManager
             String newStatus = "0";
 
             string machineCurrent = await infoBase.GetMachineFromName(comboBox3.Text);
-            int orderID = getValue.GetOrderID(machineCurrent, number, modification, orderJobItemID);
 
-            string status = getValue.GetOrderStatus(orderID);
-            int counterRepeat = getValue.GetCounterRepeat(orderID);
+            int orderID = -1;
+
+            if (orderJobItemID > 0)
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machineCurrent), number, orderJobItemID);
+            }
+            else
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machineCurrent), number, modification);
+            }
+
+            string status = orders.GetOrderStatus(orderID);
+            int counterRepeat = orders.GetCounterRepeat(orderID);
             int currentOrderID = infoBase.GetCurrentOrderID(machineCurrent);
             int lastOrderID = infoBase.GetLastOrderID(machineCurrent);
 
@@ -2101,7 +2129,6 @@ namespace OrderManager
         private async Task<bool> AbortOrderInProgressToDB()
         {
             ValueInfoBase getInfo = new ValueInfoBase();
-            ValueOrdersBase getValue = new ValueOrdersBase();
             ValueUserBase userBase = new ValueUserBase();
             ValueOrdersBase orders = new ValueOrdersBase();
             GetOrdersFromBase getOrders = new GetOrdersFromBase();
@@ -2116,10 +2143,20 @@ namespace OrderManager
             String newStatus = "0";
 
             string machineCurrent = await getInfo.GetMachineFromName(comboBox3.Text);
-            int orderID = getValue.GetOrderID(machineCurrent, number, modification, orderJobItemID);
 
-            string status = getValue.GetOrderStatus(orderID);
-            int counterRepeat = getValue.GetCounterRepeat(orderID);
+            int orderID = -1;
+
+            if (orderJobItemID > 0)
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machineCurrent), number, orderJobItemID);
+            }
+            else
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machineCurrent), number, modification);
+            }
+
+            string status = orders.GetOrderStatus(orderID);
+            int counterRepeat = orders.GetCounterRepeat(orderID);
             int currentOrderID = getInfo.GetCurrentOrderID(machineCurrent);
             int lastOrderID = getInfo.GetLastOrderID(machineCurrent);
 
@@ -2587,10 +2624,20 @@ namespace OrderManager
         {
             bool exist = false;
 
-            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            ValueOrdersBase orders = new ValueOrdersBase();
 
-            int orderIndex = ordersBase.GetOrderID(machine, number, modification, orderJobItemID);
-            int itemIndex = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == orderIndex);
+            int orderID = -1;
+
+            if (orderJobItemID > 0)
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machine), number, orderJobItemID);
+            }
+            else
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(machine), number, modification);
+            }
+
+            int itemIndex = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == orderID);
 
             if (itemIndex != -1)
             {
@@ -3428,7 +3475,9 @@ namespace OrderManager
                             return;
                         }
 
-                        int orderIndex = orders.GetOrderID(machine, textBox1.Text, textBox5.Text, idManOrderJobItem);
+                        int orderIndex = orders.GetOrderID(Convert.ToInt32(machine), textBox1.Text, idManOrderJobItem);
+
+                        int itemIndex = ordersNumbers.FindIndex(x => x.TypeJob == 0 && x.IDOrder == orderIndex);
 
                         string status = orders.GetOrderStatus(orderIndex);
 
@@ -3523,9 +3572,18 @@ namespace OrderManager
 
             DialogResult result;
 
-            int orderIndex = orders.GetOrderID(await getInfo.GetMachineFromName(comboBox3.Text), textBox1.Text, textBox5.Text, _orderJobItemID);
+            int orderID = -1;
 
-            String status = orders.GetOrderStatus(orderIndex);
+            if (_orderJobItemID > 0)
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(await getInfo.GetMachineFromName(comboBox3.Text)), textBox5.Text, _orderJobItemID);
+            }
+            else
+            {
+                orderID = orders.GetOrderID(Convert.ToInt32(await getInfo.GetMachineFromName(comboBox3.Text)), textBox1.Text, textBox5.Text);
+            }
+
+            String status = orders.GetOrderStatus(orderID);
             //
             if (numericUpDown4.Value < numericUpDown3.Value && numericUpDown4.Value > 0 /*&& status == "3"*/)
             {
