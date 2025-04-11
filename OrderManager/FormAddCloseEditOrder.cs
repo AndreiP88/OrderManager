@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static OrderManager.DataBaseReconnect;
@@ -3317,6 +3318,52 @@ namespace OrderManager
         {
             int typeAccepShifts = -1;
 
+            GetOrderOperations orderOperations = new GetOrderOperations();
+            ValueUserBase userBase = new ValueUserBase();
+            ValueShiftsBase valueShifts = new ValueShiftsBase();
+
+            List<LoadShift> loadShifts = await orderOperations.ShiftListForOrderAsync(idManOrderJobItem);
+            //MessageBox.Show("idManOrderJobItem: " + idManOrderJobItem + ", loadShifts.Count: " + loadShifts.Count);
+            bool therIsAShiftToAdd = false;
+
+            for (int i = 0; i < loadShifts.Count; i++)
+            {
+                int userOMIndex = userBase.GetUserIdFromASystemID(loadShifts[i].UserID);
+                string shiftDate = loadShifts[i].ShiftDate;
+                int shiftNumber = loadShifts[i].ShiftNumber;
+
+                LoadShift shiftsListOM = valueShifts.GetShiftListFromDate(userOMIndex, shiftDate, shiftNumber);
+
+                loadShifts[i].UserIDBaseOM = userOMIndex;
+
+                if (shiftsListOM != null)
+                {
+                    loadShifts[i].IsNewShift = false;
+                    loadShifts[i].IndexOMShift = valueShifts.GetIDFromStartShift(shiftsListOM.ShiftStart);
+                }
+                else
+                {
+                    therIsAShiftToAdd = true;
+                    loadShifts[i].IsNewShift = true;
+                    loadShifts[i].IsLoadShift = true;
+                }
+            }
+
+            if (therIsAShiftToAdd)
+            {
+                FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts, fullViewLoad);
+                form.ShowDialog();
+
+                typeAccepShifts = form.TypeAcceptedOrder;
+            }
+
+            return typeAccepShifts;
+        }
+
+        private async Task<int> LoadOtherShiftsAsyncOLD(int idManOrderJobItem, bool fullViewLoad = false)
+        {
+            int typeAccepShifts = -1;
+
             GetNumberShiftFromTimeStart getNumberShift = new GetNumberShiftFromTimeStart();
             GetOrderOperations orderOperations = new GetOrderOperations();
             ValueUserBase userBase = new ValueUserBase();
@@ -3334,7 +3381,8 @@ namespace OrderManager
 
                 //List<string> shiftsListOM = valueShifts.GetShiftFromDate(userOMIndex, shiftDate);
                 List<LoadShift> shiftsListOM = valueShifts.GetShiftListFromDate(userOMIndex, shiftDate);
-                //MessageBox.Show("userOMIndex: " + userOMIndex + ", shiftDate: " + shiftDate + ", shiftsListOM.Count: " + shiftsListOM.Count);
+                //List<LoadShift> shiftsListOM = valueShifts.GetShiftListFromDate(userOMIndex, shiftDate, shiftNumber);
+                MessageBox.Show("userOMIndex: " + userOMIndex + ", shiftDate: " + shiftDate + ", shiftsListOM.Count: " + shiftsListOM.Count);
                 loadShifts[i].UserIDBaseOM = userOMIndex;
 
                 if (shiftsListOM.Count > 0)
@@ -3342,7 +3390,8 @@ namespace OrderManager
                     for (int j = 0; j < shiftsListOM.Count; j++)
                     {
                         int shiftOMNumber = shiftsListOM[j].ShiftNumber; //getNumberShift.NumberShiftNum(shiftsListOM[j]);
-                        //MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == "+  shiftNumber);
+                        /*MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == " + shiftNumber + "" +
+                            "\nshiftsListOM.Count: " + shiftsListOM.Count + ", IDFromStartShift: " + valueShifts.GetIDFromStartShift(shiftsListOM[j].ShiftStart));*/
                         if (Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") == shiftDate && shiftOMNumber == shiftNumber)
                         {
                             loadShifts[i].IsNewShift = false;
@@ -3350,12 +3399,14 @@ namespace OrderManager
                         }
                         else
                         {
+                            MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == " + shiftNumber + "" +
+                            "\nshiftsListOM.Count: " + shiftsListOM.Count + ", IDFromStartShift: " + valueShifts.GetIDFromStartShift(shiftsListOM[j].ShiftStart));
                             therIsAShiftToAdd = true;
                             loadShifts[i].IsNewShift = true;
                             loadShifts[i].IsLoadShift = true;
                             loadShifts[i].IndexOMShift = -1;
                         }
-                    } 
+                    }
                 }
                 else
                 {

@@ -436,5 +436,43 @@ namespace OrderManager
 
             return startShift;
         }
+        public LoadShift GetShiftListFromDate(int userID, string date, int shiftNumber)
+        {
+            LoadShift startShift = null;
+
+            try
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT shiftNumber, startShift FROM `shifts`
+                                        WHERE str_to_date(startShift, '%d.%m.%Y') = str_to_date(@startDate,  '%d.%m.%Y')
+                                        AND nameUser = @userID
+                                        AND shiftNumber = @shiftNumber"
+                    };
+                    Command.Parameters.AddWithValue("@startDate", date);
+                    Command.Parameters.AddWithValue("@userID", userID);
+                    Command.Parameters.AddWithValue("@shiftNumber", shiftNumber);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        startShift = new LoadShift(userID, (int)sqlReader["shiftNumber"], sqlReader["startShift"].ToString());
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка получения списка смен: " + ex.ToString());
+            }
+
+            return startShift;
+        }
     }
 }
