@@ -1199,7 +1199,7 @@ namespace OrderManager
                 ValueInfoBase infoBase = new ValueInfoBase();
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
-                getShift.CloseShift(Info.shiftIndex, DateTime.Now.ToString());
+                getShift.CloseShift(Info.shiftIndex, DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss"));
                 infoBase.CompleteTheShift(Info.nameOfExecutor);
                 userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "-1");
                 getShift.SetNoteShift(Info.shiftIndex, form.NoteVal);

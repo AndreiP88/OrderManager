@@ -3312,7 +3312,7 @@ namespace OrderManager
                     ValueInfoBase infoBase = new ValueInfoBase();
                     ValueShiftsBase getShift = new ValueShiftsBase();
 
-                    getShift.CloseShift(shiftID, DateTime.Now.ToString());
+                    getShift.CloseShift(shiftID, DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss"));
                     infoBase.CompleteTheShift(userId);
                     userBase.UpdateCurrentShiftStart(userId, "-1");
                     getShift.SetNoteShift(shiftID, form.NoteVal);

@@ -375,7 +375,14 @@ namespace OrderManager
             
             if (order.OrderOperations[0].OrderOperationID == 0)
             {
-                await valueOrders.AddNewOrderInProgressAsync(machineCurrent, shift.UserIDBaseOM, typeJob, shiftID, orderID, makereadyStart, makereadyStop, workStart, workStop, makereadyConsider, makereadyComplete, done, counterRepeat, "");
+                int mkComplete = -1;
+
+                if (makereadyConsider == 1 && makereadyComplete != 0)
+                {
+                    mkComplete = makereadyComplete;
+                }
+
+                await valueOrders.AddNewOrderInProgressAsync(machineCurrent, shift.UserIDBaseOM, typeJob, shiftID, orderID, makereadyStart, makereadyStop, workStart, workStop, makereadyConsider, mkComplete, done, counterRepeat, "");
 
                 valueOrders.SetNewStatus(orderID, newStatus.ToString());
                 //infoBase.UpdateInfo(machineCurrent.ToString(), 0, 0, -1, orderID, false);
@@ -385,7 +392,6 @@ namespace OrderManager
                 if (order.OrderOperations[0].OLDValueMakereadyComplete != -1)
                 {
                     valueOrders.UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyComplete);
-
                 }
 
                 if (order.OrderOperations[0].OLDValueDone != -1)
