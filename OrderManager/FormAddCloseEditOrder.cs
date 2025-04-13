@@ -608,7 +608,7 @@ namespace OrderManager
                 int currentOrderID = getInfo.GetCurrentOrderID(machine.ToString());
 
                 _orderJobItemID = -1;
-                numericUpDown9.Value = _orderJobItemID;
+                this.Text = "Управление заказом (" + _orderJobItemID + ")";
 
                 ClearAllValue();//add ildetime
                 tabControl1.Refresh();
@@ -1428,7 +1428,6 @@ namespace OrderManager
                 numericUpDown8.Enabled = true;
                 textBox2.Enabled = true;
                 textBox5.Enabled = true;
-                numericUpDown9.Enabled = true;
 
                 comboBox4.Enabled = true;
                 idletimeNumericUpDownH.Enabled = true;
@@ -1449,7 +1448,6 @@ namespace OrderManager
                 numericUpDown8.Enabled = false;
                 textBox2.Enabled = false;
                 textBox5.Enabled = false;
-                numericUpDown9.Enabled = false;
 
                 comboBox4.Enabled = false;
                 idletimeNumericUpDownH.Enabled = false;
@@ -2688,7 +2686,6 @@ namespace OrderManager
                                 numericUpDown7.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item1;
                                 numericUpDown8.Value = totalMinToHM.TotalMinutesToHoursAndMinutes(Convert.ToInt32(sqlReader["timeToWork"])).Item2;
                                 _orderJobItemID = Convert.ToInt32(sqlReader["orderJobItemID"]);
-                                numericUpDown9.Value = Convert.ToInt32(sqlReader["orderJobItemID"]);
                                 textBox2.Text = sqlReader["orderStamp"].ToString();
                                 textBox5.Text = sqlReader["modification"].ToString();
                             }
@@ -3144,7 +3141,7 @@ namespace OrderManager
                     items = itemsOrder;
 
                     _orderJobItemID = order.idManOrderJobItem;
-                    numericUpDown9.Value = order.idManOrderJobItem;
+                    this.Text = "Управление заказом (" + _orderJobItemID + ")";
                 }
             }
             else if (order.TypeJob == 1)
@@ -3314,7 +3311,7 @@ namespace OrderManager
             UpdateData("note", orderInProgressID, textBox8.Text);
         }
 
-        private async Task<int> LoadOtherShiftsAsync(int idManOrderJobItem, bool fullViewLoad = false)
+        private async Task<int> LoadOtherShiftsAsync(int idManOrderJobItem, bool fullViewLoad = false, bool alwaysDisplayWorkedShiftsWindow = false)
         {
             int typeAccepShifts = -1;
 
@@ -3323,7 +3320,7 @@ namespace OrderManager
             ValueShiftsBase valueShifts = new ValueShiftsBase();
 
             List<LoadShift> loadShifts = await orderOperations.ShiftListForOrderAsync(idManOrderJobItem);
-            //MessageBox.Show("idManOrderJobItem: " + idManOrderJobItem + ", loadShifts.Count: " + loadShifts.Count);
+
             bool therIsAShiftToAdd = false;
 
             for (int i = 0; i < loadShifts.Count; i++)
@@ -3332,7 +3329,7 @@ namespace OrderManager
                 string shiftDate = loadShifts[i].ShiftDate;
                 int shiftNumber = loadShifts[i].ShiftNumber;
 
-                LoadShift shiftsListOM = valueShifts.GetShiftListFromDate(userOMIndex, shiftDate, shiftNumber);
+                LoadShift shiftsListOM = valueShifts.GetShiftFromDate(userOMIndex, shiftDate, shiftNumber);
 
                 loadShifts[i].UserIDBaseOM = userOMIndex;
 
@@ -3349,7 +3346,7 @@ namespace OrderManager
                 }
             }
 
-            if (therIsAShiftToAdd)
+            if (therIsAShiftToAdd || alwaysDisplayWorkedShiftsWindow)
             {
                 FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts, fullViewLoad);
                 form.ShowDialog();
@@ -3484,7 +3481,6 @@ namespace OrderManager
                         if (_orderJobItemID > 0)
                         {
                             idManOrderJobItem = _orderJobItemID;
-                            //
                         }
                         else
                         {

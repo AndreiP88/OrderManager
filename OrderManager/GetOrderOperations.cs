@@ -27,7 +27,7 @@ namespace OrderManager
                 this.summ = done;
             }
         }
-            public async Task<List<LoadShift>> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
+        public async Task<List<LoadShift>> OperationsForOrder(List<LoadShift> shifts, int loadIdManOrderJobItem = -1)
         {
             List<LoadShift> loadShifts = shifts;
 
@@ -210,6 +210,17 @@ namespace OrderManager
                     {
                         //loadShifts[i].Order[j].IsOrderLoad = await IsNewOrderForSelectedShift(loadShifts[i], loadShifts[i].Order[j]);
                         loadShifts[i].Order[j] = await IsNewOrderForSelectedShift(loadShifts[i], loadShifts[i].Order[j]);
+
+                        loadShifts[i].IsLoadShift = loadShifts[i].Order[j].IsOrderLoad;
+                    }
+
+                    for (int j = 0; j < loadShifts[i].Order.Count; j++)
+                    {
+                        if (loadShifts[i].Order[j].IsOrderLoad)
+                        {
+                            loadShifts[i].IsLoadShift = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -252,13 +263,14 @@ namespace OrderManager
                 if (orderOMIndex == -1)
                 {
                     result.IsOrderLoad = true;
+                    result.OrderOperations[0].OrderOperationID = -1;
                 }
                 else
                 {
                     int shiftOMIndex = shift.IndexOMShift;
 
                     LoadOrderOperations orderOperations = await getOrders.LoadOrdersOperation(shiftOMIndex, orderOMIndex);
-                    //MessageBox.Show(orderOperations.MakereadyComplete + " != " + order.OrderOperations[0].MakereadyComplete + " || " + orderOperations.Done + " != " + order.OrderOperations[0].Done);
+                    
                     if (orderOperations.OrderOperationID != -1)
                     {
                         if (orderOperations.MakereadyComplete != order.OrderOperations[0].MakereadyComplete)
@@ -272,6 +284,12 @@ namespace OrderManager
                             result.OrderOperations[0].OLDValueDone = orderOperations.Done;
                         }
                     }
+                    else
+                    {
+                        result.IsOrderLoad = true;
+                    }
+
+                    result.OrderOperations[0].OrderOperationID = orderOperations.OrderOperationID;
                 }
 
                 result.OrderOMIndex = orderOMIndex;
@@ -280,6 +298,7 @@ namespace OrderManager
             {
                 result.IsOrderLoad = true;
                 result.OrderOMIndex = -1;
+                result.OrderOperations[0].OrderOperationID = -1;
             }
 
             return result;

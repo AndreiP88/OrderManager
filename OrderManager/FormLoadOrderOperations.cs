@@ -66,8 +66,6 @@ namespace OrderManager
 
                 for (int j = 0; j < shift.Order.Count; j++)
                 {
-                    LoadOrder order = shift.Order[j];
-
                     string makereadyCompleteView = ((float)shift.Order[j].OrderOperations[0].MakereadyComplete / 100).ToString("P0");
 
                     if (shift.Order[j].OrderOperations[0].OLDValueMakereadyComplete != -1)
@@ -297,7 +295,6 @@ namespace OrderManager
             int machineCurrent = order.EquipID;
 
             int amount = order.AmountOfOrder;
-            //Сделать подсчет остатка тиража для отслеживания завершения заказа
             string makereadyStart = order.OrderOperations[0].MakereadyStart;
             string makereadyStop = order.OrderOperations[0].MakereadyStop;
             string workStart = order.OrderOperations[0].WorkStart;
@@ -372,12 +369,12 @@ namespace OrderManager
 
                 makereadyConsider = 1;
             }
-            
-            if (order.OrderOperations[0].OrderOperationID == 0)
+
+            if (order.OrderOperations[0].OrderOperationID == -1)
             {
                 int mkComplete = -1;
 
-                if (makereadyConsider == 1 && makereadyComplete != 0)
+                if (makereadyConsider == 1/* && makereadyComplete != 0*/)
                 {
                     mkComplete = makereadyComplete;
                 }
@@ -385,7 +382,6 @@ namespace OrderManager
                 await valueOrders.AddNewOrderInProgressAsync(machineCurrent, shift.UserIDBaseOM, typeJob, shiftID, orderID, makereadyStart, makereadyStop, workStart, workStop, makereadyConsider, mkComplete, done, counterRepeat, "");
 
                 valueOrders.SetNewStatus(orderID, newStatus.ToString());
-                //infoBase.UpdateInfo(machineCurrent.ToString(), 0, 0, -1, orderID, false);
             }
             else
             {
@@ -393,7 +389,7 @@ namespace OrderManager
                 {
                     valueOrders.UpdateData("makereadyComplete", machineCurrent, shiftID, orderID, counterRepeat, makereadyComplete);
                 }
-
+                
                 if (order.OrderOperations[0].OLDValueDone != -1)
                 {
                     valueOrders.UpdateData("done", machineCurrent, shiftID, orderID, counterRepeat, done.ToString());

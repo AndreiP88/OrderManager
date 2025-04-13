@@ -436,7 +436,7 @@ namespace OrderManager
 
             return startShift;
         }
-        public LoadShift GetShiftListFromDate(int userID, string date, int shiftNumber)
+        public LoadShift GetShiftFromDate(int userID, string date, int shiftNumber)
         {
             LoadShift startShift = null;
 
