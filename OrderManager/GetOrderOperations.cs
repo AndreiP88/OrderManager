@@ -722,7 +722,7 @@ namespace OrderManager
 	                                        dbo.common_ul_directory
 	                                        ON 
 		                                        order_head.id_customer = common_ul_directory.id_common_ul_directory
-	                                        INNER JOIN
+	                                        LEFT JOIN
 	                                        dbo.order_detail
 	                                        ON 
 		                                        man_order_job_item.itemid = order_detail.id_order_detail

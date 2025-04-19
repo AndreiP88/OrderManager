@@ -12,14 +12,16 @@ namespace OrderManager
         private List<LoadShift> loadShiftOrders;
 
         private bool viewAllButtons;
+        private bool updateInfo;
 
         private bool _loadShiftList = false;
 
-        public FormLoadOrderOperations(List<LoadShift> loadShift, bool viewAllButtons = false)
+        public FormLoadOrderOperations(List<LoadShift> loadShift, bool updateInfo, bool viewAllButtons = false)
         {
             InitializeComponent();
 
             this.loadShift = loadShift;
+            this.updateInfo = updateInfo;
             this.viewAllButtons = viewAllButtons;
         }
 
@@ -294,6 +296,8 @@ namespace OrderManager
             int orderID = order.OrderOMIndex;
             int machineCurrent = order.EquipID;
 
+            int currentOrderIndex = infoBase.GetCurrentOrderID(machineCurrent.ToString());
+
             int amount = order.AmountOfOrder;
             string makereadyStart = order.OrderOperations[0].MakereadyStart;
             string makereadyStop = order.OrderOperations[0].MakereadyStop;
@@ -354,7 +358,14 @@ namespace OrderManager
                     {
                         if (done > lastAmount)
                         {
-                            newStatus = 4;
+                            if (currentOrderIndex == orderID)
+                            {
+                                newStatus = 3;
+                            }
+                            else
+                            {
+                                newStatus = 4;
+                            }
                         }
                         else
                         {
@@ -396,7 +407,10 @@ namespace OrderManager
                 }
             }
 
-            infoBase.UpdateInfo(machineCurrent.ToString(), 0, 0, -1, orderID, false);
+            if (updateInfo)
+            {
+                infoBase.UpdateInfo(machineCurrent.ToString(), 0, 0, -1, orderID, false);
+            }
         }
 
         private async void FormLoadOrderOperations_LoadAsync(object sender, EventArgs e)

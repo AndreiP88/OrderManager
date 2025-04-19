@@ -130,6 +130,12 @@
     <Compile Include="DBConnection.cs" />
     <Compile Include="DBMySQLUtils.cs" />
     <Compile Include="FileDownloader.cs" />
+    <Compile Include="FormAddShiftsOrOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAddShiftsOrOrder.Designer.cs">
+      <DependentUpon>FormAddShiftsOrOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAddCloseEditOrder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -383,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DayBlank.resx">
       <DependentUpon>DayBlank.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormAddShiftsOrOrder.resx">
+      <DependentUpon>FormAddShiftsOrOrder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormAddCloseEditOrder.resx">
       <DependentUpon>FormAddCloseEditOrder.cs</DependentUpon>

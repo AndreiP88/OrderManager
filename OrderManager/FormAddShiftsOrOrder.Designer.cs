@@ -3,23 +3,7 @@ using System.ComponentModel;
 
 namespace OrderManager
 {
-    public class FormattedNumericUpDown : System.Windows.Forms.NumericUpDown
-    {
-        [Browsable(true)]
-        public string Format { get; set; }
-        public override string Text
-        {
-            get { return base.Text; }
-            set
-            {
-                if (Format != null && Format.Length > 0)
-                    base.Text = base.Value.ToString(Format);
-                else base.Text = base.Value.ToString();
-            }
-        }
-    }
-
-    partial class FormAddCloseEditOrder
+    partial class FormAddShiftsOrOrder
     {
         /// <summary>
         /// Required designer variable.
@@ -102,7 +86,6 @@ namespace OrderManager
             this.button7 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.button8 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.textBox8 = new System.Windows.Forms.TextBox();
@@ -121,7 +104,6 @@ namespace OrderManager
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.button9 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -154,7 +136,7 @@ namespace OrderManager
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(7, 19);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(440, 21);
+            this.comboBox1.Size = new System.Drawing.Size(408, 21);
             this.comboBox1.TabIndex = 0;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
@@ -162,7 +144,7 @@ namespace OrderManager
             // 
             this.textBox1.Location = new System.Drawing.Point(6, 31);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(115, 20);
+            this.textBox1.Size = new System.Drawing.Size(88, 20);
             this.textBox1.TabIndex = 1;
             // 
             // numericUpDown1
@@ -179,7 +161,7 @@ namespace OrderManager
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(116, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(89, 20);
             this.numericUpDown1.TabIndex = 3;
             this.numericUpDown1.ThousandsSeparator = true;
             this.numericUpDown1.Click += new System.EventHandler(this.numericUpDown1_Click);
@@ -188,16 +170,16 @@ namespace OrderManager
             // comboBox2
             // 
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(127, 31);
+            this.comboBox2.Location = new System.Drawing.Point(107, 31);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(391, 21);
+            this.comboBox2.Size = new System.Drawing.Size(324, 21);
             this.comboBox2.TabIndex = 2;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(13, 639);
+            this.button1.Location = new System.Drawing.Point(13, 601);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(120, 43);
+            this.button1.Size = new System.Drawing.Size(105, 43);
             this.button1.TabIndex = 12;
             this.button1.Text = "Подтвердить";
             this.button1.UseVisualStyleBackColor = true;
@@ -205,9 +187,9 @@ namespace OrderManager
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(153, 639);
+            this.button2.Location = new System.Drawing.Point(132, 601);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(120, 43);
+            this.button2.Size = new System.Drawing.Size(105, 43);
             this.button2.TabIndex = 13;
             this.button2.Text = "Завершить";
             this.button2.UseVisualStyleBackColor = true;
@@ -215,9 +197,9 @@ namespace OrderManager
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(295, 639);
+            this.button3.Location = new System.Drawing.Point(250, 601);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(120, 43);
+            this.button3.Size = new System.Drawing.Size(105, 43);
             this.button3.TabIndex = 14;
             this.button3.Text = "Прервать";
             this.button3.UseVisualStyleBackColor = true;
@@ -312,9 +294,9 @@ namespace OrderManager
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(127, 72);
+            this.textBox2.Location = new System.Drawing.Point(107, 72);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(137, 20);
+            this.textBox2.Size = new System.Drawing.Size(77, 20);
             this.textBox2.TabIndex = 4;
             // 
             // dateTimePicker3
@@ -353,7 +335,7 @@ namespace OrderManager
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(124, 18);
+            this.label2.Location = new System.Drawing.Point(104, 18);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 13);
             this.label2.TabIndex = 12;
@@ -371,7 +353,7 @@ namespace OrderManager
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(425, 59);
+            this.label6.Location = new System.Drawing.Point(337, 59);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(43, 13);
             this.label6.TabIndex = 16;
@@ -380,7 +362,7 @@ namespace OrderManager
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(124, 59);
+            this.label7.Location = new System.Drawing.Point(104, 59);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(41, 13);
             this.label7.TabIndex = 17;
@@ -454,14 +436,14 @@ namespace OrderManager
             this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(524, 144);
+            this.groupBox1.Size = new System.Drawing.Size(443, 144);
             this.groupBox1.TabIndex = 32;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Детали заказа";
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(284, 70);
+            this.button5.Location = new System.Drawing.Point(196, 70);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(35, 23);
             this.button5.TabIndex = 22;
@@ -473,7 +455,7 @@ namespace OrderManager
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Nirmala UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(467, 70);
+            this.label9.Location = new System.Drawing.Point(379, 70);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(12, 17);
             this.label9.TabIndex = 21;
@@ -483,7 +465,7 @@ namespace OrderManager
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Nirmala UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(367, 71);
+            this.label8.Location = new System.Drawing.Point(279, 71);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(12, 17);
             this.label8.TabIndex = 20;
@@ -492,7 +474,7 @@ namespace OrderManager
             // numericUpDown8
             // 
             this.numericUpDown8.Format = "00";
-            this.numericUpDown8.Location = new System.Drawing.Point(479, 72);
+            this.numericUpDown8.Location = new System.Drawing.Point(391, 72);
             this.numericUpDown8.Maximum = new decimal(new int[] {
             60,
             0,
@@ -507,7 +489,7 @@ namespace OrderManager
             // numericUpDown7
             // 
             this.numericUpDown7.Format = "000";
-            this.numericUpDown7.Location = new System.Drawing.Point(428, 72);
+            this.numericUpDown7.Location = new System.Drawing.Point(340, 72);
             this.numericUpDown7.Maximum = new decimal(new int[] {
             999,
             0,
@@ -524,7 +506,7 @@ namespace OrderManager
             // numericUpDown6
             // 
             this.numericUpDown6.Format = "00";
-            this.numericUpDown6.Location = new System.Drawing.Point(379, 72);
+            this.numericUpDown6.Location = new System.Drawing.Point(291, 72);
             this.numericUpDown6.Maximum = new decimal(new int[] {
             60,
             0,
@@ -539,7 +521,7 @@ namespace OrderManager
             // numericUpDown5
             // 
             this.numericUpDown5.Format = "000";
-            this.numericUpDown5.Location = new System.Drawing.Point(328, 72);
+            this.numericUpDown5.Location = new System.Drawing.Point(240, 72);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             999,
             0,
@@ -557,13 +539,13 @@ namespace OrderManager
             // 
             this.textBox5.Location = new System.Drawing.Point(5, 112);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(513, 20);
+            this.textBox5.Size = new System.Drawing.Size(425, 20);
             this.textBox5.TabIndex = 9;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(2, 99);
+            this.label3.Location = new System.Drawing.Point(3, 99);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(57, 13);
             this.label3.TabIndex = 11;
@@ -574,7 +556,7 @@ namespace OrderManager
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(329, 57);
+            this.checkBox1.Location = new System.Drawing.Point(241, 57);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(76, 17);
             this.checkBox1.TabIndex = 23;
@@ -587,9 +569,9 @@ namespace OrderManager
             this.groupBox2.Controls.Add(this.dateTimePicker2);
             this.groupBox2.Controls.Add(this.dateTimePicker1);
             this.groupBox2.Controls.Add(this.textBox3);
-            this.groupBox2.Location = new System.Drawing.Point(6, 190);
+            this.groupBox2.Location = new System.Drawing.Point(6, 155);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(170, 101);
+            this.groupBox2.Size = new System.Drawing.Size(128, 101);
             this.groupBox2.TabIndex = 33;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Приладка заказа";
@@ -599,9 +581,9 @@ namespace OrderManager
             this.groupBox3.Controls.Add(this.dateTimePicker3);
             this.groupBox3.Controls.Add(this.dateTimePicker4);
             this.groupBox3.Controls.Add(this.textBox4);
-            this.groupBox3.Location = new System.Drawing.Point(182, 190);
+            this.groupBox3.Location = new System.Drawing.Point(140, 155);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(170, 101);
+            this.groupBox3.Size = new System.Drawing.Size(130, 101);
             this.groupBox3.TabIndex = 34;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Выполнение заказа";
@@ -614,18 +596,18 @@ namespace OrderManager
             this.groupBox4.Controls.Add(this.label16);
             this.groupBox4.Controls.Add(this.label15);
             this.groupBox4.Controls.Add(this.label14);
-            this.groupBox4.Location = new System.Drawing.Point(357, 190);
+            this.groupBox4.Location = new System.Drawing.Point(276, 155);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(170, 101);
+            this.groupBox4.Size = new System.Drawing.Size(173, 101);
             this.groupBox4.TabIndex = 35;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Выработка";
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(437, 639);
+            this.button4.Location = new System.Drawing.Point(368, 601);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(120, 43);
+            this.button4.Size = new System.Drawing.Size(105, 43);
             this.button4.TabIndex = 15;
             this.button4.Text = "Отмена";
             this.button4.UseVisualStyleBackColor = true;
@@ -639,11 +621,11 @@ namespace OrderManager
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.textBox6);
-            this.groupBox5.Location = new System.Drawing.Point(6, 408);
+            this.groupBox5.Location = new System.Drawing.Point(6, 373);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox5.Size = new System.Drawing.Size(524, 67);
+            this.groupBox5.Size = new System.Drawing.Size(442, 67);
             this.groupBox5.TabIndex = 36;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Примечание";
@@ -655,7 +637,7 @@ namespace OrderManager
             this.textBox6.Multiline = true;
             this.textBox6.Name = "textBox6";
             this.textBox6.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox6.Size = new System.Drawing.Size(512, 45);
+            this.textBox6.Size = new System.Drawing.Size(426, 45);
             this.textBox6.TabIndex = 0;
             // 
             // groupBox6
@@ -663,7 +645,7 @@ namespace OrderManager
             this.groupBox6.Controls.Add(this.comboBox3);
             this.groupBox6.Location = new System.Drawing.Point(13, 6);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(544, 49);
+            this.groupBox6.Size = new System.Drawing.Size(460, 49);
             this.groupBox6.TabIndex = 37;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Оборудование";
@@ -674,7 +656,7 @@ namespace OrderManager
             this.comboBox3.FormattingEnabled = true;
             this.comboBox3.Location = new System.Drawing.Point(7, 18);
             this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(527, 21);
+            this.comboBox3.Size = new System.Drawing.Size(445, 21);
             this.comboBox3.TabIndex = 0;
             this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
             // 
@@ -682,9 +664,9 @@ namespace OrderManager
             // 
             this.groupBox7.Controls.Add(this.button6);
             this.groupBox7.Controls.Add(this.listView1);
-            this.groupBox7.Location = new System.Drawing.Point(6, 298);
+            this.groupBox7.Location = new System.Drawing.Point(6, 263);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(524, 105);
+            this.groupBox7.Size = new System.Drawing.Size(442, 105);
             this.groupBox7.TabIndex = 38;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Список позиций заказа";
@@ -692,7 +674,7 @@ namespace OrderManager
             // button6
             // 
             this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button6.Location = new System.Drawing.Point(483, 20);
+            this.button6.Location = new System.Drawing.Point(401, 20);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(35, 79);
             this.button6.TabIndex = 1;
@@ -714,7 +696,7 @@ namespace OrderManager
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.ShowItemToolTips = true;
-            this.listView1.Size = new System.Drawing.Size(461, 79);
+            this.listView1.Size = new System.Drawing.Size(388, 79);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -727,18 +709,18 @@ namespace OrderManager
             // columnHeader2
             // 
             this.columnHeader2.Text = "Количество";
-            this.columnHeader2.Width = 340;
+            this.columnHeader2.Width = 270;
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Width = 75;
+            this.columnHeader3.Width = 70;
             // 
             // button7
             // 
             this.button7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button7.Location = new System.Drawing.Point(495, 17);
+            this.button7.Location = new System.Drawing.Point(421, 18);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(39, 23);
+            this.button7.Size = new System.Drawing.Size(31, 23);
             this.button7.TabIndex = 23;
             this.button7.Text = "+";
             this.button7.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -753,7 +735,7 @@ namespace OrderManager
             this.tabControl1.Location = new System.Drawing.Point(13, 118);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(544, 515);
+            this.tabControl1.Size = new System.Drawing.Size(464, 477);
             this.tabControl1.TabIndex = 39;
             this.tabControl1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabControl1_DrawItem);
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
@@ -762,7 +744,6 @@ namespace OrderManager
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage1.Controls.Add(this.button8);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.groupBox2);
             this.tabPage1.Controls.Add(this.groupBox7);
@@ -773,19 +754,9 @@ namespace OrderManager
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(536, 486);
+            this.tabPage1.Size = new System.Drawing.Size(456, 448);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Заказ";
-            // 
-            // button8
-            // 
-            this.button8.Location = new System.Drawing.Point(6, 157);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(524, 23);
-            this.button8.TabIndex = 39;
-            this.button8.Text = "Обновить список смен для выбранного заказа";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_ClickAsync);
             // 
             // tabPage2
             // 
@@ -797,7 +768,7 @@ namespace OrderManager
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(536, 486);
+            this.tabPage2.Size = new System.Drawing.Size(456, 448);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Простой";
             // 
@@ -983,33 +954,20 @@ namespace OrderManager
             // 
             // groupBox8
             // 
-            this.groupBox8.Controls.Add(this.button9);
             this.groupBox8.Controls.Add(this.comboBox1);
             this.groupBox8.Controls.Add(this.button7);
             this.groupBox8.Location = new System.Drawing.Point(13, 62);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(544, 49);
+            this.groupBox8.Size = new System.Drawing.Size(460, 49);
             this.groupBox8.TabIndex = 40;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Операция";
             // 
-            // button9
-            // 
-            this.button9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button9.Location = new System.Drawing.Point(453, 17);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(36, 23);
-            this.button9.TabIndex = 24;
-            this.button9.Text = "-";
-            this.button9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button9.UseVisualStyleBackColor = false;
-            this.button9.Click += new System.EventHandler(this.button9_ClickAsync);
-            // 
-            // FormAddCloseEditOrder
+            // FormAddShiftsOrOrder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 694);
+            this.ClientSize = new System.Drawing.Size(485, 657);
             this.Controls.Add(this.groupBox8);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox6);
@@ -1020,7 +978,7 @@ namespace OrderManager
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FormAddCloseEditOrder";
+            this.Name = "FormAddShiftsOrOrder";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Управление заказом";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddEditCloseOrder_FormClosing);
@@ -1135,7 +1093,5 @@ namespace OrderManager
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.TextBox textBox8;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button9;
     }
 }

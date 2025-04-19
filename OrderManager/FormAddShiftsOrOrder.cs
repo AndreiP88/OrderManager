@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,7 +11,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OrderManager
 {
-    public partial class FormAddCloseEditOrder : Form
+    public partial class FormAddShiftsOrOrder : Form
     {
         int ShiftID;
         //int OrderID = -1;
@@ -44,7 +43,7 @@ namespace OrderManager
             }
         }
 
-        public FormAddCloseEditOrder(int loadShiftID)
+        public FormAddShiftsOrOrder(int loadShiftID)
         {
             InitializeComponent();
 
@@ -54,7 +53,7 @@ namespace OrderManager
             _editOrder = false;
         }
 
-        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, int activeMachine = -1)
+        public FormAddShiftsOrOrder(int loadShiftID, int orderInProgressID, int activeMachine = -1)
         {
             InitializeComponent();
 
@@ -74,7 +73,7 @@ namespace OrderManager
             }
         }
 
-        public FormAddCloseEditOrder(int loadShiftID, int orderInProgressID, bool adminMode = false, bool adminModeClose = false)
+        public FormAddShiftsOrOrder(int loadShiftID, int orderInProgressID, bool adminMode = false, bool adminModeClose = false)
         {
             InitializeComponent();
 
@@ -608,7 +607,7 @@ namespace OrderManager
                 int machine = await getInfo.GetMachineIDFromName(comboBox3.Text);
                 int currentOrderID = getInfo.GetCurrentOrderID(machine.ToString());
 
-                _orderJobItemID = operation.OrderJobItenID;
+                _orderJobItemID = -1;
                 this.Text = "Управление заказом (" + _orderJobItemID + ")";
 
                 ClearAllValue();//add ildetime
@@ -1437,8 +1436,6 @@ namespace OrderManager
 
                 button5.Enabled = true;
                 button7.Enabled = true;
-
-                button9.Enabled = false;
             }
             else
             {
@@ -1459,8 +1456,6 @@ namespace OrderManager
 
                 button5.Enabled = false;
                 button7.Enabled = false;
-
-                button9.Enabled = true;
             }
 
             if (AdminCloseOrder)
@@ -3316,7 +3311,7 @@ namespace OrderManager
             UpdateData("note", orderInProgressID, textBox8.Text);
         }
 
-        private async Task<int> LoadOtherShiftsAsync(int idManOrderJobItem, bool updateInfo, bool fullViewLoad = false, bool alwaysDisplayWorkedShiftsWindow = false)
+        private async Task<int> LoadOtherShiftsAsync(int idManOrderJobItem, bool fullViewLoad = false, bool alwaysDisplayWorkedShiftsWindow = false)
         {
             int typeAccepShifts = -1;
 
@@ -3353,7 +3348,7 @@ namespace OrderManager
 
             if (therIsAShiftToAdd || alwaysDisplayWorkedShiftsWindow)
             {
-                FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts, updateInfo, fullViewLoad);
+                FormLoadOrderOperations form = new FormLoadOrderOperations(loadShifts, fullViewLoad);
                 form.ShowDialog();
 
                 typeAccepShifts = form.TypeAcceptedOrder;
@@ -3362,7 +3357,7 @@ namespace OrderManager
             return typeAccepShifts;
         }
 
-       /* private async Task<int> LoadOtherShiftsAsyncOLD(int idManOrderJobItem, bool fullViewLoad = false)
+        private async Task<int> LoadOtherShiftsAsyncOLD(int idManOrderJobItem, bool fullViewLoad = false)
         {
             int typeAccepShifts = -1;
 
@@ -3392,8 +3387,8 @@ namespace OrderManager
                     for (int j = 0; j < shiftsListOM.Count; j++)
                     {
                         int shiftOMNumber = shiftsListOM[j].ShiftNumber; //getNumberShift.NumberShiftNum(shiftsListOM[j]);
-                        *//*MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == " + shiftNumber + "" +
-                            "\nshiftsListOM.Count: " + shiftsListOM.Count + ", IDFromStartShift: " + valueShifts.GetIDFromStartShift(shiftsListOM[j].ShiftStart));*//*
+                        /*MessageBox.Show(userOMIndex + ": " + Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") + " == " + shiftDate + " && " + shiftOMNumber + " == " + shiftNumber + "" +
+                            "\nshiftsListOM.Count: " + shiftsListOM.Count + ", IDFromStartShift: " + valueShifts.GetIDFromStartShift(shiftsListOM[j].ShiftStart));*/
                         if (Convert.ToDateTime(shiftsListOM[j].ShiftStart).ToString("dd.MM.yyyy") == shiftDate && shiftOMNumber == shiftNumber)
                         {
                             loadShifts[i].IsNewShift = false;
@@ -3428,7 +3423,7 @@ namespace OrderManager
 
             return typeAccepShifts;
 
-            *//*List<LoadShift> loadShiftOrders = orderOperations.OperationsForOrder(loadShifts);
+            /*List<LoadShift> loadShiftOrders = orderOperations.OperationsForOrder(loadShifts);
 
             for (int i = 0; i < loadShiftOrders.Count; i++)
             {
@@ -3446,8 +3441,8 @@ namespace OrderManager
                         Console.WriteLine();
                     }
                 }
-            }*//*
-        }*/
+            }*/
+        }
 
         private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -3492,7 +3487,7 @@ namespace OrderManager
                             idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
                         }
 
-                        switch (await LoadOtherShiftsAsync(idManOrderJobItem, false, true))
+                        switch (await LoadOtherShiftsAsync(idManOrderJobItem, true))
                         {
                             case -1:
                                 break;
@@ -3889,7 +3884,7 @@ namespace OrderManager
 
             if (fm.NewValue)
             {
-                switch (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem, true))
+                switch (await LoadOtherShiftsAsync(fm.SetValue.idManOrderJobItem))
                 {
                     case -1:
                         SetNewOrder(fm.SetValue, fm.Types);
@@ -3966,60 +3961,6 @@ namespace OrderManager
                 e.DrawFocusRectangle();
 
             e.Graphics.ResetClip();
-        }
-
-        private async void button9_ClickAsync(object sender, EventArgs e)
-        {
-            DialogResult result = DialogResult.No;
-
-            Order operation = ordersNumbers[comboBox1.SelectedIndex];
-
-            result = MessageBox.Show("Вы действительно хотите присвоить заказу: " + operation.numberOfOrder + ": " + comboBox2.Text + " статус 'Завершен'", "Внимание", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                ValueOrdersBase ordersBase = new ValueOrdersBase();
-                ValueInfoBase valueInfoBase = new ValueInfoBase();
-
-                string machine = await valueInfoBase.GetMachineFromName(comboBox3.Text);
-
-                ordersBase.SetNewStatus(operation.IDOrder, "4");
-
-                await ReloadLastOrder(machine);
-            }
-        }
-
-        private async void button8_ClickAsync(object sender, EventArgs e)
-        {
-            int idManOrderJobItem = -1;
-
-            if (_orderJobItemID != -1)
-            {
-                idManOrderJobItem = _orderJobItemID;
-            }
-            else
-            {
-                ValueInfoBase infoBase = new ValueInfoBase();
-                GetValueFromASBase valueFromASBase = new GetValueFromASBase();
-
-                string machine = await infoBase.GetMachineFromName(comboBox3.Text);
-                string orderNumber = textBox1.Text;
-
-                int equipID = Convert.ToInt32(await infoBase.GetIDEquipMachine(machine));
-                //int idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
-                idManOrderJobItem  = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
-                
-            }
-
-            int value = await LoadOtherShiftsAsync(idManOrderJobItem, false, false, true);
-
-            if (value == 3)
-            {
-                ValueInfoBase valueInfoBase = new ValueInfoBase();
-                string machine = await valueInfoBase.GetMachineFromName(comboBox3.Text);
-
-                await ReloadLastOrder(machine);
-            }
         }
     }
 
