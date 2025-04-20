@@ -783,7 +783,7 @@ namespace OrderManager
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(524, 23);
             this.button8.TabIndex = 39;
-            this.button8.Text = "Обновить список смен для выбранного заказа";
+            this.button8.Text = "Обновить список операций для выбранного заказа";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_ClickAsync);
             // 

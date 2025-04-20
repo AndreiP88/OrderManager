@@ -3974,19 +3974,30 @@ namespace OrderManager
 
             Order operation = ordersNumbers[comboBox1.SelectedIndex];
 
-            result = MessageBox.Show("Вы действительно хотите присвоить заказу: " + operation.numberOfOrder + ": " + comboBox2.Text + " статус 'Завершен'", "Внимание", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            ValueOrdersBase ordersBase = new ValueOrdersBase();
+            ValueInfoBase valueInfoBase = new ValueInfoBase();
 
-            if (result == DialogResult.Yes)
+            string machine = await valueInfoBase.GetMachineFromName(comboBox3.Text);
+
+            string machineForCurrentOrder = valueInfoBase.GetMachineFromOrderID(operation.IDOrder);
+
+            if (machineForCurrentOrder == "")
             {
-                ValueOrdersBase ordersBase = new ValueOrdersBase();
-                ValueInfoBase valueInfoBase = new ValueInfoBase();
+                result = MessageBox.Show("Вы действительно хотите присвоить заказу №" + operation.numberOfOrder + ": " + comboBox2.Text + " статус 'Завершен'", "Внимание", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                string machine = await valueInfoBase.GetMachineFromName(comboBox3.Text);
+                if (result == DialogResult.Yes)
+                {
+                    ordersBase.SetNewStatus(operation.IDOrder, "4");
 
-                ordersBase.SetNewStatus(operation.IDOrder, "4");
-
-                await ReloadLastOrder(machine);
+                    await ReloadLastOrder(machine);
+                }
             }
+            else
+            {
+                MessageBox.Show("Заказ №" + operation.numberOfOrder + ": " + comboBox2.Text + " сейчас находится в работе.\n\nНевозможно выполнить данное действие!", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            
         }
 
         private async void button8_ClickAsync(object sender, EventArgs e)
