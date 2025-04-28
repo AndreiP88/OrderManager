@@ -3492,7 +3492,7 @@ namespace OrderManager
                             idManOrderJobItem = await valueFromASBase.GetIdManOrderJobItem(equipID, orderNumber);
                         }
 
-                        switch (await LoadOtherShiftsAsync(idManOrderJobItem, false, true))
+                        switch (await LoadOtherShiftsAsync(idManOrderJobItem, true, true))
                         {
                             case -1:
                                 break;
