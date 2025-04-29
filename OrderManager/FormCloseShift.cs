@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OrderManager
 {
@@ -41,6 +42,7 @@ namespace OrderManager
             }
 
             LoadCheckOvertimeShift(loadStartOfShift);
+            CheckedFullShift(lStartOfShift);
         }
 
         private bool closeShiftVal;
@@ -122,6 +124,31 @@ namespace OrderManager
             checkBox2.Checked = check;
         }
 
+        private void CheckedFullShift(int shiftID)
+        {
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+            string timeStartShift = shiftsBase.GetStartShiftFromID(shiftID);
+
+            if (timeStartShift != null || timeStartShift != "")
+            {
+                DateTime timeStartShiftDT = Convert.ToDateTime(timeStartShift);
+
+                int time = (int)DateTime.Now.Subtract(timeStartShiftDT).TotalMinutes;
+
+                if (time > 660)
+                {
+                    checkBox1.Checked = true;
+                }
+                else
+                {
+                    checkBox1.Checked = false;
+                    dateTimePicker1.Value = Convert.ToDateTime(DateTime.Now.ToString("dd.MM.yyyy") + " 0:00").AddMinutes(time);
+                    //dateTimePicker1.Value.AddMinutes(time);
+                }
+            }
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             ShiftVal = false;
@@ -174,6 +201,16 @@ namespace OrderManager
                 }
             }
             
+            if (checkBox1.Checked)
+            {
+                label2.Visible = false;
+                dateTimePicker1.Visible = false;
+            }
+            else
+            {
+                label2.Visible = true;
+                dateTimePicker1.Visible = true;
+            }
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
