@@ -334,7 +334,7 @@ namespace OrderManager
                     }
                     else
                     {
-                        workTimeShift = timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShiftFromID(shifts[indexes[j]]), shiftsBase.GetStartShiftFromID(shifts[indexes[j]])));
+                        workTimeShift = shiftsBase.GetTimeShift(shifts[indexes[j]]);//timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(shiftsBase.GetStopShiftFromID(shifts[indexes[j]]), shiftsBase.GetStartShiftFromID(shifts[indexes[j]])));
                         countPartialShifts++;
                     }
 

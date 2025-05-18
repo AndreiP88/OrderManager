@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using static OrderManager.Form1;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace OrderManager
 {
@@ -147,11 +148,14 @@ namespace OrderManager
             string machine = ordersCurrentShift[indexOrder].machineOfOrder;
             string status = valueOrders.GetOrderStatus(getOrders.GetOrderID(ordersCurrentShift[indexOrder].id));
 
-            string shiftStart = shiftsBase.GetStartShiftFromID(Info.shiftIndex); //get from Info or user base
+            LoadShift shift = shiftsBase.GetShiftFromID(Info.shiftIndex);
+
+            string shiftStart = shift.ShiftStart; //get from Info or user base
+            int shiftNumber = shift.ShiftNumber;
 
             if (plannedWorkingOut)
             {
-                shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
+                shiftStart = startShift.PlanedStartShift(shiftStart, shiftNumber); //get from method
             }
 
             int workTime = timeOperations.DateDifferenceToMinutes(DateTime.Now.ToString(), shiftStart); //общее время с начала смены
@@ -592,6 +596,23 @@ namespace OrderManager
             }
         }
 
+        private void SetTimeShiftToBase(int id, int timeShift)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE shifts SET timeShift = @timeShift " +
+                    "WHERE id = @id";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@timeShift", timeShift);
+                Command.Parameters.AddWithValue("@id", id);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
         private void AddNewIndexes(int userId, int userIDAsystem)
         {
             using (MySqlConnection Connect = DBConnection.GetDBConnection())
@@ -747,6 +768,62 @@ namespace OrderManager
                     item.Text = sqlReader["id"].ToString();
                     item.SubItems.Add(sqlReader["startShift"].ToString());
                     item.SubItems.Add(shiftNumber.ToString());
+
+                    listView2.Items.Add(item);
+                }
+
+                Connect.Close();
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            GetDateTimeOperations timeOperations = new GetDateTimeOperations();
+
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                Connect.Open();
+                MySqlCommand Command = new MySqlCommand
+                {
+                    Connection = Connect,
+                    CommandText = @"SELECT * FROM shifts"
+                };
+                DbDataReader sqlReader = Command.ExecuteReader();
+
+                while (sqlReader.Read())
+                {
+                    string timeShift = "";
+
+                    string startShift = sqlReader["startShift"].ToString();
+                    string stopShift = sqlReader["stopShift"] == DBNull.Value ? "" : sqlReader["stopShift"].ToString();//sqlReader["stopShift"].ToString();
+
+                    bool fullShift = sqlReader["fullShift"] == DBNull.Value || Convert.ToBoolean(sqlReader["fullShift"]); //Convert.ToBoolean(sqlReader["fullShift"]);
+                    //bool fullShift = sqlReader["fullShift"] == DBNull.Value ? true : Convert.ToBoolean(sqlReader["fullShift"]);
+
+                    if (stopShift != "")
+                    {
+                        if (fullShift)
+                        {
+                            SetTimeShiftToBase((int)sqlReader["id"], 680);
+
+                            timeShift = timeOperations.MinuteToTimeString(680);
+                        }
+                        else
+                        {
+                            SetTimeShiftToBase((int)sqlReader["id"], timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(stopShift, startShift)));
+
+                            timeShift = timeOperations.MinuteToTimeString(timeOperations.totallTimeHHMMToMinutes(timeOperations.DateDifferent(stopShift, startShift)));
+                        }
+                    }
+                        
+
+                    ListViewItem item = new ListViewItem();
+
+                    item.Name = sqlReader["id"].ToString();
+                    item.Text = sqlReader["id"].ToString();
+                    item.SubItems.Add(startShift);
+                    item.SubItems.Add(stopShift);
+                    item.SubItems.Add(timeShift);
 
                     listView2.Items.Add(item);
                 }

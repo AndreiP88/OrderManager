@@ -95,11 +95,14 @@ namespace OrderManager
                 }
             }
 
-            string shiftStart = shiftsBase.GetStartShiftFromID(shiftID); //get from Info or user base
+            LoadShift shift = shiftsBase.GetShiftFromID(shiftID);
+
+            string shiftStart = shift.ShiftStart; //get from Info or user base
+            int shiftNumber = shift.ShiftNumber;
 
             if (plannedWorkingOut)
             {
-                shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
+                shiftStart = startShift.PlanedStartShift(shiftStart, shiftNumber); //get from method
             }
 
             int doneFromPreviewShifts = ordersCurrentShift[indexOrder].amountOfOrder - ordersCurrentShift[indexOrder].lastCount;
@@ -369,7 +372,7 @@ namespace OrderManager
 
 
 
-        public OrderStatusValue GetWorkingOutTimeForSelectedOrderOLD(int indexOrder, bool plannedWorkingOut, int orderRegistrationType, int typeJob = 0)
+        /*public OrderStatusValue GetWorkingOutTimeForSelectedOrderOLD(int indexOrder, bool plannedWorkingOut, int orderRegistrationType, int typeJob = 0)
         {
             GetDateTimeOperations timeOperations = new GetDateTimeOperations();
             ValueOrdersBase valueOrders = new ValueOrdersBase();
@@ -458,7 +461,7 @@ namespace OrderManager
 
             int workTimeDifferent = timeOperations.DateDifferenceToMinutesAndNegative(timeOperations.DateTimeAmountMunutes(timeStartOrder, ordersCurrentShift[indexOrder].workingOut), facticalTimeToWorkStop);
 
-            /*if (facticalTimeMakereadyStop == "" && (status == "3" || status == "4"))
+            *//*if (facticalTimeMakereadyStop == "" && (status == "3" || status == "4"))
             {
                 orderStatus.mkTimeDifferent = 0;
             } 
@@ -467,7 +470,7 @@ namespace OrderManager
                 orderStatus.mkTimeDifferent = mkTimeDifferent;
             }*/
 
-            /*orderStatus.wkTimeDifferent = wkTimeDifferent;*/
+            /*orderStatus.wkTimeDifferent = wkTimeDifferent;*//*
 
             bool print = true;
 
@@ -494,8 +497,8 @@ namespace OrderManager
             }
 
 
-            /*string timeToEndMK = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForMakeready - lastTimeForMK);
-            string timeToEndWork = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForFullWork - fullTimeForWork);*/
+            *//*string timeToEndMK = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForMakeready - lastTimeForMK);
+            string timeToEndWork = timeOperations.DateTimeAmountMunutes(DateTime.Now.ToString(), currentLastTimeForFullWork - fullTimeForWork);*//*
 
             if (status == "1" || status == "2")
             {
@@ -576,10 +579,10 @@ namespace OrderManager
                     orderStatus.mkTimeDifferent = mkTimeDifferent;
                 }
 
-                /*if (facticalTimeToWorkStop != "")
+                *//*if (facticalTimeToWorkStop != "")
                 {
                     orderStatus.wkTimeDifferent = wkTimeDifferent;
-                }*/
+                }*//*
 
                 orderStatus.wkTimeDifferent = wkTimeDifferent;
                 orderStatus.fullTimeDifferent = currentLastTimeForFullWork;
@@ -649,10 +652,10 @@ namespace OrderManager
                     orderStatus.mkTimeDifferent = mkTimeDifferent;
                 }
 
-                /*if (facticalTimeToWorkStop != "")
+                *//*if (facticalTimeToWorkStop != "")
                 {
                     orderStatus.wkTimeDifferent = workTimeDifferent;
-                }*/
+                }*//*
 
                 orderStatus.wkTimeDifferent = workTimeDifferent;
 
@@ -660,6 +663,6 @@ namespace OrderManager
             }
 
             return orderStatus;
-        }
+        }*/
     }
 }

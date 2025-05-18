@@ -71,6 +71,15 @@ namespace OrderManager
             return result;
         }
 
+        public int GetNumberShift()
+        {
+            int result = -1;
+            
+
+
+            return result;
+        }
+
         public string PlanedStartShift(string startTimeShift)
         {
             string result = "PlanedStartShift";
@@ -94,6 +103,36 @@ namespace OrderManager
             }
                 
             if (timeTwo.AddHours(-3) <= dateTime && dateTime <= timeTwo.AddHours(7))
+            {
+                result = timeTwo.ToString();
+            }
+
+            return result;
+        }
+
+        public string PlanedStartShift(string shiftDate, int shiftNumber)
+        {
+            string result = "PlanedStartShift";
+
+            DateTime dateTime = DateTime.Now;
+
+            if (shiftDate != "")
+            {
+                dateTime = Convert.ToDateTime(shiftDate);
+                result = dateTime.ToString();
+            }
+
+            DateTime timeOne = Convert.ToDateTime(dateTime.Day + "." + dateTime.Month + "." + dateTime.Year + " " + "08:00:00");
+            DateTime timeTwo = Convert.ToDateTime(dateTime.Day + "." + dateTime.Month + "." + dateTime.Year + " " + "20:00:00");
+
+            dateTime = dateTime.AddHours(6);
+
+            if (shiftNumber == 1)
+            {
+                result = timeOne.ToString();
+            }
+
+            if (shiftNumber == 2)
             {
                 result = timeTwo.ToString();
             }

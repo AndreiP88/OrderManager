@@ -101,8 +101,13 @@ namespace OrderManager
             {
                 return "";
             }
+        }
 
+        public int GetTimeShift(int shiftID)
+        {
+            List<string> result = new List<string>(GetValue("id", shiftID.ToString(), "timeShift"));
 
+            return Convert.ToInt32(result[result.Count - 1]);
         }
 
         public bool GetCheckFullShift(int shiftID)
@@ -116,7 +121,7 @@ namespace OrderManager
             {
                 result = Convert.ToBoolean(oneVal);
             }
-            
+
             return result;
         }
 
@@ -179,6 +184,23 @@ namespace OrderManager
                 Connect.Close();
             }
         }
+        public void SetTimeShift(int shiftID, int timeShift)
+        {
+            using (MySqlConnection Connect = DBConnection.GetDBConnection())
+            {
+                string commandText = "UPDATE shifts SET timeShift = @timeShift " +
+                    "WHERE id = @id";
+
+                MySqlCommand Command = new MySqlCommand(commandText, Connect);
+                Command.Parameters.AddWithValue("@id", shiftID);
+                Command.Parameters.AddWithValue("@timeShift", timeShift);
+
+                Connect.Open();
+                Command.ExecuteNonQuery();
+                Connect.Close();
+            }
+        }
+
 
         public void SetCheckOvertimeShift(int shiftID, bool check)
         {
@@ -313,7 +335,7 @@ namespace OrderManager
                     while (sqlReader.Read())
                     {
                         int load = Convert.ToInt32(sqlReader["nameUser"]);
-                        
+
                         if (!usersList.Contains(load))
                         {
                             usersList.Add(load);
@@ -323,7 +345,7 @@ namespace OrderManager
                     Connect.Close();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Ошибка получения списка сотрудников: " + ex.ToString());
             }
@@ -469,10 +491,45 @@ namespace OrderManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка получения списка смен: " + ex.ToString());
+                Console.WriteLine("Ошибка получения смены: " + ex.ToString());
             }
 
             return startShift;
         }
+
+        public LoadShift GetShiftFromID(int shiftID)
+        {
+            LoadShift startShift = null;
+
+            try
+            {
+                using (MySqlConnection Connect = DBConnection.GetDBConnection())
+                {
+                    Connect.Open();
+                    MySqlCommand Command = new MySqlCommand
+                    {
+                        Connection = Connect,
+                        CommandText = @"SELECT nameUser, shiftNumber, startShift FROM `shifts`
+                                        WHERE id = @shiftID"
+                    };
+                    Command.Parameters.AddWithValue("@shiftID", shiftID);
+
+                    DbDataReader sqlReader = Command.ExecuteReader();
+
+                    while (sqlReader.Read())
+                    {
+                        startShift = new LoadShift((int)sqlReader["nameUser"], (int)sqlReader["shiftNumber"], sqlReader["startShift"].ToString());
+                    }
+
+                    Connect.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка получения смены по индексу: " + ex.ToString());
+            }
+
+            return startShift;
+        } 
     }
 }

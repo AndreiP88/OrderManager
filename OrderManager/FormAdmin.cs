@@ -1639,11 +1639,14 @@ namespace OrderManager
 
                             GetNumberShiftFromTimeStart startShift = new GetNumberShiftFromTimeStart();
 
-                            string shiftStart = getShifts.GetStartShiftFromID(userBase.GetCurrentShiftStart(users[i])); //get from Info or user base
+                            LoadShift shift = getShifts.GetShiftFromID(userBase.GetCurrentShiftStart(users[i]));
+
+                            string shiftStart = shift.ShiftStart; //get from Info or user base
+                            int shiftNumber = shift.ShiftNumber;
 
                             if (plannedWorkingOut)
                             {
-                                shiftStart = startShift.PlanedStartShift(shiftStart); //get from method
+                                shiftStart = startShift.PlanedStartShift(shiftStart, shiftNumber); //get from method
                             }
 
                             int countWorkingOut = 0;

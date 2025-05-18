@@ -345,6 +345,7 @@ namespace OrderManager
             {
                 ValueShiftsBase getShift = new ValueShiftsBase();
 
+                getShift.SetTimeShift(shiftID, form.TimeShift);
                 getShift.SetNoteShift(shiftID, form.NoteVal);
                 getShift.SetCheckFullShift(shiftID, form.FullShiftVal);
                 getShift.SetCheckOvertimeShift(shiftID, form.OvertimeShiftVal);

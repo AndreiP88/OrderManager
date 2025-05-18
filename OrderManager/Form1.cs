@@ -1202,6 +1202,7 @@ namespace OrderManager
                 getShift.CloseShift(Info.shiftIndex, DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss"));
                 infoBase.CompleteTheShift(Info.nameOfExecutor);
                 userBase.UpdateCurrentShiftStart(Info.nameOfExecutor, "-1");
+                getShift.SetTimeShift(Info.shiftIndex, form.TimeShift);
                 getShift.SetNoteShift(Info.shiftIndex, form.NoteVal);
                 getShift.SetCheckFullShift(Info.shiftIndex, form.FullShiftVal);
                 getShift.SetCheckOvertimeShift(Info.shiftIndex, form.OvertimeShiftVal);

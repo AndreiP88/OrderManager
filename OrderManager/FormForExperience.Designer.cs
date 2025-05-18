@@ -60,6 +60,8 @@
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
+            this.columnHeader16 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // button1
@@ -196,7 +198,8 @@
             this.columnHeader10,
             this.columnHeader11,
             this.columnHeader12,
-            this.columnHeader15});
+            this.columnHeader15,
+            this.columnHeader16});
             this.listView2.FullRowSelect = true;
             this.listView2.GridLines = true;
             this.listView2.HideSelection = false;
@@ -215,15 +218,15 @@
             // columnHeader11
             // 
             this.columnHeader11.Text = "DateTime";
-            this.columnHeader11.Width = 230;
+            this.columnHeader11.Width = 100;
             // 
             // columnHeader12
             // 
-            this.columnHeader12.Width = 145;
+            this.columnHeader12.Width = 100;
             // 
             // columnHeader15
             // 
-            this.columnHeader15.Width = 153;
+            this.columnHeader15.Width = 100;
             // 
             // button4
             // 
@@ -306,11 +309,26 @@
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
+            // button10
+            // 
+            this.button10.Location = new System.Drawing.Point(13, 252);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(208, 23);
+            this.button10.TabIndex = 14;
+            this.button10.Text = "Рабочее время";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // columnHeader16
+            // 
+            this.columnHeader16.Width = 100;
+            // 
             // FormForExperience
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1034, 545);
+            this.Controls.Add(this.button10);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
@@ -366,5 +384,7 @@
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.ColumnHeader columnHeader16;
     }
 }

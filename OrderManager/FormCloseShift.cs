@@ -40,62 +40,20 @@ namespace OrderManager
                 LoadNote(loadStartOfShift);
                 LoadCheckFullShift(loadStartOfShift);                
             }
+            else
+            {
+                CheckedFullShift(lStartOfShift);
+            }
 
             LoadCheckOvertimeShift(loadStartOfShift);
-            CheckedFullShift(lStartOfShift);
+            
         }
 
-        private bool closeShiftVal;
-        public bool ShiftVal
-        {
-            get
-            {
-                return closeShiftVal;
-            }
-            set
-            {
-                closeShiftVal = value;
-            }
-        }
-
-        private String noteShiftVal;
-        public String NoteVal
-        {
-            get
-            {
-                return noteShiftVal;
-            }
-            set
-            {
-                noteShiftVal = value;
-            }
-        }
-
-        private bool fullShift;
-        public bool FullShiftVal
-        {
-            get
-            {
-                return fullShift;
-            }
-            set
-            {
-                fullShift = value;
-            }
-        }
-
-        private bool overtimeShift;
-        public bool OvertimeShiftVal
-        {
-            get
-            {
-                return overtimeShift;
-            }
-            set
-            {
-                overtimeShift = value;
-            }
-        }
+        public bool ShiftVal { get; set; }
+        public String NoteVal { get; set; }
+        public int TimeShift { get; set; }
+        public bool FullShiftVal { get; set; }
+        public bool OvertimeShiftVal { get; set; }
 
         private void LoadNote(int shiftID)
         {
@@ -113,6 +71,8 @@ namespace OrderManager
             bool check = shiftsBase.GetCheckFullShift(shiftID);
 
             checkBox1.Checked = check;
+
+            SetTimeValue(shiftID, check);
         }
 
         private void LoadCheckOvertimeShift(int shiftID)
@@ -126,25 +86,84 @@ namespace OrderManager
 
         private void CheckedFullShift(int shiftID)
         {
-            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            int time = GetShiftTime(shiftID);
 
-            string timeStartShift = shiftsBase.GetStartShiftFromID(shiftID);
-
-            if (timeStartShift != null || timeStartShift != "")
+            if (time > 650)
             {
-                DateTime timeStartShiftDT = Convert.ToDateTime(timeStartShift);
+                checkBox1.Checked = true;
+                dateTimePicker1.Value = Convert.ToDateTime(DateTime.Now.ToString("dd.MM.yyyy") + " 0:00").AddMinutes(680);
+                dateTimePicker1.Enabled = false;
+            }
+            else
+            {
+                checkBox1.Checked = false;
+                dateTimePicker1.Value = Convert.ToDateTime(DateTime.Now.ToString("dd.MM.yyyy") + " 0:00").AddMinutes(time);
+                dateTimePicker1.Enabled = true;
+            }
+        }
 
-                int time = (int)DateTime.Now.Subtract(timeStartShiftDT).TotalMinutes;
+        private void SetTimeValue(int shiftID, bool checkeBoxValue)
+        {
+            int time = GetShiftTime(shiftID);
 
-                if (time > 660)
+            if (checkeBoxValue)
+            {
+                dateTimePicker1.Value = Convert.ToDateTime(DateTime.Now.ToString("dd.MM.yyyy") + " 0:00").AddMinutes(680);
+                dateTimePicker1.Enabled = false;
+            }
+            else
+            {
+                dateTimePicker1.Value = Convert.ToDateTime(DateTime.Now.ToString("dd.MM.yyyy") + " 0:00").AddMinutes(time);
+                dateTimePicker1.Enabled = true;
+            }
+        }
+
+        private int GetShiftTime(int shiftID)
+        {
+            int result = 0;
+
+            ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            GetNumberShiftFromTimeStart shiftFromTimeStart = new GetNumberShiftFromTimeStart();
+
+            LoadShift shift = shiftsBase.GetShiftFromID(shiftID);
+
+            if (shift != null)
+            {
+                if (_edit)
                 {
-                    checkBox1.Checked = true;
+                    result = shiftsBase.GetTimeShift(shiftID);
                 }
                 else
                 {
-                    checkBox1.Checked = false;
-                    dateTimePicker1.Value = Convert.ToDateTime(DateTime.Now.ToString("dd.MM.yyyy") + " 0:00").AddMinutes(time);
-                    //dateTimePicker1.Value.AddMinutes(time);
+                    DateTime timeStartShiftPlaned = Convert.ToDateTime(shiftFromTimeStart.PlanedStartShift(shift.ShiftStart, shift.ShiftNumber));
+
+                    result = (int)DateTime.Now.Subtract(timeStartShiftPlaned).TotalMinutes;
+                }
+            }
+
+            return result;
+        }
+
+        private void ChangeEnabledButton()
+        {
+            if (_edit)
+            {
+                ValueShiftsBase shiftsBase = new ValueShiftsBase();
+
+                bool valueFullShift = shiftsBase.GetCheckFullShift(loadStartOfShift);
+
+                bool valueOvertimeShift = shiftsBase.GetCheckOvertimeShift(loadStartOfShift);
+
+                int timeShiftValue = shiftsBase.GetTimeShift(loadStartOfShift);
+                int time = Convert.ToDateTime(dateTimePicker1.Value).Hour * 60 + Convert.ToDateTime(dateTimePicker1.Value).Minute;
+
+                if (checkBox1.Checked != valueFullShift || checkBox2.Checked != valueOvertimeShift || time != timeShiftValue)
+                {
+                    button1.Enabled = true;
+                }
+                else
+                {
+                    button1.Enabled = false;
                 }
             }
         }
@@ -153,8 +172,9 @@ namespace OrderManager
         {
             ShiftVal = false;
             NoteVal = textBox1.Text;
-            fullShift = checkBox1.Checked;
-            overtimeShift = checkBox2.Checked;
+            TimeShift = Convert.ToDateTime(dateTimePicker1.Value).Hour * 60 + Convert.ToDateTime(dateTimePicker1.Value).Minute;
+            FullShiftVal = checkBox1.Checked;
+            OvertimeShiftVal = checkBox2.Checked;
 
             this.Hide();
         }
@@ -163,8 +183,9 @@ namespace OrderManager
         {
             ShiftVal = true;
             NoteVal = textBox1.Text;
-            fullShift = checkBox1.Checked;
-            overtimeShift = checkBox2.Checked;
+            TimeShift = Convert.ToDateTime(dateTimePicker1.Value).Hour * 60 + Convert.ToDateTime(dateTimePicker1.Value).Minute;
+            FullShiftVal = checkBox1.Checked;
+            OvertimeShiftVal = checkBox2.Checked;
 
             this.Hide();
 
@@ -185,52 +206,18 @@ namespace OrderManager
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (_edit)
-            {
-                ValueShiftsBase shiftsBase = new ValueShiftsBase();
+            ChangeEnabledButton();
 
-                bool value = shiftsBase.GetCheckFullShift(loadStartOfShift);
-
-                if (checkBox1.Checked != value)
-                {
-                    button1.Enabled = true;
-                }
-                else
-                {
-                    button1.Enabled = false;
-                }
-            }
-            
-            if (checkBox1.Checked)
-            {
-                label2.Visible = false;
-                dateTimePicker1.Visible = false;
-            }
-            else
-            {
-                label2.Visible = true;
-                dateTimePicker1.Visible = true;
-            }
+            SetTimeValue(loadStartOfShift, checkBox1.Checked);
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            if (_edit)
-            {
-                ValueShiftsBase shiftsBase = new ValueShiftsBase();
-
-                bool value = shiftsBase.GetCheckOvertimeShift(loadStartOfShift);
-
-                if (checkBox2.Checked != value)
-                {
-                    button1.Enabled = true;
-                }
-                else
-                {
-                    button1.Enabled = false;
-                }
-            }
-                
+           ChangeEnabledButton();
+        }
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            ChangeEnabledButton();
         }
     }
 }
