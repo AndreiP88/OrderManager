@@ -233,8 +233,8 @@ namespace OrderManager
                 MySqlCommand Command = new MySqlCommand
                 {
                     Connection = Connect,
-                    CommandText = @"INSERT INTO shifts (nameUser, shiftNumber, startShift, stopShift, note, fullShift, overtimeShift) 
-                                        SELECT @nameUser, @shiftNumber, @startShift, @stopShift, @note, @fullShift, @overtimeShift 
+                    CommandText = @"INSERT INTO shifts (nameUser, shiftNumber, startShift, stopShift, timeShift, note, fullShift, overtimeShift) 
+                                        SELECT @nameUser, @shiftNumber, @startShift, @stopShift, @timeShift, @note, @fullShift, @overtimeShift 
                                     WHERE 
                                         NOT EXISTS (SELECT nameUser, shiftNumber, startShift FROM shifts WHERE nameUser = @nameUser AND shiftNumber = @shiftNumber AND startShift = @startShift) LIMIT 1; 
                                     SELECT id FROM shifts 
@@ -245,6 +245,7 @@ namespace OrderManager
                 Command.Parameters.AddWithValue("@shiftNumber", shift.ShiftNumber);
                 Command.Parameters.AddWithValue("@startShift", shift.ShiftStart);
                 Command.Parameters.AddWithValue("@stopShift", shift.ShiftEnd);
+                Command.Parameters.AddWithValue("@timeShift", 680);
                 Command.Parameters.AddWithValue("@note", "");
                 Command.Parameters.AddWithValue("@fullShift", "True");
                 Command.Parameters.AddWithValue("@overtimeShift", "False");
