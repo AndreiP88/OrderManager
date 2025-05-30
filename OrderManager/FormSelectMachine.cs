@@ -594,6 +594,10 @@ namespace OrderManager
             {
                 comboBox1.SelectedIndex = shiftNumber - 1;
             }
+            else
+            {
+                comboBox1.SelectedIndex = 0;
+            }
         }
 
         void checkBoxMachine_CheckedChanged(object sender, EventArgs e)
