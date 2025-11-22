@@ -805,7 +805,7 @@ namespace OrderManager
                 }
                 else
                 {
-                    shiftsDetails = getWorkingOut.CalculateDetailWorkingOutAS(UserID, currentDateTime, token);
+                    shiftsDetails = await getWorkingOut.CalculateDetailWorkingOutAS(UserID, currentDateTime, token);
                 }
 
                 if (shiftsDetails != null)

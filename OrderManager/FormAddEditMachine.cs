@@ -32,7 +32,7 @@ namespace OrderManager
         /// </summary>
         /// <param name=""></param>
         /// <param name="userID"></param>
-        public FormAddEditMachine(String machineID)
+        public FormAddEditMachine(string machineID)
         {
             InitializeComponent();
 
@@ -59,10 +59,17 @@ namespace OrderManager
         private void FormAddEditUser_Load(object sender, EventArgs e)
         {
             LoadMainNormOperation();
-
+            //if (machineIDLoad != "empty")
             if (_loadForEdit)
             {
-                LoadForEdit();
+                if (machineIDLoad == "empty")
+                {
+                    Close();
+                }
+                else
+                {
+                    LoadForEdit();
+                }
             }
             else
             {
@@ -79,16 +86,19 @@ namespace OrderManager
             ValueInfoBase getMachine = new ValueInfoBase();
 
             LoadCategoryes();
+            
+            if (machineIDLoad != "empty")
+            {
+                textBox1.Text = await getMachine.GetMachineName(machineIDLoad);
 
-            textBox1.Text = await getMachine.GetMachineName(machineIDLoad);
+                dateTimePicker1.Text = await getMachine.GetMachineStartWork(machineIDLoad);
 
-            dateTimePicker1.Text = await getMachine.GetMachineStartWork(machineIDLoad);
+                textBox4.Text = await getMachine.GetMachineNote(machineIDLoad);
 
-            textBox4.Text = await getMachine.GetMachineNote(machineIDLoad);
+                comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(await getMachine.GetCategoryMachine(machineIDLoad)));
 
-            comboBox1.SelectedIndex = comboBox1.Items.IndexOf(category.GetCategoryName(await getMachine.GetCategoryMachine(machineIDLoad)));
-
-            await SelectMainNormOperationIndexAsync(machineIDLoad);
+                await SelectMainNormOperationIndexAsync(machineIDLoad);
+            }
         }
 
         private async Task SelectMainNormOperationIndexAsync(string machine)

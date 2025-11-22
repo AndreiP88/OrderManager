@@ -238,18 +238,18 @@ namespace OrderManager
             return equipsAS;
         }
 
-        public ShiftsDetails CalculateDetailWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token)
+        public async Task<ShiftsDetails> CalculateDetailWorkingOutAS(int userID, DateTime selectMonth, CancellationToken token)
         {
             ValueUserBase userBase = new ValueUserBase();
 
             List<int> userIndexAS = userBase.GetIndexUserFromASBase(userID);
 
-            ShiftsDetails shiftsDetails = WorkingOutDetailsAS(userIndexAS, selectMonth, token);
+            ShiftsDetails shiftsDetails = await WorkingOutDetailsASAsync(userIndexAS, selectMonth, token);
 
             return shiftsDetails;
         }
 
-        private ShiftsDetails WorkingOutDetailsAS(List<int> userIndexFromAS, DateTime selectMonth, CancellationToken token, List<int> equipListAS = null)
+        private async Task<ShiftsDetails> WorkingOutDetailsASAsync(List<int> userIndexFromAS, DateTime selectMonth, CancellationToken token, List<int> equipListAS = null)
         {
             ShiftsDetails shiftsDetails = null;
 
@@ -269,7 +269,7 @@ namespace OrderManager
 
             try
             {
-                usersList = valueShifts.LoadShiftsForSelectedMonth(usersList, selectMonth, 2);
+                usersList = await valueShifts.LoadShiftsForSelectedMonth(usersList, selectMonth, 2);
             }
             catch (Exception ex)
             {
