@@ -786,12 +786,12 @@ namespace OrderManager
 
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeReady)
                             {
-                                orders[itemIndex].makereadyTime = (int)(Convert.ToDouble(sqlReader["normtime"]) / Convert.ToDouble(sqlReader["plan_out_qty"]));
+                                orders[itemIndex].makereadyTime = (int)(sqlReader["normtime"] == DBNull.Value ? 0 : Convert.ToDouble(sqlReader["normtime"]) / Convert.ToDouble(sqlReader["plan_out_qty"]));
                             }
 
                             if (sqlReader["id_norm_operation"].ToString() == idNormOperationMakeWork)
                             {
-                                orders[itemIndex].workTime = Convert.ToInt32(sqlReader["normtime"]);
+                                orders[itemIndex].workTime = sqlReader["normtime"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["normtime"]);
                                 orders[itemIndex].amountOfOrder = Convert.ToInt32(sqlReader["plan_out_qty"]);
                             }
 
@@ -816,7 +816,7 @@ namespace OrderManager
                                         "",
                                         sqlReader["idletime_name"].ToString(),
                                         0,
-                                        Convert.ToInt32(sqlReader["normtime"]),
+                                        sqlReader["normtime"] == DBNull.Value ? 0 : Convert.ToInt32(sqlReader["normtime"]),
                                         0,
                                         "",
                                         "",
